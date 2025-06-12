@@ -1,0 +1,49 @@
+@use "sass:color";
+@use "../../../colors.scss" as *;
+
+.noUi-handle {
+    width: 16px !important;
+    height: 16px !important;
+    transform: translate(-50%);
+    background: none;
+    border: none;
+    box-shadow: none;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.noUi-handle::after,
+.noUi-handle::before {
+    display: none;
+}
+
+.noUi-target {
+    margin: 10px 0;
+    height: 10px;
+    border: none;
+    background-color: rgba($text, 0.2);
+    box-shadow: unset;
+}
+
+
+  
+.noUi-connect {
+    border: none;
+  background: linear-gradient(
+                  120deg,
+                  color-mix(in srgb, var(--primary-color) 50%, transparent) 25%,
+                  color-mix(in srgb, var(--secondary-color) 50%, transparent) 50%,
+                  color-mix(in srgb, var(--primary-color) 50%, transparent) 75%
+  );
+    background-size: 200% 200%;
+    animation: flowBorder 6s linear infinite;
+}
+
+@keyframes flowBorder {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 200% 200%;
+  }
+}
