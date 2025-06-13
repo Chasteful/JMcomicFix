@@ -185,13 +185,14 @@
     position: absolute;
     min-height: 80px;
     min-width: 400px;
+    border-radius: 14px;
     border: 6px dashed transparent;
     transition: background-color,border-color 0.3s ease;
 
     &:hover {
       background: rgba(204, 204, 204, 0.2);
       border-color: #ccc;
-      border-radius: 14px;
+
 
     }
 

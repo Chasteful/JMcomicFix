@@ -114,8 +114,8 @@
     --secondary-color-rgb: var(--secondary-color-rgb);
   }
   .combined-container {
-    top: 10px;
-    right: 220px;
+    top: 0;
+    right: 0;
     display: flex;
     flex-direction: column;
     gap: 5px;

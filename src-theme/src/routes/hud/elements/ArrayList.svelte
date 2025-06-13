@@ -99,8 +99,8 @@
 
 .arraylist {
     display: flex;
-    top: 10px;
-    right: 10px;
+    top: 0;
+    right: 0;
     flex-direction: column;
     align-items: flex-end;
     position: absolute;

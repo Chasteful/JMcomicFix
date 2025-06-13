@@ -48,7 +48,9 @@
         console.log(`[Router] Redirecting to ${name}`);
         await push(`/${name}`);
     }
-
+    $: if ($locked) {
+        openScreen("lockscreen");
+    }
 
     onMount(async () => {
         await insertPersistentData();
