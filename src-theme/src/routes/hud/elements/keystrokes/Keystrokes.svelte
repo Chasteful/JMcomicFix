@@ -33,7 +33,7 @@
     <Key key={keyLeft} gridArea="b" />
     <Key key={keyBack} gridArea="c" />
     <Key key={keyRight} gridArea="d" />
-    <Key key={keyJump} gridArea="e" />
+    <Key key={keyJump} gridArea="e"  asBar={true} />
 </div>
 
 <style lang="scss">

@@ -221,7 +221,6 @@ if (!isOfflineUUID(uuid)) {
     flex-direction: column;
     align-items: flex-end;
     position: absolute;
-    padding: 20px 15px;
     border: 6px dashed transparent;
     border-radius: 10px;
     overflow: hidden;

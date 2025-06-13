@@ -118,6 +118,8 @@
     right: 0;
     display: flex;
     flex-direction: column;
+    align-items: flex-end;
+    position: absolute;
     gap: 5px;
 
 }

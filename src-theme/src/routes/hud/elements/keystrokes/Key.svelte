@@ -5,6 +5,7 @@
 
   export let gridArea: string;
   export let key: MinecraftKeybind | undefined;
+  export let asBar: boolean = false;
 
   let active = false;
   let actived = false;
@@ -22,9 +23,12 @@ listen("key", (e: KeyEvent) => {
 });
 
 </script>
-
-<div class="key" style="grid-area: {gridArea};" class:active class:actived>
-  {key?.key.localized ?? "???"}
+<div class="key" style="grid-area: {gridArea};" class:active class:actived class:asBar>
+    {#if !asBar}
+        {key?.key.localized ?? "???"}
+    {:else}
+        <div class="bar" />
+    {/if}
 </div>
 
 
@@ -73,8 +77,6 @@ listen("key", (e: KeyEvent) => {
     rgba(20,20, 20, 0.6) 0%,
     rgba(darken($base, 5%), 0.5) 100%
   );
-  backdrop-filter: blur(12px) brightness(1.2);
-  -webkit-backdrop-filter: blur(12px) brightness(1.2);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 
     0 8px 32px rgba(0, 0, 0, 0.28),
@@ -95,9 +97,15 @@ listen("key", (e: KeyEvent) => {
       transform 0.3s cubic-bezier(0.2, 0.8, 0.4, 1.2);
   }
 
-
+  .bar {
+    width: 33%;
+    height: 4px;
+    background-color: currentColor;
+    border-radius: 2px;
+  }
   &:active {
     box-shadow: 0 0 10px rgba($key-color, 0.6) inset;
+
   }
 
   &:hover {
@@ -117,9 +125,9 @@ listen("key", (e: KeyEvent) => {
     content: '';
     position: absolute;
     inset: 0;
-    background: rgba($key-color, 1);
+    background: rgba($key-color, 0.8);
     border-radius: inherit;
-    transform: scale(0.1);
+    border: 1px solid rgba(255, 255, 255, 0.8);
     opacity: 0;
     z-index: 1;
     transform-origin: center;

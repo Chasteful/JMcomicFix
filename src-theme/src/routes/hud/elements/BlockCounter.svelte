@@ -59,6 +59,7 @@
     return c3 * t * t * t - c1 * t * t;
   }
 </script>
+<div class="main-wrapper" class:draggable={count === undefined}>
 {#if count !== undefined}
   <div class="hud"
   in:FadeIn|global={{ duration: 200 }}
@@ -81,9 +82,55 @@
     <div class="count">{count}</div>
     <div class="pointer"></div>
   </div>
+{:else}
+    <div class="empty-placeholder" />
 {/if}
+</div>
 <style lang="scss">
   @use "../../../colors.scss" as *;
+  .main-wrapper {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    border: 6px dashed transparent;
+    border-radius: 10px;
+    min-width: 80px;
+    min-height: 80px;
+    transition: background-color,border-color 0.3s ease;
+    &:hover {
+      background: rgba(204, 204, 204, 0.2);
+      border-color: #ccc;
+
+    }
+
+    .empty-placeholder {
+      display: none;
+    }
+    &.draggable {
+      cursor: move;
+
+      &:hover {
+        border-color: rgba(255, 255, 255, 0.8) !important;
+        background: rgba(204, 204, 204, 0.3);
+      }
+    }
+  }
+  .hud {
+    position: relative;
+    width: 80px;
+    padding: 8px 0;
+    background-color: rgba($base ,0.5);
+    border-radius: 8px;
+    text-align: center;
+    color: #fff;
+    user-select: none;
+    box-shadow:
+            0 4px 16px rgba($base, 0.6),
+            inset 0 0 10px rgba(255, 255, 255, 0.05);
+
+  }
   .item-box {
     display: flex;
     align-items: center;
@@ -108,18 +155,7 @@
     z-index: 1;
     margin-bottom: 4px;
   }
-  .hud {
-    position: relative;
-    width: 80px;
-    padding: 8px 0;
-    background: rgba(20, 20, 20, 0.5);
-    border-radius: 8px;
-    text-align: center;
-    color: #fff;
-    user-select: none;
-    box-shadow:
-      0 0 16px rgba(20,20, 20, 0.6);
-  }
+
   .count {
     font-size: 16px;
     font-weight: bold;
