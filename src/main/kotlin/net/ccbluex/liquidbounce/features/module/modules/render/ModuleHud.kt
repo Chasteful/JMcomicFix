@@ -22,9 +22,9 @@ import net.ccbluex.liquidbounce.config.types.Configurable
 import net.ccbluex.liquidbounce.config.types.Value
 import net.ccbluex.liquidbounce.event.EventManager
 import net.ccbluex.liquidbounce.event.events.ClickGuiValueChangeEvent
-import net.ccbluex.liquidbounce.event.events.DisconnectEvent
 import net.ccbluex.liquidbounce.event.events.ScreenEvent
 import net.ccbluex.liquidbounce.event.events.SpaceSeperatedNamesChangeEvent
+import net.ccbluex.liquidbounce.event.events.VirtualTypeEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.misc.HideAppearance.isDestructed
 import net.ccbluex.liquidbounce.features.misc.HideAppearance.isHidingNow
@@ -50,7 +50,6 @@ import net.minecraft.client.gui.screen.multiplayer.ConnectScreen
  *
  * The client in-game dashboard.
  */
-
 object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = true) {
 
     override val running
@@ -69,13 +68,12 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
     }
     val centeredCrosshair by boolean("CenteredCrosshair", false)
 
-
-    val PrimaryColor by color("Primary", Color4b(	255,140,0,255))
+    val PrimaryColor by color("Primary", Color4b(255,140,0,255))
         .onChanged {
             EventManager.callEvent(ClickGuiValueChangeEvent(ModuleHud))
         }
 
-    val SecondaryColor by color("Secondary", Color4b(	186,85,211, 255))
+    val SecondaryColor by color("Secondary", Color4b(186,85,211, 255))
         .onChanged {
             EventManager.callEvent(ClickGuiValueChangeEvent(ModuleHud))
         }
@@ -84,22 +82,24 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
         .onChanged {
             EventManager.callEvent(ClickGuiValueChangeEvent(ModuleHud))
         }
+
     val isBlurEffectActive
         get() = blur && !(mc.options.hudHidden && mc.currentScreen == null)
+
 
     init {
         tree(Configurable("In-built", value = components as MutableList<Value<*>>))
         tree(Configurable("Custom", value = customComponents as MutableList<Value<*>>))
     }
-
     override fun enable() {
+
+
         if (isHidingNow) {
             chat(markAsError(message("hidingAppearance")))
         }
 
         open()
 
-        // Minimap
         RenderedEntities.subscribe(this)
         ChunkScanner.subscribe(ChunkRenderer.MinimapChunkUpdateSubscriber)
     }
@@ -122,24 +122,28 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
             close()
             return@handler
         }
-
         // Otherwise, open the tab and set its visibility
         val browserTab = open()
         browserTab.visible = event.screen !is DisconnectedScreen && event.screen !is ConnectScreen
     }
 
     @Suppress("unused")
-    private val disconnectHandler = handler<DisconnectEvent> {
-        close()
+    private val virtualScreenHandler = handler<VirtualTypeEvent> { event ->
+        if (event.virtualScreenType == VirtualScreenType.LAYOUT_EDITOR) {
+            close()
+        }
     }
 
+
     private fun open(): ITab {
+
         if (browserTab != null) {
             return browserTab!!
         }
 
         return ThemeManager.openImmediate(VirtualScreenType.HUD, true).also { browserTab = it }
     }
+
 
     private fun close() {
         browserTab?.closeTab()
@@ -150,5 +154,4 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
         close()
         open()
     }
-
 }

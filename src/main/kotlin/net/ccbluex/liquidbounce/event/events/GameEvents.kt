@@ -23,6 +23,7 @@ package net.ccbluex.liquidbounce.event.events
 import com.sun.jna.platform.unix.LibCAPI
 import net.ccbluex.liquidbounce.event.CancellableEvent
 import net.ccbluex.liquidbounce.event.Event
+import net.ccbluex.liquidbounce.integration.VirtualScreenType
 import net.ccbluex.liquidbounce.integration.interop.protocol.event.WebSocketEvent
 import net.ccbluex.liquidbounce.utils.client.Nameable
 import net.ccbluex.liquidbounce.utils.movement.DirectionalInput
@@ -36,7 +37,6 @@ import net.minecraft.client.option.Perspective
 import net.minecraft.client.session.Session
 import net.minecraft.client.util.InputUtil
 import net.minecraft.item.ItemStack
-import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 
 
@@ -126,6 +126,10 @@ class SessionEvent(
 @Nameable("screen")
 class ScreenEvent(
     val screen: Screen?,
+) : CancellableEvent()
+@Nameable("virtualScreen")
+class VirtualTypeEvent(
+    val virtualScreenType: VirtualScreenType?,
 ) : CancellableEvent()
 @Nameable("chatSend")
 @WebSocketEvent

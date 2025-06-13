@@ -19,6 +19,8 @@
  */
 package net.ccbluex.liquidbounce.integration
 
+import net.ccbluex.liquidbounce.event.EventManager
+import net.ccbluex.liquidbounce.event.events.VirtualTypeEvent
 import net.ccbluex.liquidbounce.integration.theme.Theme
 import net.ccbluex.liquidbounce.integration.theme.ThemeManager
 import net.ccbluex.liquidbounce.utils.client.asText
@@ -39,7 +41,9 @@ class VirtualDisplayScreen(
 
     override fun init() {
         IntegrationListener.virtualOpen(theme, screenType)
+        EventManager.callEvent(VirtualTypeEvent(screenType))
     }
+
 
     override fun close() {
         if (parentScreen is VirtualDisplayScreen) {

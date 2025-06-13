@@ -74,6 +74,7 @@ val ALL_EVENT_CLASSES: Array<KClass<out Event>> = arrayOf(
     EntityMarginEvent::class,
     HealthUpdateEvent::class,
     DeathEvent::class,
+    VirtualTypeEvent::class,
     PlayerTickEvent::class,
     PlayerPostTickEvent::class,
     PlayerMovementTickEvent::class,

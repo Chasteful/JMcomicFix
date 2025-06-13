@@ -31,8 +31,10 @@ import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.minecraft.text.*
 import net.minecraft.util.Formatting
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleHud
+import net.ccbluex.liquidbounce.injection.mixins.minecraft.text.MixinMutableTextAccessor
 import java.util.Locale
-
+import net.minecraft.util.Util
+import java.io.File
 // Chat formatting
 
 val clientPrefix: Text
@@ -61,6 +63,11 @@ fun regular(text: String): MutableText = text.asText().formatted(Formatting.GRAY
 fun variable(text: MutableText): MutableText = text.formatted(Formatting.GOLD)
 
 fun variable(text: String): MutableText = text.asText().formatted(Formatting.GOLD)
+
+fun clickablePath(file: File): MutableText =
+    variable(file.absolutePath)
+        .onClick { Util.getOperatingSystem().open(file) }
+        .onHover(HoverEvent(HoverEvent.Action.SHOW_TEXT, "Open".asText()))
 
 fun highlight(text: MutableText): MutableText = text.formatted(Formatting.DARK_PURPLE)
 
@@ -179,15 +186,11 @@ data class MessageMetadata(
     val count: Int = 1
 )
 
-/**
- * Adds a new ChatScreen message.
- */
-fun chat(vararg texts: Text, metadata: MessageMetadata = defaultMessageMetadata) {
-    val literalText = if (metadata.prefix) clientPrefix.copy() else Text.literal("")
-    texts.forEach { literalText.append(it) }
+fun chat(text: Text, metadata: MessageMetadata = defaultMessageMetadata) {
+    val realText = if (metadata.prefix) clientPrefix.copy().append(text) else text
 
     if (mc.player == null) {
-        logger.info("(Chat) ${literalText.convertToString()}")
+        logger.info("(Chat) ${realText.convertToString()}")
         return
     }
 
@@ -197,7 +200,17 @@ fun chat(vararg texts: Text, metadata: MessageMetadata = defaultMessageMetadata)
         chatHud.removeMessage(metadata.id)
     }
 
-    chatHud.addMessage(literalText, metadata.id, metadata.count)
+    chatHud.addMessage(realText, metadata.id, metadata.count)
+}
+
+/**
+ * Adds a new chat message.
+ */
+fun chat(vararg texts: Text, metadata: MessageMetadata = defaultMessageMetadata) {
+    val text: Text = MixinMutableTextAccessor.create(
+        PlainTextContent.EMPTY, texts.asList(), Style.EMPTY
+    )
+    chat(text, metadata)
 }
 
 fun chat(text: Text, module: ClientModule) = chat(text, metadata = MessageMetadata(id = "M${module.name}#info"))

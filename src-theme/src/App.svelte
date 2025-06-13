@@ -19,6 +19,7 @@
     import LockScreen from "./routes/menu/LoginMenu/LockScreen.svelte";
     import ConnectionScreen from "./routes/menu/connected/ConnectionScreen.svelte";
     import ChatHud from "./routes/chat/ChatHud.svelte"
+    import Layouteditor from "./routes/layouteditor/Layouteditor.svelte";
 
     const routes = {
         "/loginmenu":LoginMenu,
@@ -35,6 +36,7 @@
         "/browser": Browser,
         "/connecting":ConnectionScreen,
         "/chat":ChatHud,
+        "/layouteditor":Layouteditor,
     };
 
     const url = window.location.href;

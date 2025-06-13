@@ -62,6 +62,7 @@ enum class VirtualScreenType(
 
     HUD("hud", isInGame = true),
     CLICK_GUI("clickgui"),
+    LAYOUT_EDITOR("layouteditor"),
     ALT_MANAGER("altmanager"),
     PROXY_MANAGER("proxymanager"),
     LOGIN_MENU("loginmenu"),

@@ -4,6 +4,7 @@
   "author": "CCBlueX",
   "supports": [
     "clickgui",
+    "layouteditor",
     "title",
     "proxymanager",
     "multiplayer",
