@@ -3,9 +3,10 @@
     import type {ClientPlayerDataEvent} from "../../../integration/events";
     import type {ClientInfo, PlayerData} from "../../../integration/types";
     import {tweened} from 'svelte/motion';
-    import {cubicOut} from 'svelte/easing';
+    import {cubicOut, expoInOut} from 'svelte/easing';
     import {getClientInfo} from "../../../integration/rest";
     import {onMount} from "svelte";
+    import { fly } from "svelte/transition"
 
     let clientInfo: ClientInfo | null = null;
     let playerData: PlayerData | null = {
@@ -105,7 +106,7 @@
 }
 </style>
 
-<div class="stats-container">
+<div class="stats-container" transition:fly={{duration: 700, x: -50, easing: expoInOut}}>
     {#if clientInfo}
         <div class="stat">
             <span class="label">FPS:&nbsp;</span>

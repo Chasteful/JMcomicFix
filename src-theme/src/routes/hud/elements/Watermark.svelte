@@ -10,8 +10,10 @@
     import { listen } from "../../../integration/ws";
     import {getModules} from "../../../integration/rest";
     import type {ClientPlayerDataEvent} from "../../../integration/events";
-    import { fade } from "svelte/transition";
+    import { fade, fly } from 'svelte/transition';
     import {clientName} from "../../../components/ThemeManager";
+    import {expoInOut} from "svelte/easing";
+
     let clientInfo: ClientInfo | null = null;
     let session: Session | null = null;
     let playerData: PlayerData | null = null;
@@ -71,7 +73,7 @@
     </filter>
 </svg>
 
-<div class="watermark">
+<div class="watermark"  transition:fly|global={{duration: 500, y: -50, easing: expoInOut}}>
     <div class="watermark-content">
         {#if clientInfo}
             <div  class="client client-glow" in:fade>

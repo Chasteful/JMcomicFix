@@ -1,27 +1,24 @@
 <script lang="ts">
-    import {deathCount, kills, playTime, wins} from "../../../components/SessionManager";
+    import {deathCount, kills, wins} from "../../../components/SessionManager";
     import {listen} from "../../../integration/ws.js";
     import type {ClientPlayerDataEvent} from "../../../integration/events";
     import type {PlayerData} from "../../../integration/types";
-
+    import {expoInOut} from "svelte/easing";
+    import { fly } from 'svelte/transition';
     let playerData: PlayerData | null = null;
     let currentMinutes = 0;
     let progressPercentage = 0;
     let strokeDashOffset = 0;
+    $: if (playerData) {
+        currentMinutes = Math.floor(playerData.playTime / 60);
+        const totalSeconds = playerData.playTime;
 
-    $: {
-        currentMinutes = Math.floor($playTime / 60);
-    }
+        const secondsInCurrentMinute = totalSeconds % 60;
 
-    $: {
-        const totalSeconds = $playTime;
-        if (currentMinutes < 60) {
-            progressPercentage = (totalSeconds / 3600) * 100;
-            strokeDashOffset = Math.PI * 2 * 42 * (1 - (totalSeconds % 60) / 60);
-        } else {
-            progressPercentage = (currentMinutes / 60) * 100;
-            strokeDashOffset = Math.PI * 2 * 42 * (1 - (currentMinutes % 60) / 60);
-        }
+        strokeDashOffset = Math.PI * 2 * 42 * (1 - secondsInCurrentMinute / 60);
+
+
+        progressPercentage = (currentMinutes / 60) * 100;
     }
     listen("clientPlayerData", (event: ClientPlayerDataEvent) => {
         playerData = event.playerData;
@@ -31,7 +28,7 @@
 
 </script>
 
-<div class="session-info" style={`--progress: ${progressPercentage}`}>
+<div class="session-info" style={`--progress: ${progressPercentage}`}  transition:fly|global={{duration: 500, y: -50, easing: expoInOut}}>
     <div class="time-circle">
         <div class="time-label">
             {currentMinutes}<br />

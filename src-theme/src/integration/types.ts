@@ -214,6 +214,7 @@ export interface PlayerData {
     experienceProgress: number;
     killsCount:number;
     deathCount:number;
+    playTime:number;
     effects: StatusEffect[];
     mainHandStack: ItemStack;
     offHandStack: ItemStack;

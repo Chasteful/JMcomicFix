@@ -3,10 +3,8 @@ import type { OverlayTitleEvent } from "../integration/events";
 import type {TextComponent as TTextComponent} from "../integration/types";
 import {writable} from "svelte/store";
 
-let playTimeInterval: NodeJS.Timeout | null = null;
 
 export const wins = writable(0);
-export const playTime = writable(0);
 export const kills = writable(0);
 export const deathCount = writable(0);
 
@@ -23,13 +21,7 @@ const winKeywords = [
 ];
 
 
-export function startPlayTimeTimer() {
-    if (playTimeInterval) return; // 避免重复启动
-    playTimeInterval = setInterval(() => {
-        playTime.update(v => v + 1);
-    }, 1000);
-}
-startPlayTimeTimer();
+
 function extractText(component: TTextComponent | string): string  {
     if (!component) return "";
     if (typeof component === "string") return component;

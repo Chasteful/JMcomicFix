@@ -94,6 +94,7 @@ data class PlayerData(
     val killsCount: Int,
     val deathCount: Int,
     val isDead: Boolean,
+    val playTime: Long,
 ) {
 
     companion object {
@@ -130,6 +131,8 @@ data class PlayerData(
             ModuleKillEffects.killsCount,
             deathCount = updateDeathCount(player.isDead),
             player.isDead,
+            PlayTimeTracker.getPlayTime(mc.currentServerEntry?.address ?: "")
+
 
         )
         private fun updateDeathCount(currentIsDead: Boolean): Int {
@@ -257,6 +260,8 @@ data class ScoreboardData(val header: Text, val entries: Array<SidebarEntry?>) {
         return true
     }
 
+
+
     override fun hashCode(): Int {
         var result = header.hashCode()
         result = 31 * result + entries.contentHashCode()
@@ -265,6 +270,34 @@ data class ScoreboardData(val header: Text, val entries: Array<SidebarEntry?>) {
 
 }
 
+object PlayTimeTracker {
+    private val playTimeMap = mutableMapOf<String, Long>()
+    private var lastServer: String? = null
+    private var lastUpdateTime: Long = System.currentTimeMillis()
+    private var leftoverMs: Long = 0
+
+    fun update() {
+        val address = mc.currentServerEntry?.address ?: return
+        val now = System.currentTimeMillis()
+        var deltaMs = now - lastUpdateTime + leftoverMs
+
+        if (deltaMs < 1000) {
+            leftoverMs = deltaMs
+            return
+        }
+
+        val deltaSeconds = deltaMs / 1000
+        leftoverMs = deltaMs % 1000
+
+        playTimeMap[address] = playTimeMap.getOrDefault(address, 0L) + deltaSeconds
+        lastUpdateTime = now
+        lastServer = address
+    }
+
+    fun getPlayTime(server: String): Long {
+        return playTimeMap[server] ?: 0L // 单位：秒
+    }
+}
 /**
  * GSON is not happy with NaN values, so we fix them to be 0.
  */

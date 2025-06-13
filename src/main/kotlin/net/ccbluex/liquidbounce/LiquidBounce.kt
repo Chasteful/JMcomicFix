@@ -56,6 +56,7 @@ import net.ccbluex.liquidbounce.integration.IntegrationListener
 import net.ccbluex.liquidbounce.integration.browser.BrowserManager
 import net.ccbluex.liquidbounce.integration.interop.ClientInteropServer
 import net.ccbluex.liquidbounce.integration.interop.protocol.rest.v1.game.ActiveServerList
+import net.ccbluex.liquidbounce.integration.interop.protocol.rest.v1.game.PlayTimeTracker
 import net.ccbluex.liquidbounce.integration.task.TaskManager
 import net.ccbluex.liquidbounce.integration.task.TaskProgressScreen
 import net.ccbluex.liquidbounce.integration.theme.ThemeManager
@@ -86,6 +87,8 @@ import net.minecraft.resource.ResourceReloader
 import net.minecraft.resource.SynchronousResourceReloader
 import org.apache.logging.log4j.LogManager
 import java.io.File
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import kotlin.time.measureTime
 
 /**
@@ -153,6 +156,14 @@ object LiquidBounce : EventListener {
      *
      * The thread should be the main render thread.
      */
+    private val executor = Executors.newSingleThreadScheduledExecutor()
+
+    init {
+        executor.scheduleAtFixedRate(
+            { PlayTimeTracker.update() },
+            0, 1, TimeUnit.SECONDS
+        )
+    }
     private fun initializeClient() {
         if (isInitialized) {
             return

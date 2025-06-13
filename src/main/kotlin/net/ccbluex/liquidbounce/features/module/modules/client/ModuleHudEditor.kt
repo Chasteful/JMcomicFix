@@ -25,13 +25,7 @@ object ModuleHudEditor :
     override val running = true
 
     @Suppress("UnusedPrivateProperty")
-    private val scale by float("Scale", 1f, 0.5f..2f).onChanged {
-        EventManager.callEvent(ClickGuiScaleChangeEvent(it))
-        EventManager.callEvent(ClickGuiValueChangeEvent(this))
-    }
-
-    @Suppress("UnusedPrivateProperty")
-    private val cache by boolean("Cache", true).onChanged { cache ->
+    private val cache by boolean("Cache", false).onChanged { cache ->
         RenderSystem.recordRenderCall {
             if (cache) {
                 createView()
@@ -143,7 +137,7 @@ object ModuleHudEditor :
     /**
      * An empty screen that acts as hint when to draw the clickgui
      */
-    class ClickScreen : Screen("ClickGUI".asText()) {
+    class ClickScreen : Screen("HUDEditor".asText()) {
 
         override fun close() {
             mc.mouse.lockCursor()
