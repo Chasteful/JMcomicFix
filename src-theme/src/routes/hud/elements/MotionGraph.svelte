@@ -110,12 +110,12 @@
 
 <style>
     .graph-container {
-        position: fixed;
+        display: flex;
+        flex-direction: column;
         left: 50%;
         bottom: var(--yOffset);
         transform: translateX(-50%);
         pointer-events: none;
-        z-index: 1000;
     }
 
     .motion-graph {

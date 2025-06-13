@@ -19,7 +19,7 @@
     import LockScreen from "./routes/menu/LoginMenu/LockScreen.svelte";
     import ConnectionScreen from "./routes/menu/connected/ConnectionScreen.svelte";
     import ChatHud from "./routes/chat/ChatHud.svelte"
-    import Layouteditor from "./routes/layouteditor/Layouteditor.svelte";
+    import HudLayoutEditor from "./routes/layouteditor/HudLayoutEditor.svelte";
 
     const routes = {
         "/loginmenu":LoginMenu,
@@ -36,7 +36,7 @@
         "/browser": Browser,
         "/connecting":ConnectionScreen,
         "/chat":ChatHud,
-        "/layouteditor":Layouteditor,
+        "/layouteditor":HudLayoutEditor,
     };
 
     const url = window.location.href;
@@ -49,9 +49,6 @@
         await push(`/${name}`);
     }
 
-    $: if ($locked) {
-        openScreen("lockscreen");
-    }
 
     onMount(async () => {
         await insertPersistentData();

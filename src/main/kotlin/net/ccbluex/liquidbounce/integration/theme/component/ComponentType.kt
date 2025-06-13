@@ -73,7 +73,7 @@ enum class ComponentType(
         FeatureTweak.DISABLE_HELD_ITEM_TOOL_TIP,
         FeatureTweak.DISABLE_OVERLAY_MESSAGE
     )),
-    STATUS("Status", componentTweaks = arrayOf(
+    STATUS("StatusBar", componentTweaks = arrayOf(
         FeatureTweak.DISABLE_HELD_ITEM_TOOL_TIP,
         FeatureTweak.DISABLE_STATUS_BAR,
         FeatureTweak.DISABLE_OVERLAY_MESSAGE
@@ -103,7 +103,7 @@ enum class ComponentType(
     HJ_HUD("SFZ"),
     BLOCK_COUNTER("BlockCounter"),
     ARMOR_ITEMS("ArmorItems"),
-    INVENTORY("Inventory"),
+    INVENTORY("InventoryContainer"),
     INFORMATION("Information"),
     CRAFTING_INVENTORY("CraftingInput"),
     KEYSTROKES("Keystrokes"),

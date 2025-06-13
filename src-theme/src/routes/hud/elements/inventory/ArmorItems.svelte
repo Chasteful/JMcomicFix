@@ -129,12 +129,16 @@
     {#each [...armorSlots].reverse() as stack (stack)}
       {#if shouldShowSlot(stack)}
         <ArmorItem {stack} />
+      {:else}
+          <div class="empty-slot"></div>
       {/if}
     {/each}
       {#each offHandSlots as stack (stack)}
           {#if shouldShowSlot(stack)}
               <ArmorItem {stack} />
-      {/if}
+          {:else}
+              <div class="empty-slot"></div>
+          {/if}
      {/each}
   </div>
     <div class="totem-counter" class:hidden={$totemCount === 0}>
@@ -149,7 +153,7 @@
       }
       .armoritems-hud   {
       position: relative;
-        min-width: 225px;
+      min-width: 225px;
       background-color: rgba($base ,0.5);
       border-radius: 6px;
       padding: 6px 10px;
@@ -167,6 +171,11 @@
   padding: 4px 6px;
   border-radius: 6px;
 }
+      .empty-slot {
+        width: 32px;
+        height: 32px;
+        opacity: 0;
+      }
       .totem-counter {
         position: absolute;
         bottom: 0;

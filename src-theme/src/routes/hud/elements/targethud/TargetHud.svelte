@@ -302,6 +302,7 @@ onDestroy(() => {
 
 
 </script>
+<div class="targethud-container"  class:draggable={!visible && !target}>
 {#if visible && target}
   <div
     class="targethud"
@@ -384,10 +385,40 @@ onDestroy(() => {
       {/each}
   </div>
 </div>
+{:else}
+    <div class="empty-placeholder" />
 {/if}
+</div>
 
 <style lang="scss">
 @import "../../../../colors.scss";
+.targethud-container{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  position: absolute;
+  min-height: 120px;
+  min-width: 270px;
+  border: 6px dashed transparent;
+  border-radius: 20px;
+  transition: background-color,border-color 0.3s ease;
+  &:hover {
+    background: rgba(204, 204, 204, 0.2);
+    border-color: #ccc;
+  }
+
+  .empty-placeholder {
+    display: none;
+  }
+  &.draggable {
+    cursor: move;
+
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.8) !important;
+      background: rgba(204, 204, 204, 0.3);
+    }
+  }
+}
 .targethud {
   position: relative;
   width: 270px;

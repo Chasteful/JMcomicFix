@@ -239,7 +239,7 @@
       ]
     },
     {
-      "name": "Inventory",
+      "name": "InventoryContainer",
       "value": [
         {
           "name": "Enabled",
@@ -664,7 +664,7 @@
       ]
     },
     {
-      "name": "Status",
+      "name": "StatusBar",
       "value": [
         {
           "name": "Enabled",

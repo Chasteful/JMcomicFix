@@ -162,7 +162,9 @@
     });
     listen("keybindChange", updateKeybinds);
     afterUpdate(() => {
+        if (isAtBottom) {
             container.scrollTop = container.scrollHeight;
+        }
     });
 </script>
 

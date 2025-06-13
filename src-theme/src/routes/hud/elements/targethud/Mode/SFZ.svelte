@@ -150,10 +150,10 @@ if (!isOfflineUUID(uuid)) {
 
   startHideTimeout();
 </script>
-
-{#if visible && target != null}
+<div class="main-wrapper" class:draggable={!visible && !target}>
+{#if visible && target }
     <div class="hj" transition:fly={{ y: -10, duration: 200 }}>
-        <div class="main-wrapper">
+
             <div class="id-card">
                 <div class="content">
                     <div class="info">
@@ -207,20 +207,45 @@ if (!isOfflineUUID(uuid)) {
                 </div>
             </div>
         </div>
-    </div>
-{/if}
 
+{:else}
+    <div class="empty-placeholder" />
+{/if}
+</div>
 <style lang="scss">
   @use "../../../../../colors.scss" as *;
 
   .main-wrapper {
     display: flex;
     justify-content: center;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-end;
+    position: absolute;
     padding: 20px 15px;
+    border: 6px dashed transparent;
+    border-radius: 10px;
     overflow: hidden;
-  }
+    min-width: 450px;
+    min-height: 280px;
+    transition: background-color,border-color 0.3s ease;
+    &:hover {
+      background: rgba(204, 204, 204, 0.2);
+      border-color: #ccc;
 
+    }
+
+    .empty-placeholder {
+      display: none;
+    }
+    &.draggable {
+      cursor: move;
+
+      &:hover {
+        border-color: rgba(255, 255, 255, 0.8) !important;
+        background: rgba(204, 204, 204, 0.3);
+      }
+    }
+  }
   .id-card {
     width: 450px;
     min-height: 280px;

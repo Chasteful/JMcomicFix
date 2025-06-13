@@ -71,16 +71,17 @@
 <style lang="scss">
   @use "../../../colors.scss" as *;
   .stats-container {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: baseline;
+    display: inline-flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: max-content;
     font-family:  'Alibaba', sans-serif;
   }
   .stat {
-      display: flex;
-      align-items: center;
-      gap: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
   }
   .value, .label  {
     font-size: 20px;

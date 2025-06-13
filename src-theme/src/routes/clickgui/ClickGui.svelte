@@ -8,14 +8,12 @@
     import { listen } from "../../integration/ws";
     import Search from './Search.svelte';
     import {ResolutionScaler} from "./ResolutionScaler"
-    import {
-        showResults, showSearch
-    } from "./clickgui_store";
+
     import {
         gridSize,
         showGrid,
         snappingEnabled,
-        scaleFactor,
+        scaleFactor, showSearch,
     } from "./clickgui_store";
     import type {
         ClickGuiValueChangeEvent,
@@ -36,9 +34,7 @@
     let modules: Module[] = [];
     let minecraftScaleFactor = 2;
     let clickGuiScaleFactor = 1;
-    $: {
-        scaleFactor.set(minecraftScaleFactor * clickGuiScaleFactor * resolutionScaler.getScaleFactor());
-    }
+
     const applyValues = (configurable: ConfigurableSetting) => {
 
         clickGuiScaleFactor = configurable.value.find(v => v.name === "Scale")?.value as number ?? 1;

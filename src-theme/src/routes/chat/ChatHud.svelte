@@ -1,4 +1,4 @@
-<!-- ChatScreen.svelte -->
+<!-- ChatScreen.svelte
 <script lang="ts">
     import { onMount} from "svelte";
     import EventForwarder from './elements/ChatEventForwarder.svelte';
@@ -72,4 +72,4 @@
     width: 100vw;
   }
 </style>
-
+-->

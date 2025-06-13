@@ -156,16 +156,20 @@
   }
 
   </script>
-  <div class="notifications">
-      {#each notifications as notification (notification.id)}
-      <div
-        in:notificationFly
-        out:notificationOut
-      >
-          <Notification {...notification} />
-      </div>
+<div class="notifications" class:draggable={notifications.length === 0}>
+    {#each notifications as notification (notification.id)}
+        <div
+                in:notificationFly
+                out:notificationOut
+        >
+            <Notification {...notification} />
+        </div>
+    {:else}
+        <!-- 空状态下的占位元素 -->
+        <div class="empty-placeholder" />
     {/each}
-  </div>
+</div>
+
 <style lang="scss">
   @import "../../../../colors.scss";
   .notifications {
@@ -173,5 +177,36 @@
     transform: translateZ(0);
     backface-visibility: hidden;
     perspective: 1000px;
+    display: flex;
+    bottom: 25px;
+    right: 25px;
+    flex-direction: column;
+    align-items: flex-end;
+    position: absolute;
+    min-height: 80px;
+    min-width: 400px;
+    border: 6px dashed transparent;
+    transition: background-color,border-color 0.3s ease;
+
+    &:hover {
+      background: rgba(204, 204, 204, 0.2);
+      border-color: #ccc;
+      border-radius: 14px;
+
+    }
+
+    .empty-placeholder {
+      display: none;
+    }
+
+
+    &.draggable {
+      cursor: move;
+
+      &:hover {
+        border-color: rgba(255, 255, 255, 0.8) !important;
+        background: rgba(204, 204, 204, 0.3);
+      }
+    }
   }
 </style>

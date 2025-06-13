@@ -143,7 +143,7 @@ updatePlayerData(await getPlayerData());
       );
     }
   }
-  
+
   .slot-wrapper {
     position: relative;
     display: flex;

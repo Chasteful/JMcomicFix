@@ -9,10 +9,10 @@
     import { fly } from "svelte/transition";
     import { emptySlotCount } from "../island/Island";
     let stacks: ItemStack[] = [];
-    
+
     function updateStacks(inventory: PlayerInventory) {
         stacks = inventory.main.slice(9);
-  
+
         const emptySlots = stacks.filter(
   slot => slot.identifier === "air" || slot.identifier === "minecraft:air"
 ).length;
@@ -78,6 +78,7 @@
       display: grid;
       grid-template-columns: repeat(9, 32px);
       gap: 4px;
+      min-height: 104px;
     }
     .line {
       height: 2px;

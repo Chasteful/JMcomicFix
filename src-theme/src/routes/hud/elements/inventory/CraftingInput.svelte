@@ -28,12 +28,17 @@
 <style lang="scss">
   @use "../../../../colors" as *;
   .container {
-    background-color: rgba($hotbar-base-color, 0.5);
+    box-shadow:
+            0 4px 16px rgba($base, 0.6),
+            inset 0 0 10px rgba(255, 255, 255, 0.05);
+    background: rgba($base, 0.5);
     grid-template-columns: repeat(2, 1fr);
     padding: 4px;
-    border-radius: 5px;
+    border-radius: 8px;
+    min-width: 72px;
+    min-height: 72px;
     display: grid;
     gap: 0.5rem;
   }
-  
+
 </style>

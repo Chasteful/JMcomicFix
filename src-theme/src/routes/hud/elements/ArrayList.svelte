@@ -98,9 +98,12 @@
   }
 
 .arraylist {
-    position: fixed;
+    display: flex;
     top: 10px;
     right: 10px;
+    flex-direction: column;
+    align-items: flex-end;
+    position: absolute;
     transform: translateZ(0);
     font-size: 72px;
 
@@ -120,7 +123,6 @@
     padding: 2px 6px;
     width: max-content;
     font-weight: 500;
-    margin-left: auto;
     text-transform: capitalize;
     border-radius:3px;
 

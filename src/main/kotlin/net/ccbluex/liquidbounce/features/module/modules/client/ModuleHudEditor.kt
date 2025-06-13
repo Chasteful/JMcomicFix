@@ -25,7 +25,7 @@ object ModuleHudEditor :
     override val running = true
 
     @Suppress("UnusedPrivateProperty")
-    private val cache by boolean("Cache", false).onChanged { cache ->
+    private val StartEditor by boolean("StartEditor", false).onChanged { cache ->
         RenderSystem.recordRenderCall {
             if (cache) {
                 createView()

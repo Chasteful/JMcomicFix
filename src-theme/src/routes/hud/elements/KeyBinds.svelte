@@ -87,6 +87,7 @@
   @use "../../../colors.scss" as *;
 
   .hud-container {
+    position: absolute;
     background-color: rgba($base , 0.5);
     box-shadow:
             0 4px 16px rgba($base, 0.6),

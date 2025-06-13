@@ -1,4 +1,3 @@
-import {deathCount} from "../components/SessionManager";
 
 export interface Module {
     name: string;

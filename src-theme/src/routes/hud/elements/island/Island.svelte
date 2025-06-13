@@ -556,7 +556,7 @@
 
   }
   .dynamic-island-container {
-    position: fixed;
+    display: flex;
     top: 5px;
     left: 50%;
     transform: translateX(-50%);
