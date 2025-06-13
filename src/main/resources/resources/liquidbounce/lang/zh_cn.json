@@ -489,6 +489,7 @@
   "liquidbounce.module.capeTransfer.description": "自动将你的捐赠者披风转移到当前账号。在 https://liquidbounce.net/donate 捐赠",
   "liquidbounce.module.chestStealer.description": "自动拿走箱子里的物品。",
   "liquidbounce.module.clickGUI.description": "显示一个易于使用的菜单，用于开关或配置模块。",
+  "liquidbounce.module.hudLayoutEditor.description": "显示HUD编辑界面，用于快捷配置HUD布局。",
   "liquidbounce.module.clientSpoofer.description": "将你的游戏客户端标识伪装为另一个。",
   "liquidbounce.module.clip.description": "允许你穿过方块。",
   "liquidbounce.module.clip.messages.whoosh": "嗖嗖！",

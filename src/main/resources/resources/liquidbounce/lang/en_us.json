@@ -488,6 +488,7 @@
   "liquidbounce.module.capeTransfer.description": "Automatically transfers your donator cape to the current account. Donate at liquidbounce.net/donate.",
   "liquidbounce.module.chestStealer.description": "Automatically steals all items from a chest.",
   "liquidbounce.module.clickGUI.description": "Shows you an easy to use menu to toggle and configure modules.",
+  "liquidbounce.module.hudLayoutEditor.description": "The HUD editing interface is displayed for quick configuration of the HUD layout.",
   "liquidbounce.module.clientSpoofer.description": "Spoofs your game client brand to another.",
   "liquidbounce.module.clip.description": "Allows you to clip through blocks.",
   "liquidbounce.module.clip.messages.whoosh": "Whoosh!",

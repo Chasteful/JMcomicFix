@@ -20,7 +20,7 @@ import net.minecraft.client.gui.screen.Screen
 import org.lwjgl.glfw.GLFW
 
 object ModuleHudEditor :
-    ClientModule("HUDLayoutEditor", Category.CLIENT, bind = GLFW.GLFW_KEY_RIGHT_ALT, disableActivation = true) {
+    ClientModule("HudLayoutEditor", Category.CLIENT, bind = GLFW.GLFW_KEY_RIGHT_ALT, disableActivation = true) {
 
     override val running = true
 
