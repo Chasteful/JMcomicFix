@@ -996,10 +996,10 @@ function easeInBack(t: number): number {
     &.enabled {
       .module-name {
         background-clip: text;
-        background: linear-gradient(to right, $liquid 0%, $bounce 100%);
+        background: linear-gradient(to right, var(--primary-color) 0%,  var(--secondary-color) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        text-shadow: 0 0 8px rgba($accent, 0.3);
+        text-shadow: 0 0 8px color-mix(in srgb, var(--secondary-color) 30%, transparent);
       }
 
       .aliases {

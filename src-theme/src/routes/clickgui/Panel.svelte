@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onMount, tick } from "svelte";
+    import { onMount, tick , beforeUpdate } from "svelte";
     import { Tween } from 'svelte/motion';
     import {cubicOut, quintOut} from 'svelte/easing';
     import { get, writable} from 'svelte/store';
@@ -595,11 +595,11 @@
 
       background: linear-gradient(
                       120deg,
-                      color-mix(in srgb, var(--primary-color) 50%, transparent) 25%,
-                      color-mix(in srgb, var(--secondary-color) 50%, transparent) 50%,
-                      color-mix(in srgb, var(--primary-color) 50%, transparent) 75%
+                      color-mix(in srgb, var(--primary-color) 20%, transparent) 25%,
+                      color-mix(in srgb, var(--secondary-color) 20%, transparent) 50%,
+                      color-mix(in srgb, var(--primary-color) 20%, transparent) 75%
       );
-      background-size: 300% 300%;
+      background-size: 200% 200%;
 
       pointer-events: none;
       z-index: 0;

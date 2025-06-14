@@ -122,6 +122,11 @@
       flex-direction: column;
       border-radius: 5px;
       overflow: hidden;
+    min-width: 150px;
+    flex-shrink: 0;
+     box-shadow:
+            0 4px 16px rgba($base, 0.6),
+            inset 0 0 10px rgba(255, 255, 255, 0.05);
   }
 
   .modules {
@@ -129,11 +134,14 @@
     background-color: rgba($base, 0.5);
     margin-left: 6px;
     border-radius: 5px;
-    min-width: 100px;
+    flex-shrink: 0;
+    min-width: 150px;
     display: flex;
     flex-direction: column;
     overflow: auto;
-
+    box-shadow:
+            0 4px 16px rgba($base, 0.6),
+            inset 0 0 10px rgba(255, 255, 255, 0.05);
     &::-webkit-scrollbar {
       width: 0;
     }

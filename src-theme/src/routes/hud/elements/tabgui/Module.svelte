@@ -32,29 +32,30 @@
 </div>
 
 <style lang="scss">
-    @use "../../../../colors.scss" as *;
+  @use "../../../../colors.scss" as *;
 
-    .module {
-        font-weight: 500;
-        color: $overlay0;
-        font-size: 12px;
-        padding: 6px 15px 6px 10px;
-        transition: ease color 0.2s;
+  .module {
+    font-family: "Alibaba", sans-serif;
+    font-weight: 500;
+    color: $text;
+    font-size: 14px;
+    padding: 6px 15px 6px 10px;
+    transition: ease color 0.2s;
 
-        .name {
-            transition: ease transform 0.2s;
-        }
-
-        &.selected {
-            background-color: rgba($base, 0.36);
-
-            .name {
-                transform: translateX(5px);
-            }
-        }
-
-        &.enabled {
-            color: $text;
-        }
+    .name {
+      transition: ease transform 0.2s;
     }
+
+    &.selected {
+      background-color: rgba($base, 0.36);
+    }
+
+    &.enabled .name, &.selected.enabled .name {
+      background-clip: text;
+      background: linear-gradient(to right, var(--primary-color) 0%, var(--secondary-color) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 8px color-mix(in srgb, var(--secondary-color) 30%, transparent);
+    }
+  }
 </style>

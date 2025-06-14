@@ -36,10 +36,17 @@ listen("key", (e: KeyEvent) => {
 @use "../../../../colors.scss" as *;
 @keyframes activeEffect {
   0% {
+    border-radius: 50%;
     transform: scale(0.1);
     opacity: 0.1;
   }
+  10% {
+    border-radius: 50%;
+    transform: scale(0.3);
+    opacity: 0.3;
+  }
   100% {
+    border-radius: inherit;
     transform: scale(1);
     opacity: 0.4;
   }
@@ -47,10 +54,12 @@ listen("key", (e: KeyEvent) => {
 
 @keyframes activedEffect {
   0% {
+    border-radius: inherit;
     transform: scale(1);
     opacity: 0.4;
   }
   100% {
+    border-radius: 50%;
     transform: scale(0.1);
     opacity: 0;
   }
@@ -126,13 +135,13 @@ listen("key", (e: KeyEvent) => {
     position: absolute;
     inset: 0;
     background: rgba($key-color, 0.8);
-    border-radius: inherit;
+    border-radius: 50%;
     border: 1px solid rgba(255, 255, 255, 0.8);
     opacity: 0;
     z-index: 1;
     transform-origin: center;
     pointer-events: none;
-    transform: scale(0.95);
+    transform: scale(0.1);
   }
 
   &.active::after {
@@ -143,5 +152,4 @@ listen("key", (e: KeyEvent) => {
     animation: activedEffect 0.2s ease forwards;
   }
 }
-
 </style>
