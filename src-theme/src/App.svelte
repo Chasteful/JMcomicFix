@@ -7,7 +7,7 @@
     import {onMount} from "svelte";
     import {locked} from "./routes/menu/LoginMenu/locked_store";
     import {insertPersistentData} from "./integration/persistent_storage";
-    import Inventory from "./routes/inventory/Inventory.svelte";
+    import Rat from "./routes/none/rat.svelte";
     import Title from "./routes/menu/title/Title.svelte";
     import Multiplayer from "./routes/menu/multiplayer/Multiplayer.svelte";
     import AltManager from "./routes/menu/altmanager/AltManager.svelte";
@@ -26,7 +26,7 @@
         "/lockscreen":LockScreen,
         "/clickgui": ClickGui,
         "/hud": Hud,
-        "/inventory": Inventory,
+        "/inventory": Rat,
         "/title": Title,
         "/multiplayer": Multiplayer,
         "/altmanager": AltManager,
@@ -36,7 +36,7 @@
         "/browser": Browser,
         "/connecting":ConnectionScreen,
         "/chat":ChatHud,
-        "/layouteditor":HudLayoutEditor,
+        "/layouteditor":Rat,
     };
 
     const url = window.location.href;

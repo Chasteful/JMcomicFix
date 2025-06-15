@@ -31,6 +31,7 @@
         nameProtect = Replacement?.value ?? "";
 
     }
+
     async function CheckShowUsername() {
         const modules = await getModules();
         return modules.some(module => module.name === "NameProtect" && !module.enabled)

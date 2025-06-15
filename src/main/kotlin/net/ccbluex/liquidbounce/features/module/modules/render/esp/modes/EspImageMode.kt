@@ -183,9 +183,8 @@ object EspImageMode : EspMode("Image", requiresTrueSight = true) {
         override val choiceName: String,
         val texture: Identifier
     ) : NamedChoice {
-        XINXIN("Xinxin", "image/xinxin.png".registerAsDynamicImageFromClientResources()),
-        BAIZHIJUN("SuChen", "image/suchen.png".registerAsDynamicImageFromClientResources()),
-        UWUMOUSE("UWU mouse", "image/mouse.png".registerAsDynamicImageFromClientResources()),
-        ALAN34("Alan34", "image/alan.png".registerAsDynamicImageFromClientResources()),
+        XINXIN("Xinxin", "image/esp2D/xinxin.png".registerAsDynamicImageFromClientResources()),
+        BAIZHIJUN("SuChen", "image/esp2D/suchen.png".registerAsDynamicImageFromClientResources()),
+        ALAN34("Alan34", "image/esp2D/alan.png".registerAsDynamicImageFromClientResources()),
     }
 }

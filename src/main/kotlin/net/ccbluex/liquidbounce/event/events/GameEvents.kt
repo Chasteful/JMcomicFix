@@ -224,6 +224,7 @@ data class PlayerEntry(
     val isFriend: Boolean,
     val isStaff: Boolean
 )
+
 @Nameable("overlayChatMessage")
 @WebSocketEvent
 

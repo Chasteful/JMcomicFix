@@ -77,7 +77,7 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
         .onChanged {
             EventManager.callEvent(ClickGuiValueChangeEvent(ModuleHud))
         }
-    val clientName by text("ClientName", "JMcomicFix")
+    val clientName by text("ClientName", "")
         .apply(::tagBy)
         .onChanged {
             EventManager.callEvent(ClickGuiValueChangeEvent(ModuleHud))

@@ -30,6 +30,7 @@ import net.minecraft.client.gui.screen.DisconnectedScreen
 import net.minecraft.client.gui.screen.DownloadingTerrainScreen
 import net.minecraft.client.gui.screen.GameMenuScreen
 import net.minecraft.client.gui.screen.Screen
+import net.minecraft.client.gui.screen.SplashOverlay
 import net.minecraft.client.gui.screen.TitleScreen
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
@@ -137,11 +138,10 @@ enum class VirtualScreenType(
         "connecting",
         recognizer = { it is ConnectScreen },
     ),
-    DOWNLOADINGTERRAIN(
+    DOWNLOADING_TERRAIN(
         "downloadingTerrain",
         recognizer = {it is DownloadingTerrainScreen}
     ),
-
     BROWSER("browser",
         recognizer = { it is BrowserScreen }
     );

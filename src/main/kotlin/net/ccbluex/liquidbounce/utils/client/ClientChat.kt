@@ -35,18 +35,19 @@ import net.ccbluex.liquidbounce.injection.mixins.minecraft.text.MixinMutableText
 import java.util.Locale
 import net.minecraft.util.Util
 import java.io.File
+
+import net.ccbluex.liquidbounce.LiquidBounce
 // Chat formatting
 
 val clientPrefix: Text
     get() = Text.empty()
         .formatted(Formatting.RESET, Formatting.GRAY)
         .append(gradientText(
-            ModuleHud.clientName,
+            ModuleHud.clientName.ifEmpty { LiquidBounce.CLIENT_NAME },
             Color4b.fromHex(ModuleHud.PrimaryColor.toHex()),
             Color4b.fromHex(ModuleHud.SecondaryColor.toHex())
         ))
         .append(Text.literal(" ▸ ").formatted(Formatting.RESET, Formatting.GRAY))
-
 fun Color4b.toHex(): String {
     val argb = this.toARGB()
     val r = (argb shr 16) and 0xFF

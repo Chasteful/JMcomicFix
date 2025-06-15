@@ -31,6 +31,28 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.ItemEntity
 import net.minecraft.entity.projectile.ArrowEntity
 import net.minecraft.util.math.Box
+import net.ccbluex.liquidbounce.event.events.GameTickEvent
+import net.ccbluex.liquidbounce.event.events.OverlayRenderEvent
+import net.ccbluex.liquidbounce.event.events.WorldChangeEvent
+import net.ccbluex.liquidbounce.event.handler
+import net.ccbluex.liquidbounce.render.FontManager
+import net.ccbluex.liquidbounce.render.GUIRenderEnvironment
+import net.ccbluex.liquidbounce.render.engine.font.FontRendererBuffers
+import net.ccbluex.liquidbounce.render.engine.type.Vec3
+import net.ccbluex.liquidbounce.render.renderEnvironmentForGUI
+import net.ccbluex.liquidbounce.utils.client.asText
+import net.ccbluex.liquidbounce.utils.entity.box
+import net.ccbluex.liquidbounce.utils.kotlin.EventPriorityConvention.FIRST_PRIORITY
+import net.ccbluex.liquidbounce.utils.kotlin.forEachWithSelf
+import net.ccbluex.liquidbounce.utils.kotlin.proportionOfValue
+import net.ccbluex.liquidbounce.utils.kotlin.valueAtProportion
+import net.ccbluex.liquidbounce.utils.math.Easing
+import net.ccbluex.liquidbounce.utils.math.average
+import net.ccbluex.liquidbounce.utils.math.sq
+import net.ccbluex.liquidbounce.utils.render.WorldToScreen
+import net.minecraft.client.gui.DrawContext
+import net.minecraft.item.ItemStack
+import net.minecraft.util.math.Vec3d
 
 /**
  * ItemESP module
@@ -42,6 +64,9 @@ object ModuleItemESP : ClientModule("ItemESP", Category.RENDER) {
 
     override val baseKey: String
         get() = "liquidbounce.module.itemEsp"
+    private val shadow by boolean ("Shadow", true)
+    private val shadowColor by color("ShadowColor", Color4b(0,0,0,255))
+    private val textColor by color("TextColor", Color4b(255,255,255,255))
 
     private val modes = choices("Mode", OutlineMode, arrayOf(GlowMode, OutlineMode, BoxMode))
     private val colorMode = choices("ColorMode", 0) {

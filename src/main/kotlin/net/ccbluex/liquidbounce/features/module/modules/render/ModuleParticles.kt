@@ -125,7 +125,7 @@ private enum class ParticleImage(
      * Modified: @sqlerrorthing
      */
     STAR("Star", "particles/star.png".registerAsDynamicImageFromClientResources()),
-
+    SNOWFLAKE("Snowflake","particles/snowflake.png".registerAsDynamicImageFromClientResources()),
     /**
      * Original: https://www.svgrepo.com/svg/487288/dollar?edit=true
      * Modified: @sqlerrorthing
