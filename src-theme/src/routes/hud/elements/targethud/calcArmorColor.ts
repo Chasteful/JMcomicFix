@@ -4,7 +4,7 @@ export type TeamColor =
     '红' | '橙' | '黄' | '绿' |
     '青' | '蓝' | '紫' | '粉' |
     '黑' | '灰' | '白' | '棕' |
-     null;
+    null;
 
 interface ColorRange {
     minHue: number;
@@ -16,18 +16,18 @@ interface ColorRange {
 }
 
 const TEAM_COLOR_RANGES: Record<Exclude<TeamColor, null>, ColorRange> = {
-    红:    { minHue: 0, maxHue: 15 },
-    橙: { minHue: 16, maxHue: 35 },
-    黄: { minHue: 36, maxHue: 60 },
-    绿:  { minHue: 61, maxHue: 150 },
-    青:   { minHue: 151, maxHue: 195 },
-    蓝:   { minHue: 196, maxHue: 255 },
-    紫: { minHue: 256, maxHue: 285 },
-    粉:   { minHue: 286, maxHue: 330 },
-    黑:   { minHue: 0, maxHue: 360, minValue: 0, maxValue: 0.1 },
-    灰:   { minHue: 0, maxHue: 360, minSaturation: 0, maxSaturation: 0.1, minValue: 0.2, maxValue: 0.8 },
-    白:   { minHue: 0, maxHue: 360, minSaturation: 0, minValue: 0.9 },
-    棕:   { minHue: 20, maxHue: 40, minSaturation: 0.5, minValue: 0.2, maxValue: 0.5 },
+    红: {minHue: 0, maxHue: 15},
+    橙: {minHue: 16, maxHue: 35},
+    黄: {minHue: 36, maxHue: 60},
+    绿: {minHue: 61, maxHue: 150},
+    青: {minHue: 151, maxHue: 195},
+    蓝: {minHue: 196, maxHue: 255},
+    紫: {minHue: 256, maxHue: 285},
+    粉: {minHue: 286, maxHue: 330},
+    黑: {minHue: 0, maxHue: 360, minValue: 0, maxValue: 0.1},
+    灰: {minHue: 0, maxHue: 360, minSaturation: 0, maxSaturation: 0.1, minValue: 0.2, maxValue: 0.8},
+    白: {minHue: 0, maxHue: 360, minSaturation: 0, minValue: 0.9},
+    棕: {minHue: 20, maxHue: 40, minSaturation: 0.5, minValue: 0.2, maxValue: 0.5},
 
 };
 
@@ -55,13 +55,13 @@ function rgbToHsv(rgb: number): { h: number; s: number; v: number } {
     const s = max === 0 ? 0 : delta / max;
     const v = max;
 
-    return { h, s, v };
+    return {h, s, v};
 }
 
 export function detectTeamColor(rgb: number | null): TeamColor {
     if (rgb === null) return null;
 
-    const { h, s, v } = rgbToHsv(rgb);
+    const {h, s, v} = rgbToHsv(rgb);
 
     // 检查黑白灰
     if (v < 0.1) return '黑';

@@ -1,13 +1,13 @@
 <script lang="ts">
-    import { onMount, afterUpdate } from 'svelte';
-    import { listen } from '../../../../integration/ws';
+    import {onMount, afterUpdate} from 'svelte';
+    import {listen} from '../../../../integration/ws';
     import TextComponent from '../../../menu/common/TextComponent.svelte';
-    import type { KeyEvent, OverlayChatEvent } from '../../../../integration/events';
-    import { getMinecraftKeybinds } from '../../../../integration/rest';
-    import type { MinecraftKeybind } from '../../../../integration/types';
-    import { fade } from 'svelte/transition';
-    import { tweened } from 'svelte/motion';
-    import { cubicOut } from 'svelte/easing';
+    import type {KeyEvent, OverlayChatEvent} from '../../../../integration/events';
+    import {getMinecraftKeybinds} from '../../../../integration/rest';
+    import type {MinecraftKeybind} from '../../../../integration/types';
+    import {fade} from 'svelte/transition';
+    import {tweened} from 'svelte/motion';
+    import {cubicOut} from 'svelte/easing';
 
     const MAX_MESSAGES = 1000;
     const MAX_DISPLAYED = 50;
@@ -67,6 +67,7 @@
             initialized = true;
         }
     }
+
     function scheduleFade(msg: typeof chatMessages[number]) {
         if (focus || msg.fadeTimeout || fadeQueue.includes(msg)) return;
 
@@ -93,18 +94,19 @@
             }, FADE_DELAY_BETWEEN_BATCHES);
         }, FADE_DURATION);
     }
-       $: if (initialized) {
-            if (focus) {
-                   clearAllFadeTimeouts();
-                   chatMessages.forEach(msg => msg.visible = true);
-                 } else {
 
-                      const windowMsgs = chatMessages
-                         .slice(-MAX_DISPLAYED)
-                     .filter(msg => msg.visible);
-                   windowMsgs.forEach(msg => scheduleFade(msg));
-                 }
-           }
+    $: if (initialized) {
+        if (focus) {
+            clearAllFadeTimeouts();
+            chatMessages.forEach(msg => msg.visible = true);
+        } else {
+
+            const windowMsgs = chatMessages
+                .slice(-MAX_DISPLAYED)
+                .filter(msg => msg.visible);
+            windowMsgs.forEach(msg => scheduleFade(msg));
+        }
+    }
 
     async function updateKeybinds() {
         const binds = await getMinecraftKeybinds();
@@ -119,13 +121,13 @@
     }
 
     function addMessage(event: OverlayChatEvent) {
-        const msg = { ...event, id: nextId++, visible: true } as typeof chatMessages[0];
+        const msg = {...event, id: nextId++, visible: true} as typeof chatMessages[0];
         chatMessages = [...chatMessages, msg].slice(-MAX_MESSAGES);
         maybeScrollToBottomImmediately();
 
         if (initialized && !focus &&
-                       chatMessages.slice(-MAX_DISPLAYED).includes(msg)
-                  ) {
+            chatMessages.slice(-MAX_DISPLAYED).includes(msg)
+        ) {
             scheduleFade(msg);
         }
     }
@@ -178,7 +180,7 @@
     --bg-opacity: 0.5
   "
 >
-    <div class="messages-container" bind:this={container} on:wheel={handleWheel}>
+    <div bind:this={container} class="messages-container" on:wheel={handleWheel}>
         {#each (focus ? chatMessages : chatMessages.slice(-MAX_DISPLAYED)) as msg (msg.id)}
             {#if msg.visible}
                 <div
@@ -201,6 +203,7 @@
 </div>
 <style lang="scss">
   @use '../../../../colors' as *;
+
   .chat-hud {
     position: absolute;
     bottom: 0;
@@ -208,17 +211,16 @@
     width: var(--chat-width);
     max-height: var(--chat-height);
     border-radius: 8px;
-    box-shadow:
-            0 4px 16px rgba($base, 0.6),
-            inset 0 0 10px rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 16px rgba($base, 0.6),
+    inset 0 0 10px rgba(255, 255, 255, 0.05);
     overflow: hidden;
-    transition:
-            background-color 0.3s ease,
-            transform 0.3s ease;
+    transition: background-color 0.3s ease,
+    transform 0.3s ease;
     transform-origin: left bottom;
     pointer-events: auto;
     will-change: transform, max-height;
   }
+
   .chat-hud.hidden {
     pointer-events: none;
     opacity: 0;
@@ -229,12 +231,13 @@
     opacity: 1;
     transition: opacity 0.2s ease;
   }
+
   .chat-hud.focused {
-    transition:  box-shadow 0.3s ease;
-    box-shadow:
-            0 4px 16px color-mix(in srgb, var(--primary-color) 50%, transparent),
-            inset 0 0 10px rgba(255, 255, 255, 0.05);
+    transition: box-shadow 0.3s ease;
+    box-shadow: 0 4px 16px color-mix(in srgb, var(--primary-color) 50%, transparent),
+    inset 0 0 10px rgba(255, 255, 255, 0.05);
   }
+
   .messages-container {
     display: flex;
     flex-direction: column;
@@ -242,11 +245,12 @@
     padding: 8px;
     transition: background-color 0.3s ease;
     max-height: calc(var(--chat-height) - 16px);
-    overflow:hidden;
+    overflow: hidden;
     background-color: rgba($base, var(--bg-opacity));
     transform: scale(var(--chat-scale));
     scroll-behavior: smooth;
   }
+
   .chat-line {
     display: flex;
     gap: 6px;
@@ -256,11 +260,13 @@
     opacity: 1;
     transition: opacity 0.3s ease;
   }
+
   .timestamp {
     color: #aaaaaa;
     font-size: calc(var(--line-height) * 0.8);
     flex-shrink: 0;
   }
+
   .message-content {
     flex: 1;
     white-space: pre-wrap;

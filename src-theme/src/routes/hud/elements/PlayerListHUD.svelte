@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { listen } from "../../../integration/ws";
+    import {listen} from "../../../integration/ws";
     import type {OverlayPlayListEvent, KeyEvent, ClickGuiValueChangeEvent} from "../../../integration/events";
     import TextComponent from "../../menu/common/TextComponent.svelte";
-    import { onMount } from "svelte";
+    import {onMount} from "svelte";
     import {getMinecraftKeybinds, getModuleSettings} from "../../../integration/rest";
     import type {
         ConfigurableSetting,
@@ -11,7 +11,7 @@
 
     } from "../../../integration/types";
     import AvatarView from "../../../components/PlayerView/AvatarView.svelte";
-    import { scale } from "svelte/transition"
+    import {scale} from "svelte/transition"
     import {REST_BASE} from "../../../integration/host";
 
     let keyPlayerList: MinecraftKeybind | undefined;
@@ -34,6 +34,7 @@
             columns = Math.ceil(playerCount / rows);
         }
     }
+
     async function handleKeyDown(event: KeyEvent) {
 
         if (event.key === keyPlayerList?.key.translationKey) {
@@ -86,35 +87,36 @@
                 <!-- Header - only show if HEADER is selected in visibility settings -->
                 {#if OverlayPlayList.header && isVisible("Header")}
                     <div class="tab-header">
-                        <TextComponent fontSize={20} allowPreformatting={true} textComponent={OverlayPlayList.header} />
+                        <TextComponent fontSize={20} allowPreformatting={true} textComponent={OverlayPlayList.header}/>
                     </div>
                 {/if}
 
                 <!-- Player Grid - always visible when tab is open -->
                 <div class="player-grid" style="grid-template-columns: repeat({columns}, minmax(360px, 1fr));">
                     {#each OverlayPlayList.players as player}
-                            <div class="player-entry" class:friend={player.isFriend} class:staff={player.isStaff}>
-                                {#if !isVisible("NameOnly")}
-                                    <div class="avatar">
-                                        <div class="avatar-inner">
-                                            <AvatarView skinUrl={`${REST_BASE}/api/v1/client/resource/skin?uuid=${player.uuid}`} />
-                                        </div>
+                        <div class="player-entry" class:friend={player.isFriend} class:staff={player.isStaff}>
+                            {#if !isVisible("NameOnly")}
+                                <div class="avatar">
+                                    <div class="avatar-inner">
+                                        <AvatarView
+                                                skinUrl={`${REST_BASE}/api/v1/client/resource/skin?uuid=${player.uuid}`}/>
                                     </div>
-                                {/if}
-                                <div class="player-name">
-                                    <TextComponent fontSize={20} allowPreformatting={true} textComponent={player.name} />
                                 </div>
-                                <div class="player-latency">
-                                    <TextComponent fontSize={20} allowPreformatting={true} textComponent={player.latency} />
-                                </div>
+                            {/if}
+                            <div class="player-name">
+                                <TextComponent fontSize={20} allowPreformatting={true} textComponent={player.name}/>
                             </div>
+                            <div class="player-latency">
+                                <TextComponent fontSize={20} allowPreformatting={true} textComponent={player.latency}/>
+                            </div>
+                        </div>
                     {/each}
                 </div>
 
                 <!-- Footer - only show if FOOTER is selected in visibility settings -->
                 {#if OverlayPlayList.footer && isVisible("Footer")}
                     <div class="tab-footer">
-                        <TextComponent fontSize={20} allowPreformatting={true} textComponent={OverlayPlayList.footer} />
+                        <TextComponent fontSize={20} allowPreformatting={true} textComponent={OverlayPlayList.footer}/>
                     </div>
                 {/if}
             </div>
@@ -147,9 +149,8 @@
     border-radius: 8px;
     padding: 8px;
     max-width: 1500px;
-    box-shadow:
-            0 4px 16px rgba($base, 0.6),
-            inset 0 0 10px rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 16px rgba($base, 0.6),
+    inset 0 0 10px rgba(255, 255, 255, 0.05);
   }
 
   .tab-header, .tab-footer {
@@ -213,12 +214,13 @@
     flex-shrink: 0;
     padding-left: 8px;
   }
+
   .player-entry.friend {
     background-color: rgba($blue, 0.3);
     filter: drop-shadow(0 0 4px rgba($blue, 0.6));
   }
 
-  .player-entry.staff  {
+  .player-entry.staff {
     background-color: rgba($red, 0.3);
     filter: drop-shadow(0 0 4px rgba($red, 0.6));
   }

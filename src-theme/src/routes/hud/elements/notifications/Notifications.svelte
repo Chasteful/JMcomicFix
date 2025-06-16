@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { listen } from "../../../../integration/ws";
+    import {listen} from "../../../../integration/ws";
     import Notification from "./Notification.svelte";
-    import type { NotificationEvent } from "../../../../integration/events";
-    import { Howl } from "howler";
-    import { elasticOut } from "svelte/easing";
+    import type {NotificationEvent} from "../../../../integration/events";
+    import {Howl} from "howler";
+    import {elasticOut} from "svelte/easing";
 
 
     interface TNotification {
@@ -16,12 +16,13 @@
         timeoutId?: NodeJS.Timeout;
         leaving?: boolean;
     }
+
     let notifications: TNotification[] = [];
-    const error = new Howl({ src: ['audio/notifications/error.mp3'], preload: true });
-    const info = new Howl({ src: ['audio/notifications/info.mp3'], preload: true });
-    const success = new Howl({ src: ['audio/notifications/success.ogg'], preload: true });
-    const disable = new Howl({ src: ['audio/notifications/disable.ogg'], preload: true , volume: 0.5 });
-    const enable = new Howl({ src: ['audio/notifications/enable.ogg'], preload: true, volume: 0.5 });
+    const error = new Howl({src: ['audio/notifications/error.mp3'], preload: true});
+    const info = new Howl({src: ['audio/notifications/info.mp3'], preload: true});
+    const success = new Howl({src: ['audio/notifications/success.ogg'], preload: true});
+    const disable = new Howl({src: ['audio/notifications/disable.ogg'], preload: true, volume: 0.5});
+    const enable = new Howl({src: ['audio/notifications/enable.ogg'], preload: true, volume: 0.5});
 
 
     function addNotification(title: string, message: string, severity: string) {
@@ -47,14 +48,14 @@
                 const intervalId = setInterval(() => {
                     remaining = +(remaining - 0.1).toFixed(1);
                     notifications = notifications.map(n =>
-                        n.id === id ? { ...n, remaining } : n
+                        n.id === id ? {...n, remaining} : n
                     );
                 }, 100);
 
                 const timeoutId = setTimeout(() => {
                     clearInterval(intervalId);
                     notifications = notifications.map(n =>
-                        n.id === id ? { ...n, leaving: true } : n
+                        n.id === id ? {...n, leaving: true} : n
                     );
                     setTimeout(() => {
                         notifications = notifications.filter(n => n.id !== id);
@@ -81,14 +82,14 @@
         const intervalId = setInterval(() => {
             remaining = +(remaining - 0.1).toFixed(1);
             notifications = notifications.map(n =>
-                n.id === id ? { ...n, remaining } : n
+                n.id === id ? {...n, remaining} : n
             );
         }, 100);
 
         const timeoutId = setTimeout(() => {
             clearInterval(intervalId);
             notifications = notifications.map(n =>
-                n.id === id ? { ...n, leaving: true } : n
+                n.id === id ? {...n, leaving: true} : n
             );
             setTimeout(() => {
                 notifications = notifications.filter(n => n.id !== id);
@@ -110,36 +111,48 @@
     }
 
     listen("notification", (e: NotificationEvent) => {
-      addNotification(e.title, e.message, e.severity);
-      switch (e.severity) {
-          case "ERROR": error.play(); break;
-          case "INFO": info.play(); break;
-          case "SUCCESS": success.play(); break;
-          case "ENABLED": enable.play(); break;
-          case "DISABLED": disable.play();break;
-      }
+        addNotification(e.title, e.message, e.severity);
+        switch (e.severity) {
+            case "ERROR":
+                error.play();
+                break;
+            case "INFO":
+                info.play();
+                break;
+            case "SUCCESS":
+                success.play();
+                break;
+            case "ENABLED":
+                enable.play();
+                break;
+            case "DISABLED":
+                disable.play();
+                break;
+        }
     });
-    function notificationFly(node: Element, { delay = 0, duration = 600 } = {}) {
-      return {
-        delay,
-        duration,
-        easing: elasticOut,
-        css: (t: number, u: number) => `
+
+    function notificationFly(node: Element, {delay = 0, duration = 600} = {}) {
+        return {
+            delay,
+            duration,
+            easing: elasticOut,
+            css: (t: number, u: number) => `
           transform:
             scale(${0.5 + 0.5 * t * t})
             translateY(${Math.sin(u * Math.PI) * 30}px)
             rotate(${(1 - t) * 8}deg);
           opacity: ${t * t};
         `
-      };
+        };
     }
-    function notificationOut(node: Element, { delay = 0, duration = 300 } = {}) {
-    return {
-      delay,
-      duration,
-      css: (t: number) => {
-               const eased = easeInBack(1 - t);
-        return `
+
+    function notificationOut(node: Element, {delay = 0, duration = 300} = {}) {
+        return {
+            delay,
+            duration,
+            css: (t: number) => {
+                const eased = easeInBack(1 - t);
+                return `
           transform:
             translateY(${eased * 100}px)
             scale(${1 - eased * 0.5});
@@ -147,31 +160,34 @@
           transition-timing-function: cubic-bezier(0.68, -0.55, 0.27, 1.55);
           transform-origin: top center;
         `;
-      }
-    };
-  }
-   function easeInBack(t: number): number {
-    const c1 = 1.5;    const c3 = c1 + 1;
-    return c3 * t * t * t - c1 * t * t;
-  }
+            }
+        };
+    }
 
-  </script>
+    function easeInBack(t: number): number {
+        const c1 = 1.5;
+        const c3 = c1 + 1;
+        return c3 * t * t * t - c1 * t * t;
+    }
+
+</script>
 <div class="notifications" class:draggable={notifications.length === 0}>
     {#each notifications as notification (notification.id)}
         <div
                 in:notificationFly
                 out:notificationOut
         >
-            <Notification {...notification} />
+            <Notification {...notification}/>
         </div>
     {:else}
         <!-- 空状态下的占位元素 -->
-        <div class="empty-placeholder" />
+        <div class="empty-placeholder"/>
     {/each}
 </div>
 
 <style lang="scss">
   @import "../../../../colors.scss";
+
   .notifications {
     will-change: transform, opacity;
     transform: translateZ(0);
@@ -187,7 +203,7 @@
     min-width: 400px;
     border-radius: 14px;
     border: 6px dashed transparent;
-    transition: background-color,border-color 0.3s ease;
+    transition: background-color, border-color 0.3s ease;
 
     &:hover {
       background: rgba(204, 204, 204, 0.2);

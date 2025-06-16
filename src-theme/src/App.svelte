@@ -18,8 +18,6 @@
     import LoginMenu from "./routes/menu/LoginMenu/LoginMenu.svelte";
     import LockScreen from "./routes/menu/LoginMenu/LockScreen.svelte";
     import ConnectionScreen from "./routes/menu/connected/ConnectionScreen.svelte";
-    import ChatHud from "./routes/chat/ChatHud.svelte"
-    import HudLayoutEditor from "./routes/layouteditor/HudLayoutEditor.svelte";
 
     const routes = {
         "/loginmenu":LoginMenu,
@@ -27,6 +25,7 @@
         "/clickgui": ClickGui,
         "/hud": Hud,
         "/inventory": Rat,
+        "/chat":Rat,
         "/title": Title,
         "/multiplayer": Multiplayer,
         "/altmanager": AltManager,
@@ -35,8 +34,7 @@
         "/disconnected": Disconnected,
         "/browser": Browser,
         "/connecting":ConnectionScreen,
-        "/chat":ChatHud,
-        "/layouteditor":Rat,
+
     };
 
     const url = window.location.href;

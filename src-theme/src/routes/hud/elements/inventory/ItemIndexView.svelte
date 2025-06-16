@@ -4,7 +4,7 @@
 
     export let index: ItemStack;
 
-    const {count, identifier, hasEnchantment } = index;
+    const {count, identifier, hasEnchantment} = index;
     const countColor = count <= 0 ? "red" : "white";
     const itemIconUrl = `${REST_BASE}/api/v1/client/resource/itemTexture?id=${identifier}`;
 
@@ -13,7 +13,7 @@
     {#if hasEnchantment}
         <div class="enchant-glint" style="mask-image: url({itemIconUrl})"></div>
     {/if}
-    <img class="item-icon"  src={itemIconUrl} alt={identifier}/>
+    <img alt={identifier} class="item-icon" src={itemIconUrl}/>
     <div class="count" class:hidden={count === 0 || count === 1} style="color: {countColor}">
         {count}
     </div>
@@ -21,14 +21,17 @@
 
 <style lang="scss">
   @import "../../../../colors";
+
   .hidden {
     display: none;
   }
+
   .item-stack {
     position: relative;
     width: 32px;
     height: 32px;
   }
+
   .item-icon {
     width: 100%;
     height: 100%;
@@ -42,6 +45,7 @@
     font-size: 12px;
     text-shadow: 1px 1px black;
   }
+
   .enchant-glint {
     position: absolute;
     top: 0;
@@ -59,6 +63,7 @@
     mask-size: 100% 100%;
     mask-repeat: no-repeat;
   }
+
   @keyframes enchantGlint {
     0% {
       background-position: 0 0;

@@ -1,17 +1,17 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import {onMount} from "svelte";
 
     export let componentId: string;
-    export let defaultPosition = { x: 0, y: 0 };
+    export let defaultPosition = {x: 0, y: 0};
     export let snapToGrid = false;
     export let gridSize = 10;
     export let disabled = false;
     export let hudZoom = 100;
 
-    let position = { ...defaultPosition };
+    let position = {...defaultPosition};
     let moving = false;
-    let dragStart = { mouseX: 0, mouseY: 0, elemX: 0, elemY: 0 };
-
+    let dragStart = {mouseX: 0, mouseY: 0, elemX: 0, elemY: 0};
++
     onMount(() => {
         const saved = localStorage.getItem(`hud-pos-${componentId}`);
         if (saved) position = JSON.parse(saved);
@@ -48,7 +48,7 @@
             newY = Math.round(newY / gridSize) * gridSize;
         }
 
-        position = { x: newX, y: newY };
+        position = {x: newX, y: newY};
     }
 
     function stopDrag() {
@@ -72,7 +72,7 @@
 >
 
     <div class="hud-content-wrapper">
-        <slot />
+        <slot/>
     </div>
 </div>
 

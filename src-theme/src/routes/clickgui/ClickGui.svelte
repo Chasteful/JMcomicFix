@@ -1,13 +1,13 @@
 <script lang="ts">
-    import { onMount, onDestroy } from "svelte";
-    import { getModules, getModuleSettings, setTyping } from "../../integration/rest";
-    import { groupByCategory } from "../../integration/util";
+    import {onMount, onDestroy} from "svelte";
+    import {getModules, getModuleSettings, setTyping} from "../../integration/rest";
+    import {groupByCategory} from "../../integration/util";
     import Panel from "./Panel.svelte";
     import Description from "./Description.svelte";
-    import { fade } from "svelte/transition";
-    import { listen } from "../../integration/ws";
+    import {fade} from "svelte/transition";
+    import {listen} from "../../integration/ws";
     import Search from './Search.svelte';
-    import {ResolutionScaler} from "./ResolutionScaler"
+    import {ResolutionScaler} from "../../components/ResolutionScaler"
 
     import {
         gridSize,
@@ -28,7 +28,7 @@
     import CtrlFTip from "./CtrlFTip.svelte";
 
     let resolutionScaler = new ResolutionScaler({
-        baseResolution: { width: 1920, height: 1080 }
+        baseResolution: {width: 1920, height: 1080}
     });
     let categories: GroupedModules = {};
     let modules: Module[] = [];
@@ -73,27 +73,23 @@
     });
 
 
-
-
-
-
     listen("clickGuiValueChange", (e: ClickGuiValueChangeEvent) => {
         applyValues(e.configurable);
     });
 </script>
-<div class="clickgui" class:grid={$showGrid} transition:fade|global={{duration: 200}}
-     style="transform: scale({$scaleFactor * 50}%); width: {2 / $scaleFactor * 100}vw; height: {2 / $scaleFactor * 100}vh;
-     background-size: {$gridSize}px {$gridSize}px;">
+<div class="clickgui" class:grid={$showGrid} style="transform: scale({$scaleFactor * 50}%); width: {2 / $scaleFactor * 100}vw; height: {2 / $scaleFactor * 100}vh;
+     background-size: {$gridSize}px {$gridSize}px;"
+     transition:fade|global={{duration: 200}}>
 
-    <CtrlFTip showSearch={showSearch} />
+    <CtrlFTip showSearch={showSearch}/>
 
-    <Description />
+    <Description/>
 
-    <Search modules={structuredClone(modules)} />
+    <Search modules={structuredClone(modules)}/>
 
 
     {#each Object.entries(categories) as [category, modules], panelIndex}
-        <Panel {category} {modules}  {panelIndex}/>
+        <Panel {category} {modules} {panelIndex}/>
     {/each}
 </div>
 
@@ -110,10 +106,10 @@
     top: 0;
     left: 0;
     transform-origin: left top;
+
     &.grid {
-      background-image:
-              linear-gradient(to right, rgba($clickgui-grid-color, 0.3) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba($clickgui-grid-color, 0.3) 1px, transparent 1px);
+      background-image: linear-gradient(to right, rgba($clickgui-grid-color, 0.3) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba($clickgui-grid-color, 0.3) 1px, transparent 1px);
       background-size: #{$GRID_SIZE}px #{$GRID_SIZE}px;
     }
   }

@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { fade } from "svelte/transition";
-    import { listen } from "../../../integration/ws";
-    import type { OverlayTitleEvent } from "../../../integration/events";
+    import {fade} from "svelte/transition";
+    import {listen} from "../../../integration/ws";
+    import type {OverlayTitleEvent} from "../../../integration/events";
     import TextComponent from "../../menu/common/TextComponent.svelte";
-    import { TimeoutManager } from "../../../components/TimeoutManager";
+    import {TimeoutManager} from "../../../components/TimeoutManager";
     import type {
         ConfigurableSetting,
         TextArraySetting,
@@ -31,7 +31,7 @@
     }
 
     function FilterText(component: TTextComponent | string | undefined): boolean {
-        if (!component || !shouldFilter ) return false;
+        if (!component || !shouldFilter) return false;
 
         const extractText = (c: TTextComponent | string): string => {
             if (typeof c === "string") return c;
@@ -69,13 +69,13 @@
         <div class="overlay-message" in:fade={{ duration: 100 }} out:fade={{ duration: 100 }}>
             <div class="title-wrapper">
                 {#if OverlayTitle.title}
-                    <TextComponent fontSize={50} textComponent={OverlayTitle.title} />
+                    <TextComponent fontSize={50} textComponent={OverlayTitle.title}/>
                 {/if}
             </div>
 
             <div class="subtitle-wrapper">
                 {#if OverlayTitle.subtitle}
-                    <TextComponent fontSize={36} textComponent={OverlayTitle.subtitle} />
+                    <TextComponent fontSize={36} textComponent={OverlayTitle.subtitle}/>
                 {/if}
             </div>
         </div>

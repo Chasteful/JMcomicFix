@@ -1,27 +1,30 @@
 <script lang="ts">
     import {onDestroy, onMount, tick} from "svelte";
-    import { fade } from "svelte/transition";
+    import {fade} from "svelte/transition";
     import {
         getSession,
         getModules,
         getPlayerData,
         getClientInfo
     } from "../../../../integration/rest";
-    import type { ClientInfo } from "../../../../integration/types";
-    import type { ClientPlayerDataEvent } from "../../../../integration/events";
-    import { listen } from "../../../../integration/ws";
+    import type {ClientInfo} from "../../../../integration/types";
+    import type {ClientPlayerDataEvent} from "../../../../integration/events";
+    import {listen} from "../../../../integration/ws";
     import type {
         Session,
         PlayerData,
     } from "../../../../integration/types";
-    import { tweened } from "svelte/motion";
-    import { cubicOut } from "svelte/easing";
-    import { blockCount,armorValue, armorThreshold,DURABILITY_RECOVERY,totemCount,
-        armorDurabilityStore, emptySlotCount,DURABILITY_THRESHOLD,targetId } from './Island';
-    import { get } from 'svelte/store';
+    import {tweened} from "svelte/motion";
+    import {cubicOut} from "svelte/easing";
+    import {
+        blockCount, armorValue, armorThreshold, DURABILITY_RECOVERY, totemCount,
+        armorDurabilityStore, emptySlotCount, DURABILITY_THRESHOLD, targetId
+    } from './Island';
+    import {get} from 'svelte/store';
     import {calcArmorValue} from "../targethud/calcArmorValue";
     import {clientName} from "../../../../components/ThemeManager";
     import {TimeoutManager} from "../../../../components/TimeoutManager";
+
     const INVENTORY_FULL_COOLDOWN_MS = 30000;
     const UPDATE_INTERVAL_MS = 50;
     const ALERT_DISPLAY_DURATION_MS = 2500;
@@ -39,7 +42,7 @@
         status: null as HTMLDivElement | null
     };
     type AlertType =
-        'health' | 'air' | 'blocks' | 'hunger' | 'uniform'|'totem'|
+        'health' | 'air' | 'blocks' | 'hunger' | 'uniform' | 'totem' |
         'saturation' | 'unbeatable' | 'durability' | 'inventory' | null;
     type AlertState = 'hidden' | 'showing' | 'hiding';
     type ContentType = 'alert' | 'greeting' | 'status';
@@ -77,7 +80,7 @@
     let animationPhase: 'idle' | 'contract' | 'expand' = 'idle';
     let wrapper: HTMLDivElement | null = null;
     let clientInfo: ClientInfo | null = null
-    $: loaded =  timeLoaded && clientInfo;
+    $: loaded = timeLoaded && clientInfo;
     $: {
         if ($armorDurabilityStore) {
             checkArmorDurability();
@@ -99,10 +102,10 @@
             checkInventoryFullAlert($emptySlotCount);
         }
     }
-    const initialWidth = tweened(0, { duration: 400, easing: cubicOut });
-    const initialOpacity = tweened(0, { duration: 400, easing: cubicOut });
-    const w = tweened(400, { duration: 300, easing: cubicOut });
-    const h = tweened(40, { duration: 300, easing: cubicOut });
+    const initialWidth = tweened(0, {duration: 400, easing: cubicOut});
+    const initialOpacity = tweened(0, {duration: 400, easing: cubicOut});
+    const w = tweened(400, {duration: 300, easing: cubicOut});
+    const h = tweened(40, {duration: 300, easing: cubicOut});
 
     function getTimeGreeting(hours: number): string {
         if (hours >= 5 && hours < 12) return "Good morning";
@@ -114,6 +117,7 @@
     function formatTime(hours: number, minutes: number): string {
         return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
     }
+
     async function checkUsernameVisibility(): Promise<void> {
         const modules = await getModules();
         showUsername = modules.some(module =>
@@ -130,7 +134,7 @@
     const codeGenerator = {
         generate: (length = 6): string => {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?/~`§';
-            return Array.from({ length }, () =>
+            return Array.from({length}, () =>
                 chars.charAt(Math.floor(Math.random() * chars.length))
             ).join('');
 
@@ -188,7 +192,7 @@
             setTimeout(() => {
                 animationPhase = 'expand';
                 setTimeout(() => {
-                    currentAlert = { type, title, message };
+                    currentAlert = {type, title, message};
                     currentContent = 'alert';
                     animationPhase = 'idle';
                     alertState = 'showing';
@@ -196,7 +200,7 @@
                 }, ANIMATION_DURATION_MS);
             }, ANIMATION_DURATION_MS);
         } else {
-            currentAlert = { type, title, message };
+            currentAlert = {type, title, message};
             currentContent = 'alert';
             animationPhase = 'expand';
             setTimeout(() => {
@@ -221,12 +225,13 @@
     }
 
     function checkHealthAlert(newHealth: number): void {
-        if ($totemCount >=1) return;
+        if ($totemCount >= 1) return;
         if (newHealth > 0 && newHealth <= 5 && lastHealthValue > 5) {
             showAlert('health', 'NearDeath', 'Your health is severely inadequate !');
         }
         lastHealthValue = newHealth;
     }
+
     function checkTotemAlert(newCount: number) {
 
         if (newCount >= lastTotemCount) {
@@ -256,10 +261,11 @@
         if (newFood < 19 && lastFoodValue === 19) {
             showAlert('hunger', 'Cannot Heal', `Stop combat/food recovery shortly !`);
         } else if (newFood <= 7 && lastFoodValue > 7) {
-            showAlert('saturation', 'Famine',  `Your saturation is critically low (${newFood}/20)`);
+            showAlert('saturation', 'Famine', `Your saturation is critically low (${newFood}/20)`);
         }
         lastFoodValue = newFood;
     }
+
     function checkInventoryFullAlert(emptySlots: number) {
         const now = Date.now();
         if (
@@ -270,6 +276,7 @@
             lastInventoryFullAlertTime = now;
         }
     }
+
     function checkArmorDurability() {
         const armor = get(armorDurabilityStore);
         const slots = ['helmet', 'chestplate', 'leggings', 'boots'] as const;
@@ -303,6 +310,7 @@
             }
         }
     }
+
     function checkArmorAlert(
         targetId: string,
         targetArmor: number | undefined,
@@ -349,13 +357,15 @@
         checkFoodAlert(newData.food);
 
         if ($armorValue !== undefined && typeof $targetId === 'string') {
-            checkArmorAlert($targetId,$armorValue,newData.armor);
+            checkArmorAlert($targetId, $armorValue, newData.armor);
         }
         playerData = newData;
     }
+
     async function updateClientInfo() {
         clientInfo = await getClientInfo();
     }
+
     async function updateAllData(): Promise<void> {
         const newData = await getPlayerData();
         if (!newData) return;
@@ -377,7 +387,7 @@
             : 300;
         animationPhase = 'contract';
         currentContent = type;
-        w.set(nextContentWidth );
+        w.set(nextContentWidth);
         h.set(type === 'alert' ? 50 : 40);
         animationPhase = 'expand';
         animationPhase = 'idle';
@@ -389,7 +399,7 @@
         await waitUntilNoAlert();
 
 
-        while (!session || !timeLoaded ) {
+        while (!session || !timeLoaded) {
             await new Promise((res) => setTimeout(res, 50));
         }
 
@@ -407,7 +417,7 @@
         initialAnimation = false;
         initialAnimationDone = true;
 
-         switchContent('status');
+        switchContent('status');
     }
 
 
@@ -444,8 +454,8 @@
         (async () => {
             await tick();
 
-            await  initialWidth.set((wrapper?.scrollWidth || 312) + 64);
-            await  initialOpacity.set(1);
+            await initialWidth.set((wrapper?.scrollWidth || 312) + 64);
+            await initialOpacity.set(1);
 
             await updateAllData().catch(console.error);
             await handleInitialAnimationEnd();
@@ -483,88 +493,88 @@
     });
 </script>
 {#if loaded}
-<div class="dynamic-island-container">
-    <div class="dynamic-island {alertState}"
-         class:notification-active={currentAlert !== null}
-         class:contract={animationPhase === 'contract'}
-         class:expand={animationPhase === 'expand'}
-         class:initial={initialAnimation}
-         style="width: {initialAnimation ? $initialWidth : $w}px;
+    <div class="dynamic-island-container">
+        <div class="dynamic-island {alertState}"
+             class:notification-active={currentAlert !== null}
+             class:contract={animationPhase === 'contract'}
+             class:expand={animationPhase === 'expand'}
+             class:initial={initialAnimation}
+             style="width: {initialAnimation ? $initialWidth : $w}px;
      height: {initialAnimation ? 40 : ($h + (currentAlert ? 10 : 0))}px;
      opacity: {$initialOpacity};">
-        <div class="content-wrapper" bind:this={wrapper}>
-            {#if currentAlert}
-                <div class="notification-content {currentAlert.type}"
-                     in:fade={{ duration: 150 }}
-                     bind:this={contentRefs.alert}>
-                    <div class="icon">
-                        <img src="img/hud/island.svg" alt="icon" />
+            <div class="content-wrapper" bind:this={wrapper}>
+                {#if currentAlert}
+                    <div class="notification-content {currentAlert.type}"
+                         in:fade={{ duration: 150 }}
+                         bind:this={contentRefs.alert}>
+                        <div class="icon">
+                            <img src="img/hud/island.svg" alt="icon"/>
+                        </div>
+                        <div class="text">
+                            <div class="title">{currentAlert.title}</div>
+                            <div class="description">{currentAlert.message}</div>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar {currentAlert.type}"></div>
+                        </div>
                     </div>
-                    <div class="text">
-                        <div class="title">{currentAlert.title}</div>
-                        <div class="description">{currentAlert.message}</div>
-                    </div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar {currentAlert.type}"></div>
-                    </div>
-                </div>
-            {:else if currentContent === 'greeting'}
-                <div class="greeting-content"
-                     in:fade={{ duration: 150 }}
-                     bind:this={contentRefs.greeting}>
-                    <span class="greeting">{timeGreeting}</span>
+                {:else if currentContent === 'greeting'}
+                    <div class="greeting-content"
+                         in:fade={{ duration: 150 }}
+                         bind:this={contentRefs.greeting}>
+                        <span class="greeting">{timeGreeting}</span>
 
                         <span class="username">&nbsp;{userData.username}~</span>
 
 
-                </div>
-            {:else}
-                <div class="status-content"
-                     in:fade={{ duration: 150 }}
-                     bind:this={contentRefs.status}>
-                    {#if timeLoaded && clientInfo}
-                        <span class="client"> { $clientName ||clientInfo.clientName }</span>
-                        <div class="separator"></div>
-                        <span class="time">{time}</span>
-                        <div class="separator"></div>
-                        <span class="fps">{clientInfo.fps}fps</span>
-                        <div class="separator"></div>
-                        <span class="username">
+                    </div>
+                {:else}
+                    <div class="status-content"
+                         in:fade={{ duration: 150 }}
+                         bind:this={contentRefs.status}>
+                        {#if timeLoaded && clientInfo}
+                            <span class="client"> { $clientName || clientInfo.clientName }</span>
+                            <div class="separator"></div>
+                            <span class="time">{time}</span>
+                            <div class="separator"></div>
+                            <span class="fps">{clientInfo.fps}fps</span>
+                            <div class="separator"></div>
+                            <span class="username">
                             {#if showUsername}
                                 {userData.username}
                             {:else}
                                 {randomCode}
                             {/if}
                         </span>
-                    {/if}
-                </div>
-            {/if}
+                        {/if}
+                    </div>
+                {/if}
+            </div>
         </div>
     </div>
-</div>
 {/if}
 <style lang="scss">
   @import "../../../../colors";
+
   @mixin text-ellipsis {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
   :root {
     --island-bg: rgba(20, 20, 20, 0.5);
     --text-primary: rgba(255, 255, 255, 0.9);
 
   }
+
   .dynamic-island-container {
     display: flex;
     top: 5px;
     left: 50%;
     transform: translateX(-50%);
     perspective: 1000px;
-    filter:
-            drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3))
-            drop-shadow(0 8px 24px rgba(0, 0, 0, 0.2))
-            drop-shadow(0 16px 48px rgba(0, 0, 0, 0.15));
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3)) drop-shadow(0 8px 24px rgba(0, 0, 0, 0.2)) drop-shadow(0 16px 48px rgba(0, 0, 0, 0.15));
   }
 
   .dynamic-island {
@@ -575,15 +585,13 @@
     padding: 0 16px;
     display: flex;
     align-items: center;
-    transition:
-            width 0.3s cubic-bezier(0.25, 1, 0.5, 1),
-            height 0.3s cubic-bezier(0.25, 1, 0.5, 1),
-            border-radius 0.3s 0.1s cubic-bezier(0.4, 0, 0.2, 1),
-            box-shadow 0.3s ease;
+    transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1),
+    height 0.3s cubic-bezier(0.25, 1, 0.5, 1),
+    border-radius 0.3s 0.1s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s ease;
     transform-style: preserve-3d;
-    box-shadow:
-            0 4px 16px rgba(0, 0, 0, 0.6),
-            inset 0 0 10px rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6),
+    inset 0 0 10px rgba(255, 255, 255, 0.05);
 
     &.expand {
       border-radius: 16px;
@@ -631,7 +639,7 @@
     font-size: 14px;
     white-space: nowrap;
 
-    .client, .username, .greeting, .time, .fps{
+    .client, .username, .greeting, .time, .fps {
       font-size: 20px;
       letter-spacing: -0.25px;
       flex-shrink: 0;
@@ -644,7 +652,7 @@
     .client {
       font-weight: bold;
       background-clip: text;
-      background: linear-gradient(to right, var(--primary-color) 0%,  var(--secondary-color) 100%);
+      background: linear-gradient(to right, var(--primary-color) 0%, var(--secondary-color) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       text-shadow: 0 0 1px color-mix(in srgb, var(--primary-color) 30%, transparent);
@@ -662,6 +670,7 @@
       animation: fadeBreath 2s infinite ease-in-out;
     }
   }
+
   .notification-content {
     display: flex;
     align-items: center;
@@ -674,6 +683,7 @@
       width: 24px;
       height: 24px;
       flex-shrink: 0;
+
       img {
         width: 100%;
         height: 100%;
@@ -704,9 +714,7 @@
 
       &.#{$type} {
         .icon img {
-          filter:
-                  brightness(0.8) saturate(200%) invert(25%) sepia(90%) saturate(2000%) hue-rotate($hue-rotate)
-                  drop-shadow(0 0 5px rgba($primary, 0.7));
+          filter: brightness(0.8) saturate(200%) invert(25%) sepia(90%) saturate(2000%) hue-rotate($hue-rotate) drop-shadow(0 0 5px rgba($primary, 0.7));
         }
 
         .title {
@@ -768,8 +776,12 @@
   }
 
   @keyframes progress {
-    from { transform: scaleX(1); }
-    to { transform: scaleX(0); }
+    from {
+      transform: scaleX(1);
+    }
+    to {
+      transform: scaleX(0);
+    }
   }
 
   @keyframes initialExpand {
@@ -796,13 +808,22 @@
       opacity: 0.9;
     }
   }
+
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   @keyframes textGlow {
-    0% { text-shadow: 0 0 5px currentColor; }
-    100% { text-shadow: 0 0 10px currentColor; }
+    0% {
+      text-shadow: 0 0 5px currentColor;
+    }
+    100% {
+      text-shadow: 0 0 10px currentColor;
+    }
   }
 </style>

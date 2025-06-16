@@ -25,9 +25,9 @@
     }
 </script>
 
-<svelte:window on:keydown={handleKeyDown} />
+<svelte:window on:keydown={handleKeyDown}/>
 
-<div class="module" class:enabled class:selected bind:this={moduleElement}>
+<div bind:this={moduleElement} class="module" class:enabled class:selected>
     <div class="name">{$spaceSeperatedNames ? convertToSpacedString(name) : name}</div>
 </div>
 

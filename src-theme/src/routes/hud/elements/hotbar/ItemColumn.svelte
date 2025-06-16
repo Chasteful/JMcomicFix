@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import type { ClientPlayerDataEvent, PlayerInventory, PlayerInventoryEvent } from "../../../../integration/events";
-    import type { ItemStack, PlayerData } from "../../../../integration/types";
-    import { listen } from "../../../../integration/ws";
-    import { getPlayerData, getPlayerInventory } from "../../../../integration/rest";
+    import {onMount} from "svelte";
+    import type {ClientPlayerDataEvent, PlayerInventory, PlayerInventoryEvent} from "../../../../integration/events";
+    import type {ItemStack, PlayerData} from "../../../../integration/types";
+    import {listen} from "../../../../integration/ws";
+    import {getPlayerData, getPlayerInventory} from "../../../../integration/rest";
     import ItemIndexView from "../inventory/ItemIndexView.svelte";
 
     let lastSlot = 0;
@@ -17,7 +17,7 @@
         for (let i = -4; i <= 4; i++) {
             const index = (currentSlot + i + 9) % 9;
             const stack = hotbar[index] ?? null;
-            stacks.push({ index, stack });
+            stacks.push({index, stack});
         }
         displayedStacks = stacks;
     }
@@ -64,7 +64,7 @@
 
 <div class="hotbar-container">
     <div class="hotbar-track">
-        {#each displayedStacks as { index, stack },i (stack)}
+        {#each displayedStacks as {index, stack},i (stack)}
             <div
                     class="slot-wrapper"
                     class:active={index === currentSlot}
@@ -80,11 +80,11 @@
                     <div class="slot" class:active={index === currentSlot}>
                         <div class="item-icon">
                             {#if stack}
-                                <ItemIndexView index ={stack} />
+                                <ItemIndexView index={stack}/>
                             {/if}
                         </div>
                         {#if index === currentSlot}
-                            <div class="selection-overlay" />
+                            <div class="selection-overlay"/>
                         {/if}
                     </div>
                 </div>
@@ -96,6 +96,7 @@
 
 <style lang="scss">
   @import "../../../../colors.scss";
+
   .hotbar-container {
     display: flex;
     justify-content: center;
@@ -116,7 +117,7 @@
   }
 
   .slot-wrapper.active {
-    filter: drop-shadow(0 0 4px rgba($base , 0.5));
+    filter: drop-shadow(0 0 4px rgba($base, 0.5));
   }
 
   .hud-slot {

@@ -69,6 +69,8 @@ data class PlayerData(
     val uuid: String,
     val dimension: Identifier,
     val position: Vec3d,
+    val pitch: Float,
+    val yaw: Float,
     val netherPosition: Vec3d,
     val blockPosition: BlockPos,
     val velocity: Vec3d,
@@ -95,6 +97,7 @@ data class PlayerData(
     val deathCount: Int,
     val isDead: Boolean,
     val playTime: Long,
+
 ) {
 
     companion object {
@@ -106,6 +109,8 @@ data class PlayerData(
             player.uuidAsString,
             player.world.registryKey.value,
             player.pos,
+            player.pitch,
+            player.yaw,
             player.netherPosition,
             player.blockPos,
             player.velocity,
@@ -136,7 +141,7 @@ data class PlayerData(
 
         )
         private fun updateDeathCount(currentIsDead: Boolean): Int {
-            // 如果上次是活着而现在是死亡状态，增加计数器
+
             if (!lastIsDead && currentIsDead) {
                 deathCounter++
             }

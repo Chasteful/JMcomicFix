@@ -1,4 +1,3 @@
-
 export interface Module {
     name: string;
     category: string;
@@ -192,6 +191,12 @@ export interface Scoreboard {
     }[];
 }
 
+export interface Vec3 {
+    x: number;
+    y: number;
+    z: number;
+}
+
 export interface PlayerData {
     username: string;
     uuid: string;
@@ -207,13 +212,13 @@ export interface PlayerData {
     armor: number;
     food: number;
     air: number;
-    ping:number;
+    ping: number;
     maxAir: number;
     experienceLevel: number;
     experienceProgress: number;
-    killsCount:number;
-    deathCount:number;
-    playTime:number;
+    killsCount: number;
+    deathCount: number;
+    playTime: number;
     effects: StatusEffect[];
     mainHandStack: ItemStack;
     offHandStack: ItemStack;
@@ -221,6 +226,9 @@ export interface PlayerData {
     scoreboard: Scoreboard;
     serverAddress: String,
     isDead: Boolean,
+    yaw: number;
+    pitch: number;
+    dimension: string; // 维度标识符
 }
 
 export interface StatusEffect {
@@ -236,11 +244,6 @@ export interface StatusEffect {
     color: number;
 }
 
-export interface Vec3 {
-    x: number;
-    y: number;
-    z: number;
-}
 
 export interface ItemStack {
     identifier: string;
@@ -284,7 +287,7 @@ export interface Session {
 
 export interface Verification {
     isDev: boolean;
-    isOwner:boolean;
+    isOwner: boolean;
     hwid: string;
     developer: string;
     avatar: string;
@@ -381,6 +384,7 @@ export interface GameWindow {
 
 export interface Component {
     name: string;
+    mode: string;
     settings: { [name: string]: any };
 }
 

@@ -1,6 +1,6 @@
-import { writable, derived, type Writable, type Readable } from 'svelte/store';
-import { getModuleSettings } from '../integration/rest';
-import { listen } from '../integration/ws';
+import {writable, derived, type Writable, type Readable} from 'svelte/store';
+import {getModuleSettings} from '../integration/rest';
+import {listen} from '../integration/ws';
 import type {ConfigurableSetting, TextSetting} from '../integration/types';
 import type {ClickGuiValueChangeEvent} from "../integration/events";
 
@@ -67,8 +67,8 @@ function rgbToHex(r: number, g: number, b: number): string {
 }
 
 function convertColor4b(color4b: number): ColorFormats {
-    const { r, g, b } = color4bToRgb(color4b);
-    const { h, s, l } = rgbToHsl(r, g, b);
+    const {r, g, b} = color4bToRgb(color4b);
+    const {h, s, l} = rgbToHsl(r, g, b);
 
     return {
         rgb: `${r}, ${g}, ${b}`,

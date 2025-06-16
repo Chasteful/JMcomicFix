@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { type Writable } from "svelte/store";
-    import { onDestroy, onMount } from "svelte";
+    import {type Writable} from "svelte/store";
+    import {onDestroy, onMount} from "svelte";
     import {quintOut} from "svelte/easing";
     import {fly} from "svelte/transition";
 
@@ -49,19 +49,18 @@
 </script>
 
 
-
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="ctrl-f-tip"
-         in:fly|global={{y: -30, duration: 200, easing: quintOut}}
-         out:fly|global={{y: -30, duration: 200, easing: quintOut}}
-         class:visible={showTip}
-         class:hidden={$showSearch}
-         on:mouseenter={() => isHoveringTip = true}
-         on:mouseleave={() => isHoveringTip = false}
-         on:click={handleTipClick}>
-        Press CTRL+F to open search bar
-    </div>
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div class="ctrl-f-tip"
+     class:hidden={$showSearch}
+     class:visible={showTip}
+     in:fly|global={{y: -30, duration: 200, easing: quintOut}}
+     on:click={handleTipClick}
+     on:mouseenter={() => isHoveringTip = true}
+     on:mouseleave={() => isHoveringTip = false}
+     out:fly|global={{y: -30, duration: 200, easing: quintOut}}>
+    Press CTRL+F to open search bar
+</div>
 
 
 <style lang="scss">
@@ -74,7 +73,7 @@
     transform: translateX(-50%);
     font-size: 32px;
     color: rgba($text, 0.3);
-    text-shadow: 0 0 16px rgba($text,0.5);
+    text-shadow: 0 0 16px rgba($text, 0.5);
     font-weight: bold;
     padding: 8px 16px;
     border-radius: 20px;
@@ -84,16 +83,17 @@
     transition: all 0.3s ease;
     pointer-events: auto;
     font-family: "Genshin", sans-serif;
+
     &.visible {
       &:hover {
         color: rgba($text, 0.5);
         transform: translateX(-50%) scale(1.05);
-        text-shadow:
-                4 8 12px rgba($base,0.52),
-                4 8 16px rgba($text,0.8);
+        text-shadow: 4 8 12px rgba($base, 0.52),
+        4 8 16px rgba($text, 0.8);
       }
     }
   }
+
   .ctrl-f-tip.hidden {
     visibility: hidden;
     opacity: 0;

@@ -10,7 +10,6 @@
   let showShadow = false;
   const noAccountPaths = ["/altmanager","/disconnected"];
   const noHeaderPaths = ["/lockscreen","/disconnected","connecting"];
-  const noLogoPaths = [""];
   const BackgroundPaths = ["lockscreen",];
 
 
@@ -23,7 +22,6 @@
   $: showAccount = !noAccountPaths.includes($location);
   $: showHeader = !noHeaderPaths.includes($location);
   $: showBackground = BackgroundPaths.includes($location);
-  $: showLogo = !noLogoPaths.includes($location);
 </script>
 
 <div class="menu-container">
@@ -48,7 +46,7 @@
 
               <Header showAccount={showAccount}
                       showHeader={ showHeader }
-                      showLogo={showLogo}/>
+              />
           </div>
 
           <div class="menu-wrapper">

@@ -53,7 +53,7 @@
         {:else if clientButtonsShown}
           <MainButton title="Proxy Manager" icon="proxymanager" index={0} on:click={() => openScreen("proxymanager")} />
           <MainButton title="Click GUI" icon="clickgui" index={1} on:click={() => openScreen("clickgui")} />
-          <MainButton title="HUD" icon="layout" index={2} on:click={() => openScreen("layouteditor")} />
+          <MainButton title="HUD" icon="layout" index={2} on:click={() => openScreen("hud")} />
           <MainButton title="Back" icon="back-large" index={3} on:click={toggleButtons} />
         {/if}
       </div>

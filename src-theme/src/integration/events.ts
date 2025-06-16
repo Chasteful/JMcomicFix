@@ -55,10 +55,10 @@ export interface OverlayMessageEvent {
     tinted: boolean;
 }
 
-export interface ConnectionDetailsEvent{
+export interface ConnectionDetailsEvent {
 
-    result:TextComponent | string;
-    
+    result: TextComponent | string;
+
 }
 
 export interface OverlayTitleEvent {
@@ -80,7 +80,8 @@ export interface OverlayPlayListEvent {
     players: PlayerEntry[];
 
 }
-export interface OverlayChatEvent{
+
+export interface OverlayChatEvent {
     content: TextComponent | string,
     timestamp: number;
     isSystem: Boolean;
@@ -93,6 +94,7 @@ export interface OverlayDisconnectionEvent {
     parent: "title" | "menu" | "custom";
     info: TextComponent | string;
 }
+
 export interface NotificationEvent {
     title: string;
     message: string;
@@ -103,7 +105,7 @@ export interface KeyEvent {
     key: string;
     action: number;
     mods: number;
-    
+
 }
 
 export interface TargetChangeEvent {

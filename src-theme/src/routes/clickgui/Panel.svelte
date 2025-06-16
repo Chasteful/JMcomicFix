@@ -1,14 +1,14 @@
 <script lang="ts">
-    import { onMount, tick , beforeUpdate } from "svelte";
-    import { Tween } from 'svelte/motion';
+    import {onMount, tick, beforeUpdate} from "svelte";
+    import {Tween} from 'svelte/motion';
     import {cubicOut, quintOut} from 'svelte/easing';
-    import { get, writable} from 'svelte/store';
-    import { setContext } from "svelte";
-    import type { Module as TModule } from "../../integration/types";
-    import type { ModuleToggleEvent } from "../../integration/events";
-    import { listen } from "../../integration/ws";
-    import { setItem } from "../../integration/persistent_storage";
-    import { fly } from 'svelte/transition';
+    import {get, writable} from 'svelte/store';
+    import {setContext} from "svelte";
+    import type {Module as TModule} from "../../integration/types";
+    import type {ModuleToggleEvent} from "../../integration/events";
+    import {listen} from "../../integration/ws";
+    import {setItem} from "../../integration/persistent_storage";
+    import {fly} from 'svelte/transition';
     import Module from "./Module.svelte";
     import {
         gridSize,
@@ -22,8 +22,9 @@
         locked,
         savedConfigs
     } from "./clickgui_store";
-    import { debounce } from "lodash";
-    import { readable } from 'svelte/store';
+    import {debounce} from "lodash";
+    import {readable} from 'svelte/store';
+
     const EDGE_THRESHOLD = 50;
     const UNDO_STACK_LIMIT = 100;
     const ANIMATION_DURATION = 2000;
@@ -35,7 +36,7 @@
     export const lockAnimation = writable<'lock' | 'unlock' | null>(null);
     const glowState = writable(false);
 
-    const tween = new Tween(0, { duration: 150, easing: cubicOut });
+    const tween = new Tween(0, {duration: 150, easing: cubicOut});
 
     const indicatorOpacity = readable(tween.current, (set) => {
         const interval = setInterval(() => {
@@ -198,6 +199,7 @@
         panelConfig.zIndex = ++$maxPanelZIndex;
         panelElement.style.transition = "none";
     }
+
     function onMouseMove(e: MouseEvent) {
         if ($locked || !moving) return;
 
@@ -340,7 +342,7 @@
 
         const cfg = clonePanelConfig(panelConfig);
         const all = get(savedConfigs);
-        savedConfigs.set({ ...all, [category]: cfg });
+        savedConfigs.set({...all, [category]: cfg});
 
         saveAnimation.set('save');
         setTimeout(() => saveAnimation.set(null), ANIMATION_DURATION);
@@ -353,6 +355,7 @@
         const cfg = all[category];
         if (cfg) applyPanelConfig(cfg);
     }
+
     function handleReset() {
         localStorage.removeItem(`clickgui.panel.${category}`);
         const initialConfig = loadPanelConfig();
@@ -372,8 +375,6 @@
             }
         }, true);
     }
-
-
 
 
     highlightModuleName.subscribe((name) => {
@@ -429,14 +430,14 @@
             if (name) localStorage.setItem(storageKey, name);
             else localStorage.removeItem(storageKey);
         });
-        const options = { passive: true };
+        const options = {passive: true};
         const keydownHandler = (e: KeyboardEvent) => handleKeydown(e);
         const keyupHandler = (e: KeyboardEvent) => handleKeyup(e);
 
         window.addEventListener('mousemove', handleMouseMove);
         window.addEventListener('mousedown', handleMouseDown);
         window.addEventListener('mousemove', debouncedMouseMove, options);
-        window.addEventListener('wheel', handleWheel, { passive: false });
+        window.addEventListener('wheel', handleWheel, {passive: false});
         window.addEventListener("keydown", keydownHandler, true);
         window.addEventListener("keyup", keyupHandler, true);
 
@@ -457,46 +458,46 @@
 
 <!-- Window Event Listeners -->
 <svelte:window
-        on:mouseup={onMouseUp}
-        on:mousemove={onMouseMove}
         on:keydown={handleKeydown}
         on:keyup={handleKeyup}
+        on:mousemove={onMouseMove}
+        on:mouseup={onMouseUp}
 />
 
 <!-- Panel Wrapper -->
 <div
+        bind:this={panelElement}
         class="panel-wrapper {moving ? 'no-transition' : ''}"
         class:expanded={panelConfig.expanded}
-        style="left: {panelConfig.left}px; top: {panelConfig.top}px; z-index: {panelConfig.zIndex};
-        --panel-height: {panelElement?.offsetHeight || 0}px;"
-        bind:this={panelElement}
         in:fly|global={{y: -30, duration: 200, easing: quintOut}}
         out:fly|global={{y: -30, duration: 200, easing: quintOut}}
+        style="left: {panelConfig.left}px; top: {panelConfig.top}px; z-index: {panelConfig.zIndex};
+        --panel-height: {panelElement?.offsetHeight || 0}px;"
 >
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
             class="panel"
-            class:locked={$locked}
             class:glowing={$glowState}
+            class:locked={$locked}
 
     >
         <!-- Panel Title -->
         <div
                 class="title"
-                on:mousedown={onMouseDown}
                 on:contextmenu|preventDefault={toggleExpanded}
+                on:mousedown={onMouseDown}
         >
             <img
+                    alt="icon"
                     class="icon"
                     src="img/clickgui/icon-{category.toLowerCase()}.svg"
-                    alt="icon"
             />
             <span class="category">{category === 'Client' ? 'Client' : category}</span>
             <svg style="display: none;">
                 <defs>
-                    <linearGradient id="globalGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="var(--gradient-start)" />
-                        <stop offset="100%" stop-color="var(--gradient-end)" />
+                    <linearGradient id="globalGradient" x1="0%" x2="100%" y1="0%" y2="100%">
+                        <stop offset="0%" stop-color="var(--gradient-start)"/>
+                        <stop offset="100%" stop-color="var(--gradient-end)"/>
                     </linearGradient>
                 </defs>
             </svg>
@@ -513,8 +514,8 @@
                                     <defs>
                                         <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
 
-                                            <stop offset="0%" stop-color="var(--gradient-start)" />
-                                            <stop offset="100%" stop-color="var(--gradient-end)" />
+                                            <stop offset="0%" stop-color="var(--gradient-start)"/>
+                                            <stop offset="100%" stop-color="var(--gradient-end)"/>
                                         </linearGradient>
                                     </defs>
 
@@ -531,8 +532,8 @@
                                 <svg viewBox="0 0 24 24" class="gradient-icon">
                                     <defs>
                                         <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
-                                            <stop offset="0%" stop-color="var(--gradient-start)" />
-                                            <stop offset="100%" stop-color="var(--gradient-end)" />
+                                            <stop offset="0%" stop-color="var(--gradient-start)"/>
+                                            <stop offset="100%" stop-color="var(--gradient-end)"/>
                                         </linearGradient>
                                     </defs>
                                     <path
@@ -556,14 +557,14 @@
 
         <!-- Modules List -->
         <div
+                bind:this={modulesElement}
                 class="modules"
                 on:scroll={handleModulesScroll}
-                bind:this={modulesElement}
                 style="--duration: 0.3s;max-height: {2 / $scaleFactor * 66}vh"
         >
             {#each renderedModules as {name, enabled, description, aliases} (name)}
                 <div>
-                    <Module {name} {enabled} {description} {aliases} />
+                    <Module {name} {enabled} {description} {aliases}/>
                 </div>
             {/each}
         </div>
@@ -571,6 +572,7 @@
 </div>
 <style lang="scss">
   @import "../../colors.scss";
+
   .gradient-icon {
     --gradient-start: var(--primary-color);
     --gradient-end: var(--secondary-color);
@@ -580,12 +582,14 @@
     position: absolute;
     border-radius: 12px;
     padding: 4px;
-    background:transparent;
+    background: transparent;
     box-shadow: 0 0 10px rgba($base, 0.4);
     transition: all 0.5s ease;
+
     &.no-transition {
       transition: none;
     }
+
     &::before {
       content: '';
       position: absolute;
@@ -618,6 +622,7 @@
     opacity: 0;
     pointer-events: none;
   }
+
   .panel {
     width: 230px;
     max-width: 100%;
@@ -641,6 +646,7 @@
 
   .panel.glowing {
     isolation: isolate;
+
     &::before {
       content: '';
       position: absolute;
@@ -659,9 +665,8 @@
       background-size: 300% 300%;
       z-index: -1;
       opacity: 0;
-      animation:
-              glowGradient 1.5s ease-out,
-              glowMovement 3s linear infinite;
+      animation: glowGradient 1.5s ease-out,
+      glowMovement 3s linear infinite;
     }
   }
 
@@ -677,7 +682,7 @@
     color: $text-color;
     border-radius: 4px;
     transition: all 0.3s ease;
-    animation:fadeInOut 2s ease;
+    animation: fadeInOut 2s ease;
 
 
     &.locked::before {
@@ -703,6 +708,7 @@
       height: 64px;
     }
   }
+
   .panel-wrapper:hover:not(.expanded) {
     box-shadow: 0 0 20px color-mix(in srgb, var(--primary-color) 60%, transparent);
     transform: translateY(-4px);
@@ -715,22 +721,24 @@
     column-gap: 12px;
     cursor: grab;
     text-align: center;
-    text-shadow: 0 0 10px  color-mix(in srgb, var(--primary-color) 30%, transparent);
+    text-shadow: 0 0 10px color-mix(in srgb, var(--primary-color) 30%, transparent);
     border-radius: 8px 8px 0 0;
     transition: all 0.3s ease;
     padding: 10px 15px;
 
     .panel:not(.expanded) & {
       background: rgba($mantle, 0.6);
-      box-shadow: inset 0 0 10px  color-mix(in srgb, var(--primary-color) 20%, transparent);
-      text-shadow: 0 0 5px  color-mix(in srgb, var(--primary-color) 20%, transparent);
+      box-shadow: inset 0 0 10px color-mix(in srgb, var(--primary-color) 20%, transparent);
+      text-shadow: 0 0 5px color-mix(in srgb, var(--primary-color) 20%, transparent);
     }
+
     .icon {
       width: 20px;
       height: 20px;
       object-fit: contain;
       display: block;
     }
+
     .category {
       font-size: 16px;
       color: $text-color;
@@ -796,34 +804,79 @@
   }
 
   @keyframes lockEffect {
-    0% { opacity: 0; transform: translateY(20px) scale(0.8); }
-    40% { opacity: 1; transform: translateY(0) scale(1.1); }
-    60% { transform: scale(1); }
-    100% { opacity: 0; transform: scale(1.2); }
+    0% {
+      opacity: 0;
+      transform: translateY(20px) scale(0.8);
+    }
+    40% {
+      opacity: 1;
+      transform: translateY(0) scale(1.1);
+    }
+    60% {
+      transform: scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1.2);
+    }
   }
 
   @keyframes unlockEffect {
-    0% { opacity: 1; transform: scale(1) rotate(0deg); }
-    60% { transform: scale(1.2) rotate(-30deg); }
-    100% { opacity: 0; transform: scale(0.5) rotate(45deg); }
+    0% {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+    }
+    60% {
+      transform: scale(1.2) rotate(-30deg);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(0.5) rotate(45deg);
+    }
   }
 
   @keyframes pulse {
-    0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary-color) 40%, transparent); }
-    70% { box-shadow: 0 0 0 10px color-mix(in srgb, var(--primary-color) 0%, transparent); }
-    100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary-color) 0%, transparent); }
+    0% {
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary-color) 40%, transparent);
+    }
+    70% {
+      box-shadow: 0 0 0 10px color-mix(in srgb, var(--primary-color) 0%, transparent);
+    }
+    100% {
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary-color) 0%, transparent);
+    }
   }
+
   @keyframes fadeInOut {
-    0%   { opacity: 0; }
-    20%  { opacity: 1; }
-    80%  { opacity: 1; }
-    100% { opacity: 0; }
+    0% {
+      opacity: 0;
+    }
+    20% {
+      opacity: 1;
+    }
+    80% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
   }
+
   @keyframes gentlePulse {
-    0% { opacity: 0; transform: scale(0.95); }
-    50% { opacity: 1; transform: scale(1.02); }
-    100% { opacity: 0; transform: scale(0.95); }
+    0% {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.02);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(0.95);
+    }
   }
+
   @keyframes saveEnter {
     0% {
       transform: translateY(-100%);
@@ -836,12 +889,20 @@
   }
 
   @keyframes glowGradient {
-    0%, 100% { opacity: 0; }
-    50% { opacity: 1; }
+    0%, 100% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
   }
 
   @keyframes glowMovement {
-    0% { background-position: 0 50%; }
-    100% { background-position: 100% 50%; }
+    0% {
+      background-position: 0 50%;
+    }
+    100% {
+      background-position: 100% 50%;
+    }
   }
 </style>

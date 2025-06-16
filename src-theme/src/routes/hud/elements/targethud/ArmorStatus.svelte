@@ -1,16 +1,17 @@
 <script lang="ts">
-    import { REST_BASE } from "../../../../integration/host";
-    import type { ItemStack } from "../../../../integration/types";
+    import {REST_BASE} from "../../../../integration/host";
+    import type {ItemStack} from "../../../../integration/types";
 
     export let itemStack: ItemStack;
 
-    const {identifier, hasEnchantment } = itemStack;
+    const {identifier, hasEnchantment} = itemStack;
     const itemIconUrl = `${REST_BASE}/api/v1/client/resource/itemTexture?id=${identifier}`;
     /*
     const hasDurability = itemStack.maxDamage > 0;
      $: value = hasDurability
        ? itemStack.maxDamage - itemStack.damage
-       : itemStack.count;*/
+       : itemStack.count;
+     */
 
 </script>
 <div class="item-box">
@@ -19,7 +20,7 @@
         {#if hasEnchantment}
             <div class="enchant-glint" style="mask-image: url({itemIconUrl})"></div>
         {/if}
-        <img class="item-icon"  src={itemIconUrl} alt={identifier}/>
+        <img alt={identifier} class="item-icon" src={itemIconUrl}/>
     </div>
 </div>
 
@@ -31,6 +32,7 @@
     align-items: center;
     justify-content: center;
   }
+
   .content {
     position: relative;
     width: 100%;
@@ -42,11 +44,13 @@
     justify-content: flex-start;
     z-index: 0;
   }
+
   .item-icon {
     width: 32px;
     height: 32px;
     z-index: 1;
   }
+
   .enchant-glint {
     position: absolute;
     top: 0;
@@ -65,6 +69,7 @@
     mask-repeat: no-repeat;
     z-index: 1;
   }
+
   @keyframes enchantGlint {
     0% {
       background-position: 0 0;

@@ -1,158 +1,166 @@
 <script lang="ts">
-  import { listen } from "../../../../../integration/ws.js";
-  import type { PlayerData } from "../../../../../integration/types";
-  import { REST_BASE } from "../../../../../integration/host";
-  import { calcArmorColor } from "../calcArmorColor";
-  import { detectTeamColor, type TeamColor } from "../calcArmorColor";
-  import type { TargetChangeEvent } from "../../../../../integration/events.js";
-  import { fly } from "svelte/transition";
-  import PlayerView from "../../../../../components/PlayerView/PlayerView.svelte";
+    import {listen} from "../../../../../integration/ws.js";
+    import type {PlayerData} from "../../../../../integration/types";
+    import {REST_BASE} from "../../../../../integration/host";
+    import {calcArmorColor} from "../calcArmorColor";
+    import {detectTeamColor, type TeamColor} from "../calcArmorColor";
+    import type {TargetChangeEvent} from "../../../../../integration/events.js";
+    import {fly} from "svelte/transition";
+    import PlayerView from "../../../../../components/PlayerView/PlayerView.svelte";
 
-  interface NameHistoryEntry {
-    name: string;
-    changedToAt: string; // "2020/03/10 03:52:18" or ""
-  }
-  interface UAPIResponse {
-    history: NameHistoryEntry[];
-  }
-
-  let target: PlayerData | null = null;
-  let visible = true;
-  let hideTimeout: ReturnType<typeof setTimeout>;
-  let teamColor: TeamColor = null;
-  let xp = "不明";
-
-  let birthYear = "2009";
-  let birthMonth = "5";
-  let birthDay = "17";
-
-
-  let isPremium = false;
-
-  const xpCache = new Map<string, string>();
-  function getRandomXP() {
-    const xps = ["恋物","恋童","施虐","受虐","贫乳","巨乳","绑缚","异瞳"];
-    return xps[Math.floor(Math.random()*xps.length)];
-  }
-  function getXPForTarget(id: string|null) {
-    if (!id) return "不明";
-    if (!xpCache.has(id)) xpCache.set(id, getRandomXP());
-    return xpCache.get(id)!;
-  }
-
-
-  function startHideTimeout() {
-    hideTimeout = setTimeout(() => (visible = false), 2000);
-  }
-  function isOfflineUUID(uuid: string) {
-    return !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(uuid);
-  }
-  function getDefaultBirthDate() {
-    return new Date("2009-05-17");
-  }
-  function parseDateString(s: string): Date|null {
-    if (!s) return null;
-    const iso = s.replace(/\//g, "-").replace(" ", "T");
-    const d = new Date(iso);
-    return isNaN(d.getTime()) ? null : d;
-  }
-
-
-  const infoCache = new Map<
-    string,
-    Promise<{ year: string; month: string; day: string; premium: boolean }>
-  >();
-  function removeColorCodes(str: string): string {
-
-      return str.replace(/§[0-9a-fA-F]/g, '');
-  }
-  async function fetchTargetInfo(uuid: string) {
- 
-    let date: Date;
-    if (isOfflineUUID(uuid)) {
-      date = getDefaultBirthDate();
-    } else {
-      try {
-        const clean = uuid.replace(/-/g, "");
-        const res = await fetch(`https://uapis.cn/api/mchistoryid?uuid=${clean}`);
-        if (!res.ok) throw new Error();
-        const data = (await res.json()) as UAPIResponse;
-    
-        const timestamps = data.history
-          .map((e) => parseDateString(e.changedToAt))
-          .filter((d): d is Date => d !== null)
-          .map((d) => d.getTime());
-        date = timestamps.length > 0
-          ? new Date(Math.min(...timestamps))
-          : new Date("2010-06-13");
-      } catch {
-        date = getDefaultBirthDate();
-      }
+    interface NameHistoryEntry {
+        name: string;
+        changedToAt: string; // "2020/03/10 03:52:18" or ""
     }
 
-let premium = false;
-if (!isOfflineUUID(uuid)) {
-  try {
-    const clean = uuid.replace(/-/g, "");
-    const response = await fetch(
-      `https://sessionserver.mojang.com/session/minecraft/profile/${clean}`
-    );
-    
-    if (response.ok) {
-      const data = await response.json();
-   
-      premium = Array.isArray(data.properties) && 
-                data.properties.some((prop: { name: string; value: string }) => {
-                  return prop.name === "textures" && 
-                         prop.value && 
-                         prop.value.length > 0;
-                });
-    }
-  } catch (error) {
-    console.error("正版验证失败:", error);
-    premium = false;
-  }
-}
-    return {
-      year: String(date.getFullYear()),
-      month: String(date.getMonth() + 1),
-      day: String(date.getDate()),
-      premium
-    };
-  }
-
-  async function updateTargetInfo(uuid: string) {
- 
-    if (!infoCache.has(uuid)) {
-      infoCache.set(uuid, fetchTargetInfo(uuid));
+    interface UAPIResponse {
+        history: NameHistoryEntry[];
     }
 
-    const { year, month, day, premium } = await infoCache.get(uuid)!;
-    birthYear = year;
-    birthMonth = month;
-    birthDay = day;
-    isPremium = premium;
-  }
+    let target: PlayerData | null = null;
+    let visible = true;
+    let hideTimeout: ReturnType<typeof setTimeout>;
+    let teamColor: TeamColor = null;
+    let xp = "不明";
 
-  listen("targetChange", (data: TargetChangeEvent) => {
-    target = data.target;
-    visible = true;
-    clearTimeout(hideTimeout);
+    let birthYear = "2009";
+    let birthMonth = "5";
+    let birthDay = "17";
+
+
+    let isPremium = false;
+
+    const xpCache = new Map<string, string>();
+
+    function getRandomXP() {
+        const xps = ["恋物", "恋童", "施虐", "受虐", "贫乳", "巨乳", "绑缚", "异瞳"];
+        return xps[Math.floor(Math.random() * xps.length)];
+    }
+
+    function getXPForTarget(id: string | null) {
+        if (!id) return "不明";
+        if (!xpCache.has(id)) xpCache.set(id, getRandomXP());
+        return xpCache.get(id)!;
+    }
+
+
+    function startHideTimeout() {
+        hideTimeout = setTimeout(() => (visible = false), 2000);
+    }
+
+    function isOfflineUUID(uuid: string) {
+        return !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(uuid);
+    }
+
+    function getDefaultBirthDate() {
+        return new Date("2009-05-17");
+    }
+
+    function parseDateString(s: string): Date | null {
+        if (!s) return null;
+        const iso = s.replace(/\//g, "-").replace(" ", "T");
+        const d = new Date(iso);
+        return isNaN(d.getTime()) ? null : d;
+    }
+
+
+    const infoCache = new Map<
+        string,
+        Promise<{ year: string; month: string; day: string; premium: boolean }>
+    >();
+
+    function removeColorCodes(str: string): string {
+
+        return str.replace(/§[0-9a-fA-F]/g, '');
+    }
+
+    async function fetchTargetInfo(uuid: string) {
+
+        let date: Date;
+        if (isOfflineUUID(uuid)) {
+            date = getDefaultBirthDate();
+        } else {
+            try {
+                const clean = uuid.replace(/-/g, "");
+                const res = await fetch(`https://uapis.cn/api/mchistoryid?uuid=${clean}`);
+                if (!res.ok) throw new Error();
+                const data = (await res.json()) as UAPIResponse;
+
+                const timestamps = data.history
+                    .map((e) => parseDateString(e.changedToAt))
+                    .filter((d): d is Date => d !== null)
+                    .map((d) => d.getTime());
+                date = timestamps.length > 0
+                    ? new Date(Math.min(...timestamps))
+                    : new Date("2010-06-13");
+            } catch {
+                date = getDefaultBirthDate();
+            }
+        }
+
+        let premium = false;
+        if (!isOfflineUUID(uuid)) {
+            try {
+                const clean = uuid.replace(/-/g, "");
+                const response = await fetch(
+                    `https://sessionserver.mojang.com/session/minecraft/profile/${clean}`
+                );
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    premium = Array.isArray(data.properties) &&
+                        data.properties.some((prop: { name: string; value: string }) => {
+                            return prop.name === "textures" &&
+                                prop.value &&
+                                prop.value.length > 0;
+                        });
+                }
+            } catch (error) {
+                console.error("正版验证失败:", error);
+                premium = false;
+            }
+        }
+        return {
+            year: String(date.getFullYear()),
+            month: String(date.getMonth() + 1),
+            day: String(date.getDate()),
+            premium
+        };
+    }
+
+    async function updateTargetInfo(uuid: string) {
+
+        if (!infoCache.has(uuid)) {
+            infoCache.set(uuid, fetchTargetInfo(uuid));
+        }
+
+        const {year, month, day, premium} = await infoCache.get(uuid)!;
+        birthYear = year;
+        birthMonth = month;
+        birthDay = day;
+        isPremium = premium;
+    }
+
+    listen("targetChange", (data: TargetChangeEvent) => {
+        target = data.target;
+        visible = true;
+        clearTimeout(hideTimeout);
+        startHideTimeout();
+
+        if (target) {
+            xp = getXPForTarget(target.username);
+            teamColor = detectTeamColor(calcArmorColor(target.armorItems));
+
+            updateTargetInfo(target.uuid);
+        }
+    });
+
     startHideTimeout();
-
-    if (target) {
-      xp = getXPForTarget(target.username);
-      teamColor = detectTeamColor(calcArmorColor(target.armorItems));
-   
-      updateTargetInfo(target.uuid);
-    }
-  });
-
-  startHideTimeout();
 </script>
 <div class="main-wrapper" class:draggable={!visible && !target}>
-{#if visible && target }
-    <div class="hj" transition:fly={{ y: -10, duration: 200 }}>
+    {#if visible && target }
+        <div class="hj" transition:fly={{ y: -10, duration: 200 }}>
 
             <div class="id-card">
                 <div class="content">
@@ -166,7 +174,7 @@ if (!isOfflineUUID(uuid)) {
                                 <span class="label">性 癖：</span>
                                 <span class="value">{xp}</span>
                             </div>
-                      
+
                             <div class="combined-item">
                                 <span class="label">正 版：</span>
                                 <span class="value">{isPremium ? '是' : '否'}</span>
@@ -183,19 +191,20 @@ if (!isOfflineUUID(uuid)) {
                         </div>
                         <div class="info-row">
                             <span class="label">现 居：</span>
-                            <span class="value">X:{Math.round(target.position.x)} Y:{Math.round(target.position.y)} Z:{Math.round(target.position.z)}</span>
+                            <span class="value">X:{Math.round(target.position.x)} Y:{Math.round(target.position.y)}
+                                Z:{Math.round(target.position.z)}</span>
                         </div>
-                              {#if teamColor}
-                                <div class="info-row">
-                                    <span class="label">队 伍：</span>
-                                    <span class="value">{teamColor}队</span>
-                                </div>
-                            {/if}
+                        {#if teamColor}
+                            <div class="info-row">
+                                <span class="label">队 伍：</span>
+                                <span class="value">{teamColor}队</span>
+                            </div>
+                        {/if}
                     </div>
                     <div class="view-container">
                         <div class="view">
                             <div class="view-inner">
-                                <PlayerView skinUrl={`${REST_BASE}/api/v1/client/resource/skin?uuid=${target.uuid}`}  />
+                                <PlayerView skinUrl={`${REST_BASE}/api/v1/client/resource/skin?uuid=${target.uuid}`}/>
                             </div>
                         </div>
                     </div>
@@ -208,9 +217,9 @@ if (!isOfflineUUID(uuid)) {
             </div>
         </div>
 
-{:else}
-    <div class="empty-placeholder" />
-{/if}
+    {:else}
+        <div class="empty-placeholder"/>
+    {/if}
 </div>
 <style lang="scss">
   @use "../../../../../colors.scss" as *;
@@ -226,7 +235,8 @@ if (!isOfflineUUID(uuid)) {
     overflow: hidden;
     min-width: 450px;
     min-height: 280px;
-    transition: background-color,border-color 0.3s ease;
+    transition: background-color, border-color 0.3s ease;
+
     &:hover {
       background: rgba(204, 204, 204, 0.2);
       border-color: #ccc;
@@ -236,6 +246,7 @@ if (!isOfflineUUID(uuid)) {
     .empty-placeholder {
       display: none;
     }
+
     &.draggable {
       cursor: move;
 
@@ -245,15 +256,16 @@ if (!isOfflineUUID(uuid)) {
       }
     }
   }
+
   .id-card {
     width: 450px;
     min-height: 280px;
     background-image: url('/img/hud/targethud/sfz.png');
     background-size: 100% 100%;
-    filter: drop-shadow(0 0 4px rgba($base , 0.5));
+    filter: drop-shadow(0 0 4px rgba($base, 0.5));
     background-position: center;
     border-radius: 10px;
-    padding:40px;
+    padding: 40px;
     color: #333;
     font-family: 'Microsoft YaHei', 'SimHei', sans-serif;
     overflow: hidden;
@@ -280,14 +292,16 @@ if (!isOfflineUUID(uuid)) {
     align-items: center;
     justify-content: center;
     pointer-events: none;
+
     .view {
       position: relative;
+
       .view-inner {
         position: absolute;
         top: 40%;
         left: 50%;
         transform: translate(-50%, -50%) scale(5.5);
-        filter: drop-shadow(0 0 4px rgba($base , 0.5));
+        filter: drop-shadow(0 0 4px rgba($base, 0.5));
       }
     }
   }
@@ -377,6 +391,7 @@ if (!isOfflineUUID(uuid)) {
       margin-right: 8px;
       flex-shrink: 0;
     }
+
     .uuid {
       flex: 1;
       color: #131220;

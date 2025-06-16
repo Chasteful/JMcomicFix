@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { onDestroy } from 'svelte';
-    import { listen } from "../../../integration/ws";
-    import type { ClientPlayerDataEvent } from "../../../integration/events";
-    import type { PlayerData } from "../../../integration/types";
-    import { throttle } from "lodash";
+    import {onDestroy} from 'svelte';
+    import {listen} from "../../../integration/ws";
+    import type {ClientPlayerDataEvent} from "../../../integration/events";
+    import type {PlayerData} from "../../../integration/types";
+    import {throttle} from "lodash";
 
     export let width: number = 250;
     export let amplitude: number = 50;
@@ -16,7 +16,7 @@
     let lastUpdate = Date.now();
 
     let playerData: PlayerData | null = null;
-    let lastPosition = { x: 0, z: 0 };
+    let lastPosition = {x: 0, z: 0};
 
     const updateGraph = () => {
         const MAX_POINTS = 100;
@@ -47,8 +47,8 @@
         let d = `M ${points[0].x},${points[0].y}`;
         points.slice(1).forEach((p, i) => {
             const prev = points[i];
-            const cp1 = { x: prev.x + (p.x - prev.x) * 0.5, y: prev.y };
-            const cp2 = { x: prev.x + (p.x - prev.x) * 0.5, y: p.y };
+            const cp1 = {x: prev.x + (p.x - prev.x) * 0.5, y: prev.y};
+            const cp2 = {x: prev.x + (p.x - prev.x) * 0.5, y: p.y};
             d += ` C ${cp1.x},${cp1.y} ${cp2.x},${cp2.y} ${p.x},${p.y}`;
         });
 
@@ -74,7 +74,7 @@
             const speed = Math.sqrt(dx * dx + dz * dz) * tickrate;
 
             speeds = [...speeds, speed];
-            lastPosition = { x: newPos.x, z: newPos.z };
+            lastPosition = {x: newPos.x, z: newPos.z};
             updateGraph();
         }, 50)
     );
@@ -85,25 +85,25 @@
 </script>
 
 <div class="graph-container" style={`--yOffset: ${yOffset}px`}>
-    <svg class="motion-graph" width={width} height={amplitude}>
+    <svg class="motion-graph" height={amplitude} width={width}>
 
         <defs>
-            <mask id="fade-mask" maskUnits="userSpaceOnUse" x="0" y="0" width={width} height={amplitude}>
+            <mask height={amplitude} id="fade-mask" maskUnits="userSpaceOnUse" width={width} x="0" y="0">
 
-                <linearGradient id="fade-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <linearGradient id="fade-gradient" x1="0%" x2="100%" y1="0%" y2="0%">
                     <stop offset="0%" stop-color="white" stop-opacity="0"/>
                     <stop offset="10%" stop-color="white" stop-opacity="1"/>
                     <stop offset="90%" stop-color="white" stop-opacity="1"/>
                     <stop offset="100%" stop-color="white" stop-opacity="0"/>
                 </linearGradient>
 
-                <rect x="0" y="0" width={width} height={amplitude} fill="url(#fade-gradient)" />
+                <rect fill="url(#fade-gradient)" height={amplitude} width={width} x="0" y="0"/>
             </mask>
         </defs>
 
         <g mask="url(#fade-mask)">
-            <path class="base-path" d={pathD} />
-            <path class="highlight-path" d={pathD} />
+            <path class="base-path" d={pathD}/>
+            <path class="highlight-path" d={pathD}/>
         </g>
     </svg>
 </div>

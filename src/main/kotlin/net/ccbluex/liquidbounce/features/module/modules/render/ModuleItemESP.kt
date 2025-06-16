@@ -64,8 +64,17 @@ object ModuleItemESP : ClientModule("ItemESP", Category.RENDER) {
 
     override val baseKey: String
         get() = "liquidbounce.module.itemEsp"
+
+    @Suppress("unused")
     private val shadow by boolean ("Shadow", true)
+
+    @Suppress("unused")
     private val shadowColor by color("ShadowColor", Color4b(0,0,0,255))
+
+    @Suppress("unused")
+    private val showName by boolean("ShowName",true)
+
+    @Suppress("unused")
     private val textColor by color("TextColor", Color4b(255,255,255,255))
 
     private val modes = choices("Mode", OutlineMode, arrayOf(GlowMode, OutlineMode, BoxMode))

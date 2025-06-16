@@ -1,10 +1,11 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import type { ModuleSetting, BindSetting } from "../../../integration/types";
-    import { getModules, getModuleSettings, getPrintableKeyName } from "../../../integration/rest";
-    import { listen } from "../../../integration/ws";
+    import {onMount} from "svelte";
+    import type {ModuleSetting, BindSetting} from "../../../integration/types";
+    import {getModules, getModuleSettings, getPrintableKeyName} from "../../../integration/rest";
+    import {listen} from "../../../integration/ws";
     import {expoInOut} from "svelte/easing";
-    import { fly } from "svelte/transition";
+    import {fly} from "svelte/transition";
+
     type BindInfo = {
         moduleName: string;
         enabled: boolean;
@@ -40,19 +41,19 @@
 
             await Promise.all(modules.map(async (module) => {
                 if (module.hidden) return;
-                    const settings = await getModuleSettings(module.name);
-                    const bindSetting = settings.value.find(isBindSetting);
+                const settings = await getModuleSettings(module.name);
+                const bindSetting = settings.value.find(isBindSetting);
 
-                    if (bindSetting && bindSetting.value.boundKey !== UNKNOWN_KEY) {
-                        const printable = await getCachedPrintableKeyName(bindSetting.value.boundKey);
+                if (bindSetting && bindSetting.value.boundKey !== UNKNOWN_KEY) {
+                    const printable = await getCachedPrintableKeyName(bindSetting.value.boundKey);
 
-                        results.push({
-                            moduleName: module.name,
-                            enabled: module.enabled,
-                            keyName: printable,
-                            action: bindSetting.value.action
-                        });
-                    }
+                    results.push({
+                        moduleName: module.name,
+                        enabled: module.enabled,
+                        keyName: printable,
+                        action: bindSetting.value.action
+                    });
+                }
             }));
 
             bindings = results.sort((a, b) => a.moduleName.localeCompare(b.moduleName));
@@ -69,35 +70,35 @@
     listen("moduleToggle", updateBindings);
 </script>
 {#if loaded}
-<div class="hud-container" transition:fly|global={{duration: 500, y: -50, easing: expoInOut}}>
-    <div class="title">
-        <img class="icon" src="img/hud/keybinds/keyboard.svg" alt="keyboard" />
-        <span>Keybindings</span>
-    </div>
-    <div class="line" ></div>
-    {#each bindings as binding (binding.moduleName)}
-        <div class:disabled={!binding.enabled} class="binding-item">
-            <span class="module-name">{binding.moduleName}</span>
-            <span class="key-info">[{binding.keyName}]</span>
+    <div class="hud-container" transition:fly|global={{duration: 500, y: -50, easing: expoInOut}}>
+        <div class="title">
+            <img class="icon" src="img/hud/keybinds/keyboard.svg" alt="keyboard"/>
+            <span>Keybindings</span>
         </div>
-    {/each}
-</div>
+        <div class="line"></div>
+        {#each bindings as binding (binding.moduleName)}
+            <div class:disabled={!binding.enabled} class="binding-item">
+                <span class="module-name">{binding.moduleName}</span>
+                <span class="key-info">[{binding.keyName}]</span>
+            </div>
+        {/each}
+    </div>
 {/if}
 <style lang="scss">
   @use "../../../colors.scss" as *;
 
   .hud-container {
     position: absolute;
-    background-color: rgba($base , 0.5);
-    box-shadow:
-            0 4px 16px rgba($base, 0.6),
-            inset 0 0 10px rgba(255, 255, 255, 0.05);
+    background-color: rgba($base, 0.5);
+    box-shadow: 0 4px 16px rgba($base, 0.6),
+    inset 0 0 10px rgba(255, 255, 255, 0.05);
     border-radius: 6px;
     padding: 0.5em 0.8em;
     color: $text-color;
     min-width: 225px;
     font-size: 1rem;
   }
+
   .title {
     display: flex;
     align-items: center;
@@ -133,6 +134,7 @@
     color: $text-color;
     font-weight: 500;
   }
+
   .line {
     height: 2px;
     background: linear-gradient(

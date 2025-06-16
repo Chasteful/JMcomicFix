@@ -1,5 +1,5 @@
-import { listen } from "../integration/ws";
-import type { OverlayTitleEvent } from "../integration/events";
+import {listen} from "../integration/ws";
+import type {OverlayTitleEvent} from "../integration/events";
 import type {TextComponent as TTextComponent} from "../integration/types";
 import {writable} from "svelte/store";
 
@@ -21,8 +21,7 @@ const winKeywords = [
 ];
 
 
-
-function extractText(component: TTextComponent | string): string  {
+function extractText(component: TTextComponent | string): string {
     if (!component) return "";
     if (typeof component === "string") return component;
 

@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { listen } from "../../../integration/ws";
-    import type { ClientPlayerDataEvent } from "../../../integration/events";
-    import type { PlayerData } from "../../../integration/types";
-    import { rgbaToHex } from "../../../integration/util";
-    import { intToRgba } from "../../../integration/util.js";
+    import {listen} from "../../../integration/ws";
+    import type {ClientPlayerDataEvent} from "../../../integration/events";
+    import type {PlayerData} from "../../../integration/types";
+    import {rgbaToHex} from "../../../integration/util";
+    import {intToRgba} from "../../../integration/util.js";
 
     let playerData: PlayerData | null = null;
     let processedText: string = '';
@@ -71,11 +71,11 @@
 <style lang="scss">
   @use "../../../colors.scss" as *;
 
-    .text {
-        position: absolute;
-        white-space: nowrap;
-        user-select: none;
-        pointer-events: none;
-        z-index: 1000;
-    }
+  .text {
+    position: absolute;
+    white-space: nowrap;
+    user-select: none;
+    pointer-events: none;
+    z-index: 1000;
+  }
 </style>

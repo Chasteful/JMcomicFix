@@ -27,6 +27,7 @@ import net.ccbluex.liquidbounce.integration.theme.component.types.minimap.Minima
 enum class ComponentType(
     override val choiceName: String,
     private val componentTweaks: Array<FeatureTweak> = emptyArray(),
+
     val createComponent: () -> Component = { IntegratedComponent(choiceName, componentTweaks) }
 ) : NamedChoice{
 
@@ -108,8 +109,8 @@ enum class ComponentType(
     CRAFTING_INVENTORY("CraftingInput"),
     KEYSTROKES("Keystrokes"),
     ISLAND("Island"),
-    NOTIFICATIONS("Notifications");
-
+    NOTIFICATIONS("Notifications"),
+    VIGNETTE("Vignette");
 
     companion object {
         fun byName(name: String) = entries.find { it.choiceName == name }

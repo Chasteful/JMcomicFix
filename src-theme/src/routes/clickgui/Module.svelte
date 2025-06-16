@@ -1,38 +1,38 @@
 <script lang="ts">
-  import { getContext } from "svelte";
-  import { get, type Writable } from "svelte/store";
-  import { setItem } from "../../integration/persistent_storage";
-  import type { ConfigurableSetting} from "../../integration/types";
-  import { onMount } from "svelte";
-  import { getModuleSettings, setModuleSettings, setModuleEnabled } from "../../integration/rest";
-  import GenericSetting from "./setting/common/GenericSetting.svelte";
-  import { description as descriptionStore, highlightModuleName, scaleFactor} from "./clickgui_store";
-  import {  slide } from "svelte/transition";
-  import { quintOut } from "svelte/easing";
-  import { convertToSpacedString, spaceSeperatedNames } from "../../theme/theme_config";
+    import {getContext} from "svelte";
+    import {get, type Writable} from "svelte/store";
+    import {setItem} from "../../integration/persistent_storage";
+    import type {ConfigurableSetting} from "../../integration/types";
+    import {onMount} from "svelte";
+    import {getModuleSettings, setModuleSettings, setModuleEnabled} from "../../integration/rest";
+    import GenericSetting from "./setting/common/GenericSetting.svelte";
+    import {description as descriptionStore, highlightModuleName, scaleFactor} from "./clickgui_store";
+    import {slide} from "svelte/transition";
+    import {quintOut} from "svelte/easing";
+    import {convertToSpacedString, spaceSeperatedNames} from "../../theme/theme_config";
 
-  export let name: string;
-  export let enabled: boolean;
-  export let description: string;
-  export let aliases: string[];
-  const expandedModuleName: Writable<string | null> = getContext("expandedModuleName");
-  const modulesElement = getContext<HTMLElement>("modules-element");
-  const path = `clickgui.${name}`;
-  let expanded: boolean = false;
-  let configurable: ConfigurableSetting;
-  let moduleNameElement: HTMLElement;
-
-
-   $: expanded = $expandedModuleName === name;
+    export let name: string;
+    export let enabled: boolean;
+    export let description: string;
+    export let aliases: string[];
+    const expandedModuleName: Writable<string | null> = getContext("expandedModuleName");
+    const modulesElement = getContext<HTMLElement>("modules-element");
+    const path = `clickgui.${name}`;
+    let expanded: boolean = false;
+    let configurable: ConfigurableSetting;
+    let moduleNameElement: HTMLElement;
 
 
-  highlightModuleName.subscribe((name) => {
-  if (!modulesElement || !name) return;
-  
-  const el = modulesElement.querySelector(`[data-module-name="${name}"]`);
-    if (el instanceof HTMLElement) {
-    console.log('scrolling to:', el.offsetTop);     
-  }
+    $: expanded = $expandedModuleName === name;
+
+
+    highlightModuleName.subscribe((name) => {
+        if (!modulesElement || !name) return;
+
+        const el = modulesElement.querySelector(`[data-module-name="${name}"]`);
+        if (el instanceof HTMLElement) {
+            console.log('scrolling to:', el.offsetTop);
+        }
         setTimeout(() => {
             if (!moduleNameElement) {
                 return;
@@ -42,20 +42,20 @@
                 block: "center",
             });
         }, 1000);
-});
+    });
 
 
-  async function updateModuleSettings() {
-      await setModuleSettings(name, configurable);
-      configurable = await getModuleSettings(name);
-  }
+    async function updateModuleSettings() {
+        await setModuleSettings(name, configurable);
+        configurable = await getModuleSettings(name);
+    }
 
 
-  async function toggleModule() {
-    await setModuleEnabled(name, !enabled);
-  }
+    async function toggleModule() {
+        await setModuleEnabled(name, !enabled);
+    }
 
-  function setDescription() {
+    function setDescription() {
         if (!moduleNameElement) return;
 
         const boundingRect = moduleNameElement.getBoundingClientRect();
@@ -66,7 +66,7 @@
             moduleDescription += ` (aka ${aliases.map(name => $spaceSeperatedNames ? convertToSpacedString(name) : name).join(", ")})`;
         }
 
-        
+
         if (window.innerWidth - boundingRect.right > 300) {
             const x = boundingRect.right * (2 / $scaleFactor);
             descriptionStore.set({
@@ -86,39 +86,40 @@
             });
         }
     }
-  
+
     async function toggleExpanded() {
-  if (get(expandedModuleName) === name) {
-    expandedModuleName.set(null); 
-  } else {
-    expandedModuleName.set(name);
-  }
-  await setItem(path, (get(expandedModuleName) === name).toString());
-}
+        if (get(expandedModuleName) === name) {
+            expandedModuleName.set(null);
+        } else {
+            expandedModuleName.set(name);
+        }
+        await setItem(path, (get(expandedModuleName) === name).toString());
+    }
+
     onMount(async () => {
         configurable = await getModuleSettings(name);
     });
 </script>
 
 <div
-  class="module" data-module-name={name}
-  class:expanded
-  class:has-settings={configurable?.value.length > 2}
-  in:slide={{ duration: 300, easing: quintOut }}
-  out:slide={{ duration: 200 ,easing: quintOut }}
+        class="module" class:expanded
+        class:has-settings={configurable?.value.length > 2}
+        data-module-name={name}
+        in:slide={{ duration: 300, easing: quintOut }}
+        out:slide={{ duration: 200 ,easing: quintOut }}
 >
-  <!-- svelte-ignore a11y_click_events_have_key_events -->
-  <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div
-    class="name"
-    on:contextmenu|preventDefault={toggleExpanded}
-    on:click={toggleModule}
-    on:mouseenter={setDescription}
-    on:mouseleave={() => descriptionStore.set(null)}
-    bind:this={moduleNameElement}
-    class:enabled
-    class:highlight={name === $highlightModuleName}
-  >
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div
+            bind:this={moduleNameElement}
+            class="name"
+            class:enabled
+            class:highlight={name === $highlightModuleName}
+            on:click={toggleModule}
+            on:contextmenu|preventDefault={toggleExpanded}
+            on:mouseenter={setDescription}
+            on:mouseleave={() => descriptionStore.set(null)}
+    >
   <span class="name-inner">
     {#if $spaceSeperatedNames}
       {convertToSpacedString(name)}
@@ -126,28 +127,41 @@
       {name}
     {/if}
   </span>
-  </div>
-
-  {#if expanded && configurable}
-    <div class="settings-wrapper"  >
-      <div class="settings">
-        {#each configurable.value as setting (setting.name)}
-          <GenericSetting skipAnimationDelay = {true} {path} bind:setting on:change={updateModuleSettings} />
-        {/each}
-      </div>
     </div>
-  {/if}
+
+    {#if expanded && configurable}
+        <div class="settings-wrapper">
+            <div class="settings">
+                {#each configurable.value as setting (setting.name)}
+                    <GenericSetting skipAnimationDelay={true} {path} bind:setting on:change={updateModuleSettings}/>
+                {/each}
+            </div>
+        </div>
+    {/if}
 </div>
 
 <style lang="scss">
   @use "../../colors.scss" as *;
+
   @keyframes shake-horizontal {
-    0%, 100% { transform: translateX(0); }
-    10%, 90% { transform: translateX(-4px); }
-    20%, 80% { transform: translateX(4px); }
-    30%, 70% { transform: translateX(-6px); }
-    40%, 60% { transform: translateX(6px); }
-    50% { transform: translateX(0); }
+    0%, 100% {
+      transform: translateX(0);
+    }
+    10%, 90% {
+      transform: translateX(-4px);
+    }
+    20%, 80% {
+      transform: translateX(4px);
+    }
+    30%, 70% {
+      transform: translateX(-6px);
+    }
+    40%, 60% {
+      transform: translateX(6px);
+    }
+    50% {
+      transform: translateX(0);
+    }
   }
 
   @keyframes highlight-flash {
@@ -228,6 +242,7 @@
       position: relative;
       overflow: hidden;
       transition: all 0.3s ease-out;
+
       .name-inner {
         display: inline-block;
       }
@@ -250,9 +265,8 @@
         background-size: 200% auto;
         color: white;
         text-shadow: 0 0 12px color-mix(in srgb, var(--primary-color) 70%, transparent);
-        box-shadow:
-                0 0 8px color-mix(in srgb, var(--primary-color) 30%, transparent),
-                inset 0 0 10px rgba(white, 0.1);
+        box-shadow: 0 0 8px color-mix(in srgb, var(--primary-color) 30%, transparent),
+        inset 0 0 10px rgba(white, 0.1);
         transition: background-position 0.3s ease;
 
         &:hover {

@@ -46,7 +46,9 @@ object ModuleJumpCircle : ClientModule("JumpCircle", Category.RENDER) {
             if (!player.isOnGround && players.contains(player)) {
                 circles.add(ObjectLongMutablePair.of(player.pos, System.currentTimeMillis()))
                 true
-            } else false
+            } else {
+                false
+            }
         }
         circles.removeAll {
             System.currentTimeMillis() - it.rightLong() > if (easeOut) 5000 else 6000
@@ -84,8 +86,8 @@ object ModuleJumpCircle : ClientModule("JumpCircle", Category.RENDER) {
                 }
                 val alpha = 1f - progress
                 val rotation = sizeAnim * rotateSpeed * 1000f
-
-                withPositionRelativeToCamera(pos) {
+                val renderPos = Vec3d(pos.x, pos.y - 0.5, pos.z)
+                withPositionRelativeToCamera(renderPos) {
                     matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90f))
                     matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotation))
 
