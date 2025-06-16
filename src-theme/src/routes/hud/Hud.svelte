@@ -1,6 +1,6 @@
 <script lang="ts">
     import {onMount} from "svelte";
-    import ArrayList from "./elements/ArrayList.svelte";
+    import ArrayList from "./elements/arrayList/ArrayList.svelte";
     import TargetHud from "./elements/targethud/TargetHud.svelte";
     import Notifications from "./elements/notifications/Notifications.svelte";
     import TabGui from "./elements/tabgui/TabGui.svelte";

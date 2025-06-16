@@ -1,19 +1,19 @@
 <script lang="ts">
     import {onMount, onDestroy, tick} from 'svelte';
-    import type {Module} from '../../../integration/types';
-    import {getModules} from '../../../integration/rest';
-    import {listen} from '../../../integration/ws';
-    import {getTextWidth} from '../../../integration/text_measurement';
-    import {convertToSpacedString, spaceSeperatedNames} from '../../../theme/theme_config';
-    import {getPrefixAsync} from '../../../theme/arraylist';
+    import type {Module} from '../../../../integration/types';
+    import {getModules} from '../../../../integration/rest';
+    import {listen} from '../../../../integration/ws';
+    import {getTextWidth} from '../../../../integration/text_measurement';
+    import {convertToSpacedString, spaceSeperatedNames} from '../../../../theme/theme_config';
+    import {getPrefixAsync} from '../../../../theme/arraylist';
     import {flip} from 'svelte/animate';
     import {fly} from 'svelte/transition';
-    import {expoInOut} from 'svelte/easing';
+
     import {
         subscribeColors,
         arraylistGradient,
         destroyGradient
-    } from '../../../theme/arraylist';
+    } from '../../../../theme/arraylist';
 
     let enabledModules: Array<Module & { prefix: string; formattedName: string; width: number }> = [];
     let intervalId: number;
@@ -71,44 +71,24 @@
     });
 </script>
 
-<div
-        class="arraylist"
-        id="arraylist"
-        transition:fly|global={{ duration: 500, y: -50, easing: expoInOut }}
->
-    {#each enabledModules as {formattedName, prefix, name} (name)}
-        <div
-                class="module"
-                id="module-name"
-                animate:flip={{ duration: 200 }}
-                in:fly={{ x: 50, duration: 200 }}
-        >
-            {formattedName}
-            {#if prefix}&nbsp;<span class="prefix">{prefix}</span>{/if}
-            <span class="side-bar" id="side-bar"></span>
-        </div>
-    {/each}
-</div>
+
+{#each enabledModules as {formattedName, prefix, name} (name)}
+    <div
+            class="module"
+            id="module-name"
+            animate:flip={{ duration: 200 }}
+            in:fly={{ x: 50, duration: 200 }}
+    >
+        {formattedName}
+        {#if prefix}&nbsp;<span class="prefix">{prefix}</span>{/if}
+        <span class="side-bar" id="side-bar"></span>
+    </div>
+{/each}
+
 
 <style lang="scss">
-  @import '../../../colors.scss';
+  @import '../../../../colors';
 
-  :root {
-    --primary-color-rgb: var(--primary-color-rgb);
-    --secondary-color-rgb: var(--secondary-color-rgb);
-  }
-
-  .arraylist {
-    display: flex;
-    top: 0;
-    right: 0;
-    flex-direction: column;
-    align-items: flex-end;
-    position: absolute;
-    transform: translateZ(0);
-    font-size: 72px;
-
-  }
 
   .module {
     position: relative;

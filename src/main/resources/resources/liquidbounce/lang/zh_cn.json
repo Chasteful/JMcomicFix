@@ -581,6 +581,7 @@
   "liquidbounce.module.inventoryTracker.description": "跟踪其他玩家的物品栏。",
   "liquidbounce.module.itemEsp.description": "允许你透过方块看到掉落物。",
   "liquidbounce.module.jumpEffect.description": "跳跃时在你脚下显示一种效果。",
+  "liquidbounce.module.jumpCircle.description": "标识出你曾经跳跃的地方。",
   "liquidbounce.module.keepChatAfterDeath.description": "允许你在死亡屏幕使用聊天。",
   "liquidbounce.module.keepSprint.description": "允许你在攻击时保持疾跑。",
   "liquidbounce.module.clickTp.description": "单击鼠标中键时，将你传送至你准星所指的方块。仅适用于 Vulcan 286 反作弊。",
@@ -733,6 +734,6 @@
   "liquidbounce.module.replenish.description": "自动用物品栏中的物品填充快捷栏，使物品数量保持设定的阈值。",
   "liquidbounce.module.anchor.description": "让你移动到水晶PvP的安全点里。",
   "liquidbounce.module.antiCheatDetect.messages.description": "Anti Cheat Detect 将尝试在你下次加入任何服务器/游戏时，通过监测 ping 参数来检测服务器的反作弊系统。请注意，结果可能不准确，特别是当服务器上有多个反作弊系统时。",
-  "liquidbounce.module.titleControl.description": "过滤服务器的标题上，你不想看见的关键词",
-  "liquidbounce.module.capes.description": "自定义一个属于你的披风。"
+  "liquidbounce.module.titleControl.description": "过滤服务器的标题上，你不想看见的关键词。",
+  "liquidbounce.module.capes.description": "自定义一个仅你可见的披风。"
 }

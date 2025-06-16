@@ -32,8 +32,9 @@
         "/singleplayer": Singleplayer,
         "/proxymanager": ProxyManager,
         "/disconnected": Disconnected,
-        "/browser": Browser,
         "/connecting":ConnectionScreen,
+        "/browser": Browser,
+
 
     };
 
@@ -46,11 +47,14 @@
         console.log(`[Router] Redirecting to ${name}`);
         await push(`/${name}`);
     }
-    $: if ($locked) {
-        openScreen("lockscreen");
-    }
+    $effect(() => {
+        if ($locked) {
+            openScreen("lockscreen");
+        }
+    });
 
     onMount(async () => {
+
         await insertPersistentData();
 
         if (isStatic) {

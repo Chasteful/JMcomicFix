@@ -578,6 +578,7 @@
   "liquidbounce.module.inventoryTracker.description": "Tracks the inventories of other players.",
   "liquidbounce.module.itemEsp.description": "Allows you to see dropped items through walls.",
   "liquidbounce.module.jumpEffect.description": "Shows an effect beneath your feet when jumping.",
+  "liquidbounce.module.jumpCircle.description": "Identify where you used to jump.",
   "liquidbounce.module.keepChatAfterDeath.description": "Allows you to use the chat on the death screen.",
   "liquidbounce.module.keepSprint.description": "Keeps you sprinting even when attacking.",
   "liquidbounce.module.clickTp.description": "Teleports you to the block you are looking at when pressing MIDDLE_CLICK. Only works on Vulcan 286 anti-cheat.",
@@ -728,6 +729,6 @@
   "liquidbounce.module.autoPearl.description": "Aims and throws a pearl at an enemies pearl trajectory.",
   "liquidbounce.module.replenish.description": "Automatically refills your hotbar with items from your inventory when the count drops to a certain threshold.",
   "liquidbounce.module.anchor.description": "Pulls you into safe holes for crystal PvP.",
-  "liquidbounce.module.titleControl.description": "Filter the title of the server for keywords you don't want to see",
-  "liquidbounce.module.capes.description":"Customize a cloak of your own."
+  "liquidbounce.module.titleControl.description": "Filter the title of the server for keywords you don't want to see.",
+  "liquidbounce.module.capes.description":"Customize a cape that is only visible to you."
 }
