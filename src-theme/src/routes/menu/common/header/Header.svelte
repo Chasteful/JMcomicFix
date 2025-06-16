@@ -4,7 +4,7 @@
     import Logo from "./Logo.svelte";
     export let showAccount: boolean;
     export let showHeader: boolean;
-    export let src = 'img/lb-logo.svg';
+
 </script>
 
 {#if showHeader}
@@ -14,7 +14,7 @@
             <Notifications />
         </div>
         <div class="logo">
-            <Logo src={src} showLogo={true}/>
+            <Logo showLogo={true}/>
         </div>
         {#if showAccount}
             <Account />

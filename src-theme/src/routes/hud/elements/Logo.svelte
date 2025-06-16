@@ -1,19 +1,27 @@
 <script lang="ts">
-    import {onMount, onDestroy} from 'svelte';
-    import {primaryRgb, secondaryRgb} from '../../../components/ThemeManager';
-    import {toggleBackgroundShaderEnabled} from "../../../integration/rest";
+    import { onMount, onDestroy } from 'svelte';
+    import { primaryRgb, secondaryRgb } from '../../../components/ThemeManager';
+    import { toggleBackgroundShaderEnabled } from "../../../integration/rest";
+    import ClientLogo from "../../menu/common/header/ClientLogo.svelte";
 
-    export let src = 'img/LiquidBounce.svg';
-    export let size = 225;
-    // svelte-ignore export_let_unused
-    export let baseColor = '#ffffff';
-    let redLayer: HTMLImageElement;
-    let blueLayer: HTMLImageElement;
+    export let size =  262;
+
+    let redLayer: HTMLElement;
+    let blueLayer: HTMLElement;
     let intervalId: ReturnType<typeof setInterval>;
     let timeoutId: ReturnType<typeof setTimeout>;
+    let mounted = false;
+
+    const delays = Array(8).fill(0).map(() => Math.random() * 100);
+    const durations = Array(8).fill(0).map(() => 100 + Math.random() * 300);
+    const randomClipPaths = Array(3).fill(0).map(() => {
+        const top = Math.random() * 60;
+        const bottom = top + 20 + Math.random() * 30;
+        return `polygon(0 ${top}%, 100% ${top}%, 100% ${bottom}%, 0 ${bottom}%)`;
+    });
 
     function startGlitchLoop() {
-        const layers = [redLayer, blueLayer].filter(Boolean) as HTMLImageElement[];
+        const layers = [redLayer, blueLayer].filter(Boolean) as HTMLElement[];
         intervalId = setInterval(() => {
             layers.forEach((layer) => {
                 const tx = Math.random() * 20 - 10;
@@ -25,6 +33,7 @@
                 const h = Math.random() * 20 + 20;
                 layer.style.clipPath = `polygon(${x}% ${y}%, ${x + w}% ${y}%, ${x + w}% ${y + h}%, ${x}% ${y + h}%)`;
             });
+
             clearTimeout(timeoutId);
             timeoutId = setTimeout(() => {
                 layers.forEach((layer) => {
@@ -37,54 +46,79 @@
 
     onMount(() => {
         startGlitchLoop();
+        requestAnimationFrame(() => mounted = true);
     });
+
     onDestroy(() => {
         clearInterval(intervalId);
         clearTimeout(timeoutId);
     });
-    const delays = Array(8).fill(0).map(() => Math.random() * 100);
-    const durations = Array(8).fill(0).map(() => 100 + Math.random() * 300);
-
-    const randomClipPaths = Array(3).fill(0).map(() => {
-        const top = Math.random() * 60;
-        const bottom = top + 20 + Math.random() * 30;
-        return `polygon(0 ${top}%, 100% ${top}%, 100% ${bottom}%, 0 ${bottom}%)`;
-    });
-    let mounted = false;
-    onMount(() => {
-
-        requestAnimationFrame(() => mounted = true);
-    });
 </script>
+
 <div
         class="logo-container {mounted ? 'animate' : ''}"
         on:contextmenu={toggleBackgroundShaderEnabled}
-        style={`--size: ${size}px; --accent1: ${primaryRgb}; --accent2: ${secondaryRgb}; --base: ${baseColor};`}
+        style={`--size: ${size}px; --accent1: ${primaryRgb}; --accent2: ${secondaryRgb};`}
 >
-    <img alt="logo-base" class="layer base" src={src}/>
-    <img alt="logo-neon" class="layer neon-effect" src={src}
-         style={`animation-delay: ${delays[0]}ms; animation-duration: ${durations[0]}ms`}/>
-    <img alt="logo-glitch" class="layer glitch" src={src}
-         style={`animation-delay: ${delays[1]}ms; animation-duration: ${durations[1]}ms`}/>
-    <img alt="logo-glitch-partial" class="layer glitch-partial" src={src}
-         style={`animation-delay: ${delays[2]}ms; animation-duration: ${durations[2]}ms`}/>
-    <!-- Additional random localized glitch layers -->
-    <img alt="logo-glitch-local-1" class="layer glitch-localized-1" src={src}
-         style={`animation-delay: ${delays[3]}ms; animation-duration: ${durations[3]}ms; clip-path: ${randomClipPaths[0]}`}/>
-    <img alt="logo-glitch-local-2" class="layer glitch-localized-2" src={src}
-         style={`animation-delay: ${delays[4]}ms; animation-duration: ${durations[4]}ms; clip-path: ${randomClipPaths[1]}`}/>
-    <img alt="logo-glitch-local-3" class="layer glitch-localized-3" src={src}
-         style={`animation-delay: ${delays[5]}ms; animation-duration: ${durations[5]}ms; clip-path: ${randomClipPaths[2]}`}/>
-    <div class="holographic-effect"
-         style={`animation-delay: ${delays[6]}ms; animation-duration: ${durations[6]}ms`}></div>
-    <img alt="glitch-red" bind:this={redLayer} class="layer glitch-dynamic red" src={src}/>
-    <img alt="glitch-blue" bind:this={blueLayer} class="layer glitch-dynamic blue" src={src}/>
+    <!-- Base Layer -->
+    <div class="layer base">
+        <ClientLogo />
+    </div>
+
+    <!-- Effect Layers -->
+    <div class="layer neon-effect" style={`animation-delay: ${delays[0]}ms; animation-duration: ${durations[0]}ms`}>
+        <ClientLogo />
+    </div>
+
+    <div class="layer glitch" style={`animation-delay: ${delays[1]}ms; animation-duration: ${durations[1]}ms`}>
+        <ClientLogo />
+    </div>
+
+    <div class="layer glitch-partial" style={`animation-delay: ${delays[2]}ms; animation-duration: ${durations[2]}ms`}>
+        <ClientLogo />
+    </div>
+
+    <!-- Localized Glitch Layers -->
+    <div
+            class="layer glitch-localized-1"
+            style={`animation-delay: ${delays[3]}ms; animation-duration: ${durations[3]}ms; clip-path: ${randomClipPaths[0]}`}
+    >
+        <ClientLogo />
+    </div>
+
+    <div
+            class="layer glitch-localized-2"
+            style={`animation-delay: ${delays[4]}ms; animation-duration: ${durations[4]}ms; clip-path: ${randomClipPaths[1]}`}
+    >
+        <ClientLogo />
+    </div>
+
+    <div
+            class="layer glitch-localized-3"
+            style={`animation-delay: ${delays[5]}ms; animation-duration: ${durations[5]}ms; clip-path: ${randomClipPaths[2]}`}
+    >
+        <ClientLogo />
+    </div>
+
+    <!-- Holographic Effect -->
+    <div
+            class="holographic-effect"
+            style={`animation-delay: ${delays[6]}ms; animation-duration: ${durations[6]}ms`}
+    ></div>
+
+    <!-- Dynamic Glitch Layers -->
+    <div bind:this={redLayer} class="layer glitch-dynamic red">
+        <ClientLogo />
+    </div>
+
+    <div bind:this={blueLayer} class="layer glitch-dynamic blue">
+        <ClientLogo />
+    </div>
 </div>
 <style>
     .logo-container {
-        --size: 165px;
         position: relative;
-        left: 10px;
+        left: 0;
         width: var(--size);
         height: var(--size);
         filter: contrast(1.2);

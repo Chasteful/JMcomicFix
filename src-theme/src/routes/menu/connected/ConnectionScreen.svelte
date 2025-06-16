@@ -1,21 +1,13 @@
 <script lang="ts">
     import { tweened } from "svelte/motion";
     import { onMount, tick} from "svelte";
-    import type { ClientInfo } from "../../../integration/types";
-    import { getClientInfo } from "../../../integration/rest";
     import {expoInOut} from "svelte/easing";
-    import { scale, fade } from "svelte/transition";
+    import { fade } from "svelte/transition";
     import ConnectionDetail from "./ConnectionDetail.svelte";
     import SplashTip from "./SplashTip.svelte";
-    let clientInfo: ClientInfo | null = null;
     let fps = 60;
-    let totalDuration = 1000;
+    let totalDuration = 2333;
 
-    function computeTotalDuration(fpsValue: number) {
-        const clamped = Math.max(20, Math.min(fpsValue, 60));
-        const factor = 60 / clamped;
-        totalDuration = Math.round(1000 * factor);
-    }
 
     function makeCustomEasing(fpsValue: number) {
         const clamped = Math.max(20, Math.min(fpsValue,60));
@@ -51,22 +43,29 @@
             easing: makeCustomEasing(fps),
         });
     }
-
-    async function updateClientInfo() {
-        clientInfo = await getClientInfo();
-        if (clientInfo?.fps) {
-            fps = clientInfo.fps;
-            computeTotalDuration(fps);
-            await restartProgress();
-        } else {
-            await progress.set(100);
-        }
-    }
-
     onMount(() => {
-        updateClientInfo();
+        restartProgress();
     });
 </script>
+
+<div class="wrapper" out:fade={{ duration: 400 }}>
+    <div class="bg-pattern"
+         transition:fade={{ duration:1200, easing: expoInOut }}>
+    </div>
+    <ConnectionDetail/>
+    <SplashTip/>
+    <div class="line-decoration" transition:fade={{ duration: 600, easing: expoInOut }}></div>
+    <div class="loader-wrapper"
+         transition:fade={{ duration: 600, easing: expoInOut }}>
+        <div class="loading-bar" role="presentation" aria-hidden="true">
+            <div class="loading-bar-bg"></div>
+            <div
+                    class="loading-bar-progress"
+                    style="width: {$progress}%"
+            ></div>
+        </div>
+    </div>
+</div>
 
 <style lang="scss">
   .wrapper {
@@ -158,21 +157,3 @@
 </style>
 
 
-<div class="wrapper" out:fade={{ duration: 400 }}>
-    <div class="bg-pattern"
-         transition:fade={{ duration:1200, easing: expoInOut }}>
-    </div>
-    <ConnectionDetail/>
-    <SplashTip/>
-    <div class="line-decoration" transition:fade={{ duration: 600, easing: expoInOut }}></div>
-    <div class="loader-wrapper"
-         transition:fade={{ duration: 600, easing: expoInOut }}>
-        <div class="loading-bar" role="presentation" aria-hidden="true">
-            <div class="loading-bar-bg"></div>
-            <div
-                    class="loading-bar-progress"
-                    style="width: {$progress}%"
-            ></div>
-        </div>
-    </div>
-</div>

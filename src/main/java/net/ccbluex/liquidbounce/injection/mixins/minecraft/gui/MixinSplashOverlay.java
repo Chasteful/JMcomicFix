@@ -89,9 +89,6 @@ public class MixinSplashOverlay {
         long elapsed = System.currentTimeMillis() - START_TIME;
         float progress = Math.min(elapsed / 1000F, 1F);
 
-        int displayWidth = screenWidth;
-        int displayHeight = screenHeight;
-
         int alpha = (int)(255 * progress);
         int colorWithAlpha = (alpha << 24) | (color & 0x00FFFFFF);
         int textureWidth = ClientLogoTexture.WIDTH;
@@ -101,7 +98,7 @@ public class MixinSplashOverlay {
                 RenderLayerExtensions::getSmoothTextureLayer,
                 ClientLogoTexture.CLIENT_LOGO,
                 0, 0, 0.0F, 0.0F,
-                displayWidth, displayHeight,
+                screenWidth, screenHeight,
                 textureWidth, textureHeight,
                 textureWidth, textureHeight,
                 colorWithAlpha
