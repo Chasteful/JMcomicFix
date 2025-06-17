@@ -6,7 +6,7 @@
     import TabGui from "./elements/tabgui/TabGui.svelte";
     import HealthBar from "./elements/hotbar/HealthBar.svelte";
     import Scoreboard from "./elements/Scoreboard.svelte";
-    import Watermark from "./elements/Watermark.svelte";
+    import Watermark from "./elements/watermark/Watermark.svelte";
     import Logo from "./elements/Logo.svelte";
     import Information from "./elements/Information.svelte";
     import ItemColumnHUD from "./elements/inventory/ItemColumnHUD.svelte";
@@ -32,7 +32,7 @@
     import type {ComponentsUpdateEvent} from "../../integration/events";
     import {getComponents} from "../../integration/rest";
     import {listen} from "../../integration/ws";
-    import LayoutEditor from "./LayoutEditor.svelte";
+    import LayoutEditor from "./utils/LayoutEditor.svelte";
     import Vignette from "./elements/Vignette.svelte";
 
     const baseResolution = {width: 1920, height: 1080};

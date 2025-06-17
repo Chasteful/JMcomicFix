@@ -6,9 +6,11 @@
 </script>
 
 <div class="arraylist" id="arraylist"
-        transition:fly|global={{ duration: 500, y: -50, easing: expoInOut }}
+     transition:fly|global={{ duration: 500, y: -50, easing: expoInOut }}
 >
+
     <Modules/>
+
 </div>
 
 <style lang="scss">

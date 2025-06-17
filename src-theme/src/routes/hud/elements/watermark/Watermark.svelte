@@ -1,18 +1,18 @@
 <script lang="ts">
-    import {getClientInfo, getModuleSettings, getSession} from "../../../integration/rest";
+    import {getClientInfo, getModuleSettings, getSession} from "../../../../integration/rest";
     import type {
         ClientInfo,
         Session,
         PlayerData,
         ConfigurableSetting, TextSetting,
-    } from "../../../integration/types";
+    } from "../../../../integration/types";
     import {onMount} from "svelte";
-    import {listen} from "../../../integration/ws";
-    import {getModules} from "../../../integration/rest";
-    import type {ClientPlayerDataEvent} from "../../../integration/events";
-    import {fade, fly} from 'svelte/transition';
-    import {clientName} from "../../../components/ThemeManager";
+    import {listen} from "../../../../integration/ws";
+    import {getModules} from "../../../../integration/rest";
+    import type {ClientPlayerDataEvent} from "../../../../integration/events";
+    import {fly} from 'svelte/transition';
     import {expoInOut} from "svelte/easing";
+    import ClientName from "./ClientName.svelte";
 
     let clientInfo: ClientInfo | null = null;
     let session: Session | null = null;
@@ -68,31 +68,28 @@
         await updateSession();
     });
 </script>
-<svg aria-hidden="true" height="0" width="0">
-    <filter height="500%" id="glow" primitiveUnits="objectBoundingBox" width="200%" x="-50%" y="-200%">
-        <feGaussianBlur in="SourceGraphic" result="blurred" stdDeviation=".025 .2"/>
-        <feColorMatrix in="blurred" result="saturated" type="saturate" values="1.3"/>
-        <feBlend in="SourceGraphic" in2="saturated" mode="normal"/>
-    </filter>
-</svg>
 
-<div class="watermark" transition:fly|global={{duration: 500, y: -50, easing: expoInOut}}>
+
+<div class="watermark" transition:fly|global={{ duration: 500, y: -50, easing: expoInOut }}>
     <div class="watermark-content">
         {#if clientInfo}
-            <div class="client client-glow" in:fade>
-                { $clientName || "禁漫修复" }&nbsp;{clientInfo.clientVersion}
-            </div>
-            {#if session }
+            <ClientName {clientInfo}
+            />
+
+            {#if session}
                 <div class="separator"></div>
-                {#if showUsername }
-                    <div class="info">{session.username}</div>
-                {:else }
-                    <div class="info">{nameProtect}</div>
-                {/if}
+                <div class="info">
+                    {#if showUsername}
+                        {session.username}
+                    {:else}
+                        {nameProtect}
+                    {/if}
+                </div>
             {/if}
+
             {#if playerData}
                 <div class="separator"></div>
-                <div class="info">{playerData.ping}&nbsp;Ping</div>
+                <div class="info">{playerData.ping} Ping</div>
                 <div class="separator"></div>
                 <div class="info">{playerData.serverAddress}</div>
             {/if}
@@ -100,37 +97,8 @@
     </div>
 </div>
 
-
 <style lang="scss">
-  @import "../../../colors.scss";
-
-  @property --k {
-    syntax: '<number>';
-    initial-value: 0;
-    inherits: false;
-  }
-
-  @keyframes k {
-    to {
-      --k: 1;
-    }
-  }
-
-  .client-glow {
-    animation: k 4s linear infinite;
-    filter: url(#glow);
-    background-image: linear-gradient(
-                    90deg,
-                    hsl(calc(var(--k) * 1turn), 95%, 65%),
-                    hsl(calc(var(--k) * 1turn + 90deg), 95%, 65%)
-    );
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    color: transparent;
-    font-weight: 900;
-  }
-
+  @import "../../../../colors";
 
   .watermark {
     display: flex;
@@ -143,8 +111,9 @@
     border-radius: 8px;
     font-size: 20px;
     min-width: 150px;
-    box-shadow: 0 4px 16px rgba($base, 0.6),
-    inset 0 0 10px rgba(255, 255, 255, 0.05);
+    box-shadow:
+            0 4px 16px rgba($base, 0.6),
+            inset 0 0 10px rgba(255, 255, 255, 0.05);
   }
 
   .watermark-content {
@@ -163,14 +132,4 @@
   .info {
     margin: 0 6px;
   }
-
-  .client {
-    font-size: 22px;
-    font-family: 'Alibaba', sans-serif;
-    font-feature-settings: "tnum";
-    font-variant-numeric: tabular-nums;
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-
 </style>

@@ -18,10 +18,10 @@
 </script>
 <div class="combined-container">
 
-        <div class="arraylist-section" id="arraylist"
-             transition:fly|global={{duration: 500, y: -50, easing: expoInOut}}>
-     <Modules/>
-        </div>
+    <div class="arraylist-section" id="arraylist"
+         transition:fly|global={{duration: 500, y: -50, easing: expoInOut}}>
+        <Modules/>
+    </div>
 
     {#if scoreboard}
         <div class="scoreboard-section" transition:fly|global={{duration: 500, x: 50, easing: expoInOut}}>
