@@ -38,7 +38,7 @@
         const scale = hudZoom / 100;
 
         let dx = (e.clientX - dragStart.mouseX) / scale;
-        let dy = (e.clientY - dragStart.mouseY) / scale;
+        let dy = - (e.clientY - dragStart.mouseY) / scale;
 
         let newX = dragStart.elemX + dx;
         let newY = dragStart.elemY + dy;
@@ -66,7 +66,7 @@
         style="
         position: absolute;
         left: {position.x}px;
-        top: {position.y}px;
+        bottom: {position.y}px;
         {disabled ? 'pointer-events: none;' : ''}
     "
 >

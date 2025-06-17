@@ -61,7 +61,6 @@
     min-width: max-content;
     flex-direction: column-reverse;
     align-items: flex-end;
-    perspective: 1000px;
     gap: -8px;
     white-space: nowrap;
     font-family: 'Alibaba', sans-serif;

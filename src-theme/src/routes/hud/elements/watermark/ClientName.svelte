@@ -13,7 +13,7 @@
     </filter>
 </svg>
 <div class="client client-glow" in:fade>
-    { $clientName || "JMcomicFix" } {clientInfo.clientVersion}
+    { $clientName || "禁漫修复" } {clientInfo.clientVersion}
 </div>
 
 <style lang="scss">
