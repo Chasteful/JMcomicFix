@@ -97,8 +97,8 @@
     background-color: rgba(0, 0, 0, 0.1);
     box-shadow: -10px 0px 20px rgba(0, 0, 0, 0.15),
     10px 0px 20px rgba(0, 0, 0, 0.15);
-    color: var(--primary-color);
-    text-shadow: var(--primary-color);
+    color: white;
+    text-shadow:0 0 0.5px white;
     font-family: 'Product Sans', system-ui, -apple-system, sans-serif;
     font-size: 16px;
     padding: 2px 6px;

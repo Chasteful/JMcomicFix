@@ -63,7 +63,6 @@
     <div class="layer glitch-localized-1" style={`animation-delay: ${delays[3]}ms; animation-duration: ${durations[3]}ms; clip-path: ${randomClipPaths[0]}`}><slot /></div>
     <div class="layer glitch-localized-2" style={`animation-delay: ${delays[4]}ms; animation-duration: ${durations[4]}ms; clip-path: ${randomClipPaths[1]}`}><slot /></div>
     <div class="layer glitch-localized-3" style={`animation-delay: ${delays[5]}ms; animation-duration: ${durations[5]}ms; clip-path: ${randomClipPaths[2]}`}><slot /></div>
-    <div class="holographic-effect" style={`animation-delay: ${delays[6]}ms; animation-duration: ${durations[6]}ms`}></div>
     <div bind:this={redLayer} class="layer glitch-dynamic red"><slot /></div>
     <div bind:this={blueLayer} class="layer glitch-dynamic blue"><slot /></div>
 </div>
@@ -145,20 +144,7 @@
         filter: hue-rotate(300deg) brightness(1.3);
     }
 
-    .holographic-effect {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        z-index: 7;
-        background: radial-gradient(
-                circle at center,
-                rgba(255, 255, 255, 0.1) 0%,
-                transparent 70%
-        );
-        opacity: 0;
-        animation: holographic-pulse 0.1s infinite;
-        mix-blend-mode: hard-light;
-    }
+
 
     @keyframes zoomInDown {
         from {
@@ -295,14 +281,4 @@
         }
     }
 
-    @keyframes holographic-pulse {
-        0%, 100% {
-            opacity: 0;
-            transform: scale(1);
-        }
-        50% {
-            opacity: 0.2;
-            transform: scale(1.05);
-        }
-    }
 </style>

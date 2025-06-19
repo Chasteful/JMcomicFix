@@ -5,6 +5,8 @@
     import ItemStackView from "./ItemStackView.svelte";
     import {onMount} from "svelte";
     import {getPlayerInventory} from "../../../../integration/rest";
+    import {fly} from "svelte/transition";
+    import {expoInOut} from "svelte/easing";
 
     let stacks: ItemStack[] = [];
 
@@ -22,7 +24,7 @@
 
 </script>
 
-<div class="container">
+<div class="container" transition:fly|global={{duration: 500, y: -50, easing: expoInOut}}>
     {#each stacks as stack (stack)}
         <ItemStackView {stack}/>
     {/each}

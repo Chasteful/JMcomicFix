@@ -1,16 +1,17 @@
 <script lang="ts">
-    import {fly} from 'svelte/transition';
+    import {fade} from 'svelte/transition';
     import {expoInOut} from 'svelte/easing';
     import Modules from "./Modules.svelte";
+    import GlitchedLayers from "../../utils/GlitchedLayers.svelte";
 
 </script>
 
 <div class="arraylist" id="arraylist"
-     transition:fly|global={{ duration: 500, y: -50, easing: expoInOut }}
+     transition:fade|global={{ duration: 500,  easing: expoInOut }}
 >
-
+    <GlitchedLayers size={1000}>
     <Modules/>
-
+    </GlitchedLayers>
 </div>
 
 <style lang="scss">
@@ -22,14 +23,14 @@
   }
 
   .arraylist {
-    display: flex;
+    position: fixed;
     top: 0;
     right: 0;
+    display: flex;
     flex-direction: column;
     align-items: flex-end;
-    position: absolute;
+    pointer-events: none;
     transform: translateZ(0);
-
   }
 
 </style>
