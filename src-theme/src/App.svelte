@@ -2,10 +2,9 @@
     import Router, {push} from "svelte-spa-router";
     import ClickGui from "./routes/clickgui/ClickGui.svelte";
     import Hud from "./routes/hud/Hud.svelte";
-    import {getVirtualScreen, openScreen} from "./integration/rest";
+    import {getVirtualScreen} from "./integration/rest";
     import {cleanupListeners, listenAlways} from "./integration/ws";
     import {onMount} from "svelte";
-    import {locked} from "./routes/menu/LoginMenu/locked_store";
     import {insertPersistentData} from "./integration/persistent_storage";
     import Rat from "./routes/none/rat.svelte";
     import Title from "./routes/menu/title/Title.svelte";
@@ -47,11 +46,7 @@
         console.log(`[Router] Redirecting to ${name}`);
         await push(`/${name}`);
     }
-    $effect(() => {
-        if ($locked) {
-            openScreen("lockscreen");
-        }
-    });
+
 
     onMount(async () => {
 

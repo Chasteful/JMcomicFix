@@ -14,8 +14,7 @@ class Verifications(
         )
 
         private val developerHWIDs = mapOf(
-            "idk" to "5tvpidX1nx1n",
-            "idk" to "KotlinModule"
+            "d52275280bf2b780b915b9d2eb9636d1196049ca4d89eb6a3e6d7e8fdf5d10ab" to "5tvpidX1nx1n",
         )
 
         fun getDeveloperByHWID(hwid: String): String {

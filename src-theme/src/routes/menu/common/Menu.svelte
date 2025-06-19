@@ -4,6 +4,10 @@
   import { onMount } from "svelte";
   import { location } from "svelte-spa-router";
   import Background from "./Background.svelte";
+  import {locked} from "../LoginMenu/locked_store";
+  import {openScreen} from "../../../integration/rest";
+
+
 
   const transitionDuration = 700;
   let ready = false;
@@ -22,6 +26,10 @@
   $: showAccount = !noAccountPaths.includes($location);
   $: showHeader = !noHeaderPaths.includes($location);
   $: showBackground = BackgroundPaths.includes($location);
+  $:if ($locked) {
+      openScreen("lockscreen");
+  }
+
 </script>
 
 <div class="menu-container">

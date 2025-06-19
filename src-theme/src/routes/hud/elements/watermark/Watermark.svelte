@@ -102,7 +102,8 @@
 
   .watermark {
     display: flex;
-    flex-direction: column;
+    white-space: nowrap;
+    flex-direction: row;
     align-items: stretch;
     padding: 10px;
     color: hsl(0, 0%, 90%);

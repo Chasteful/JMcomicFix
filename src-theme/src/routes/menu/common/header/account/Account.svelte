@@ -34,7 +34,7 @@
         localStorage.getItem('userSettings') ||
         JSON.stringify({
             username: 'Customer',
-            uid: '',
+            uid: '0000',
             isDev: false,
             isOwner: false,
             hwid: '',
@@ -195,7 +195,7 @@
     <div class="selector-header" bind:this={headerElement}>
         <div class="avatar-container">
             <!-- svelte-ignore a11y_missing_attribute -->
-                    <img src={userData.avatar} alt="avatar" class="avatar" draggable="false" />
+                    <img src={userData.avatar|| 'img/avatars/Customer.png'} alt="avatar" class="avatar" draggable="false" />
         </div>
         <div class="account-info">
             <div class="username" on:dblclick|stopPropagation={copyHWID} style="cursor: pointer">
