@@ -72,15 +72,15 @@
             },
             {
               "name": "HorizontalOffset",
-              "value": 10
+              "value": 250
             },
             {
               "name": "Vertical",
-              "value": "Top"
+              "value": "CenterTranslated"
             },
             {
               "name": "VerticalOffset",
-              "value": 424
+              "value": 0
             }
           ]
         }
@@ -192,7 +192,7 @@
             },
             {
               "name": "HorizontalOffset",
-              "value": 125
+              "value": 160
             },
             {
               "name": "Vertical",
@@ -200,7 +200,7 @@
             },
             {
               "name": "VerticalOffset",
-              "value": 40
+              "value": 0
             }
           ]
         }
@@ -254,7 +254,7 @@
             },
             {
               "name": "HorizontalOffset",
-              "value": 5
+              "value": 0
             },
             {
               "name": "Vertical",
@@ -262,7 +262,7 @@
             },
             {
               "name": "VerticalOffset",
-              "value": 100
+              "value": 0
             }
           ]
         }
@@ -284,15 +284,15 @@
             },
             {
               "name": "HorizontalOffset",
-              "value": 10
+              "value": 250
             },
             {
               "name": "Vertical",
-              "value": "Top"
+              "value": "CenterTranslated"
             },
             {
               "name": "VerticalOffset",
-              "value": 248
+              "value": -142
             }
           ]
         }
@@ -352,7 +352,7 @@
             },
             {
               "name": "VerticalOffset",
-              "value": 15
+              "value": 0
             }
           ]
         }
@@ -382,7 +382,7 @@
             },
             {
               "name": "VerticalOffset",
-              "value": 10
+              "value": 70
             }
           ]
         }
@@ -400,19 +400,19 @@
           "value": [
             {
               "name": "Horizontal",
-              "value": "Left"
+              "value": "CenterTranslated"
             },
             {
               "name": "HorizontalOffset",
-              "value": 15
+              "value": -450
             },
             {
               "name": "Vertical",
-              "value": "Center"
+              "value": "Bottom"
             },
             {
               "name": "VerticalOffset",
-              "value": 50
+              "value": 0
             }
           ]
         }
@@ -434,7 +434,7 @@
             },
             {
               "name": "HorizontalOffset",
-              "value": 10
+              "value": 0
             },
             {
               "name": "Vertical",
@@ -442,7 +442,7 @@
             },
             {
               "name": "VerticalOffset",
-              "value": 234
+              "value": 242
             }
           ]
         }
@@ -567,7 +567,7 @@
             },
             {
               "name": "VerticalOffset",
-              "value": 215
+              "value": 0
             }
           ]
         }
@@ -619,7 +619,7 @@
             },
             {
               "name": "HorizontalOffset",
-              "value": 25
+              "value": 30
             },
             {
               "name": "Vertical",
@@ -627,7 +627,7 @@
             },
             {
               "name": "VerticalOffset",
-              "value": 15
+              "value": 50
             }
           ]
         }
@@ -679,7 +679,7 @@
             },
             {
               "name": "HorizontalOffset",
-              "value": 10
+              "value": 0
             },
             {
               "name": "Vertical",
@@ -687,7 +687,7 @@
             },
             {
               "name": "VerticalOffset",
-              "value": 100
+              "value": 210
             }
           ]
         }
@@ -829,7 +829,7 @@
             },
             {
               "name": "HorizontalOffset",
-              "value": 10
+              "value": 0
             },
             {
               "name": "Vertical",
@@ -837,7 +837,7 @@
             },
             {
               "name": "VerticalOffset",
-              "value": 12
+              "value": 80
             }
           ]
         }
@@ -859,7 +859,7 @@
             },
             {
               "name": "HorizontalOffset",
-              "value": 10
+              "value": 5
             },
             {
               "name": "Vertical",
@@ -867,7 +867,7 @@
             },
             {
               "name": "VerticalOffset",
-              "value": 110
+              "value": 100
             }
           ]
         }
