@@ -107,7 +107,7 @@
     {:else}
         <LayoutEditor
                 componentId={component.name.toLowerCase()}
-                hudZoom={hudZoom}
+                hudZoom={hudZoom}     
                 defaultPosition={{ x: component.settings.x ?? 0, y: component.settings.y ?? 0 }}
         >
             {#if component.name === 'Watermark'}

@@ -23,7 +23,7 @@
         "/lockscreen":LockScreen,
         "/clickgui": ClickGui,
         "/hud": Hud,
-        "/layouteditor":Hud,
+        "/layouteditor":Rat,
         "/inventory": Rat,
         "/chat":Rat,
         "/title": Title,
