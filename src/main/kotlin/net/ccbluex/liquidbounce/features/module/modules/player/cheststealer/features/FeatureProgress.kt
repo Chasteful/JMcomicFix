@@ -7,7 +7,6 @@ import net.ccbluex.liquidbounce.features.module.modules.player.cheststealer.Modu
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleHud
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleProgress.ProgressBarConfig
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleProgress.renderProgressBar
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
 import kotlin.math.pow
 
 
@@ -40,7 +39,9 @@ object FeatureProgress : ToggleableConfigurable(ModuleChestStealer, "Progress", 
         remainingItems = count
     }
     fun getStealingProgress(): Float {
-        val target = if (initialItemCount <= 0) 0f else {
+        val target = if (initialItemCount <= 0) {
+            0f
+        } else {
             val stolenItems = (initialItemCount - remainingItems).coerceAtLeast(0)
             (stolenItems.toFloat() / initialItemCount).coerceIn(0f..1f)
         }
