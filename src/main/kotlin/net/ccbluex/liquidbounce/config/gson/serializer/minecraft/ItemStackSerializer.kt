@@ -22,8 +22,6 @@ package net.ccbluex.liquidbounce.config.gson.serializer.minecraft
 import com.google.gson.JsonObject
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
-import net.ccbluex.liquidbounce.utils.inventory.getArmorColor
-import net.minecraft.component.DataComponentTypes
 import net.minecraft.item.ItemStack
 import net.minecraft.registry.Registries
 import java.lang.reflect.Type
@@ -37,14 +35,19 @@ object ItemStackSerializer : JsonSerializer<ItemStack> {
             addProperty("damage", it.damage)
             addProperty("maxDamage", it.maxDamage)
             addProperty("empty", it.isEmpty)
-            addProperty("hasEnchantment", !it.enchantments.isEmpty)
-            val dyedColor = it.get(DataComponentTypes.DYED_COLOR)?.rgb()
-                ?: it.getArmorColor()
-            addProperty("hasDyedColor", dyedColor != null)
-            dyedColor?.let { color ->
-                addProperty("dyedColor", color)
-            }
+            it.enchantments.enchantmentEntries
+                .takeIf { set -> set.isNotEmpty() }
+                ?.let { entries ->
+                    // TODO: this property is deprecated. Please remove it in 0.32.0
+                    addProperty("hasEnchantment", true)
+                    add("enchantments", JsonObject().apply {
+                        for ((key, level) in entries) {
+                            addProperty(key.idAsString, level)
+                        }
+                    })
+                }
         }
     }
+
 
 }

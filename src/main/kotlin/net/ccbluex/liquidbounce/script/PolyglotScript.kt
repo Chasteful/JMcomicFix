@@ -117,7 +117,6 @@ class PolyglotScript(
             bindings.putMember("registerScript", RegisterScript())
         }
 
-    private val scriptText: String = file.readText()
 
     // Script information
     lateinit var scriptName: String
@@ -143,8 +142,7 @@ class PolyglotScript(
      */
     fun initScript() {
         // Evaluate script
-        context.eval(Source.newBuilder(language, scriptText, file.name).build())
-
+        context.eval(Source.newBuilder(language, file).build())
         // Call load event
         callGlobalEvent("load")
 

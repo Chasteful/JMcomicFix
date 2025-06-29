@@ -2,7 +2,7 @@
     import type {ItemStack} from "../../../../integration/types";
     import {REST_BASE} from "../../../../integration/host";
     import {mapToColor} from "../../../../util/color_utils";
-    import {fade} from "svelte/transition";
+
 
     export let stack: ItemStack;
 

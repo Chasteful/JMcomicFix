@@ -8,6 +8,9 @@ import net.ccbluex.liquidbounce.event.events.WorldRenderEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
+import net.ccbluex.liquidbounce.render.GenericCustomColorMode
+import net.ccbluex.liquidbounce.render.GenericStaticColorMode
+import net.ccbluex.liquidbounce.render.GenericSyncColorMode
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.ccbluex.liquidbounce.render.renderEnvironmentForWorld
 import net.minecraft.client.gl.ShaderProgramKeys
@@ -26,9 +29,16 @@ import java.util.*
 object ModuleBreadcrumbs : ClientModule("Breadcrumbs", Category.RENDER, aliases = arrayOf("PlayerTrails")) {
 
     private val onlyOwn by boolean("OnlyOwn", true)
-    private val startColor by color("StartColor", Color4b(57,98,205, 120))
-    private val endColor by color("EndColor", Color4b(31,143,106, 120))
     private val height by float("Height", 0.5f, 0f..2f)
+
+    private val colorModes = choices(this, "ColorMode", 0) {
+        arrayOf(
+            GenericCustomColorMode(it, ModuleHud.PrimaryColor, ModuleHud.SecondaryColor),
+            GenericStaticColorMode(it, Color4b.WHITE.with(a = 100)),
+            GenericSyncColorMode(it),
+        )
+    }
+
 
     internal object TemporaryConfigurable : ToggleableConfigurable(this, "Temporary", true) {
         val alive by int("Alive", 900, 10..10000, "ms")
@@ -49,7 +59,9 @@ object ModuleBreadcrumbs : ClientModule("Breadcrumbs", Category.RENDER, aliases 
     val renderHandler = handler<WorldRenderEvent> { event ->
         val matrixStack = event.matrixStack
         renderEnvironmentForWorld(matrixStack) {
-            draw(matrixStack, startColor, endColor)
+
+            val (colorStart, colorEnd) = colorModes.activeChoice.getColors(player)
+            draw(matrixStack, colorStart, colorEnd)
         }
     }
 
@@ -167,14 +179,14 @@ object ModuleBreadcrumbs : ClientModule("Breadcrumbs", Category.RENDER, aliases 
                     val deltaTime = time - position.creationTime
                     val multiplier = (1F - deltaTime.toFloat() / aliveDurationF)
                     multiplier * initialAlphaStart
-                }  else {
+                } else {
                     initialAlphaStart
                 }
                 val alphaEnd = if (shouldFade) {
                     val deltaTime = time - position.creationTime
                     val multiplier = (1F - deltaTime.toFloat() / aliveDurationF)
                     multiplier * initialAlphaEnd
-                }  else { 
+                } else {
                     initialAlphaStart
                 }
                 val point = calculatePoint(camera, position.x, position.y, position.z)
@@ -197,6 +209,7 @@ object ModuleBreadcrumbs : ClientModule("Breadcrumbs", Category.RENDER, aliases 
             point.sub(camera.pos.x.toFloat(), camera.pos.y.toFloat(), camera.pos.z.toFloat())
             return point
         }
+
         private fun interpolateColor(
             t: Float,
             colorStart: Vector4f,
@@ -211,6 +224,7 @@ object ModuleBreadcrumbs : ClientModule("Breadcrumbs", Category.RENDER, aliases 
                 alphaStart + (alphaEnd - alphaStart) * t
             )
         }
+
         private fun addVerticesToBuffer(
             renderData: RenderData,
             list: List<Triple<Vector3f, Float, Float>>
@@ -235,7 +249,6 @@ object ModuleBreadcrumbs : ClientModule("Breadcrumbs", Category.RENDER, aliases 
                     buffer.vertex(renderData.matrix, v1.x, v1.y + height, v1.z).color(c1.x, c1.y, c1.z, c1.w)
                     buffer.vertex(renderData.matrix, v0.x, v0.y + height, v0.z).color(c0.x, c0.y, c0.z, c0.w)
                 }
-
             }
         }
     }

@@ -104,7 +104,7 @@ object ModuleChestStealer : ClientModule("ChestStealer", Category.PLAYER) {
             break
         }
 
-        if (autoClose && sortedItemsToCollect.isEmpty()) {
+        if (autoClose && (sortedItemsToCollect.isEmpty() || !hasInventorySpace() && stillRequiredSpace > 0)) {
             event.schedule(inventoryConstrains, CloseContainerAction(screen))
         }
     }

@@ -47,13 +47,11 @@ object EspImageMode : EspMode("Image", requiresTrueSight = true) {
     private data class HitData(var startTime: Long, var startAngle: Float, var isRotatingBack: Boolean = false)
     private val hitDataMap = mutableMapOf<UUID, HitData>()
     private val chronometer = Chronometer()
+
     init {
         tree(ImageOffset)
-    }
-    init {
         tree(RotationOption)
     }
-
     @Suppress("unused")
     private val attackHandler = handler<AttackEntityEvent> { event ->
 
@@ -181,14 +179,14 @@ object EspImageMode : EspMode("Image", requiresTrueSight = true) {
     @Suppress("UNUSED")
     private enum class FaceImage(
         override val choiceName: String,
-        private val textureName: String
+        textureName: String
     ) : NamedChoice {
         XINXIN("Xinxin", "xinxin"),
         BAIZHIJUN("SuChen", "suchen"),
         ALAN34("Alan34", "alan");
 
-        val texture: Identifier by lazy {
+        val texture: Identifier =
             "image/esp2D/$textureName.png".registerAsDynamicImageFromClientResources()
-        }
+
     }
 }

@@ -651,7 +651,7 @@
   "liquidbounce.module.richPresence.description": "在你的Discord用户状态中显示客户端信息。",
   "liquidbounce.module.rotations.description": "允许你看到服务端层面的转头。",
   "liquidbounce.module.silentHotbar.description": "禁用显示你手中静默选择的物品。",
-  "liquidbounce.module.skinChanger.description": "允许你替换自己的皮肤。",
+  "liquidbounce.module.skinChanger.description": "在客户端隐藏玩家的真实皮肤（对制作视频很有用）。",
   "liquidbounce.module.safeWalk.description": "防止你走下方块（类似潜行）。",
   "liquidbounce.module.scaffold.description": "自动在你脚下放方块搭路。",
   "liquidbounce.module.serverCrasher.description": "尝试利用已知的漏洞使服务器崩溃。",

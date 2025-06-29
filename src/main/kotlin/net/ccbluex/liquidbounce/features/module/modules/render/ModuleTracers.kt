@@ -60,7 +60,9 @@ object ModuleTracers : ClientModule("Tracers", Category.RENDER) {
         val useViewDistance by boolean("UseViewDistance", true)
         val customViewDistance by float("CustomViewDistance", 128.0F, 1.0F..512.0F)
 
-        override fun getColor(param: LivingEntity): Color4b = throw NotImplementedError()
+        override fun getColors(param: LivingEntity): Pair<Color4b, Color4b> {
+            return Color4b(255, 0, 0, 255) to Color4b(0, 255, 0, 255)
+        }
     }
 
     val renderHandler = handler<WorldRenderEvent> { event ->

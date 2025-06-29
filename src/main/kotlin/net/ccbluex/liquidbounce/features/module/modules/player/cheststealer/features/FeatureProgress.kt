@@ -1,3 +1,4 @@
+
 package net.ccbluex.liquidbounce.features.module.modules.player.cheststealer.features
 
 import net.ccbluex.liquidbounce.config.types.ToggleableConfigurable
@@ -5,19 +6,31 @@ import net.ccbluex.liquidbounce.event.events.OverlayRenderEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.modules.player.cheststealer.ModuleChestStealer
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleHud
+import net.ccbluex.liquidbounce.render.GenericCustomColorMode
+import net.ccbluex.liquidbounce.render.GenericStaticColorMode
+import net.ccbluex.liquidbounce.render.GenericSyncColorMode
+import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.minecraft.client.gui.DrawContext
 import kotlin.math.pow
-
 
 object FeatureProgress : ToggleableConfigurable(ModuleChestStealer, "Progress", true) {
 
     private val weight by float("Weight", 1f, 0.1f..2f)
     private val height by float("Height", 1f, 0.1f..2f)
+    private val smooth by boolean("Smooth", true)
 
-    private val smooth by boolean( "Smooth", true)
+    private val colorModes = choices(this, "ColorMode", 0) {
+        arrayOf(
+            GenericCustomColorMode(it, ModuleHud.PrimaryColor, ModuleHud.SecondaryColor),
+            GenericStaticColorMode(it, Color4b.WHITE.with(a = 100)),
+            GenericSyncColorMode(it),
+        )
+    }
+
 
     private var lastProgress = 0f
     private var lastUpdateTime = System.nanoTime()
+
     data class ProgressBarConfig(
         val ctx: DrawContext,
         val screenWidth: Int,
@@ -25,8 +38,8 @@ object FeatureProgress : ToggleableConfigurable(ModuleChestStealer, "Progress", 
         val progress: Float,
         val weight: Float = 1f,
         val height: Float = 1f,
-        val colorStart: Int,
-        val colorEnd: Int
+        val colorStart: Color4b,
+        val colorEnd: Color4b
     )
 
     fun renderProgressBar(config: ProgressBarConfig) {
@@ -37,26 +50,35 @@ object FeatureProgress : ToggleableConfigurable(ModuleChestStealer, "Progress", 
         config.ctx.fill(barX, config.yPos, barX + barWidth, config.yPos + barHeight, 0x88000000.toInt())
 
         val filledWidth = (barWidth * config.progress).toInt()
+
+
+        val (startColor, endColor) = when (val mode = colorModes.activeChoice) {
+            is GenericStaticColorMode -> {
+                val color = mode.getColors(mc.player).first
+                color to color
+            }
+            else -> colorModes.activeChoice.getColors(mc.player)
+        }
+
         config.ctx.fillGradient(
             barX,
             config.yPos,
             barX + filledWidth,
             config.yPos + barHeight,
             0,
-            config.colorStart,
-            config.colorEnd
+            startColor.toARGB(),
+            endColor.toARGB(),
         )
     }
 
     @JvmStatic
     var stealingStartTime: Long = 0L
     @JvmStatic
-    var initialItemCount: Int = 0  // 初始物品总数
+    var initialItemCount: Int = 0
     @JvmStatic
-    var remainingItems: Int = 0   // 当前剩余物品数
+    var remainingItems: Int = 0
 
     fun onStartStealing(total: Int) {
-
         stealingStartTime = System.currentTimeMillis()
         initialItemCount = total
         remainingItems = total
@@ -65,6 +87,7 @@ object FeatureProgress : ToggleableConfigurable(ModuleChestStealer, "Progress", 
     fun updateRemainingItems(count: Int) {
         remainingItems = count
     }
+
     fun getStealingProgress(): Float {
         val target = if (initialItemCount <= 0) {
             0f
@@ -86,16 +109,14 @@ object FeatureProgress : ToggleableConfigurable(ModuleChestStealer, "Progress", 
         lastProgress += (target - lastProgress) * factor
         return lastProgress
     }
-
     @Suppress("unused")
     private val renderChestStealBar = handler<OverlayRenderEvent> {
-        fun breakRequirement() = (
-                !running || initialItemCount == 0
-            )
+        fun breakRequirement() = (!running || initialItemCount == 0)
 
         if (breakRequirement()) {
             return@handler
         }
+
         val ctx = it.context
         val sw = ctx.scaledWindowWidth
         val sh = ctx.scaledWindowHeight
@@ -107,8 +128,8 @@ object FeatureProgress : ToggleableConfigurable(ModuleChestStealer, "Progress", 
             progress = getStealingProgress(),
             weight = weight,
             height = height,
-            colorStart = ModuleHud.PrimaryColor.toARGB(),
-            colorEnd = ModuleHud.SecondaryColor.toARGB()
+            colorStart = Color4b.WHITE,
+            colorEnd = Color4b.WHITE
         ))
     }
 }
