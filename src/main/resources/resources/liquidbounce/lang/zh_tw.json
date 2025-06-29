@@ -579,6 +579,7 @@
   "liquidbounce.module.inventoryTracker.description": "追蹤其他玩家的物品欄。",
   "liquidbounce.module.itemEsp.description": "允許你透過方塊看到掉落物。",
   "liquidbounce.module.jumpEffect.description": "跳躍時在你腳下顯示一種效果。",
+  "liquidbounce.module.jumpCircle.description": "標識出你曾經跳躍的場所。",
   "liquidbounce.module.keepChatAfterDeath.description": "允許你在死亡螢幕使用聊天。",
   "liquidbounce.module.keepSprint.description": "允許你在攻擊時保持疾跑。",
   "liquidbounce.module.clickTp.description": "單擊滑鼠中鍵時，將你傳送至你準星所指的方塊。僅適用於 Vulcan 286 反作弊。",
@@ -600,6 +601,7 @@
   "liquidbounce.module.maceKill.description": "使用重錘時一擊擊殺",
   "liquidbounce.module.liquidWalk.description": "允許你在水面上行走。",
   "liquidbounce.module.longJump.description": "允許你跳的更遠。",
+  "liquidbounce.module.killEffects.description": "在你擊殺目標時顯示一種效果。",
   "liquidbounce.module.mobOwners.description": "允許你看到已馴養生物和彈射物屬於哪個玩家。",
   "liquidbounce.module.moreCarry.description": "允許你在合成欄裏儲存更多物品 (僅限多人模式)。",
   "liquidbounce.module.murderMystery.description": "告訴你誰是殺手。",
@@ -729,5 +731,9 @@
   "liquidbounce.module.autoPearl.description": "跟隨敵人珍珠的軌跡瞄準並投擲珍珠。",
   "liquidbounce.module.replenish.description": "自動用物品欄中的物品填充快捷欄，使物品數量保持設定的閾值。",
   "liquidbounce.module.anchor.description": "讓你移動到水晶PvP的安全點里。",
-  "liquidbounce.module.antiCheatDetect.messages.description": "Anti Cheat Detect 將嘗試在你下次加入任何伺服器/遊戲時，通過監控 ping 參數來檢測伺服器的反作弊系統。請注意，結果可能不準確，特別是當伺服器上有多個反作弊系統時。"
+  "liquidbounce.module.antiCheatDetect.messages.description": "Anti Cheat Detect 將嘗試在你下次加入任何伺服器/遊戲時，通過監控 ping 參數來檢測伺服器的反作弊系統。請注意，結果可能不準確，特別是當伺服器上有多個反作弊系統時。",
+  "liquidbounce.module.titleControl.description": "過濾伺服器的字幕上，你不想看到關鍵詞。",
+  "liquidbounce.module.capes.description": "显示一個只有你能見到的披風。",
+  "liquidbounce.module.halo.description":"在玩家頭頂放一個蔚藍案人物的光環。"
+
 }

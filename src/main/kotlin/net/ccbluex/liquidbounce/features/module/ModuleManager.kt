@@ -18,7 +18,7 @@
  */
 package net.ccbluex.liquidbounce.features.module
 
-import net.ccbluex.jmcomicfix.features.module.modules.render.ModuleBAHalo
+import net.ccbluex.jmcomicfix.features.module.modules.render.ModuleHalo
 import net.ccbluex.jmcomicfix.features.module.modules.client.ModuleCapes
 import net.ccbluex.jmcomicfix.features.module.modules.misc.ModuleTitleControl
 import net.ccbluex.jmcomicfix.features.module.modules.render.ModuleJumpCircle
@@ -344,7 +344,7 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             // Render
             ModuleAnimations,
             ModuleAntiBlind,
-            ModuleBAHalo,
+            ModuleHalo,
             ModuleBlockESP,
             ModuleBlockOutline,
             ModuleBreadcrumbs,
