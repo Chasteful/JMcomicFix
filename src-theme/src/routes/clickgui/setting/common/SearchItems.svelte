@@ -44,17 +44,18 @@
             cSetting.value = cSetting.value.filter(b => b !== e.detail.identifier);
         }
 
-        setting = { ...cSetting };
+        setting = {...cSetting};
         dispatch("change");
     }
 </script>
 
 <div class="setting">
     <div class="name">{$spaceSeperatedNames ? convertToSpacedString(cSetting.name) : cSetting.name}</div>
-    <input type="text" placeholder="Search" class="search-input" bind:value={searchQuery} spellcheck="false">
+    <input bind:value={searchQuery} class="search-input" placeholder="Search" spellcheck="false" type="text">
     <div class="results">
         <VirtualList items={renderedItems} let:item>
-            <ItemView identifier={item.identifier} name={item.name} enabled={cSetting.value.includes(item.identifier)} on:toggle={handleBlockToggle}/>
+            <ItemView enabled={cSetting.value.includes(item.identifier)} identifier={item.identifier} name={item.name}
+                      on:toggle={handleBlockToggle}/>
         </VirtualList>
     </div>
 </div>
@@ -74,7 +75,7 @@
 
   .name {
     color: $text;
-    font-size: 14px;
+    font-size: var(--font-size);
     font-weight: 500;
     margin-bottom: 5px;
   }
@@ -84,7 +85,7 @@
     border: none;
     border-bottom: solid 1px var(--primary-color);
 
-    font-size: 14px;
+    font-size: var(--font-size);
     padding: 5px;
     color: $text;
     margin-bottom: 5px;

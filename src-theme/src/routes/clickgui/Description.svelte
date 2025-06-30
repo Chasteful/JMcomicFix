@@ -75,7 +75,7 @@
 
   .text {
     font-family: 'Alibaba', serif;
-    font-size: 16px;
+    font-size: calc(var(--font-size) + 2px);
     padding: 10px;
     color: $text;
   }

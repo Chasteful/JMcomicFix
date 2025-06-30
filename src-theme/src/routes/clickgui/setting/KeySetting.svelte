@@ -92,7 +92,7 @@
     padding: 4px;
     font-weight: 500;
     color: $text;
-    font-size: 14px;
+    font-size: var(--font-size);
     width: 100%;
     display: flex;
     justify-content: center;

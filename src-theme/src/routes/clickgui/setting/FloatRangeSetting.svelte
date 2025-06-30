@@ -46,11 +46,11 @@
 <div class="setting" class:has-suffix={cSetting.suffix !== ""}>
     <div class="name">{$spaceSeperatedNames ? convertToSpacedString(cSetting.name) : cSetting.name}</div>
     <div class="value">
-        <ValueInput valueType="float" value={cSetting.value.from}
-                    on:change={(e) => apiSlider.set([e.detail.value, cSetting.value.to])}/>
+        <ValueInput on:change={(e) => apiSlider.set([e.detail.value, cSetting.value.to])} value={cSetting.value.from}
+                    valueType="float"/>
         -
-        <ValueInput valueType="float" value={cSetting.value.to}
-                    on:change={(e) => apiSlider.set([cSetting.value.from, e.detail.value])}/>
+        <ValueInput on:change={(e) => apiSlider.set([cSetting.value.from, e.detail.value])} value={cSetting.value.to}
+                    valueType="float"/>
     </div>
     {#if cSetting.suffix !== ""}
         <div class="suffix">{cSetting.suffix}</div>
@@ -70,7 +70,7 @@
     grid-template-columns: 1fr max-content;
     column-gap: 5px;
 
-    
+
     min-height: 46px;
   }
 
@@ -85,7 +85,7 @@
   .setting {
     color: $text;
     font-weight: 500;
-    font-size: 14px;
+    font-size: var(--font-size);
   }
 
   .name {

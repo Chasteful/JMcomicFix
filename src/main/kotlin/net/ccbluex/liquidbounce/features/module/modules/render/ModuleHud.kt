@@ -70,17 +70,18 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
 
     val PrimaryColor by color("Primary", Color4b(255,140,0,255))
         .onChanged {
-            EventManager.callEvent(ClickGuiValueChangeEvent(ModuleHud))
+            EventManager.callEvent(ClickGuiValueChangeEvent(this))
         }
 
     val SecondaryColor by color("Secondary", Color4b(186,85,211, 255))
         .onChanged {
-            EventManager.callEvent(ClickGuiValueChangeEvent(ModuleHud))
+            EventManager.callEvent(ClickGuiValueChangeEvent(this))
         }
+
     val clientName by text("ClientName", "")
         .apply(::tagBy)
         .onChanged {
-            EventManager.callEvent(ClickGuiValueChangeEvent(ModuleHud))
+            EventManager.callEvent(ClickGuiValueChangeEvent(this))
         }
 
     val isBlurEffectActive

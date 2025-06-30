@@ -13,7 +13,10 @@
         gridSize,
         showGrid,
         snappingEnabled,
-        scaleFactor, showSearch,
+        scaleFactor,
+        showSearch,
+        panelLength,
+        fontSize
     } from "./clickgui_store";
     import type {
         ClickGuiValueChangeEvent,
@@ -34,22 +37,34 @@
     let modules: Module[] = [];
     let minecraftScaleFactor = 2;
     let clickGuiScaleFactor = 1;
+    let panelLengthFactor = 1
+    let ClickGuiFontSizeFactor = 14
     $: {
         scaleFactor.set(minecraftScaleFactor * clickGuiScaleFactor * resolutionScaler.getScaleFactor());
+        panelLength.set(panelLengthFactor)
+        fontSize.set(ClickGuiFontSizeFactor)
     }
 
     const applyValues = (configurable: ConfigurableSetting) => {
 
         clickGuiScaleFactor = configurable.value.find(v => v.name === "Scale")?.value as number ?? 1;
+        panelLengthFactor = configurable.value.find(v => v.name === "Length")?.value as number ?? 66
+        ClickGuiFontSizeFactor = configurable.value.find(v => v.name === "FontSize")?.value as number ?? 14
         const snappingValue = configurable.value.find(v => v.name === "Snapping") as TogglableSetting;
         $snappingEnabled = snappingValue?.value.find(v => v.name === "Enabled")?.value as boolean ?? true;
         $gridSize = snappingValue?.value.find(v => v.name === "GridSize")?.value as number ?? 10;
 
     };
+    fontSize.subscribe((fontSize) => {
+        if (typeof document === 'undefined') return;
+        document.documentElement.style.setProperty('--font-size', `${fontSize}px`);
+    });
+
     const handleResize = () => {
         requestAnimationFrame(() => {
             resolutionScaler.updateScaleFactor();
             scaleFactor.set(minecraftScaleFactor * clickGuiScaleFactor * resolutionScaler.getScaleFactor());
+
         });
     };
 
@@ -57,7 +72,7 @@
     onMount(async () => {
         resolutionScaler.updateScaleFactor();
         scaleFactor.set(minecraftScaleFactor * clickGuiScaleFactor * resolutionScaler.getScaleFactor());
-
+        panelLength.set(panelLengthFactor)
         modules = await getModules();
         categories = groupByCategory(modules);
 

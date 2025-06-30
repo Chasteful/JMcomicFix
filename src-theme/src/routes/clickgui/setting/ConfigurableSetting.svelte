@@ -6,7 +6,7 @@
     } from "../../../integration/types";
     import GenericSetting from "./common/GenericSetting.svelte";
     import ExpandArrow from "./common/ExpandArrow.svelte";
-    import { setItem } from "../../../integration/persistent_storage";
+    import {setItem} from "../../../integration/persistent_storage";
     import {convertToSpacedString, spaceSeperatedNames} from "../../../theme/theme_config";
 
     export let setting: ModuleSetting;
@@ -37,7 +37,7 @@
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div class="head" class:expanded on:contextmenu|preventDefault={toggleExpanded}>
         <div class="title">{$spaceSeperatedNames ? convertToSpacedString(cSetting.name) : cSetting.name}</div>
-        <ExpandArrow bind:expanded on:click={() => skipAnimationDelay = true} />
+        <ExpandArrow bind:expanded on:click={() => skipAnimationDelay = true}/>
     </div>
 
     {#if expanded}
@@ -54,7 +54,7 @@
 
   .title {
     color: $text;
-    font-size: 14px;
+    font-size: var(--font-size);
     font-weight: 600;
   }
 

@@ -1,7 +1,7 @@
 <script lang="ts">
-    import type { ModuleSetting, TextArraySetting } from "../../../integration/types";
-    import { convertToSpacedString, spaceSeperatedNames } from "../../../theme/theme_config";
-    import { createEventDispatcher } from "svelte";
+    import type {ModuleSetting, TextArraySetting} from "../../../integration/types";
+    import {convertToSpacedString, spaceSeperatedNames} from "../../../theme/theme_config";
+    import {createEventDispatcher} from "svelte";
 
     export let setting: ModuleSetting;
 
@@ -10,7 +10,7 @@
     const dispatch = createEventDispatcher();
 
     function handleChange() {
-        setting = { ...cSetting };
+        setting = {...cSetting};
         dispatch("change");
     }
 
@@ -34,7 +34,8 @@
         <div class="inputs">
             {#each cSetting.value as _, index}
                 <div class="input-wrapper">
-                    <input type="text" class="value" spellcheck="false" placeholder={setting.name} bind:value={cSetting.value[index]}
+                    <input type="text" class="value" spellcheck="false" placeholder={setting.name}
+                           bind:value={cSetting.value[index]}
                            on:input={handleChange}>
                     <button class="button-remove" title="Remove" on:click={() => removeValueIndex(index)}>
                         <img src="img/clickgui/icon-cross.svg" alt="remove">
@@ -76,13 +77,13 @@
   .name {
     font-weight: 500;
     color: $text;
-    font-size: 14px;
+    font-size: var(--font-size);
     margin-bottom: 5px;
   }
 
   .button-add {
 
-    font-size: 14px;
+    font-size: var(--font-size);
     color: $text;
     background: linear-gradient(to right,
             color-mix(in srgb, var(--primary-color) 30%, transparent) 0%,
@@ -108,7 +109,7 @@
     background: rgba($base, 0.3);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
-    font-size: 14px;
+    font-size: var(--font-size);
     color: $text;
     padding: 6px;
     border-radius: 3px;

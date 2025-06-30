@@ -1,5 +1,6 @@
 @use "sass:color";
 @use "../../../colors.scss" as *;
+
 .noUi-handle {
   width: 12px !important;
   height: 12px !important;
@@ -20,19 +21,18 @@
 
 .noUi-handle::after,
 .noUi-handle::before {
-    display: none;
+  display: none;
 }
 
 .noUi-target {
-    margin: 10px 0;
-    height: 10px;
-    border: none;
-    background-color: rgba($text, 0.2);
-    box-shadow: unset;
+  margin: 10px 0;
+  height: 10px;
+  border: none;
+  background-color: rgba($text, 0.2);
+  box-shadow: unset;
 }
 
 
-  
 .noUi-connect {
   border: none;
   background: linear-gradient(

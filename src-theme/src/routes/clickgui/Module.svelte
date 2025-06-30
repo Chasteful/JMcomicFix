@@ -235,7 +235,7 @@
     .name {
       cursor: pointer;
       text-align: center;
-      font-size: 16px;
+      font-size: calc(var(--font-size) + 2px);
       font-weight: 500;
       padding: 10px;
       color: rgba(150, 150, 150);

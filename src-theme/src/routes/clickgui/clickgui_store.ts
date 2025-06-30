@@ -25,7 +25,8 @@ export const query = writable<string>("")
 export const highlightModuleName: Writable<string | null> = writable(null);
 export const savedConfigs = writable<Record<string, PanelConfig>>({});
 export const scaleFactor: Writable<number> = writable(2);
-
+export const panelLength: Writable<number> = writable(66);
+export const fontSize: Writable<number> = writable(14);
 export const showGrid: Writable<boolean> = writable(false);
 
 export const snappingEnabled: Writable<boolean> = writable(true);

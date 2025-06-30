@@ -830,7 +830,7 @@
     }
 
     .title {
-      font-size: 14px;
+      font-size: var(--font-size);
       color: color-mix(in srgb, var(--primary-color) 90%, transparent);
       border-bottom: 1px solid color-mix(in srgb, var(--primary-color) 15%, transparent);
       text-transform: uppercase;
@@ -850,7 +850,7 @@
       transform: translateY(-50%);
       padding: 4px 10px;
       margin-left: 12px;
-      font-size: 14px;
+      font-size: var(--font-size);
       font-weight: 500;
       color: transparent;
       background: transparent;
@@ -913,7 +913,7 @@
       transition: all 0.2s ease;
       cursor: pointer;
       color: $subtext0;
-      font-size: 15px;
+        font-size: calc(var(--font-size) + 1px);
       display: flex;
       align-items: center;
 
@@ -965,7 +965,7 @@
       background: transparent;
       border: none;
       color: rgba($subtext0, 0.5);
-      font-size: 16px;
+      font-size: calc(var(--font-size) + 2px);
       cursor: pointer;
       margin-right: 8px;
       border-radius: 50%;
@@ -984,7 +984,7 @@
   }
 
   .result {
-    font-size: 16px;
+    font-size: calc(var(--font-size) + 2px);
     padding: 14px 34px;
     position: relative;
     transition: all 0.2s ease;
@@ -1030,7 +1030,7 @@
     .aliases {
       color: rgba($subtext0, 0.5);
       margin-left: 10px;
-      font-size: 14px;
+      font-size: var(--font-size);
       transition: color 0.2s ease;
     }
 
@@ -1044,7 +1044,7 @@
     &:hover::after {
       content: "Right-click to locate";
       color: rgba($text, 0.4);
-      font-size: 14px;
+      font-size: var(--font-size);
       position: absolute;
       right: 28px;
       top: 50%;

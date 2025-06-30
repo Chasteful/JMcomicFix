@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
+    import {createEventDispatcher} from "svelte";
     import type {
         ModuleSetting,
         ChooseSetting,
@@ -14,22 +14,22 @@
     const dispatch = createEventDispatcher();
 
     function handleChange() {
-        setting = { ...cSetting };
+        setting = {...cSetting};
         dispatch("change");
     }
 </script>
 
 <div class="setting">
     <Dropdown
-        on:change={handleChange}
-        bind:value={cSetting.value}
-        options={cSetting.choices}
-        name={$spaceSeperatedNames ? convertToSpacedString(cSetting.name) : cSetting.name}
+            bind:value={cSetting.value}
+            name={$spaceSeperatedNames ? convertToSpacedString(cSetting.name) : cSetting.name}
+            on:change={handleChange}
+            options={cSetting.choices}
     />
 </div>
 
 <style lang="scss">
-    .setting {
-        padding: 7px 0;
-    }
+  .setting {
+    padding: 7px 0;
+  }
 </style>

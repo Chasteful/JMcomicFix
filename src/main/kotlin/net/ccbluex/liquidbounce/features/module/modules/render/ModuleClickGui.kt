@@ -53,6 +53,14 @@ object ModuleClickGui :
         EventManager.callEvent(ClickGuiScaleChangeEvent(it))
         EventManager.callEvent(ClickGuiValueChangeEvent(this))
     }
+    @Suppress("UnusedPrivateProperty")
+    private val length by float("Length", 66f, 0f..100f, "%").onChanged {
+        EventManager.callEvent(ClickGuiValueChangeEvent(this))
+    }
+    @Suppress("UnusedPrivateProperty")
+    private val fontSize by float("FontSize", 14f, 10f..20f, "px").onChanged {
+        EventManager.callEvent(ClickGuiValueChangeEvent(this))
+    }
 
     @Suppress("UnusedPrivateProperty")
     private val cache by boolean("Cache", true).onChanged { cache ->

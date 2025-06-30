@@ -20,7 +20,8 @@
         snappingEnabled,
         filteredModules,
         locked,
-        savedConfigs
+        savedConfigs,
+        panelLength
     } from "./clickgui_store";
     import {debounce} from "lodash";
     import {readable} from 'svelte/store';
@@ -560,7 +561,7 @@
                 bind:this={modulesElement}
                 class="modules"
                 on:scroll={handleModulesScroll}
-                style="--duration: 0.3s;max-height: {2 / $scaleFactor * 66}vh"
+                style="--duration: 0.3s;max-height: {2 / $scaleFactor * $panelLength}vh"
         >
             {#each renderedModules as {name, enabled, description, aliases} (name)}
                 <div>
@@ -678,7 +679,7 @@
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    font-size: 14px;
+    font-size: var(--font-size);
     color: $text-color;
     border-radius: 4px;
     transition: all 0.3s ease;
@@ -740,7 +741,7 @@
     }
 
     .category {
-      font-size: 16px;
+      font-size: calc(var(--font-size) + 2px);
       color: $text-color;
       font-weight: 600;
       transition: color 0.3s ease;
@@ -750,6 +751,7 @@
   .modules {
     overflow-y: auto;
     overflow-x: hidden;
+    transition: max-height 0.2s ease;
   }
 
   .modules::-webkit-scrollbar {

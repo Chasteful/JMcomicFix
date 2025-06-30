@@ -17,9 +17,9 @@
 
 <div class="setting">
     <div class="name">{$spaceSeperatedNames ? convertToSpacedString(cSetting.name) : cSetting.name}</div>
-    <input type="text" class="value" spellcheck="false"
+    <input bind:value={cSetting.value} class="value" on:input={handleChange}
            placeholder={$spaceSeperatedNames ? convertToSpacedString(cSetting.name) : cSetting.name}
-           bind:value={cSetting.value} on:input={handleChange}>
+           spellcheck="false" type="text">
 </div>
 
 <style lang="scss">
@@ -32,7 +32,7 @@
   .name {
     font-weight: 500;
     color: $text;
-    font-size: 14px;
+    font-size: var(--font-size);
     margin-bottom: 5px;
   }
 
@@ -40,7 +40,7 @@
     width: 100%;
     background-color: rgba($base, .36);
 
-    font-size: 14px;
+    font-size: var(--font-size);
     color: $text;
     border: none;
     border-bottom: solid 2px $text;

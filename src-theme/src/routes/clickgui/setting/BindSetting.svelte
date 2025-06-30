@@ -1,10 +1,10 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
-    import type { BindSetting, ModuleSetting } from "../../../integration/types";
-    import { listen } from "../../../integration/ws";
-    import { getPrintableKeyName } from "../../../integration/rest";
-    import type { KeyboardKeyEvent } from "../../../integration/events";
-    import { convertToSpacedString, spaceSeperatedNames } from "../../../theme/theme_config";
+    import {createEventDispatcher} from "svelte";
+    import type {BindSetting, ModuleSetting} from "../../../integration/types";
+    import {listen} from "../../../integration/ws";
+    import {getPrintableKeyName} from "../../../integration/rest";
+    import type {KeyboardKeyEvent} from "../../../integration/events";
+    import {convertToSpacedString, spaceSeperatedNames} from "../../../theme/theme_config";
 
     export let setting: ModuleSetting;
 
@@ -53,7 +53,7 @@
             cSetting.value.boundKey = UNKNOWN_KEY;
         }
 
-        setting = { ...cSetting };
+        setting = {...cSetting};
         dispatch("change");
     });
 
@@ -62,39 +62,39 @@
             cSetting.value.boundKey = UNKNOWN_KEY;
         }
         binding = !binding;
-        setting = { ...cSetting };
+        setting = {...cSetting};
         dispatch("change");
     }
 
     function toggleAction() {
         cSetting.value.action = cSetting.value.action === "Toggle" ? "Hold" : "Toggle";
-        setting = { ...cSetting };
+        setting = {...cSetting};
         dispatch("change");
     }
 </script>
 
 <div class="setting" class:has-value={cSetting.value.boundKey !== UNKNOWN_KEY}>
-  <button class="change-bind" on:click={toggleBinding}>
-    {#if !binding}
-      <div class="name">
-        {$spaceSeperatedNames ? convertToSpacedString(cSetting.name) : cSetting.name}:
-      </div>
+    <button class="change-bind" on:click={toggleBinding}>
+        {#if !binding}
+            <div class="name">
+                {$spaceSeperatedNames ? convertToSpacedString(cSetting.name) : cSetting.name}:
+            </div>
 
-      {#if cSetting.value.boundKey === UNKNOWN_KEY}
-        <span class="none">None</span>
-      {:else}
-        <span>{printableKeyName}</span>
-      {/if}
-    {:else}
-      <span>Press any key</span>
-    {/if}
-  </button>
-
-  {#if cSetting.value.boundKey !== UNKNOWN_KEY}
-    <button class="action-toggle" on:click={toggleAction}>
-      <span class="fade-text">{cSetting.value.action}</span>
+            {#if cSetting.value.boundKey === UNKNOWN_KEY}
+                <span class="none">None</span>
+            {:else}
+                <span>{printableKeyName}</span>
+            {/if}
+        {:else}
+            <span>Press any key</span>
+        {/if}
     </button>
-  {/if}
+
+    {#if cSetting.value.boundKey !== UNKNOWN_KEY}
+        <button class="action-toggle" on:click={toggleAction}>
+            <span class="fade-text">{cSetting.value.action}</span>
+        </button>
+    {/if}
 </div>
 
 <style lang="scss">
@@ -120,7 +120,7 @@
     padding: 4px;
     font-weight: 900;
     color: $text;
-    font-size: 14px;
+    font-size: var(--font-size);
     width: 100%;
     display: flex;
     justify-content: center;
@@ -150,11 +150,11 @@
     border: 4px solid rgba($text, 0.1);
     border-radius: 6px;
     padding: 4px 10px;
-    font-size: 14px;
+    font-size: var(--font-size);
     font-weight: 600;
     color: $text;
     cursor: pointer;
-    width: 64px; 
+    width: 64px;
     overflow: hidden;
     position: relative;
     text-align: center;

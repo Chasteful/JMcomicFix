@@ -7,6 +7,7 @@ import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.modules.player.cheststealer.ModuleChestStealer
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleHud
 import net.ccbluex.liquidbounce.render.GenericCustomColorMode
+import net.ccbluex.liquidbounce.render.GenericRainbowColorMode
 import net.ccbluex.liquidbounce.render.GenericStaticColorMode
 import net.ccbluex.liquidbounce.render.GenericSyncColorMode
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
@@ -23,6 +24,7 @@ object FeatureProgress : ToggleableConfigurable(ModuleChestStealer, "Progress", 
         arrayOf(
             GenericCustomColorMode(it, ModuleHud.PrimaryColor, ModuleHud.SecondaryColor),
             GenericStaticColorMode(it, Color4b.WHITE.with(a = 100)),
+            GenericRainbowColorMode(it),
             GenericSyncColorMode(it),
         )
     }
@@ -53,7 +55,7 @@ object FeatureProgress : ToggleableConfigurable(ModuleChestStealer, "Progress", 
 
 
         val (startColor, endColor) = when (val mode = colorModes.activeChoice) {
-            is GenericStaticColorMode -> {
+            is GenericStaticColorMode, is GenericRainbowColorMode -> {
                 val color = mode.getColors(mc.player).first
                 color to color
             }

@@ -1,10 +1,10 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
-    import type { ModuleSetting, MultiChooseSetting } from "../../../integration/types";
-    import { slide } from "svelte/transition";
-    import { convertToSpacedString, spaceSeperatedNames } from "../../../theme/theme_config";
+    import {createEventDispatcher} from "svelte";
+    import type {ModuleSetting, MultiChooseSetting} from "../../../integration/types";
+    import {slide} from "svelte/transition";
+    import {convertToSpacedString, spaceSeperatedNames} from "../../../theme/theme_config";
     import ExpandArrow from "./common/ExpandArrow.svelte";
-    import { setItem } from "../../../integration/persistent_storage";
+    import {setItem} from "../../../integration/persistent_storage";
 
     export let setting: ModuleSetting;
     export let path: string;
@@ -37,7 +37,7 @@
             cSetting.value = [...cSetting.value, v];
         }
 
-        setting = { ...cSetting };
+        setting = {...cSetting};
         dispatch("change");
     }
 
@@ -83,7 +83,7 @@
         <div class="amount">
             {cSetting.value.length}/{cSetting.choices.length}
         </div>
-        <ExpandArrow bind:expanded />
+        <ExpandArrow bind:expanded/>
     </div>
 
     {#if expanded}
@@ -142,7 +142,6 @@
 
       background: linear-gradient(
                       135deg,
-
                       color-mix(in srgb, var(--primary-color) var(--border-opacity-pct), transparent),
                       color-mix(in srgb, var(--secondary-color) var(--border-opacity-pct), transparent)
       );
@@ -155,24 +154,20 @@
       opacity: var(--border-opacity);
       transition: all 0.4s ease;
 
-      box-shadow:
-              0 0 calc(10px * var(--glow-intensity))
-              color-mix(in srgb, var(--primary-color) var(--border-opacity-pct), transparent),
-              inset 0 0 calc(10px * var(--glow-intensity))
-              color-mix(in srgb, var(--secondary-color) var(--border-opacity-pct), transparent);
+      box-shadow: 0 0 calc(10px * var(--glow-intensity)) color-mix(in srgb, var(--primary-color) var(--border-opacity-pct), transparent),
+      inset 0 0 calc(10px * var(--glow-intensity)) color-mix(in srgb, var(--secondary-color) var(--border-opacity-pct), transparent);
     }
 
     &.has-selections {
       --glow-size: calc(10px * var(--glow-intensity));
-      box-shadow:
-              0 0 var(--glow-size) var(--border-color),
-              inset 0 0 var(--glow-size) var(--border-color);
+      box-shadow: 0 0 var(--glow-size) var(--border-color),
+      inset 0 0 var(--glow-size) var(--border-color);
     }
   }
 
   .title {
     color: $text;
-    font-size: 14px;
+    font-size: var(--font-size);
     font-weight: 600;
   }
 
@@ -206,7 +201,7 @@
   .amount {
     letter-spacing: 1px;
     font-weight: 500;
-    font-size: 14px;
+    font-size: var(--font-size);
     color: $text;
   }
 
@@ -225,6 +220,6 @@
     display: flex;
     flex-wrap: wrap;
     gap: 7px;
-    font-size: 14px;
+    font-size: var(--font-size);
   }
 </style>

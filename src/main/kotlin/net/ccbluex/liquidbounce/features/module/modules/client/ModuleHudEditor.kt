@@ -25,7 +25,7 @@ object ModuleHudEditor :
     override val running = true
     @Suppress("UnusedPrivateProperty")
     private val hudZoom by float("Zoom", 1f, 0.5f..2f).onChanged {
-        EventManager.callEvent(ClickGuiValueChangeEvent(ModuleHudEditor))
+        EventManager.callEvent(ClickGuiValueChangeEvent(this))
     }
 
     @Suppress("UnusedPrivateProperty")

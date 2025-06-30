@@ -20,12 +20,13 @@
     let bottom = 0;
     let average_height;
     $: visible = items.slice(start, end).map((data, i) => {
-        return { index: i + start, data };
+        return {index: i + start, data};
     });
     // whenever `items` changes, invalidate the current heightmap
     $: if (mounted) refresh(items, viewport_height, itemHeight);
+
     async function refresh(items, viewport_height, itemHeight) {
-        const { scrollTop } = viewport;
+        const {scrollTop} = viewport;
         await tick(); // wait until the DOM is up to date
         let content_height = top - scrollTop;
         let i = start;
@@ -50,8 +51,9 @@
             viewport.scrollTop = 0;
         }, 100);
     }
+
     async function handle_scroll() {
-        const { scrollTop } = viewport;
+        const {scrollTop} = viewport;
         const old_start = start;
         for (let v = 0; v < rows.length; v += 1) {
             height_map[start + v] = itemHeight || rows[v].offsetHeight;
@@ -83,7 +85,7 @@
             await tick();
             let expected_height = 0;
             let actual_height = 0;
-            for (let i = start; i < old_start; i +=1) {
+            for (let i = start; i < old_start; i += 1) {
                 if (rows[i - start]) {
                     expected_height += height_map[i];
                     actual_height += itemHeight || rows[i - start].offsetHeight;
@@ -96,6 +98,7 @@
         // rows would occupy we may need to add some
         // more. maybe we can just call handle_scroll again?
     }
+
     // trigger initial refresh
     onMount(() => {
         rows = contents.getElementsByTagName('svelte-virtual-list-row');
@@ -107,20 +110,22 @@
     svelte-virtual-list-viewport {
         position: relative;
         overflow-y: auto;
-        -webkit-overflow-scrolling:touch;
+        -webkit-overflow-scrolling: touch;
         display: block;
     }
+
     svelte-virtual-list-contents, svelte-virtual-list-row {
         display: block;
     }
+
     svelte-virtual-list-row {
         overflow: hidden;
     }
 </style>
 
 <svelte-virtual-list-viewport
-        bind:this={viewport}
         bind:offsetHeight={viewport_height}
+        bind:this={viewport}
         on:scroll={handle_scroll}
         style="height: {height};"
 >
