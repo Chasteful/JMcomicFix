@@ -20,10 +20,10 @@ object FeatureProgress : ToggleableConfigurable(ModuleChestStealer, "Progress", 
     private val height by float("Height", 1f, 0.1f..2f)
     private val smooth by boolean("Smooth", true)
 
-    private val colorModes = choices(this, "ColorMode", 0) {
+    private val colorModes = choices(this, "ColorMode", 3) {
         arrayOf(
-            GenericCustomColorMode(it, ModuleHud.PrimaryColor, ModuleHud.SecondaryColor),
-            GenericStaticColorMode(it, Color4b.WHITE.with(a = 100)),
+            GenericCustomColorMode(it, Color4b.WHITE.with(a = 137),Color4b.WHITE.with(a = 233)),
+            GenericStaticColorMode(it, Color4b.WHITE.with(a = 233)),
             GenericRainbowColorMode(it),
             GenericSyncColorMode(it),
         )

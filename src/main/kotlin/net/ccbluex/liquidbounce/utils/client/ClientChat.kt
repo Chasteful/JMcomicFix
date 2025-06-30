@@ -32,6 +32,7 @@ import net.minecraft.text.*
 import net.minecraft.util.Formatting
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleHud
 import net.ccbluex.liquidbounce.injection.mixins.minecraft.text.MixinMutableTextAccessor
+import net.ccbluex.liquidbounce.render.gradientText
 import java.util.Locale
 import net.minecraft.util.Util
 import java.io.File
@@ -128,16 +129,6 @@ inline operator fun MutableText.plusAssign(other: Text) {
  * @param endColor The second color in the gradient
  * @return A MutableText with the gradient applied
  */
-fun gradientText(text: String, startColor: Color4b, endColor: Color4b): MutableText {
-    return text.foldIndexed(Text.empty()) { index, newText, char ->
-        val factor = if (text.length > 1) index / (text.length - 1.0) else 0.0
-        val color = startColor.interpolateTo(endColor, factor)
-
-        newText.append(
-            Text.literal(char.toString()).withColor(color.toARGB())
-        )
-    }
-}
 
 /**
  * Creates text with a copy-to-clipboard click event

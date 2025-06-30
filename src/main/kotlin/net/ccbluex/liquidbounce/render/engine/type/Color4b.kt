@@ -87,7 +87,9 @@ data class Color4b(val r: Int, val g: Int, val b: Int, val a: Int = 255) {
 
     fun toARGB() = (a shl 24) or (r shl 16) or (g shl 8) or b
 
-    fun toABGR() = (a shl 24) or (b shl 16) or (g shl 8) or r
+    fun withAlpha(alpha: Int): Color4b {
+        return Color4b(r, g, b, alpha.coerceIn(0, 255))
+    }
 
     fun fade(fade: Float): Color4b {
         return if (fade >= 1.0f) {

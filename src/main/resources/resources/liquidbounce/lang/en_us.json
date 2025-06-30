@@ -732,5 +732,6 @@
   "liquidbounce.module.anchor.description": "Pulls you into safe holes for crystal PvP.",
   "liquidbounce.module.titleControl.description": "Filter the title of the server for keywords you don't want to see.",
   "liquidbounce.module.capes.description":"Customize a cape that is only visible to you.",
-  "liquidbounce.module.halo.description":"Displays the aura of a BlueArchive character above the player's head."
+  "liquidbounce.module.halo.description":"Displays the aura of a BlueArchive character above the player's head.",
+  "liquidbounce.module.PacketQueueColor.description": "Setting the player Wireframe model color for the PacketQueue."
 }

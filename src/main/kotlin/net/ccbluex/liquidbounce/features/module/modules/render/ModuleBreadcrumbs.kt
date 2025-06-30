@@ -9,6 +9,7 @@ import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.render.GenericCustomColorMode
+import net.ccbluex.liquidbounce.render.GenericRainbowColorMode
 import net.ccbluex.liquidbounce.render.GenericStaticColorMode
 import net.ccbluex.liquidbounce.render.GenericSyncColorMode
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
@@ -31,10 +32,11 @@ object ModuleBreadcrumbs : ClientModule("Breadcrumbs", Category.RENDER, aliases 
     private val onlyOwn by boolean("OnlyOwn", true)
     private val height by float("Height", 0.5f, 0f..2f)
 
-    private val colorModes = choices(this, "ColorMode", 0) {
+    private val colorModes = choices(this, "ColorMode", 3) {
         arrayOf(
             GenericCustomColorMode(it, ModuleHud.PrimaryColor, ModuleHud.SecondaryColor),
             GenericStaticColorMode(it, Color4b.WHITE.with(a = 100)),
+            GenericRainbowColorMode(it),
             GenericSyncColorMode(it),
         )
     }

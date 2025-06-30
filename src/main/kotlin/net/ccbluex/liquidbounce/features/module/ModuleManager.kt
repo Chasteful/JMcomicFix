@@ -35,6 +35,7 @@ import net.ccbluex.liquidbounce.features.module.modules.client.ModuleHudEditor
 import net.ccbluex.liquidbounce.features.module.modules.client.ModuleLiquidChat
 import net.ccbluex.liquidbounce.features.module.modules.client.ModuleRichPresence
 import net.ccbluex.liquidbounce.features.module.modules.client.ModuleTargets
+import net.ccbluex.liquidbounce.features.module.modules.client.ModulePacketQueue
 import net.ccbluex.liquidbounce.features.module.modules.combat.*
 import net.ccbluex.liquidbounce.features.module.modules.combat.aimbot.ModuleAutoBow
 import net.ccbluex.liquidbounce.features.module.modules.combat.autoarmor.ModuleAutoArmor
@@ -425,6 +426,7 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             // Client
             ModuleAutoConfig,
             ModuleRichPresence,
+            ModulePacketQueue,
             ModuleTargets,
             ModuleLiquidChat,
             ModuleCapes,

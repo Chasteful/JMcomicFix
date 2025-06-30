@@ -32,6 +32,8 @@ import net.minecraft.client.gl.ShaderProgramKeys
 import net.minecraft.client.render.*
 import net.minecraft.client.render.VertexFormat.DrawMode
 import net.minecraft.client.util.math.MatrixStack
+import net.minecraft.text.MutableText
+import net.minecraft.text.Text
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.Vec3d
@@ -260,7 +262,16 @@ fun RenderEnvironment.drawLines(vararg lines: Vec3) {
 fun RenderEnvironment.drawLineStrip(vararg positions: Vec3) {
     drawLines(positions, mode = DrawMode.DEBUG_LINE_STRIP)
 }
+fun gradientText(text: String, startColor: Color4b, endColor: Color4b): MutableText {
+    return text.foldIndexed(Text.empty()) { index, newText, char ->
+        val factor = if (text.length > 1) index / (text.length - 1.0) else 0.0
+        val color = startColor.interpolateTo(endColor, factor)
 
+        newText.append(
+            Text.literal(char.toString()).withColor(color.toARGB())
+        )
+    }
+}
 fun RenderEnvironment.drawLineStrip(positions: List<Vec3>) {
     drawLines(positions.toTypedArray(), mode = DrawMode.DEBUG_LINE_STRIP)
 }

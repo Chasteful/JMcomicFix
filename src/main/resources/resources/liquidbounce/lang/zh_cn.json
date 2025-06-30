@@ -736,5 +736,6 @@
   "liquidbounce.module.antiCheatDetect.messages.description": "Anti Cheat Detect 将尝试在你下次加入任何服务器/游戏时，通过监测 ping 参数来检测服务器的反作弊系统。请注意，结果可能不准确，特别是当服务器上有多个反作弊系统时。",
   "liquidbounce.module.titleControl.description": "过滤服务器的字幕上，你不想看见的关键词。",
   "liquidbounce.module.capes.description": "显示一个仅你可见的披风。",
-  "liquidbounce.module.halo.description":"在玩家头顶显示一个蔚蓝档案人物的光环。"
+  "liquidbounce.module.halo.description":"在玩家头顶显示一个蔚蓝档案人物的光环。",
+  "liquidbounce.module.PacketQueueColor.description": "设置PacketQueue的玩家模型颜色"
 }

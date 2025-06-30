@@ -26,6 +26,9 @@ import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.injection.mixins.minecraft.render.MixinWorldRenderer
 import net.ccbluex.liquidbounce.render.BoxRenderer
+import net.ccbluex.liquidbounce.render.GenericRainbowColorMode
+import net.ccbluex.liquidbounce.render.GenericStaticColorMode
+import net.ccbluex.liquidbounce.render.GenericSyncColorMode
 import net.ccbluex.liquidbounce.render.drawBoxSide
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.ccbluex.liquidbounce.render.renderEnvironmentForWorld
@@ -50,8 +53,16 @@ import net.minecraft.util.shape.VoxelShape
 object ModuleBlockOutline : ClientModule("BlockOutline", Category.RENDER, aliases = arrayOf("BlockOverlay")) {
 
     private val sideOnly by boolean("SideOnly", true)
-    private val color by color("Color", Color4b(68, 117, 255, 70))
-    private val outlineColor by color("Outline", Color4b(68, 117, 255, 150))
+    private val alpha by int("Alpha", 70, 0..255)
+    private val outlineAlpha by int("OutlineAlpha", 150, 0..255)
+
+    private val colorMode = choices("ColorMode", 2) {
+        arrayOf(
+            GenericStaticColorMode(it, Color4b(68, 117, 255)),
+            GenericRainbowColorMode(it),
+            GenericSyncColorMode(it),
+        )
+    }
 
     private object Slide : ToggleableConfigurable(this, "Slide", true) {
         val time by int("Time", 150, 1..1000, "ms")
@@ -69,7 +80,7 @@ object ModuleBlockOutline : ClientModule("BlockOutline", Category.RENDER, aliase
     @Suppress("unused")
     private val renderHandler = handler<WorldRenderEvent> { event ->
         val target = mc.crosshairTarget
-        if (target !is BlockHitResult || target.getType() == HitResult.Type.MISS) {
+        if (target !is BlockHitResult || target.type == HitResult.Type.MISS) {
             resetPositions()
             return@handler
         }
@@ -107,12 +118,16 @@ object ModuleBlockOutline : ClientModule("BlockOutline", Category.RENDER, aliase
         }
 
         val translatedPosition = renderPosition.offset(mc.entityRenderDispatcher.camera.pos.negate())
+        val baseColor = colorMode.activeChoice.getColor(Unit)
+        val fillColor = baseColor.withAlpha(alpha)
+        val outline = baseColor.withAlpha(outlineAlpha)
+
         renderEnvironmentForWorld(event.matrixStack) {
             if (sideOnly) {
-                drawBoxSide(translatedPosition, side, color, outlineColor)
+                drawBoxSide(translatedPosition, side, fillColor, outline)
             } else {
                 BoxRenderer.drawWith(this) {
-                    drawBox(translatedPosition, color, outlineColor)
+                    drawBox(translatedPosition, fillColor, outline)
                 }
             }
         }
@@ -164,5 +179,4 @@ object ModuleBlockOutline : ClientModule("BlockOutline", Category.RENDER, aliase
         currentPosition = null
         previousPosition = null
     }
-
 }
