@@ -9,6 +9,8 @@ import net.ccbluex.liquidbounce.render.GenericRainbowColorMode
 import net.ccbluex.liquidbounce.render.GenericStaticColorMode
 import net.ccbluex.liquidbounce.render.GenericSyncColorMode
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
+import net.ccbluex.liquidbounce.utils.combat.shouldBeShown
+import net.minecraft.entity.LivingEntity
 
 
 object ModuleJumpEffect : ClientModule("JumpEffect", Category.RENDER) {

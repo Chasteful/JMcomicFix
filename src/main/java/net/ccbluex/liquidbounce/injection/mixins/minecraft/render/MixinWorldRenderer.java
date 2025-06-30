@@ -20,7 +20,6 @@ package net.ccbluex.liquidbounce.injection.mixins.minecraft.render;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.ccbluex.liquidbounce.common.OutlineFlag;
 import net.ccbluex.liquidbounce.event.EventManager;
 import net.ccbluex.liquidbounce.event.events.DrawOutlinesEvent;
@@ -164,27 +163,15 @@ public abstract class MixinWorldRenderer {
             OutlineShader.INSTANCE.apply(false);
         }
     }
+
     @Unique
     private boolean isRenderingChams = false;
 
     @Inject(method = "renderEntity", at = @At("HEAD"))
     private void injectChamsForEntity(Entity entity, double cameraX, double cameraY, double cameraZ, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
-        if (ModuleChams.INSTANCE.getRunning() && CombatExtensionsKt.shouldBeShown(entity)) {
-
+        if (ModuleChams.INSTANCE.getRunning() && CombatExtensionsKt.shouldBeAttacked(entity)) {
             glEnable(GL_POLYGON_OFFSET_FILL);
             glPolygonOffset(1f, -1000000F);
-
-
-            glEnable(GL_DEPTH_TEST);
-
-
-            glDepthMask(false);
-
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-
-            RenderSystem.setShaderColor(1f, 1f, 1f, ModuleChams.INSTANCE.getOpacity());
 
             this.isRenderingChams = true;
         }
@@ -192,24 +179,13 @@ public abstract class MixinWorldRenderer {
 
     @Inject(method = "renderEntity", at = @At("RETURN"))
     private void injectChamsForEntityPost(Entity entity, double cameraX, double cameraY, double cameraZ, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
-        if (this.isRenderingChams) {
-
+        if (ModuleChams.INSTANCE.getRunning() && CombatExtensionsKt.shouldBeAttacked(entity) && this.isRenderingChams) {
             glPolygonOffset(1f, 1000000F);
             glDisable(GL_POLYGON_OFFSET_FILL);
-
-
-            glDepthMask(true);
-            glDisable(GL_DEPTH_TEST);
-
-
-            glDisable(GL_BLEND);
-
-            RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
             this.isRenderingChams = false;
         }
     }
-
     @Redirect(method = "getEntitiesToRender", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isSleeping()Z"))
     private boolean hookFreeCamRenderPlayerFromAllPerspectives(LivingEntity instance) {
         return ModuleFreeCam.INSTANCE.renderPlayerFromAllPerspectives(instance);

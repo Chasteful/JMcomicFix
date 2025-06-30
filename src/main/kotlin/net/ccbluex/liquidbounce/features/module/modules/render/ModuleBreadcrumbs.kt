@@ -34,7 +34,7 @@ object ModuleBreadcrumbs : ClientModule("Breadcrumbs", Category.RENDER, aliases 
 
     private val colorModes = choices(this, "ColorMode", 3) {
         arrayOf(
-            GenericCustomColorMode(it, ModuleHud.PrimaryColor, ModuleHud.SecondaryColor),
+            GenericCustomColorMode(it, Color4b.WHITE.with(a = 80),Color4b.WHITE.with(a = 100)),
             GenericStaticColorMode(it, Color4b.WHITE.with(a = 100)),
             GenericRainbowColorMode(it),
             GenericSyncColorMode(it),

@@ -15,7 +15,6 @@ import net.minecraft.util.math.Vec3d
 object RenderMode : JumpEffectMode("Render") {
 
     private val endRadius by floatRange("EndRadius", 0.9F..1F, 0F..3F)
-
     private val innerAlpha by int("InnerAlpha", 0, 0..255)
     private val outerAlpha by int("OuterAlpha", 91, 0..255)
     private val animCurve by curve("AnimCurve", Easing.QUAD_OUT)

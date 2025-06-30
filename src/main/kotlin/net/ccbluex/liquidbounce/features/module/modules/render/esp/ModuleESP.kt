@@ -28,6 +28,7 @@ import net.ccbluex.liquidbounce.features.module.modules.render.esp.modes.EspOutl
 import net.ccbluex.liquidbounce.render.GenericEntityHealthColorMode
 import net.ccbluex.liquidbounce.render.GenericRainbowColorMode
 import net.ccbluex.liquidbounce.render.GenericStaticColorMode
+import net.ccbluex.liquidbounce.render.GenericSyncColorMode
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.ccbluex.liquidbounce.utils.combat.EntityTaggingManager
 import net.ccbluex.liquidbounce.utils.combat.shouldBeShown
@@ -56,9 +57,11 @@ object ModuleESP : ClientModule("ESP", Category.RENDER) {
         arrayOf(
             GenericEntityHealthColorMode(it),
             GenericStaticColorMode(it, Color4b.Companion.WHITE.with(a = 100)),
-            GenericRainbowColorMode(it)
+            GenericRainbowColorMode(it),
+
         )
     }
+
     private val friendColor by color("Friends", Color4b.Companion.GREEN)
 
     override fun enable() {
@@ -79,7 +82,7 @@ object ModuleESP : ClientModule("ESP", Category.RENDER) {
         return baseColor
     }
 
-    private fun getBaseColor(entity: LivingEntity): Color4b {
+     fun getBaseColor(entity: LivingEntity): Color4b {
         if (entity is PlayerEntity) {
             if (FriendManager.isFriend(entity) && friendColor.a > 0) {
                 return friendColor

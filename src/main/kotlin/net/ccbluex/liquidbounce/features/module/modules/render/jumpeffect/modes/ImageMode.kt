@@ -21,14 +21,12 @@ import kotlin.collections.contains
 import kotlin.math.pow
 
 object ImageMode : JumpEffectMode("Image") {
-
-    private val imageType by enumChoice("ImageType", Image.CIRCLE)
     private val onlySelf by boolean("OnlySelf", false)
     private val easeOut by boolean("EaseOut", true)
     private val circleAlpha by float("Alpha", 255f,0f..255f)
-    private val circleScale by float("CircleScale", 1f, 0.5f..5f)
+    private val circleScale by float("Scale", 1f, 0.5f..5f)
     private val rotateSpeed by float("RotateSpeed", 2f, 0.5f..5f)
-
+    private val imageType by enumChoice("ImageType", Image.CIRCLE)
     private val circles = ArrayDeque<ObjectLongMutablePair<Vec3d>>()
     private val cache = mutableListOf<PlayerEntity>()
 
