@@ -1,34 +1,31 @@
-package net.ccbluex.liquidbounce.features.module.modules.render.jumpcircle
+package net.ccbluex.liquidbounce.features.module.modules.render.jumpeffect.modes
 
 import it.unimi.dsi.fastutil.objects.ObjectLongMutablePair
 import net.ccbluex.liquidbounce.event.events.PlayerJumpEvent
 import net.ccbluex.liquidbounce.event.events.WorldRenderEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.event.tickHandler
-import net.ccbluex.liquidbounce.features.module.Category
-import net.ccbluex.liquidbounce.features.module.ClientModule
-import net.ccbluex.liquidbounce.render.drawGradientCircle
+import net.ccbluex.liquidbounce.features.module.modules.render.jumpeffect.ModuleJumpEffect.colorMode
+import net.ccbluex.liquidbounce.render.*
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
-import net.ccbluex.liquidbounce.render.renderEnvironmentForWorld
 import net.ccbluex.liquidbounce.render.utils.shiftHue
-import net.ccbluex.liquidbounce.render.withPositionRelativeToCamera
 import net.ccbluex.liquidbounce.utils.math.Easing
 import net.minecraft.util.math.Vec3d
 
-object ModuleJumpEffect : ClientModule("JumpEffect", Category.RENDER) {
+object RenderMode : JumpEffectMode("Render") {
 
-    private val endRadius by floatRange("EndRadius", 0.15F..0.8F, 0F..3F)
+    private val endRadius by floatRange("EndRadius", 0.9F..1F, 0F..3F)
 
-    private val innerColor by color("InnerColor", Color4b(0, 255, 4, 0))
-    private val outerColor by color("OuterColor", Color4b(0, 255, 4, 89))
-
+    private val innerAlpha by int("InnerAlpha", 0, 0..255)
+    private val outerAlpha by int("OuterAlpha", 91, 0..255)
     private val animCurve by curve("AnimCurve", Easing.QUAD_OUT)
-
-    private val hueOffsetAnim by int("HueOffsetAnim", 63, -360..360)
-
-    private val lifetime by int("Lifetime", 15, 1..30)
-
+    private val hueOffsetAnim by int("HueOffsetAnim", 0, -360..360)
+    private val lifetime by int("Lifetime", 30, 1..30)
     private val circles = ArrayDeque<ObjectLongMutablePair<Vec3d>>()
+
+    override fun enable() {
+        circles.clear()
+    }
 
     val repeatable = tickHandler {
         with(circles.iterator()) {
@@ -45,42 +42,35 @@ object ModuleJumpEffect : ClientModule("JumpEffect", Category.RENDER) {
     }
 
     val renderHandler = handler<WorldRenderEvent> { event ->
-        val matrixStack = event.matrixStack
-
-        renderEnvironmentForWorld(matrixStack) {
+        renderEnvironmentForWorld(event.matrixStack) {
             circles.forEach {
                 val progress = animCurve
                     .transform((it.valueLong() + event.partialTicks) / lifetime)
                     .coerceIn(0f..1f)
 
+                val baseColor = colorMode.activeChoice.getColor(null)
+                val outerColor = animateColor(baseColor.withAlpha(outerAlpha), progress)
+                val innerColor = animateColor(baseColor.withAlpha(innerAlpha), progress)
+
                 withPositionRelativeToCamera(it.key()) {
                     drawGradientCircle(
                         endRadius.endInclusive * progress,
                         endRadius.start * progress,
-                        animateColor(outerColor, progress),
-                        animateColor(innerColor, progress)
+                        outerColor,
+                        innerColor
                     )
                 }
             }
         }
-
     }
-
 
     private fun animateColor(baseColor: Color4b, progress: Float): Color4b {
         val color = baseColor.fade(1.0F - progress)
-
-        if (hueOffsetAnim == 0){
-            return color
-        }
-
-        return shiftHue(color, (hueOffsetAnim * progress).toInt())
+        return if (hueOffsetAnim == 0) color else shiftHue(color, (hueOffsetAnim * progress).toInt())
     }
 
     @Suppress("unused")
-    val onJump = handler<PlayerJumpEvent> { _ ->
-        // Adds new circle when the player jumps
+    val onJump = handler<PlayerJumpEvent> {
         circles.add(ObjectLongMutablePair(player.pos, 0L))
     }
-
 }

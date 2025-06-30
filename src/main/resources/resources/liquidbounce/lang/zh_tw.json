@@ -579,7 +579,6 @@
   "liquidbounce.module.inventoryTracker.description": "追蹤其他玩家的物品欄。",
   "liquidbounce.module.itemEsp.description": "允許你透過方塊看到掉落物。",
   "liquidbounce.module.jumpEffect.description": "跳躍時在你腳下顯示一種效果。",
-  "liquidbounce.module.jumpCircle.description": "標識出你曾經跳躍的場所。",
   "liquidbounce.module.keepChatAfterDeath.description": "允許你在死亡螢幕使用聊天。",
   "liquidbounce.module.keepSprint.description": "允許你在攻擊時保持疾跑。",
   "liquidbounce.module.clickTp.description": "單擊滑鼠中鍵時，將你傳送至你準星所指的方塊。僅適用於 Vulcan 286 反作弊。",

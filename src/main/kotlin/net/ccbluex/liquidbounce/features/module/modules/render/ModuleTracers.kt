@@ -46,7 +46,7 @@ import java.awt.Color
 
 object ModuleTracers : ClientModule("Tracers", Category.RENDER) {
 
-    private val modes = choices("ColorMode", 0) {
+    private val modes = choices("ColorMode", 4) {
         arrayOf(
             DistanceColor,
             GenericCustomColorMode(it, Color4b.WHITE.with(a = 80),Color4b.WHITE.with(a = 100)),

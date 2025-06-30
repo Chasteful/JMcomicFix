@@ -577,7 +577,6 @@
   "liquidbounce.module.inventoryTracker.description": "Tracks the inventories of other players.",
   "liquidbounce.module.itemEsp.description": "Allows you to see dropped items through walls.",
   "liquidbounce.module.jumpEffect.description": "Shows an effect beneath your feet when jumping.",
-  "liquidbounce.module.jumpCircle.description": "Identify where you used to jump.",
   "liquidbounce.module.killEffects.description": "Displays an effect when you kill a target.",
   "liquidbounce.module.keepChatAfterDeath.description": "Allows you to use the chat on the death screen.",
   "liquidbounce.module.keepSprint.description": "Keeps you sprinting even when attacking.",

@@ -580,7 +580,7 @@
   "liquidbounce.module.inventoryTracker.description": "跟踪其他玩家的物品栏。",
   "liquidbounce.module.itemEsp.description": "允许你透过方块看到掉落物。",
   "liquidbounce.module.jumpEffect.description": "跳跃时在你脚下显示一种效果。",
-  "liquidbounce.module.jumpCircle.description": "标识出你曾经跳跃的地方。",
+
   "liquidbounce.module.killEffects.description": "在你击杀目标时显示一种效果。",
   "liquidbounce.module.keepChatAfterDeath.description": "允许你在死亡屏幕使用聊天。",
   "liquidbounce.module.keepSprint.description": "允许你在攻击时保持疾跑。",
