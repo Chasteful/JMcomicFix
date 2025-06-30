@@ -18,7 +18,7 @@
  */
 package net.ccbluex.liquidbounce.features.module.modules.movement.noslow.modes.consume
 
-import net.ccbluex.liquidbounce.config.types.Choice
+
 import net.ccbluex.liquidbounce.config.types.NoneChoice
 import net.ccbluex.liquidbounce.features.module.modules.movement.noslow.NoSlowUseActionHandler
 import net.ccbluex.liquidbounce.features.module.modules.movement.noslow.modes.shared.NoSlowNoBlockInteract

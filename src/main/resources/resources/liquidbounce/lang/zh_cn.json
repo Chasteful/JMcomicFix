@@ -737,5 +737,6 @@
   "liquidbounce.module.titleControl.description": "过滤服务器的字幕上，你不想看见的关键词。",
   "liquidbounce.module.capes.description": "显示一个仅你可见的披风。",
   "liquidbounce.module.halo.description":"在玩家头顶显示一个蔚蓝档案人物的光环。",
-  "liquidbounce.module.PacketQueueColor.description": "设置PacketQueue的玩家模型颜色"
+  "liquidbounce.module.packetQueueColor.description": "设置PacketQueue的玩家模型颜色",
+  "liquidbounce.module.autoGG.description": "在你赢得胜利后自动在聊天框发送指定的信息"
 }

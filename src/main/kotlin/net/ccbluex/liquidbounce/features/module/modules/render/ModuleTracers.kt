@@ -94,10 +94,12 @@ object ModuleTracers : ClientModule("Tracers", Category.RENDER) {
 
                     val dist = player.distanceTo(entity) * 2.0F
                     val tagColor = EntityTaggingManager.getTag(entity).color
-                    val friendColor =
-                        if (entity is PlayerEntity &&
-                            FriendManager.isFriend(entity.gameProfile.name)) Color4b.BLUE else null
-
+                    val friendColor = if (entity is PlayerEntity &&
+                        FriendManager.isFriend(entity.gameProfile.name)) {
+                        Color4b.BLUE
+                    } else {
+                        null
+                    }
                     val activeMode = modes.activeChoice
                     val (startColor, endColor) = when (activeMode) {
                         is GenericCustomColorMode -> activeMode.getColors(entity)
