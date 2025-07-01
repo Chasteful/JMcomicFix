@@ -8,6 +8,7 @@
     import {fade} from 'svelte/transition';
     import {tweened} from 'svelte/motion';
     import {cubicOut} from 'svelte/easing';
+    import {wins} from "../../../../util/Theme/SessionManager";
 
     const MAX_MESSAGES = 1000;
     const MAX_DISPLAYED = 50;
@@ -16,6 +17,9 @@
     const FADE_DURATION = 5000;
     const MAX_SIMULTANEOUS_FADES = 3;
     const FADE_DELAY_BETWEEN_BATCHES = 800;
+    const winKeywordsBloxd = [
+        "victory", "YOU WIN!",
+    ];
     $: chatHeight.set(focus ? HEIGHT_FOCUSED : HEIGHT_BLUR);
     const chatHeight = tweened(HEIGHT_BLUR, {
         duration: 300,
@@ -48,7 +52,18 @@
         }
     }
 
+    function extractText(component: any | string): string {
+        if (!component) return "";
+        if (typeof component === "string") return component;
 
+        let result = component.text ?? "";
+        if (Array.isArray(component.extra)) {
+            for (const child of component.extra) {
+                result += extractText(child);
+            }
+        }
+        return result;
+    }
     function clearAllFadeTimeouts() {
         chatMessages.forEach(msg => {
             if (msg.fadeTimeout) {
@@ -125,13 +140,17 @@
         chatMessages = [...chatMessages, msg].slice(-MAX_MESSAGES);
         maybeScrollToBottomImmediately();
 
+        const messageText = extractText(event.content).toLowerCase();
+        if (winKeywordsBloxd.some(keyword => messageText.includes(keyword.toLowerCase()))) {
+            wins.update(n => n + 1);
+        }
+
         if (initialized && !focus &&
             chatMessages.slice(-MAX_DISPLAYED).includes(msg)
         ) {
             scheduleFade(msg);
         }
     }
-
     function handleKeyDown(event: KeyEvent) {
         const k = event.key;
         if (k === keyChat?.key.translationKey) {

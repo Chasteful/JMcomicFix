@@ -48,6 +48,7 @@ import net.ccbluex.liquidbounce.features.module.modules.combat.velocity.ModuleVe
 import net.ccbluex.liquidbounce.features.module.modules.exploit.*
 import net.ccbluex.liquidbounce.features.module.modules.exploit.disabler.ModuleDisabler
 import net.ccbluex.liquidbounce.features.module.modules.exploit.dupe.ModuleDupe
+import net.ccbluex.liquidbounce.features.module.modules.exploit.movefix.ModuleMovePhysics
 import net.ccbluex.liquidbounce.features.module.modules.exploit.phase.ModulePhase
 import net.ccbluex.liquidbounce.features.module.modules.exploit.servercrasher.ModuleServerCrasher
 import net.ccbluex.liquidbounce.features.module.modules.`fun`.*
@@ -244,6 +245,7 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleVehicleOneHit,
             ModuleServerCrasher,
             ModuleDupe,
+            ModuleMovePhysics,
             ModuleClickTp,
             ModuleTimeShift,
             ModuleTeleport,

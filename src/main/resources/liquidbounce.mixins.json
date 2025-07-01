@@ -37,7 +37,6 @@
     "minecraft.client.network.message.MixinMessageHandler",
     "minecraft.client.option.MixinServerListAccessor",
     "minecraft.crash.CrashReportMixin",
-    "minecraft.gui.MixinGenericContainerScreen",
     "minecraft.entity.MixinAbstractClientPlayerEntity",
     "minecraft.entity.MixinAbstractHorseEntity",
     "minecraft.entity.MixinArmorFeatureRenderer",
@@ -62,6 +61,7 @@
     "minecraft.gui.MixinChatScreen",
     "minecraft.gui.MixinChatScreenAccessor",
     "minecraft.gui.MixinDrawContext",
+    "minecraft.gui.MixinGenericContainerScreen",
     "minecraft.gui.MixinHandledScreen",
     "minecraft.gui.MixinInGameHud",
     "minecraft.gui.MixinPlayerListHud",
@@ -134,5 +134,8 @@
   "server": [],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "mixins": [
+    "minecraft.block.MixinAbstractBlock"
+  ]
 }

@@ -9,7 +9,7 @@ export const kills = writable(0);
 export const deathCount = writable(0);
 
 const winKeywords = [
-    "win", "victory", "you win",
+    "victory", "you win",
     "胜", "赢",
     "victoire", "gagné",
     "gewonnen",
