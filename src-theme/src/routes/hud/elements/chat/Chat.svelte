@@ -18,7 +18,7 @@
     const MAX_SIMULTANEOUS_FADES = 3;
     const FADE_DELAY_BETWEEN_BATCHES = 800;
     const winKeywordsBloxd = [
-        "victory", "YOU WIN!",
+        "YOU WON!",
     ];
     $: chatHeight.set(focus ? HEIGHT_FOCUSED : HEIGHT_BLUR);
     const chatHeight = tweened(HEIGHT_BLUR, {
