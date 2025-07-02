@@ -254,8 +254,10 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             // Fun
             ModuleDankBobbing,
             ModuleDerp,
-            ModuleSkinDerp,
+            ModuleIQBoost,
             ModuleHandDerp,
+            ModulePendant,
+            ModuleSkinDerp,
             ModuleTwerk,
             ModuleVomit,
 

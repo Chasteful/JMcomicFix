@@ -37,7 +37,7 @@
                 ? convertToSpacedString(m.name)
                 : m.name;
             const prefix = prefixMap.get(m.name) || '';
-            const fullName = `${formattedName} ${prefix}`;
+            const fullName = `${formattedName}\u00A0${prefix}`;
             const width = getTextWidth(
                 fullName,
                 "500 16px 'Product Sans', system-ui, sans-serif"

@@ -734,5 +734,6 @@
   "liquidbounce.module.halo.description":"Displays the aura of a BlueArchive character above the player's head.",
   "liquidbounce.module.packetQueueColor.description": "Setting the player Wireframe model color for the PacketQueue.",
   "liquidbounce.module.autoGG.description": "Automatically send the specified message in the chat box after you win." ,
-  "liquidbounce.moudle.movePhysics": "Allows you to move under certain special server anti-cheats."
+  "liquidbounce.module.movePhysics.description": "Allows you to move under certain special server anti-cheats.",
+  "liquidbounce.module.pendant.description": "Display a picture on some interfaces."
 }

@@ -6,7 +6,7 @@
     import {cleanupListeners, listenAlways} from "./integration/ws";
     import {onMount} from "svelte";
     import {insertPersistentData} from "./integration/persistent_storage";
-    import Rat from "./routes/none/rat.svelte";
+    import Pendant from "./routes/pendant/Pendant.svelte";
     import Title from "./routes/menu/title/Title.svelte";
     import Multiplayer from "./routes/menu/multiplayer/Multiplayer.svelte";
     import AltManager from "./routes/menu/altmanager/AltManager.svelte";
@@ -24,8 +24,8 @@
         "/clickgui": ClickGui,
         "/hud": Hud,
         "/layouteditor":Hud,
-        "/inventory": Rat,
-        "/chat":Rat,
+        "/inventory": Pendant,
+        "/chat":Pendant,
         "/title": Title,
         "/multiplayer": Multiplayer,
         "/altmanager": AltManager,
