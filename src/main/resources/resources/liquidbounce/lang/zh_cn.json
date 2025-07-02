@@ -509,7 +509,7 @@
   "liquidbounce.module.disabler.messages.vulcanRiptideMessage": "为了绕过Vulcan的移动检查，你需要在副手持有一个附魔了激流的三叉戟。",
   "liquidbounce.module.disabler.messages.grimSpectateMessage": "你被服务器检测了！现在应该关闭Disabler模块。",
   "liquidbounce.module.disabler.messages.grimSpectateEnableMessage": "在重生期间——当你具有飞行能力时，启用此禁用器。你应该能够飞行和破坏方块，在此期间不能攻击其他玩家。你需要尽快关闭它，否则你将连接超时。",
-  "liquidbounce.module.disabler.messages.minibloxProtocol": "Miniblox disabler仅适用于 ViaFabricPlus 协议 1.8.X.",
+  "liquidbounce.module.disabler.messages.minibloxdProtocol": "Minibloxd MoveFix仅适用于 ViaFabricPlus 协议 1.8.X.",
   "liquidbounce.module.antiCheatDetect.description": "检测服务器的反作弊并通知您。",
   "liquidbounce.module.antiCheatDetect.messages.detected": "检测到 %s 反作弊.",
   "liquidbounce.module.antiCheatDetect.messages.actionNumbers": "动作编号: %s",
@@ -737,7 +737,8 @@
   "liquidbounce.module.titleControl.description": "过滤服务器的字幕上，你不想看见的关键词。",
   "liquidbounce.module.capes.description": "显示一个仅你可见的披风。",
   "liquidbounce.module.halo.description":"在玩家头顶显示一个蔚蓝档案人物的光环。",
-  "liquidbounce.module.packetQueueColor.description": "设置PacketQueue的玩家模型颜色",
-  "liquidbounce.module.autoGG.description": "在你赢得胜利后自动在聊天框发送指定的信息",
-  "liquidbounce.moudle.movePhysics": "用于MineBloxd的移动修复"
+  "liquidbounce.module.packetQueueColor.description": "设置PacketQueue的玩家模型颜色。",
+  "liquidbounce.module.autoGG.description": "在你赢得胜利后自动在聊天框发送指定的信息。",
+  "liquidbounce.moudle.movePhysics": "允许你在某些特殊的服务器反作弊下移动。"
+
 }
