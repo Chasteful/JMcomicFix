@@ -65,8 +65,9 @@
 
         listen('moduleToggle', () => updateEnabledModules());
         listen('refreshArrayList', () => updateEnabledModules());
+        listen('clickGuiValueChange',() => updateEnabledModules());
         spaceSeperatedNames.subscribe(() => updateEnabledModules());
-
+    0
         unsubs = subscribeColors();
         unsubRenderSettings = subscribeRenderSettings(() => {
             updateEnabledModules();

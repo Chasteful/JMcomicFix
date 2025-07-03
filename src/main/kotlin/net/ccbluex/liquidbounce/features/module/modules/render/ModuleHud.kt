@@ -63,13 +63,17 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
         get() = "liquidbounce.module.hud"
 
     private val blur by boolean("Blur", true)
+
+    @Suppress("unused")
+    private val refresh by boolean("Refresh",true).onChanged {
+        EventManager.callEvent(ClickGuiValueChangeEvent(ModuleBetterTab))
+    }
+    val centeredCrosshair by boolean("CenteredCrosshair", false)
     @Suppress("unused")
     private val spaceSeperatedNames by boolean("SpaceSeperatedNames", true).onChange { state ->
         EventManager.callEvent(SpaceSeperatedNamesChangeEvent(state))
         state
     }
-    val centeredCrosshair by boolean("CenteredCrosshair", false)
-
     val PrimaryColor by color("Primary", Color4b(255,140,0,255))
         .onChanged {
             EventManager.callEvent(ClickGuiValueChangeEvent(this))
@@ -100,14 +104,19 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
         EventManager.callEvent(ClickGuiValueChangeEvent(this))
     }
 
+    @Suppress("Unused")
     enum class DoPrefix(override val choiceName: String) : NamedChoice {
         CHOICE("CHOICE"),
         CHOOSE("CHOOSE"),
+        MULTI_CHOOSE("MULTI_CHOOSE"),
         INT_RANGE("INT_RANGE"),
         FLOAT_RANGE("FLOAT_RANGE"),
         INT("INT"),
-        FLOAT("FLOAT")
+        FLOAT("FLOAT"),
+        TEXT("TEXT"),
+
     }
+
     init {
         tree(Configurable("In-built", value = components as MutableList<Value<*>>))
         tree(Configurable("Custom", value = customComponents as MutableList<Value<*>>))

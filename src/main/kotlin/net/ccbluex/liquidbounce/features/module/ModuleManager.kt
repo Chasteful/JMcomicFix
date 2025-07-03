@@ -32,6 +32,8 @@ import net.ccbluex.liquidbounce.event.events.WorldChangeEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.modules.client.ModuleAutoConfig
 import net.ccbluex.jmcomicfix.features.module.modules.client.ModuleHudEditor
+import net.ccbluex.jmcomicfix.features.module.modules.`fun`.ModuleIQBoost
+import net.ccbluex.jmcomicfix.features.module.modules.`fun`.ModulePendant
 import net.ccbluex.liquidbounce.features.module.modules.client.ModuleLiquidChat
 import net.ccbluex.liquidbounce.features.module.modules.client.ModuleRichPresence
 import net.ccbluex.liquidbounce.features.module.modules.client.ModuleTargets

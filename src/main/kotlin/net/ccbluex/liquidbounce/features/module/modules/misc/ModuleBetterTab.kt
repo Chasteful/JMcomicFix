@@ -43,7 +43,10 @@ object ModuleBetterTab : ClientModule("BetterTab", Category.RENDER) {
     private val visibility by multiEnumChoice("Visibility",
         Visibility.HEADER,
         Visibility.FOOTER
-    )
+    ).onChanged {
+        EventManager.callEvent(ClickGuiValueChangeEvent(ModuleBetterTab))
+    }
+
 
     @JvmStatic
     fun isVisible(visibility: Visibility) = visibility in this.visibility
@@ -93,7 +96,6 @@ class PlayerFilter: Configurable("Filter") {
     private var filters = setOf<Regex>()
 
     private val filterBy by multiEnumChoice("FilterBy", Filter.entries)
-
     @Suppress("unused")
     private val names by textArray("Names", mutableListOf()).onChanged { newValue ->
         filters = newValue.mapTo(HashSet(newValue.size, 1.0F)) {

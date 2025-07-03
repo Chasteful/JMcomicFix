@@ -6,7 +6,8 @@ import type {
     FloatRangeSetting,
     FloatSetting,
     IntRangeSetting,
-    IntSetting
+    IntSetting,
+    MultiChooseSetting, TextSetting,
 } from '../integration/types';
 import {ArraylistRenderSettings, primaryRgb, secondaryRgb} from '../util/Theme/ThemeManager';
 import {type Readable} from "svelte/store";
@@ -17,20 +18,25 @@ export async function getPrefixAsync(name: string) {
     const settings = await getModuleSettings(name);
     let value = '';
 
+    // @ts-ignore
     const checkSetting = (setting: any): string | null => {
         const valueType = setting.valueType.toLowerCase();
         if (!currentRenderSettings.size || currentRenderSettings.has(valueType)) {
             switch (valueType) {
                 case 'choice':
-                    return (setting as ChoiceSetting).active ? setting.name : null;
+                    return (setting as ChoiceSetting).active;
                 case 'choose':
                     return (setting as ChooseSetting).value;
+                case 'multi_choose':
+                    return (setting as MultiChooseSetting).value.toString();
                 case 'int_range':
                     const intRange = setting as IntRangeSetting;
                     return `${intRange.value.from}-${intRange.value.to}`;
                 case 'float_range':
                     const floatRange = setting as FloatRangeSetting;
                     return `${floatRange.value.from}-${floatRange.value.to}`;
+                case 'text':
+                    return (setting as TextSetting).value
                 case 'int':
                     return (setting as IntSetting).value.toString();
                 case 'float':
