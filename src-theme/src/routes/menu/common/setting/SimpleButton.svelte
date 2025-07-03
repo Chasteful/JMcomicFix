@@ -22,7 +22,7 @@
 </script>
 
 <svelte:window on:keydown={handleKeyDown}/>
-<button class="button-setting" class:inset type="button" on:click={() => dispatch("click")} {disabled} class:secondary>
+<button class="button-setting" class:inset class:secondary {disabled} on:click={() => dispatch("click")} type="button">
     {#if loading}
         <CircleLoader/>
     {/if}
@@ -38,13 +38,14 @@
     color: #DDD;
     font-weight: 600;
     font-size: 20px;
-    padding: 10px 24px 10px 24px ;
+    padding: 10px 24px 10px 24px;
     border: none;
     border-radius: 5px;
     transition: ease background-color .2s, ease opacity .2s, border-bottom .2s ease;
     background: rgba($base, 0.5);
     box-shadow: inset -2px -4px #0006, inset 2px 2px #FFF7;
     text-shadow: 2px 2px #000A;
+
     &.inset {
       margin: 0 30px;
     }

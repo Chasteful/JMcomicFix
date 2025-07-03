@@ -1,18 +1,18 @@
 <script lang="ts">
-    import { onDestroy, onMount, tick } from "svelte";
-    import { fade } from "svelte/transition";
+    import {onDestroy, onMount, tick} from "svelte";
+    import {fade} from "svelte/transition";
     import {
         getSession,
         getModules,
         getPlayerData,
         getClientInfo
     } from "../../../../integration/rest";
-    import type { ClientInfo } from "../../../../integration/types";
-    import type { ClientPlayerDataEvent } from "../../../../integration/events";
-    import { listen } from "../../../../integration/ws";
-    import type { Session, PlayerData } from "../../../../integration/types";
-    import { tweened } from "svelte/motion";
-    import { cubicOut } from "svelte/easing";
+    import type {ClientInfo} from "../../../../integration/types";
+    import type {ClientPlayerDataEvent} from "../../../../integration/events";
+    import {listen} from "../../../../integration/ws";
+    import type {Session, PlayerData} from "../../../../integration/types";
+    import {tweened} from "svelte/motion";
+    import {cubicOut} from "svelte/easing";
     import {
         blockCount,
         armorValue,
@@ -24,10 +24,10 @@
         DURABILITY_THRESHOLD,
         targetId
     } from './Island';
-    import { get } from 'svelte/store';
-    import { calcArmorValue } from "../../../../util/Client/calcArmorValue";
-    import { clientName } from "../../../../util/Theme/ThemeManager";
-    import { TimeoutManager } from "../../../../util/Theme/TimeoutManager";
+    import {get} from 'svelte/store';
+    import {calcArmorValue} from "../../../../util/Client/calcArmorValue";
+    import {clientName} from "../../../../util/Theme/ThemeManager";
+    import {TimeoutManager} from "../../../../util/Theme/TimeoutManager";
 
     const ALERT_DISPLAY_DURATION_MS = 2500;
     const INVENTORY_FULL_COOLDOWN_MS = 30000;
@@ -93,10 +93,10 @@
         status: null as HTMLDivElement | null
     };
 
-    const initialWidth = tweened(0, { duration: 400, easing: cubicOut });
-    const initialOpacity = tweened(0, { duration: 400, easing: cubicOut });
-    const w = tweened(400, { duration: 300, easing: cubicOut });
-    const h = tweened(40, { duration: 300, easing: cubicOut });
+    const initialWidth = tweened(0, {duration: 400, easing: cubicOut});
+    const initialOpacity = tweened(0, {duration: 400, easing: cubicOut});
+    const w = tweened(400, {duration: 300, easing: cubicOut});
+    const h = tweened(40, {duration: 300, easing: cubicOut});
 
 
     const getTimeGreeting = (hours: number): string => {
@@ -121,7 +121,7 @@
     const codeGenerator = {
         generate: (length = 6): string => {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?/~`§';
-            return Array.from({ length }, () =>
+            return Array.from({length}, () =>
                 chars.charAt(Math.floor(Math.random() * chars.length))
             ).join('');
         },
@@ -295,7 +295,7 @@
         clearAlertState();
 
         const applyAlert = () => {
-            currentAlert = { type, title, message };
+            currentAlert = {type, title, message};
             currentContent = 'alert';
             animationPhase = 'expand';
 
@@ -786,6 +786,7 @@
         }
       }
     }
+
     .eating-progress-bar {
       position: absolute;
       bottom: 0;
@@ -802,7 +803,8 @@
         background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
       }
     }
-      .progress-bar-container {
+
+    .progress-bar-container {
       position: absolute;
       bottom: 0;
       left: 0;

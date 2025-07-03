@@ -38,7 +38,7 @@
         <img alt="inventory" class="icon" src="img/hud/inventory/inventory.svg"/>
         <span>Inventory List</span>
     </div>
-   <Line/>
+    <Line/>
     <div class="container">
         {#each stacks as stack (stack)}
             <ItemStackView {stack}/>

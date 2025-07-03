@@ -13,7 +13,6 @@
     "singleplayer",
     "lockscreen",
     "loginmenu"
-
   ],
   "overlays": [
     "hud",
@@ -25,7 +24,6 @@
     "disconnected"
   ],
   "components": [
-
     {
       "name": "Vignette",
       "value": [
@@ -236,8 +234,6 @@
         }
       ]
     },
-
-
     {
       "name": "Information",
       "value": [
@@ -303,7 +299,7 @@
       "value": [
         {
           "name": "Enabled",
-          "value":false
+          "value": false
         },
         {
           "name": "Alignment",
@@ -313,7 +309,7 @@
               "value": "Left"
             },
             {
-              "name": "HorizontalOffset" ,
+              "name": "HorizontalOffset",
               "value": 10
             },
             {
@@ -478,7 +474,6 @@
         }
       ]
     },
-
     {
       "name": "Message",
       "value": [
@@ -873,7 +868,6 @@
         }
       ]
     },
-
     {
       "name": "Notifications",
       "value": [

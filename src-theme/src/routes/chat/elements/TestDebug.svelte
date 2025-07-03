@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { onDestroy} from 'svelte';
-    import { chatEvents } from "./chatEventStore";
-    import { get } from 'svelte/store';
+    import {onDestroy} from 'svelte';
+    import {chatEvents} from "./chatEventStore";
+    import {get} from 'svelte/store';
 
     let lastWheel: WheelEvent | null = null;
     let lastKey: KeyboardEvent | null = null;
@@ -39,7 +39,7 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background: rgba(0,0,0,0.85);
+        background: rgba(0, 0, 0, 0.85);
         color: white;
         padding: 1rem;
         border-radius: 8px;
@@ -49,12 +49,14 @@
         width: 300px;
         height: 200px;
         overflow-y: auto;
-        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         font-family: monospace;
-        &:hover{
+
+        &:hover {
             color: red;
         }
     }
+
     .status {
         margin-top: 10px;
         padding-top: 10px;
@@ -62,7 +64,7 @@
     }
 </style>
 
-<div class="debug" bind:this={debugContainer}>
+<div bind:this={debugContainer} class="debug">
     <h3>事件调试器</h3>
 
     <div class="event">

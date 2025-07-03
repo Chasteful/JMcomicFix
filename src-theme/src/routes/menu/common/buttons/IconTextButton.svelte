@@ -1,59 +1,59 @@
 <script lang="ts">
-  import { createEventDispatcher, onMount } from "svelte";
+    import {createEventDispatcher, onMount} from "svelte";
 
-  export let title: string;
-  export let icon: string;
-  export let disabled = false;
+    export let title: string;
+    export let icon: string;
+    export let disabled = false;
 
 
-  const MIN_HOVER_TIME = 50;   
-  let buttonWidth = 60;
-  let titleElement: HTMLDivElement;
+    const MIN_HOVER_TIME = 50;
+    let buttonWidth = 60;
+    let titleElement: HTMLDivElement;
 
-  const dispatch = createEventDispatcher();
+    const dispatch = createEventDispatcher();
 
-  let hoverTimer: number;
-  let isIntent = false; 
+    let hoverTimer: number;
+    let isIntent = false;
 
-  onMount(() => {
-    if (titleElement) {
-      const titleWidth = titleElement.offsetWidth;
-      buttonWidth = 60 + titleWidth + 12;
+    onMount(() => {
+        if (titleElement) {
+            const titleWidth = titleElement.offsetWidth;
+            buttonWidth = 60 + titleWidth + 12;
+        }
+    });
+
+    function handleMouseEnter() {
+
+        clearTimeout(hoverTimer);
+        isIntent = false;
+        hoverTimer = window.setTimeout(() => {
+            isIntent = true;
+        }, MIN_HOVER_TIME);
     }
-  });
 
-  function handleMouseEnter() {
-
-    clearTimeout(hoverTimer);
-    isIntent = false;
-    hoverTimer = window.setTimeout(() => {
-      isIntent = true;
-    }, MIN_HOVER_TIME);
-  }
-
-  function handleMouseLeave() {
-    clearTimeout(hoverTimer);
-    if (isIntent) {
-      isIntent = false;
+    function handleMouseLeave() {
+        clearTimeout(hoverTimer);
+        if (isIntent) {
+            isIntent = false;
+        }
     }
-  }
 </script>
 
 <button
-  class="icon-text-button"
-  on:click={() => dispatch("click")}
-  on:mouseenter={handleMouseEnter}
-  on:mouseleave={handleMouseLeave}
-  {disabled}
-  style="--button-width: {buttonWidth}px"
-  class:intent={isIntent}
+        class="icon-text-button"
+        class:intent={isIntent}
+        {disabled}
+        on:click={() => dispatch("click")}
+        on:mouseenter={handleMouseEnter}
+        on:mouseleave={handleMouseLeave}
+        style="--button-width: {buttonWidth}px"
 >
-  <div class="icon-container">
-    <div class="icon">
-      <img src="img/menu/{icon}" alt={title} draggable="false" />
+    <div class="icon-container">
+        <div class="icon">
+            <img alt={title} draggable="false" src="img/menu/{icon}"/>
+        </div>
+        <div bind:this={titleElement} class="title">{title}</div>
     </div>
-    <div class="title" bind:this={titleElement}>{title}</div>
-  </div>
 </button>
 
 <style lang="scss">
@@ -82,6 +82,7 @@
     height: 60px;
     width: 60px;
     margin: 4px 8px;
+
     &[disabled] {
       opacity: 0.4;
       pointer-events: none;

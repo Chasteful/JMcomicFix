@@ -5,7 +5,7 @@
     import {calcArmorValue} from "../../../../util/Client/calcArmorValue"
     import {armorValue, targetId} from '../island/Island';
     import {REST_BASE} from "../../../../integration/host";
-    import {popOut,popIn} from "../../../../util/animate_utils";
+    import {popOut, popIn} from "../../../../util/animate_utils";
     import {onMount, onDestroy} from "svelte";
     import {calcArmorColor, detectTeamColor, type TeamColor} from "../../../../util/Client/calcArmorColor";
     import ArmorStatus from "../../common/ItemView/ArmorStatus.svelte";
@@ -71,7 +71,6 @@
         };
         animate();
     }
-
 
 
     function removeColorCodes(str: string): string {
@@ -459,9 +458,8 @@
     }
 
     &.shrink .avatar-inner {
-      animation:
-              hitScale 0.4s ease-out forwards,
-              highFlash 0.4s ease-out;
+      animation: hitScale 0.4s ease-out forwards,
+      highFlash 0.4s ease-out;
     }
   }
 
@@ -608,13 +606,14 @@
     50% {
       transform: scale(6);
     }
-    80%{
+    80% {
       transform: scale(5.3);
     }
     100% {
       transform: scale(5.5);
     }
   }
+
   @keyframes highFlash {
     0%, 100% {
       filter: drop-shadow(0 0 4px rgba($base, 0.5)) brightness(1);

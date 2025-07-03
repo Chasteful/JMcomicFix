@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import {writable} from 'svelte/store';
 
 const STORAGE_KEY = 'logoVariant';
 const logoVariants = 2;
@@ -9,7 +9,7 @@ function createLogoStorage() {
         ? parseInt(localStorage.getItem(STORAGE_KEY) || '1')
         : 1;
 
-    const { subscribe, set, update } = writable(initialValue);
+    const {subscribe, set, update} = writable(initialValue);
 
     return {
         subscribe,
@@ -32,4 +32,4 @@ function createLogoStorage() {
 }
 
 export const currentLogo = createLogoStorage();
-export { logoVariants };
+export {logoVariants};

@@ -5,7 +5,7 @@
     import {listen} from "../../../integration/ws";
     import {getPlayerData} from "../../../integration/rest";
     import {onMount} from "svelte";
-    import {FadeOut,FadeIn} from "../../../util/animate_utils";
+    import {FadeOut, FadeIn} from "../../../util/animate_utils";
     import {blockCount} from './island/Island';
 
     let playerData: PlayerData | null = null;

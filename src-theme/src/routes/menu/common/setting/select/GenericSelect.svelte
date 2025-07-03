@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { quintOut } from "svelte/easing";
-    import { fade } from "svelte/transition";
+    import {quintOut} from "svelte/easing";
+    import {fade} from "svelte/transition";
 
     export let closeOnInternalClick: boolean;
 
@@ -14,7 +14,7 @@
         }
     }
 
-    function handleSelectClick(e:MouseEvent) {
+    function handleSelectClick(e: MouseEvent) {
         if (closeOnInternalClick) {
             expanded = !expanded;
         } else {
@@ -30,17 +30,17 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class="select" class:expanded bind:this={selectElement} on:click={handleSelectClick}>
-    <div class="header" bind:this={headerElement}>
+<div bind:this={selectElement} class="select" class:expanded on:click={handleSelectClick}>
+    <div bind:this={headerElement} class="header">
         <span class="title">
             <slot name="title"/>
         </span>
-        <img 
-          src="img/menu/icon-select-arrow.svg" 
-          alt="expand"
-          class="arrow"
-          draggable="false"
-          class:expanded
+        <img
+                alt="expand"
+                class="arrow"
+                class:expanded
+                draggable="false"
+                src="img/menu/icon-select-arrow.svg"
         >
     </div>
     {#if expanded}
@@ -65,7 +65,7 @@
       }
     }
   }
- 
+
   .header {
     background: rgba($base, 0.5);
     box-shadow: 0 0 8px rgba($base, 0.6);
@@ -89,7 +89,7 @@
     width: 16px;
     height: 16px;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    
+
     &.expanded {
       transform: rotate(180deg);
     }

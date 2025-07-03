@@ -76,7 +76,7 @@
             <img class="icon" src="img/hud/keybinds/keyboard.svg" alt="keyboard"/>
             <span>Keybindings</span>
         </div>
-         <Line/>
+        <Line/>
         {#each bindings as binding (binding.moduleName)}
             <div class:disabled={!binding.enabled} class="binding-item">
                 <span class="module-name">{binding.moduleName}</span>

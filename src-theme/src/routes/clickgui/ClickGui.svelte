@@ -95,7 +95,8 @@
         applyValues(e.configurable);
     });
 </script>
-<div class="clickgui" class:grid={$showGrid} style="transform: scale({$scaleFactor * 50}%); width: {2 / $scaleFactor * 100}vw; height: {2 / $scaleFactor * 100}vh;
+<div class="clickgui" class:grid={$showGrid}
+     style="transform: scale({$scaleFactor * 50}%); width: {2 / $scaleFactor * 100}vw; height: {2 / $scaleFactor * 100}vh;
      background-size: {$gridSize}px {$gridSize}px;"
      transition:fade|global={{duration: 200}}>
 

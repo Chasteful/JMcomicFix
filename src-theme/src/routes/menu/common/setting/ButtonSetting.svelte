@@ -22,11 +22,11 @@
 </script>
 
 <svelte:window on:keydown={handleKeyDown}/>
-<button class="button-setting" class:inset type="button" on:click={() => dispatch("click")} {disabled} class:secondary>
-  {#if loading}
-      <CircleLoader/>
-  {/if}
-  {title}
+<button class="button-setting" class:inset class:secondary {disabled} on:click={() => dispatch("click")} type="button">
+    {#if loading}
+        <CircleLoader/>
+    {/if}
+    {title}
 </button>
 
 <style lang="scss">

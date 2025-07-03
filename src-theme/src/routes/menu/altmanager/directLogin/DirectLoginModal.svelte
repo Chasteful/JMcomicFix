@@ -3,7 +3,7 @@
     import Modal from "../../common/modal/Modal.svelte";
     import CrackedAccountDirectLoginTab from "./CrackedAccountDirectLoginTab.svelte";
     import SessionAccountDirectLoginTab from "./SessionAccountDirectLoginTab.svelte";
-    import { setItem } from "../../../../integration/persistent_storage";
+    import {setItem} from "../../../../integration/persistent_storage";
 
     export let visible: boolean;
 
@@ -28,6 +28,6 @@
     }
 </script>
 
-<Modal title="Direct Login" bind:visible={visible}>
-    <Tabs {tabs} {activeTab} on:changeTab={handleChangeTab}/>
+<Modal bind:visible={visible} title="Direct Login">
+    <Tabs {activeTab} on:changeTab={handleChangeTab} {tabs}/>
 </Modal>

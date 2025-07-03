@@ -183,6 +183,7 @@ export async function getVerification(): Promise<Verification> {
 
     return data;
 }
+
 export async function browse(target: string) {
     await fetch(`${API_BASE}/client/browse`, {
         method: "POST",
@@ -515,7 +516,7 @@ export async function addProxy(host: string, port: number, username: string, pas
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({host, port, username, password,forwardAuthentication})
+        body: JSON.stringify({host, port, username, password, forwardAuthentication})
     });
 }
 
@@ -592,10 +593,11 @@ export async function toggleBackgroundShaderEnabled() {
         method: "POST",
     });
 }
+
 export async function getShaderEnabled(): Promise<boolean> {
     const response = await fetch(`${API_BASE}/client/theme/shaderEnabled`, {
         method: "GET",
-        headers: { "Accept": "application/json" }
+        headers: {"Accept": "application/json"}
     });
     if (!response.ok) {
         throw new Error(`getShaderEnabled failed: ${response.status}`);
@@ -610,9 +612,10 @@ export async function setShaderEnabled(enabled: boolean) {
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ enabled }),
+        body: JSON.stringify({enabled}),
     });
 }
+
 export async function getBrowser(): Promise<Browser> {
     const response = await fetch(`${API_BASE}/client/browser`);
     const data: Browser = await response.json();

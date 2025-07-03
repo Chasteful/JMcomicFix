@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import {writable} from 'svelte/store';
 
 
 const STORAGE_KEY = 'userSettings';
@@ -15,22 +15,22 @@ function createUserSettingsStore() {
     };
 
 
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-            try {
-                initialValue = JSON.parse(stored);
-            } catch (e) {
-                console.error('Failed to parse userSettings from localStorage:', e);
-            }
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+        try {
+            initialValue = JSON.parse(stored);
+        } catch (e) {
+            console.error('Failed to parse userSettings from localStorage:', e);
         }
+    }
 
 
-    const { subscribe, set, update } = writable(initialValue);
+    const {subscribe, set, update} = writable(initialValue);
 
 
-        subscribe((value) => {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
-        });
+    subscribe((value) => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
+    });
 
 
     return {

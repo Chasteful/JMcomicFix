@@ -126,7 +126,7 @@
         <img alt="armor" class="icon" src="img/hud/inventory/armor.svg"/>
         <span>ArmorItems</span>
     </div>
-     <Line/>
+    <Line/>
     <div class="armor-items">
         {#each [...armorSlots].reverse() as stack (stack)}
             {#if shouldShowSlot(stack)}

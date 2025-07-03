@@ -39,6 +39,6 @@
     }
 </script>
 
-<Modal title="Add Account" bind:visible={visible}>
-    <Tabs {tabs} {activeTab} on:changeTab={handleChangeTab}/>
+<Modal bind:visible={visible} title="Add Account">
+    <Tabs {activeTab} on:changeTab={handleChangeTab} {tabs}/>
 </Modal>

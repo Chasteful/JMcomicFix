@@ -56,56 +56,56 @@
 
 <style lang="scss">
 
-    @use "../../colors.scss" as *;
+  @use "../../colors.scss" as *;
 
-    .browser-controls {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        position: fixed;
-        bottom: 10px;
-        left: 10px;
-        right: 10px;
-        background-color: rgba($base, 0.5);
-        padding: 10px;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba($crust, 0.4);
-        border: 2px solid color-mix(in srgb, var(--primary-color) 60%, transparent)
-    }
+  .browser-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    background-color: rgba($base, 0.5);
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba($crust, 0.4);
+    border: 2px solid color-mix(in srgb, var(--primary-color) 60%, transparent)
+  }
 
-    .address-bar {
-        flex-grow: 1;
-        margin: 0 10px;
-        background: $surface0;
-    }
+  .address-bar {
+    flex-grow: 1;
+    margin: 0 10px;
+    background: $surface0;
+  }
 
-    input {
-        width: 100%;
-        padding: 10px;
-        border-radius: 5px;
-        outline: none;
-        font-size: 14px;
-    }
+  input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    outline: none;
+    font-size: 14px;
+  }
 
-    button {
-        background-color: color-mix(in srgb, var(--primary-color) 60%, transparent);
-        color: $text;
-        border: none;
-        padding: 10px 15px;
-        margin-left: 5px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 14px;
-    }
+  button {
+    background-color: color-mix(in srgb, var(--primary-color) 60%, transparent);
+    color: $text;
+    border: none;
+    padding: 10px 15px;
+    margin-left: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+  }
 
-    button:disabled {
-        background-color: $overlay0;
-        cursor: not-allowed;
-    }
+  button:disabled {
+    background-color: $overlay0;
+    cursor: not-allowed;
+  }
 
-    button:focus {
-        outline: none;
-    }
+  button:focus {
+    outline: none;
+  }
 </style>
 
 {#if browser}
@@ -114,7 +114,7 @@
         <button on:click={handleForward}>&rarr;</button>
         <button on:click={handleReload}>&#x21bb;</button>
         <div class="address-bar">
-            <input id="url" bind:value={browser.url} on:keypress={onKeyPress} placeholder="Enter URL" />
+            <input id="url" bind:value={browser.url} on:keypress={onKeyPress} placeholder="Enter URL"/>
         </div>
         <button on:click={handleGo}>Go</button>
         <button on:click={handleForceReload}>Force Reload</button>

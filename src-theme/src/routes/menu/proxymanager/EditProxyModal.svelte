@@ -59,13 +59,13 @@
     });
 </script>
 
-<Modal title="Edit Proxy" bind:visible={visible}>
-    <IconTextInput title="Host:Port" icon="server" pattern=".+:[0-9]+" bind:value={hostPort}/>
-    <SwitchSetting title="Requires Authentication" bind:value={requiresAuthentication}/>
+<Modal bind:visible={visible} title="Edit Proxy">
+    <IconTextInput bind:value={hostPort} icon="server" pattern=".+:[0-9]+" title="Host:Port"/>
+    <SwitchSetting bind:value={requiresAuthentication} title="Requires Authentication"/>
     {#if requiresAuthentication}
         <IconTextInput title="Username" icon="user" bind:value={username}/>
         <IconTextInput title="Password" icon="lock" type="password" bind:value={password}/>
     {/if}
-    <SwitchSetting title="Forward Microsoft Authentication" bind:value={forwardAuthentication}/>
-    <ButtonSetting title="Edit Proxy" {disabled} on:click={editProxy} listenForEnter={true} {loading}/>
+    <SwitchSetting bind:value={forwardAuthentication} title="Forward Microsoft Authentication"/>
+    <ButtonSetting {disabled} listenForEnter={true} {loading} on:click={editProxy} title="Edit Proxy"/>
 </Modal>

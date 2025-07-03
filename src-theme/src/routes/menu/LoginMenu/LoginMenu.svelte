@@ -1,8 +1,9 @@
 <script lang="ts">
-    import { slide } from 'svelte/transition';
-    import { createEventDispatcher, onDestroy, onMount } from 'svelte';
-    import { getVerification } from "../../../integration/rest";
-    import { userSettings } from './userSettings';
+    import {slide} from 'svelte/transition';
+    import {createEventDispatcher, onDestroy, onMount} from 'svelte';
+    import {getVerification} from "../../../integration/rest";
+    import {userSettings} from './userSettings';
+
     const dispatch = createEventDispatcher();
 
     interface UserSettings {
@@ -158,7 +159,7 @@
 
         try {
             const verification = await getVerification();
-            if (verification.isDev || verification.isOwner|| verification.hwid) {
+            if (verification.isDev || verification.isOwner || verification.hwid) {
                 await simulateTyping(verification.developer, 'username');
                 await simulateTyping('0d000721', 'password');
                 await simulateTyping('0d000721', 'confirmPassword');
@@ -186,57 +187,57 @@
         <div class="form-group">
             <label for="username">Username</label>
             <input
-                    id="username"
-                    type="text"
                     bind:value={username}
-                    placeholder="Enter your username"
                     class:error={error.includes('Username')}
-                    readonly={isTyping}
+                    id="username"
                     on:focus={() => currentInputIndex = 0}
+                    placeholder="Enter your username"
+                    readonly={isTyping}
+                    type="text"
             />
         </div>
 
         <div class="form-group">
             <label for="password">Password</label>
             <input
-                    id="password"
-                    type="password"
                     bind:value={password}
-                    placeholder="At least 6 characters"
                     class:error={error.includes('Password')}
-                    readonly={isTyping}
+                    id="password"
                     on:focus={() => currentInputIndex = 1}
+                    placeholder="At least 6 characters"
+                    readonly={isTyping}
+                    type="password"
             />
         </div>
 
         <div class="form-group">
             <label for="confirmPassword">Confirm Password</label>
             <input
-                    id="confirmPassword"
-                    type="password"
                     bind:value={confirmPassword}
-                    placeholder="Re-enter your password"
                     class:error={error.includes('match')}
-                    readonly={isTyping}
+                    id="confirmPassword"
                     on:focus={() => currentInputIndex = 2}
+                    placeholder="Re-enter your password"
+                    readonly={isTyping}
+                    type="password"
             />
         </div>
 
         <div class="form-group">
             <label for="accessKey">Access Key</label>
             <input
-                    id="accessKey"
-                    type="text"
                     bind:value={accessKey}
-                    maxlength="10"
-                    placeholder="Enter access key"
                     class:error={error.includes('access key')}
-                    readonly={isTyping}
+                    id="accessKey"
+                    maxlength="10"
                     on:focus={() => currentInputIndex = 3}
+                    placeholder="Enter access key"
+                    readonly={isTyping}
+                    type="text"
             />
         </div>
 
-        <button class="register-button" on:click={register} disabled={isTyping}>
+        <button class="register-button" disabled={isTyping} on:click={register}>
             {isTyping ? 'Registering...' : 'Register'}
         </button>
     </div>
@@ -291,8 +292,8 @@
         padding: 2rem;
         border-radius: 12px;
         width: 380px;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .title {
@@ -301,7 +302,7 @@
         margin-bottom: 1.5rem;
         font-size: 1.5rem;
         font-weight: 600;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         padding-bottom: 0.5rem;
     }
 
@@ -378,8 +379,8 @@
         color: white;
         padding: 1rem 1.5rem;
         border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         display: flex;
         align-items: center;
         gap: 12px;

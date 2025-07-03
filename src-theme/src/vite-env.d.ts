@@ -11,6 +11,6 @@ declare global {
 
 interface CSSWithPaint extends CSS {
     paintWorklet: Worklet;
-  }
-  
-  declare const CSS: CSSWithPaint;
+}
+
+declare const CSS: CSSWithPaint;

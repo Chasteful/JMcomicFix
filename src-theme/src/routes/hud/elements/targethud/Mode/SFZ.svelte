@@ -5,7 +5,7 @@
     import {calcArmorColor} from "../../../../../util/Client/calcArmorColor";
     import {detectTeamColor, type TeamColor} from "../../../../../util/Client/calcArmorColor";
     import type {TargetChangeEvent} from "../../../../../integration/events.js";
-    import {popOut,popIn} from "../../../../../util/animate_utils";
+    import {popOut, popIn} from "../../../../../util/animate_utils";
     import PlayerView from "../../../common/PlayerView/PlayerView.svelte";
 
     interface NameHistoryEntry {

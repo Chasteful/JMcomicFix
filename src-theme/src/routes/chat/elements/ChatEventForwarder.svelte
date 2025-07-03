@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
-    import { chatEvents } from "./chatEventStore";
+    import {onMount} from 'svelte';
+    import {chatEvents} from "./chatEventStore";
 
     function handleKeyDown(e: KeyboardEvent) {
 
@@ -21,7 +21,7 @@
     onMount(() => {
 
         window.addEventListener('keydown', handleKeyDown);
-        window.addEventListener('wheel', handleMouseWheel, { passive: false });
+        window.addEventListener('wheel', handleMouseWheel, {passive: false});
 
         return () => {
             window.removeEventListener('keydown', handleKeyDown);

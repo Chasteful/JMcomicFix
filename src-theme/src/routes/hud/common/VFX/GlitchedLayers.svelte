@@ -1,6 +1,6 @@
 <script lang="ts">
     import {onMount, onDestroy} from "svelte";
-    import { primaryRgb, secondaryRgb } from "../../../../util/Theme/ThemeManager";
+    import {primaryRgb, secondaryRgb} from "../../../../util/Theme/ThemeManager";
 
     export let size = 262;
 
@@ -56,15 +56,36 @@
         class="logo-container {mounted ? 'animate' : ''}"
         style={`--size: ${size}px; --accent1: ${primaryRgb}; --accent2: ${secondaryRgb};`}
 >
-    <div class="layer base"><slot /></div>
-    <div class="layer neon-effect" style={`animation-delay: ${delays[0]}ms; animation-duration: ${durations[0]}ms`}><slot /></div>
-    <div class="layer glitch" style={`animation-delay: ${delays[1]}ms; animation-duration: ${durations[1]}ms`}><slot /></div>
-    <div class="layer glitch-partial" style={`animation-delay: ${delays[2]}ms; animation-duration: ${durations[2]}ms`}><slot /></div>
-    <div class="layer glitch-localized-1" style={`animation-delay: ${delays[3]}ms; animation-duration: ${durations[3]}ms; clip-path: ${randomClipPaths[0]}`}><slot /></div>
-    <div class="layer glitch-localized-2" style={`animation-delay: ${delays[4]}ms; animation-duration: ${durations[4]}ms; clip-path: ${randomClipPaths[1]}`}><slot /></div>
-    <div class="layer glitch-localized-3" style={`animation-delay: ${delays[5]}ms; animation-duration: ${durations[5]}ms; clip-path: ${randomClipPaths[2]}`}><slot /></div>
-    <div bind:this={redLayer} class="layer glitch-dynamic red"><slot /></div>
-    <div bind:this={blueLayer} class="layer glitch-dynamic blue"><slot /></div>
+    <div class="layer base">
+        <slot/>
+    </div>
+    <div class="layer neon-effect" style={`animation-delay: ${delays[0]}ms; animation-duration: ${durations[0]}ms`}>
+        <slot/>
+    </div>
+    <div class="layer glitch" style={`animation-delay: ${delays[1]}ms; animation-duration: ${durations[1]}ms`}>
+        <slot/>
+    </div>
+    <div class="layer glitch-partial" style={`animation-delay: ${delays[2]}ms; animation-duration: ${durations[2]}ms`}>
+        <slot/>
+    </div>
+    <div class="layer glitch-localized-1"
+         style={`animation-delay: ${delays[3]}ms; animation-duration: ${durations[3]}ms; clip-path: ${randomClipPaths[0]}`}>
+        <slot/>
+    </div>
+    <div class="layer glitch-localized-2"
+         style={`animation-delay: ${delays[4]}ms; animation-duration: ${durations[4]}ms; clip-path: ${randomClipPaths[1]}`}>
+        <slot/>
+    </div>
+    <div class="layer glitch-localized-3"
+         style={`animation-delay: ${delays[5]}ms; animation-duration: ${durations[5]}ms; clip-path: ${randomClipPaths[2]}`}>
+        <slot/>
+    </div>
+    <div bind:this={redLayer} class="layer glitch-dynamic red">
+        <slot/>
+    </div>
+    <div bind:this={blueLayer} class="layer glitch-dynamic blue">
+        <slot/>
+    </div>
 </div>
 
 <style>
@@ -143,7 +164,6 @@
     .glitch-localized-3 {
         filter: hue-rotate(300deg) brightness(1.3);
     }
-
 
 
     @keyframes zoomInDown {

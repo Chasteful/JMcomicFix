@@ -19,20 +19,20 @@
     import ConnectionScreen from "./routes/menu/connected/ConnectionScreen.svelte";
 
     const routes = {
-        "/loginmenu":LoginMenu,
-        "/lockscreen":LockScreen,
+        "/loginmenu": LoginMenu,
+        "/lockscreen": LockScreen,
         "/clickgui": ClickGui,
         "/hud": Hud,
-        "/layouteditor":Hud,
+        "/layouteditor": Hud,
         "/inventory": Pendant,
-        "/chat":Pendant,
+        "/chat": Pendant,
         "/title": Title,
         "/multiplayer": Multiplayer,
         "/altmanager": AltManager,
         "/singleplayer": Singleplayer,
         "/proxymanager": ProxyManager,
         "/disconnected": Disconnected,
-        "/connecting":ConnectionScreen,
+        "/connecting": ConnectionScreen,
         "/browser": Browser,
 
 

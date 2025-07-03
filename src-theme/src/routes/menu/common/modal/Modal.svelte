@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { createEventDispatcher, onMount, onDestroy } from "svelte";
-    import { cubicOut } from "svelte/easing";
-    import { fade, scale } from "svelte/transition";
+    import {createEventDispatcher, onMount, onDestroy} from "svelte";
+    import {cubicOut} from "svelte/easing";
+    import {fade, scale} from "svelte/transition";
 
     export let title: string;
     export let visible: boolean;
@@ -24,11 +24,10 @@
     }
 
     function handleKeyDown(event: KeyboardEvent) {
-            if (event.key === "Tab") {
+        if (event.key === "Tab") {
             closeModal();
         }
     }
-
 
 
     function startDrag(event: MouseEvent) {
@@ -56,6 +55,7 @@
         document.removeEventListener("mousemove", onDrag);
         document.removeEventListener("mouseup", stopDrag);
     }
+
     onMount(() => {
         window.addEventListener("keydown", handleKeyDown);
     });
@@ -77,7 +77,7 @@
             </div>
 
             <div class="content">
-                <slot />
+                <slot/>
             </div>
         </div>
     </div>
@@ -155,11 +155,11 @@
     width: 40px;
     align-items: center;
     justify-content: center;
+
     &:hover {
       color: #8ab4f8;
     }
   }
-
 
 
   .content {

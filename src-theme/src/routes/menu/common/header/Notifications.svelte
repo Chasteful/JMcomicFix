@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { fly } from "svelte/transition";
-    import { notification, type TNotification } from "./notification_store";
-    import { onMount } from "svelte";
-    import { get } from "svelte/store";
+    import {fly} from "svelte/transition";
+    import {notification, type TNotification} from "./notification_store";
+    import {onMount} from "svelte";
+    import {get} from "svelte/store";
 
     let currentNotification: TNotification | null = null;
     let showNotification = false;
@@ -42,27 +42,29 @@
 <div class="notifications">
     {#if showNotification && currentNotification}
         {#key currentNotification.id || currentNotification.message}
-                <div class="notification"
-                        transition:fly|global={{duration: 500, y: -100}}
-                        on:outroend={() => {
+            <div class="notification"
+                 transition:fly|global={{duration: 500, y: -100}}
+                 on:outroend={() => {
                         if (!showNotification) currentNotification = null;
                     }}
-                >
-                    <div class="icon" class:error={currentNotification.error}>
-                        <img src="img/hud/notification/icon-info.svg" alt="info">
-                    </div>
-                    <div class="title">{currentNotification.title}</div>
-                    <div class="message">{currentNotification.message}</div>
+            >
+                <div class="icon" class:error={currentNotification.error}>
+                    <img src="img/hud/notification/icon-info.svg" alt="info">
                 </div>
+                <div class="title">{currentNotification.title}</div>
+                <div class="message">{currentNotification.message}</div>
+            </div>
         {/key}
     {/if}
 </div>
 <style lang="scss">
   @use "../../../../colors.scss" as *;
+
   .notifications {
     display: grid;
     grid-template-columns: 1fr;
   }
+
   .notification {
     grid-row-start: 1;
     grid-column-start: 1;

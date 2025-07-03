@@ -6,7 +6,7 @@
         openScreen,
         directLoginToCrackedAccount,
         randomUsername,
-       loginToAccount as loginToAccountRest
+        loginToAccount as loginToAccountRest
 
     } from "../../../../../integration/rest";
     import {onMount} from "svelte";
@@ -24,6 +24,7 @@
         AccountManagerMessageEvent
     } from "../../../../../integration/events";
     import DirectLoginModal from "../../../altmanager/directLogin/DirectLoginModal.svelte";
+
     let username = "";
     let expanded = false;
     let accountElement: HTMLElement;
@@ -60,7 +61,6 @@
     }
 
 
-
     listen("session", async () => {
         await refreshSession();
     });
@@ -95,7 +95,8 @@
         notification.set({
             title: "AltManager",
             message: e.message,
-            error: false });
+            error: false
+        });
     });
 
     listen("accountManagerLogin", (e: AccountManagerLoginEvent) => {
@@ -114,6 +115,7 @@
             });
         }
     });
+
     function handleWindowClick(e: MouseEvent) {
         if (!accountElement.contains(e.target as Node)) {
             expanded = false;
@@ -162,6 +164,7 @@
         const username = await randomUsername();
         await directLoginToCrackedAccount(username, false);
     }
+
     function copyHWID() {
         navigator.clipboard.writeText(userData.hwid)
             .then(() => {
@@ -179,6 +182,7 @@
                 });
             });
     }
+
     onMount(async () => {
         await refreshSession();
         await refreshAccounts();
@@ -191,11 +195,11 @@
 <DirectLoginModal bind:visible={directLoginModalVisible}/>
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class="account-selector" class:expanded bind:this={accountElement} on:click={handleSelectClick}>
-    <div class="selector-header" bind:this={headerElement}>
+<div bind:this={accountElement} class="account-selector" class:expanded on:click={handleSelectClick}>
+    <div bind:this={headerElement} class="selector-header">
         <div class="avatar-container">
             <!-- svelte-ignore a11y_missing_attribute -->
-                    <img src={userData.avatar|| 'img/avatars/Customer.png'} alt="avatar" class="avatar" draggable="false" />
+            <img alt="avatar" class="avatar" draggable="false" src={userData.avatar|| 'img/avatars/Customer.png'}/>
         </div>
         <div class="account-info">
             <div class="username" on:dblclick|stopPropagation={copyHWID} style="cursor: pointer">
@@ -216,16 +220,16 @@
         </div>
 
         <div class="action-buttons">
-            <button class="icon-button" type="button" on:click={loginWithRandomUsername}>
+            <button class="icon-button" on:click={loginWithRandomUsername} type="button">
                 <ToolTip text="Random username"/>
 
-                <img class="icon" src="img/menu/account/icon-random.svg" alt="random username" draggable="false">
+                <img alt="random username" class="icon" draggable="false" src="img/menu/account/icon-random.svg">
             </button>
-            <button class="icon-button" disabled={inAccountManager} type="button"
-                    on:click={() => openScreen("altmanager")}>
+            <button class="icon-button" disabled={inAccountManager} on:click={() => openScreen("altmanager")}
+                    type="button">
                 <ToolTip text="Change account"/>
 
-                <img class="icon" src="img/menu/icon-pen.svg" alt="change account" draggable="false">
+                <img alt="change account" class="icon" draggable="false" src="img/menu/icon-pen.svg">
             </button>
         </div>
     </div>
@@ -238,7 +242,8 @@
                     <path d="M21 21L17 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                 </svg>
                 <!-- svelte-ignore a11y_autofocus -->
-                <input type="text" autofocus class="search-input" placeholder="Search accounts..." bind:value={searchQuery}>
+                <input type="text" autofocus class="search-input" placeholder="Search accounts..."
+                       bind:value={searchQuery}>
             </div>
 
             <div class="account-list-container" in:slide|global={{ duration: 150, easing: quintOut, delay: 50 }}>
@@ -249,14 +254,15 @@
                                 <div on:click={() => logging(a.id)} class="account-item"
                                      transition:slide|global={{ duration: 150, easing: quintOut }}
                                      class:active={a.username === username}>
-                                    <Avatar url={a.avatar} />
+                                    <Avatar url={a.avatar}/>
                                     <div class="account-details">
                                         <div class="account-username">{a.username}</div>
                                         <div class="account-type">{a.type}</div>
                                     </div>
                                     {#if a.username === username}
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="check-icon">
-                                            <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2"
+                                                  stroke-linecap="round" stroke-linejoin="round"/>
                                         </svg>
                                     {/if}
                                 </div>
@@ -265,8 +271,10 @@
                     {:else}
                         <div class="empty-state" in:fade>
                             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" class="empty-icon">
-                                <path d="M3 7V17C3 18.1046 3.89543 19 5 19H19C20.1046 19 21 18.1046 21 17V7C21 5.89543 20.1046 5 19 5H5C3.89543 5 3 5.89543 3 7Z" stroke="currentColor" stroke-width="2"/>
-                                <path d="M7 10L12 13L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M3 7V17C3 18.1046 3.89543 19 5 19H19C20.1046 19 21 18.1046 21 17V7C21 5.89543 20.1046 5 19 5H5C3.89543 5 3 5.89543 3 7Z"
+                                      stroke="currentColor" stroke-width="2"/>
+                                <path d="M7 10L12 13L17 10" stroke="currentColor" stroke-width="2"
+                                      stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                             <div class="empty-text">No accounts found</div>
                         </div>
@@ -274,8 +282,10 @@
                 {:else}
                     <div class="empty-state" transition:fade>
                         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" class="empty-icon">
-                            <path d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z" stroke="currentColor" stroke-width="2"/>
-                            <path d="M19 21V19C19 17.3431 17.6569 16 16 16H8C6.34315 16 5 17.3431 5 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z"
+                                  stroke="currentColor" stroke-width="2"/>
+                            <path d="M19 21V19C19 17.3431 17.6569 16 16 16H8C6.34315 16 5 17.3431 5 19V21"
+                                  stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                         </svg>
                         <div class="empty-text">No accounts added yet</div>
                         <button class="add-account-button" on:click={() => addAccountModalVisible = true}>
@@ -361,7 +371,7 @@
   }
 
   .account-type {
-    font-weight:bold;
+    font-weight: bold;
     font-size: 20px;
     margin-top: 2px;
   }
@@ -369,9 +379,11 @@
   .owner-badge {
     color: $menu-account-owner;
   }
+
   .developer-badge {
     color: $menu-account-developer;
   }
+
   .customer-badge {
     color: $menu-account-customer;
   }
@@ -391,15 +403,16 @@
     cursor: pointer;
     display: flex;
     align-items: center;
-  .icon{
-    filter: drop-shadow(0 0 4px rgba($base , 0.5));
-  }
+
+    .icon {
+      filter: drop-shadow(0 0 4px rgba($base, 0.5));
+    }
+
     &:disabled {
       pointer-events: none;
       opacity: .5;
     }
   }
-
 
 
   .account-dropdown {
@@ -469,6 +482,7 @@
     cursor: pointer;
     transition: all $transition-speed ease;
     font-weight: 600;
+
     &:hover {
       background: rgba($text, 0.05);
     }

@@ -22,8 +22,9 @@
     const success = new Howl({src: ['audio/notifications/success.ogg'], preload: true});
     const disable = new Howl({src: ['audio/notifications/disable.ogg'], preload: true, volume: 0.5});
     const enable = new Howl({src: ['audio/notifications/enable.ogg'], preload: true, volume: 0.5});
-    const blink = new Howl({src:['audio/notifications/blink.wav'], preload: true})
-    const blinked = new Howl({src:['audio/notifications/blinked.wav'], preload: true})
+    const blink = new Howl({src: ['audio/notifications/blink.wav'], preload: true})
+    const blinked = new Howl({src: ['audio/notifications/blinked.wav'], preload: true})
+
     function addNotification(title: string, message: string, severity: string) {
         const animationKey = Date.now();
         let id = animationKey;

@@ -70,12 +70,12 @@
 <Menu>
     <OptionBar>
         <Search on:search={handleSearch}/>
-        <MultiSelect title="Game Mode" options={["Survival", "Creative", "Adventure", "Spectator"]}
-                     bind:values={gameModes}/>
-        <MultiSelect title="Difficulty" options={["Peaceful", "Easy", "Normal", "Hard"]} bind:values={difficulties}/>
+        <MultiSelect bind:values={gameModes} options={["Survival", "Creative", "Adventure", "Spectator"]}
+                     title="Game Mode"/>
+        <MultiSelect bind:values={difficulties} options={["Peaceful", "Easy", "Normal", "Hard"]} title="Difficulty"/>
     </OptionBar>
 
-    <MenuList  sortable={false} on:sort={handleWorldSort}>
+    <MenuList on:sort={handleWorldSort} sortable={false}>
         {#each renderedWorlds as world}
             <MenuListItem
                     image={!world.icon ?
@@ -111,11 +111,11 @@
 
     <BottomButtonWrapper>
         <ButtonContainer>
-            <IconTextButton icon="icon-plus-circle.svg" title="Add" on:click={() => openScreen("create_world")}/>
+            <IconTextButton icon="icon-plus-circle.svg" on:click={() => openScreen("create_world")} title="Add"/>
         </ButtonContainer>
 
         <ButtonContainer>
-            <IconTextButton icon="icon-back.svg" title="Back" on:click={() => openScreen("title")}/>
+            <IconTextButton icon="icon-back.svg" on:click={() => openScreen("title")} title="Back"/>
         </ButtonContainer>
     </BottomButtonWrapper>
 </Menu>

@@ -4,5 +4,5 @@
 </script>
 
 <GlitchedLayers size={262}>
-    <ClientLogo />
+    <ClientLogo/>
 </GlitchedLayers>

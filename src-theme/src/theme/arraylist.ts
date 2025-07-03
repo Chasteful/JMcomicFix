@@ -83,9 +83,16 @@ export async function getPrefixAsync(name: string) {
 
     return value;
 }
-interface RGBColor { r: number; g: number; b: number; }
+
+interface RGBColor {
+    r: number;
+    g: number;
+    b: number;
+}
+
 let currentPrimaryRgb = '';
 let currentSecondaryRgb = '';
+
 export function subscribeRenderSettings(callback?: (settings: Set<string>) => void) {
     return ArraylistRenderSettings.subscribe(settings => {
         currentRenderSettings = settings;
@@ -109,7 +116,7 @@ export function subscribeColors() {
 function parseRgbString(str: string): RGBColor {
 
     const parts = str.split(',').map((x) => parseInt(x.trim()));
-    return { r: parts[0] || 0, g: parts[1] || 0, b: parts[2] || 0 };
+    return {r: parts[0] || 0, g: parts[1] || 0, b: parts[2] || 0};
 }
 
 export function colorInterpolate(a: RGBColor, b: RGBColor, t: number): RGBColor {
@@ -139,7 +146,7 @@ export function arraylistGradient() {
         if (el.id !== 'module-name') continue;
 
         const pct = 1 - i / total + 0.5 * Math.sin(0.5 * i + progress);
-        const { r, g, b } = colorInterpolate(rgb1, rgb2, pct);
+        const {r, g, b} = colorInterpolate(rgb1, rgb2, pct);
 
         el.style.color = `rgba(${r}, ${g}, ${b}, 0.8)`;
         el.style.textShadow = `0.25px 0.25px 0 rgb(${r}, ${g}, ${b})`;

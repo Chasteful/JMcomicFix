@@ -112,9 +112,8 @@
     border-radius: 8px;
     font-size: 20px;
     min-width: 150px;
-    box-shadow:
-            0 4px 16px rgba($base, 0.6),
-            inset 0 0 10px rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 16px rgba($base, 0.6),
+    inset 0 0 10px rgba(255, 255, 255, 0.05);
   }
 
   .watermark-content {

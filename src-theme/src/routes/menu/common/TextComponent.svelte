@@ -57,6 +57,7 @@
             italic = false;
             color = colors.white;
         }
+
         const components: TTextComponent[] = [];
         const textParts = text.split("§");
 
@@ -79,12 +80,24 @@
             const t = p.slice(1);
 
             switch (code) {
-                case "k": obfuscated = true; break;
-                case "l": bold = true; break;
-                case "m": strikethrough = true; break;
-                case "n": underlined = true; break;
-                case "o": italic = true; break;
-                case "r": reset(); break;
+                case "k":
+                    obfuscated = true;
+                    break;
+                case "l":
+                    bold = true;
+                    break;
+                case "m":
+                    strikethrough = true;
+                    break;
+                case "n":
+                    underlined = true;
+                    break;
+                case "o":
+                    italic = true;
+                    break;
+                case "r":
+                    reset();
+                    break;
                 default:
 
                     const colorIndex = parseInt(code, 16);
@@ -107,13 +120,14 @@
             }
         }
 
-        return { extra: components };
+        return {extra: components};
     }
 </script>
 
 <span class="text-component">
     {#if typeof textComponent === "string"}
-        <svelte:self {fontSize} {allowPreformatting} {preFormattingMonospace} textComponent={convertLegacyCodes(textComponent)}/>
+        <svelte:self {fontSize} {allowPreformatting} {preFormattingMonospace}
+                     textComponent={convertLegacyCodes(textComponent)}/>
     {:else if textComponent}
         {#if textComponent.text}
             {#if !textComponent.text.includes("§")}

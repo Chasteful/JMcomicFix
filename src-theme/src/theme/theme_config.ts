@@ -17,6 +17,6 @@ async function updateSettings() {
 }
 
 listenAlways("spaceSeperatedNamesChange", (e: SpaceSeperatedNamesChangeEvent) => {
-   spaceSeperatedNames.set(e.value);
+    spaceSeperatedNames.set(e.value);
 });
 updateSettings();

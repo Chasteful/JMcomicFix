@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { fade } from "svelte/transition";
+    import {fade} from "svelte/transition";
 
     const titles: string[] = ["京东白条",];
     const descriptions1: string[] = [
@@ -32,7 +32,7 @@
 </script>
 
 
-<div class="splash-tip"  transition:fade={{duration:600}} on:click={refreshContent}>
+<div class="splash-tip" on:click={refreshContent} transition:fade={{duration:600}}>
     <h1>{currentTitle}</h1>
     <p class="desc1">{currentDesc1}。</p>
     <p class="desc2">{currentDesc2}···</p>
@@ -48,7 +48,7 @@
         -moz-osx-font-smoothing: grayscale;
         transform: translate(-50%, -50%);
         display: flex;
-        font-family: 'Genshin',serif;
+        font-family: 'Genshin', serif;
         flex-direction: column;
         align-items: center;
         text-align: center;

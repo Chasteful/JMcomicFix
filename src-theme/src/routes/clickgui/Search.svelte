@@ -913,7 +913,7 @@
       transition: all 0.2s ease;
       cursor: pointer;
       color: $subtext0;
-        font-size: calc(var(--font-size) + 1px);
+      font-size: calc(var(--font-size) + 1px);
       display: flex;
       align-items: center;
 

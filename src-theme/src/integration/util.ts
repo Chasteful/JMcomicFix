@@ -1,8 +1,8 @@
-import type { Module, GroupedModules } from "./types"
+import type {Module, GroupedModules} from "./types"
 
 export function groupByCategory(modules: Module[]): GroupedModules {
     return modules.reduce((acc: GroupedModules, current: Module) => {
-        const { category } = current;
+        const {category} = current;
         if (!acc[category]) {
             acc[category] = [];
         }

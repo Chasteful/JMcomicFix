@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { shouldZoom } from "../LoginMenu/locked_store";
-    import { currentLogo } from './header/logoStorage';
+    import {shouldZoom} from "../LoginMenu/locked_store";
+    import {currentLogo} from './header/logoStorage';
     import {fade} from "svelte/transition";
 
     export let showBackground: boolean;
@@ -8,13 +8,12 @@
 
 {#if showBackground && $currentLogo === 1}
     <div class="background zoom-in-{$shouldZoom}">
-        <div class="vignette" ></div>
+        <div class="vignette"></div>
     </div>
 {:else}
     <div class="vignette "
          transition:fade|global={{duration: 300}}></div>
 {/if}
-
 
 
 <style lang="scss">
@@ -32,6 +31,7 @@
       transform: scale(1.2);
     }
   }
+
   .vignette {
     position: absolute;
     inset: 0;

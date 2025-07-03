@@ -64,6 +64,7 @@
         }
         return result;
     }
+
     function clearAllFadeTimeouts() {
         chatMessages.forEach(msg => {
             if (msg.fadeTimeout) {
@@ -151,6 +152,7 @@
             scheduleFade(msg);
         }
     }
+
     function handleKeyDown(event: KeyEvent) {
         const k = event.key;
         if (k === keyChat?.key.translationKey) {

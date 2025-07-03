@@ -21,7 +21,7 @@
 </script>
 
 <div class="tabs">
-    <div class="available-tabs" bind:this={availableTabsElement}>
+    <div bind:this={availableTabsElement} class="available-tabs">
         {#each tabs as {title, icon}, index}
             <button class="tab-button" class:active={tabs[activeTab].title === title}
                     on:click={() => setActiveTab(index)}>
@@ -65,7 +65,7 @@
     }
 
     &.active {
-      border-color: rgba($text,0.7);
+      border-color: rgba($text, 0.7);
     }
   }
 </style>

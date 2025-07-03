@@ -1,18 +1,18 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
+    import {createEventDispatcher} from "svelte";
 
-  export let value: boolean;
-  export let title: string;
+    export let value: boolean;
+    export let title: string;
 
-  const dispatch = createEventDispatcher();
+    const dispatch = createEventDispatcher();
 </script>
 
 <div class="switch-setting">
-  <label class="switch">
-    <input type="checkbox" bind:checked={value} on:change={() => dispatch("change")} />
-    <span class="checkbox"></span>
-  </label>
-  <div class="title">{title}</div>
+    <label class="switch">
+        <input bind:checked={value} on:change={() => dispatch("change")} type="checkbox"/>
+        <span class="checkbox"></span>
+    </label>
+    <div class="title">{title}</div>
 </div>
 
 <style lang="scss">
@@ -61,38 +61,34 @@
 
   input:checked + .checkbox {
     background-color: $text;
-    box-shadow: 
-    0 0 12px 3px rgba($text , 0.4),
+    box-shadow: 0 0 12px 3px rgba($text, 0.4),
     inset 0 1px 2px rgba(255, 255, 255, 0.1);
     animation: pulse 0.5s ease-out;
   }
 
   .switch:hover .checkbox {
-    box-shadow: 
-      0 0 12px 3px rgba($text, 0.4),
-      inset 0 1px 2px rgba(255, 255, 255, 0.1); 
+    box-shadow: 0 0 12px 3px rgba($text, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.1);
   }
 
   .switch:focus-within .checkbox {
     outline: 2px solid $text;
   }
+
   @keyframes pulse {
-  0% { 
-    box-shadow: 
-      0 0 12px 3px rgba($text, 0.4),
+    0% {
+      box-shadow: 0 0 12px 3px rgba($text, 0.4),
       inset 0 1px 2px rgba(255, 255, 255, 0.1),
-      0 0 0 0 rgba($text, 0.7); 
-  }
-  70% { 
-    box-shadow: 
-      0 0 12px 3px rgba($text, 0.4),
+      0 0 0 0 rgba($text, 0.7);
+    }
+    70% {
+      box-shadow: 0 0 12px 3px rgba($text, 0.4),
       inset 0 1px 2px rgba(255, 255, 255, 0.1),
-      0 0 0 8px rgba($text, 0); 
+      0 0 0 8px rgba($text, 0);
+    }
+    100% {
+      box-shadow: 0 0 12px 3px rgba($text, 0.4),
+      inset 0 1px 2px rgba(255, 255, 255, 0.1);
+    }
   }
-  100% { 
-    box-shadow: 
-      0 0 12px 3px rgba($text, 0.4),
-      inset 0 1px 2px rgba(255, 255, 255, 0.1); 
-  }
-}
 </style>

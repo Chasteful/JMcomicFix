@@ -209,11 +209,11 @@
 <Menu>
     <OptionBar>
         <Search on:search={handleSearch}/>
-        <SwitchSetting title="Favorites Only" bind:value={favoritesOnly}/>
-        <MultiSelect title="Country" options={allCountries} bind:values={countries}/>
+        <SwitchSetting bind:value={favoritesOnly} title="Favorites Only"/>
+        <MultiSelect bind:values={countries} options={allCountries} title="Country"/>
     </OptionBar>
 
-    <MenuList sortable={false} on:sort={handleProxySort}>
+    <MenuList on:sort={handleProxySort} sortable={false}>
         {#each renderedProxies as proxy}
             <MenuListItem
                     image="img/flags/{(proxy.ipInfo?.country ?? 'unknown').toLowerCase()}.svg"
@@ -245,16 +245,16 @@
 
     <BottomButtonWrapper>
         <ButtonContainer>
-            <IconTextButton icon="icon-plus-circle.svg" title="Add" on:click={() => addProxyModalVisible = true}/>
-            <IconTextButton icon="icon-clipboard.svg" title="Add Clipboard" on:click={() => addProxyFromClipboard()}/>
-            <IconTextButton icon="icon-random.svg" disabled={renderedProxies.length === 0} title="Random"
-                            on:click={connectToRandomProxy}/>
-            <IconTextButton icon="icon-disconnect.svg" disabled={!isConnectedToProxy} title="Disconnect"
-                            on:click={disconnectFromProxy}/>
+            <IconTextButton icon="icon-plus-circle.svg" on:click={() => addProxyModalVisible = true} title="Add"/>
+            <IconTextButton icon="icon-clipboard.svg" on:click={() => addProxyFromClipboard()} title="Add Clipboard"/>
+            <IconTextButton disabled={renderedProxies.length === 0} icon="icon-random.svg" on:click={connectToRandomProxy}
+                            title="Random"/>
+            <IconTextButton disabled={!isConnectedToProxy} icon="icon-disconnect.svg" on:click={disconnectFromProxy}
+                            title="Disconnect"/>
         </ButtonContainer>
 
         <ButtonContainer>
-            <IconTextButton icon="icon-back.svg" title="Back" on:click={() => openScreen("title")}/>
+            <IconTextButton icon="icon-back.svg" on:click={() => openScreen("title")} title="Back"/>
         </ButtonContainer>
     </BottomButtonWrapper>
 </Menu>

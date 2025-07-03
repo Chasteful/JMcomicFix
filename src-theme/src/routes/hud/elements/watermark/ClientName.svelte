@@ -1,12 +1,12 @@
 <script lang="ts">
-    import { fade } from 'svelte/transition';
+    import {fade} from 'svelte/transition';
     import {clientName} from "../../../../util/Theme/ThemeManager";
-    import type { ClientInfo } from "../../../../integration/types";
+    import type {ClientInfo} from "../../../../integration/types";
 
     export let clientInfo: ClientInfo;
 </script>
 <svg aria-hidden="true" height="0" width="0">
-    <filter id="glow" primitiveUnits="objectBoundingBox" x="-50%" y="-200%" width="200%" height="500%">
+    <filter height="500%" id="glow" primitiveUnits="objectBoundingBox" width="200%" x="-50%" y="-200%">
         <feGaussianBlur in="SourceGraphic" result="blurred" stdDeviation=".025 .2"/>
         <feColorMatrix in="blurred" result="saturated" type="saturate" values="1.3"/>
         <feBlend in="SourceGraphic" in2="saturated" mode="normal"/>
@@ -24,7 +24,12 @@
     initial-value: 0;
     inherits: false;
   }
-  @keyframes k { to { --k: 1; } }
+
+  @keyframes k {
+    to {
+      --k: 1;
+    }
+  }
 
   .client-glow {
     animation: k 4s linear infinite;

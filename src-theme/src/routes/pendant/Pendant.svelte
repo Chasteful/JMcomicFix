@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { fade } from "svelte/transition";
-    import { getModules, getModuleSettings } from "../../integration/rest.js";
-    import { onMount } from "svelte";
-    import type { ConfigurableSetting } from "../../integration/types.js";
+    import {fade} from "svelte/transition";
+    import {getModules, getModuleSettings} from "../../integration/rest.js";
+    import {onMount} from "svelte";
+    import type {ConfigurableSetting} from "../../integration/types.js";
 
     let shouldShow = false;
     let isLoading = true;
@@ -10,6 +10,7 @@
     let AlphaFactor = 255;
     let CustomURL: string | null = null;
     $: opacityValue = AlphaFactor / 255;
+
     async function checkShouldShow(): Promise<void> {
         const modules = await getModules();
         shouldShow = modules.some(module =>

@@ -1,16 +1,17 @@
 <script lang="ts">
-    import { tweened } from "svelte/motion";
-    import { onMount, tick} from "svelte";
+    import {tweened} from "svelte/motion";
+    import {onMount, tick} from "svelte";
     import {expoInOut} from "svelte/easing";
-    import { fade } from "svelte/transition";
+    import {fade} from "svelte/transition";
     import ConnectionDetail from "./ConnectionDetail.svelte";
     import SplashTip from "./SplashTip.svelte";
+
     let fps = 60;
     let totalDuration = 2333;
 
 
     function makeCustomEasing(fpsValue: number) {
-        const clamped = Math.max(20, Math.min(fpsValue,60));
+        const clamped = Math.max(20, Math.min(fpsValue, 60));
         const factor = 60 / clamped;
 
         return (t: number) => {
@@ -34,7 +35,7 @@
 
     async function restartProgress() {
 
-        await progress.set(0, { duration: 0 });
+        await progress.set(0, {duration: 0});
 
         await tick();
 
@@ -43,6 +44,7 @@
             easing: makeCustomEasing(fps),
         });
     }
+
     onMount(() => {
         restartProgress();
     });
@@ -57,7 +59,7 @@
     <div class="line-decoration" transition:fade={{ duration: 600, easing: expoInOut }}></div>
     <div class="loader-wrapper"
          transition:fade={{ duration: 600, easing: expoInOut }}>
-        <div class="loading-bar" role="presentation" aria-hidden="true">
+        <div aria-hidden="true" class="loading-bar" role="presentation">
             <div class="loading-bar-bg"></div>
             <div
                     class="loading-bar-progress"
@@ -80,6 +82,7 @@
     align-items: flex-start;
     z-index: 0;
   }
+
   .line-decoration {
     position: absolute;
     top: calc(87vh + 31.25px);
@@ -118,6 +121,7 @@
     z-index: 2;
     transform: scale(0.6);
   }
+
   .bg-pattern {
     position: absolute;
     width: 100%;

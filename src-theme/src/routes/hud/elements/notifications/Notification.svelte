@@ -45,7 +45,7 @@
     <div class="content">
         <h3 class="title">{severity}</h3>
         <p class="message">{subtitle}</p>
-        {#if ['ENABLED', 'DISABLED', 'SUCCESS', 'ERROR', 'INFO','BLINKING','BLINKED'].includes(severity)}
+        {#if ['ENABLED', 'DISABLED', 'SUCCESS', 'ERROR', 'INFO', 'BLINKING', 'BLINKED'].includes(severity)}
             <div class="progress-container">
                 <!-- svelte-ignore element_invalid_self_closing_tag -->
                 <div
@@ -115,10 +115,12 @@
       --accent-color: var(--info-color);
       box-shadow: 0 12px 24px rgba($blue, 0.4);
     }
-    &.blinking ,&.blinked{
+
+    &.blinking, &.blinked {
       --accent-color: var(--info-color);
       box-shadow: 0 12px 24px rgba($blue, 0.4);
     }
+
     &.enabled {
       --accent-color: var(--success-color);
       border-left-color: var(--success-color);
@@ -162,6 +164,7 @@
       background-image: url("/img/hud/notification/icon-info.svg");
       background-color: rgba($blue, 0.12);
     }
+
     &.blinking, &.blinked {
       background-image: none;
 
@@ -197,6 +200,7 @@
     &.blinked svg {
       animation: none;
     }
+
     &.blinking svg {
       animation: rotate 1s linear infinite;
     }
@@ -310,7 +314,8 @@
     &.info {
       background: linear-gradient(90deg, mix($blue, $text, 30%) 0%, $blue 100%);
     }
-    &.blinking, &.blinked{
+
+    &.blinking, &.blinked {
       background: linear-gradient(90deg, mix($blue, $text, 30%) 0%, $blue 100%);
     }
   }

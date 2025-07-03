@@ -34,7 +34,7 @@
     import {listen} from "../../integration/ws";
     import LayoutEditor from "./LayoutEditor.svelte";
     import Vignette from "./elements/Vignette.svelte";
-    import {gridSize, snappingEnabled, showGrid,hudZoom} from "./Hud_store";
+    import {gridSize, snappingEnabled, showGrid, hudZoom} from "./Hud_store";
     import {WindowSize} from "../../util/WindowSize";
 
     const {width, height, destroy} = WindowSize();
@@ -47,9 +47,9 @@
     const gameScale = 50 * 2;
     const MIN_ASPECT_RATIO = 2;
 
-     $: {
-         hudZoom.set(gameScale * hudZoomFactor * calcResolutionCoefficient())
-     }
+    $: {
+        hudZoom.set(gameScale * hudZoomFactor * calcResolutionCoefficient())
+    }
     type ComponentWrapperParams = {
         component: Component;
 
@@ -77,7 +77,7 @@
             min = Math.max(min, 0.45);
         }
 
-        return Math.min(1, Math.max(MIN_ZOOM , min));
+        return Math.min(1, Math.max(MIN_ZOOM, min));
     }
 
     async function updateZoom(): Promise<void> {

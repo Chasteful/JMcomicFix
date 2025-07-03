@@ -10,7 +10,7 @@
      transition:fade|global={{ duration: 500,  easing: expoInOut }}
 >
     <GlitchedLayers size={1000}>
-    <Modules/>
+        <Modules/>
     </GlitchedLayers>
 </div>
 

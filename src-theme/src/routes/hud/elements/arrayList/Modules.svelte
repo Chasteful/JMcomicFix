@@ -20,6 +20,7 @@
     let intervalId: number;
     let unsubs: [() => void, () => void];
     let unsubRenderSettings: () => void;
+
     async function updateEnabledModules() {
         await document.fonts.load("500 16px 'Product Sans'");
 
@@ -65,9 +66,9 @@
 
         listen('moduleToggle', () => updateEnabledModules());
         listen('refreshArrayList', () => updateEnabledModules());
-        listen('clickGuiValueChange',() => updateEnabledModules());
+        listen('clickGuiValueChange', () => updateEnabledModules());
         spaceSeperatedNames.subscribe(() => updateEnabledModules());
-    0
+
         unsubs = subscribeColors();
         unsubRenderSettings = subscribeRenderSettings(() => {
             updateEnabledModules();
@@ -110,7 +111,7 @@
     box-shadow: -10px 0px 20px rgba(0, 0, 0, 0.15),
     10px 0px 20px rgba(0, 0, 0, 0.15);
     color: white;
-    text-shadow:0 0 0.5px white;
+    text-shadow: 0 0 0.5px white;
     font-family: 'Product Sans', system-ui, -apple-system, sans-serif;
     font-size: 16px;
     padding: 2px 6px;

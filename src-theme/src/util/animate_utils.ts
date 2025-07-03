@@ -3,9 +3,11 @@ import {elasticOut, quintOut} from "svelte/easing";
 export function easeOutQuad(t: number) {
     return t * (2 - t);
 }
+
 export function easeInQuad(t: number) {
     return t * t;
 }
+
 export function easeInBack(t: number) {
     const c1 = 1.5;
     const c3 = c1 + 1;
