@@ -20,6 +20,7 @@ package net.ccbluex.liquidbounce.features.module
 
 import net.ccbluex.jmcomicfix.features.module.modules.render.ModuleHalo
 import net.ccbluex.jmcomicfix.features.module.modules.client.ModuleCapes
+import net.ccbluex.jmcomicfix.features.module.modules.misc.ModuleAutoGG
 import net.ccbluex.jmcomicfix.features.module.modules.misc.ModuleTitleControl
 import net.ccbluex.jmcomicfix.features.module.modules.render.ModuleKillEffects
 import net.ccbluex.liquidbounce.config.ConfigSystem
@@ -30,11 +31,11 @@ import net.ccbluex.liquidbounce.event.events.MouseButtonEvent
 import net.ccbluex.liquidbounce.event.events.WorldChangeEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.modules.client.ModuleAutoConfig
-import net.ccbluex.liquidbounce.features.module.modules.client.ModuleHudEditor
+import net.ccbluex.jmcomicfix.features.module.modules.client.ModuleHudEditor
 import net.ccbluex.liquidbounce.features.module.modules.client.ModuleLiquidChat
 import net.ccbluex.liquidbounce.features.module.modules.client.ModuleRichPresence
 import net.ccbluex.liquidbounce.features.module.modules.client.ModuleTargets
-import net.ccbluex.liquidbounce.features.module.modules.client.ModulePacketQueue
+import net.ccbluex.jmcomicfix.features.module.modules.render.ModulePacketQueue
 import net.ccbluex.liquidbounce.features.module.modules.combat.*
 import net.ccbluex.liquidbounce.features.module.modules.combat.aimbot.ModuleAutoBow
 import net.ccbluex.liquidbounce.features.module.modules.combat.autoarmor.ModuleAutoArmor
@@ -82,7 +83,7 @@ import net.ccbluex.liquidbounce.features.module.modules.player.nofall.ModuleNoFa
 import net.ccbluex.liquidbounce.features.module.modules.player.offhand.ModuleOffhand
 import net.ccbluex.liquidbounce.features.module.modules.render.*
 import net.ccbluex.liquidbounce.features.module.modules.render.esp.ModuleESP
-import net.ccbluex.liquidbounce.features.module.modules.render.jumpeffect.ModuleJumpEffect
+import net.ccbluex.jmcomicfix.features.module.modules.render.jumpeffect.ModuleJumpEffect
 import net.ccbluex.liquidbounce.features.module.modules.render.murdermystery.ModuleMurderMystery
 import net.ccbluex.liquidbounce.features.module.modules.render.nametags.ModuleNametags
 import net.ccbluex.liquidbounce.features.module.modules.render.trajectories.ModuleTrajectories

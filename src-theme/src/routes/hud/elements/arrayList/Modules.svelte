@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {onMount, onDestroy, tick} from 'svelte';
+    import {onMount, onDestroy} from 'svelte';
     import type {Module} from '../../../../integration/types';
     import {getModules} from '../../../../integration/rest';
     import {listen} from '../../../../integration/ws';
@@ -12,19 +12,21 @@
     import {
         subscribeColors,
         arraylistGradient,
-        destroyGradient
+        destroyGradient,
+        subscribeRenderSettings
     } from '../../../../theme/arraylist';
 
     let enabledModules: Array<Module & { prefix: string; formattedName: string; width: number }> = [];
     let intervalId: number;
     let unsubs: [() => void, () => void];
-
+    let unsubRenderSettings: () => void;
     async function updateEnabledModules() {
         await document.fonts.load("500 16px 'Product Sans'");
+
         const modules = await getModules();
         const visible = modules.filter((m) => m.enabled && !m.hidden);
-        const prefixMap = new Map<string, string>();
 
+        const prefixMap = new Map<string, string>();
         await Promise.all(
             visible.map(async (m) => {
                 const prefix = await getPrefixAsync(m.name);
@@ -32,24 +34,30 @@
             })
         );
 
-        const arr = visible.map((m) => {
+        const measuredModules = await Promise.all(visible.map(async (m) => {
             const formattedName = $spaceSeperatedNames
                 ? convertToSpacedString(m.name)
                 : m.name;
             const prefix = prefixMap.get(m.name) || '';
             const fullName = `${formattedName}\u00A0${prefix}`;
+
             const width = getTextWidth(
                 fullName,
-                "500 16px 'Product Sans', system-ui, sans-serif"
+                "normal 500 16px 'Product Sans', system-ui, sans-serif"
             );
-            return {...m, formattedName, prefix, width};
-        });
 
-        arr.sort((a, b) => b.width - a.width);
-        enabledModules = arr;
-        await tick();
+            return {
+                ...m,
+                formattedName,
+                prefix,
+                width
+            };
+        }));
+
+        measuredModules.sort((a, b) => b.width - a.width);
+
+        enabledModules = measuredModules;
     }
-
 
     onMount(async () => {
 
@@ -60,13 +68,16 @@
         spaceSeperatedNames.subscribe(() => updateEnabledModules());
 
         unsubs = subscribeColors();
-
+        unsubRenderSettings = subscribeRenderSettings(() => {
+            updateEnabledModules();
+        });
         setTimeout(() => arraylistGradient(), 50);
 
         intervalId = window.setInterval(arraylistGradient, 50);
     });
 
     onDestroy(() => {
+        unsubRenderSettings?.();
         destroyGradient(intervalId, unsubs);
     });
 </script>
@@ -79,8 +90,8 @@
             animate:flip={{ duration: 200 }}
             in:fly={{ x: 50, duration: 200 }}
     >
-        {formattedName}
-        {#if prefix}&nbsp;<span class="prefix">{prefix}</span>{/if}
+        {formattedName}&nbsp;
+        {#if prefix}<span class="prefix">{prefix}</span>{/if}
         <span class="side-bar" id="side-bar"></span>
     </div>
 {/each}
@@ -135,6 +146,7 @@
   .prefix {
     color: #AAAAAA;
     text-shadow: 0 0 3px rgba(#AAAAAA, 0.9);
+    font-family: 'Product Sans', system-ui, -apple-system, sans-serif;
   }
 
   .side-bar {

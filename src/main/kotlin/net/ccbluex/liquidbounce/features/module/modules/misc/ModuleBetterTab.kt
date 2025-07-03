@@ -44,10 +44,6 @@ object ModuleBetterTab : ClientModule("BetterTab", Category.RENDER) {
         Visibility.HEADER,
         Visibility.FOOTER
     )
-    @Suppress("unused")
-    private val refresh by boolean("Refresh",true).onChanged {
-        EventManager.callEvent(ClickGuiValueChangeEvent(ModuleBetterTab))
-    }
 
     @JvmStatic
     fun isVisible(visibility: Visibility) = visibility in this.visibility

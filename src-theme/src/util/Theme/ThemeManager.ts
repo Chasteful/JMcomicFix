@@ -1,7 +1,7 @@
 import {writable, derived, type Writable, type Readable} from 'svelte/store';
 import {getModuleSettings} from '../../integration/rest';
 import {listen} from '../../integration/ws';
-import type {ConfigurableSetting, TextSetting} from '../../integration/types';
+import type {ConfigurableSetting, MultiChooseSetting, TextSetting} from '../../integration/types';
 import type {ClickGuiValueChangeEvent} from "../../integration/events";
 
 type ColorFormats = {
@@ -15,7 +15,7 @@ type ThemeColors = {
     primary: ColorFormats;
     secondary: ColorFormats;
 };
-
+export const ArraylistRenderSettings = writable<Set<string>>(new Set());
 
 function color4bToRgb(color4b: number): { r: number; g: number; b: number } {
     const unsigned = color4b >>> 0;
@@ -184,7 +184,10 @@ function updateColorsFromSettings(settings: ConfigurableSetting): void {
         ?.value as number;
     const secondaryValue = settings.value.find((v) => v.name === 'Secondary')
         ?.value as number;
-
+    const renderSetting = settings.value.find(v => v.name === 'ArraylistPerfixRender') as MultiChooseSetting;
+    if (renderSetting) {
+        ArraylistRenderSettings.set(new Set(renderSetting.value.map(v => v.toLowerCase())));
+    }
     if (primaryValue !== undefined && secondaryValue !== undefined) {
         const newTheme: ThemeColors = {
             primary: convertColor4b(primaryValue),
@@ -198,5 +201,4 @@ function updateColorsFromSettings(settings: ConfigurableSetting): void {
 listen("clickGuiValueChange", (e: ClickGuiValueChangeEvent) => {
     updateColorsFromSettings(e.configurable);
 });
-
 loadInitialColors().catch(console.error);

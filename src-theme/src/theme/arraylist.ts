@@ -1,12 +1,91 @@
-import { getModuleSettings } from '../integration/rest';
-import type {ChoiceSetting, ChooseSetting, ConfigurableSetting, IntSetting} from '../integration/types';
-import { primaryRgb, secondaryRgb } from '../util/Theme/ThemeManager';
-import type {Readable} from "svelte/store";
+import {getModuleSettings} from '../integration/rest';
+import type {
+    ChoiceSetting,
+    ChooseSetting,
+    ConfigurableSetting,
+    FloatRangeSetting,
+    FloatSetting,
+    IntRangeSetting,
+    IntSetting
+} from '../integration/types';
+import {ArraylistRenderSettings, primaryRgb, secondaryRgb} from '../util/Theme/ThemeManager';
+import {type Readable} from "svelte/store";
+
+let currentRenderSettings = new Set<string>();
+
+export async function getPrefixAsync(name: string) {
+    const settings = await getModuleSettings(name);
+    let value = '';
+
+    const checkSetting = (setting: any): string | null => {
+        const valueType = setting.valueType.toLowerCase();
+        if (!currentRenderSettings.size || currentRenderSettings.has(valueType)) {
+            switch (valueType) {
+                case 'choice':
+                    return (setting as ChoiceSetting).active ? setting.name : null;
+                case 'choose':
+                    return (setting as ChooseSetting).value;
+                case 'int_range':
+                    const intRange = setting as IntRangeSetting;
+                    return `${intRange.value.from}-${intRange.value.to}`;
+                case 'float_range':
+                    const floatRange = setting as FloatRangeSetting;
+                    return `${floatRange.value.from}-${floatRange.value.to}`;
+                case 'int':
+                    return (setting as IntSetting).value.toString();
+                case 'float':
+                    return (setting as FloatSetting).value.toString();
+                default:
+                    return null;
+            }
+        }
+        return null;
+    };
 
 
+    for (const setting of settings.value) {
+        const result = checkSetting(setting);
+        if (result) {
+            return result;
+        }
+    }
+
+    const checkConfigurable = (configurable: ConfigurableSetting): string | null => {
+        for (const setting of configurable.value) {
+            const result = checkSetting(setting);
+            if (result) {
+                return result;
+            }
+
+            if (setting.valueType === 'CONFIGURABLE') {
+                const nestedResult = checkConfigurable(setting as ConfigurableSetting);
+                if (nestedResult) {
+                    return nestedResult;
+                }
+            }
+        }
+        return null;
+    };
+
+    const configurable = settings.value.find(n => n.valueType === 'CONFIGURABLE');
+    if (configurable) {
+        const configurableValue = checkConfigurable(configurable as ConfigurableSetting);
+        if (configurableValue) {
+            return configurableValue;
+        }
+    }
+
+    return value;
+}
 interface RGBColor { r: number; g: number; b: number; }
 let currentPrimaryRgb = '';
 let currentSecondaryRgb = '';
+export function subscribeRenderSettings(callback?: (settings: Set<string>) => void) {
+    return ArraylistRenderSettings.subscribe(settings => {
+        currentRenderSettings = settings;
+        callback?.(settings);
+    });
+}
 
 export function subscribeColors() {
 
@@ -20,36 +99,6 @@ export function subscribeColors() {
     });
     return [unsub1, unsub2] as [() => void, () => void];
 }
-
-
-export async function getPrefixAsync(name: string) {
-    const settings = await getModuleSettings(name);
-    let value = '';
-    let mode = settings.value.find(n => n.valueType == 'CHOICE');
-    if (mode != null) {
-        const cMode = mode as ChoiceSetting;
-        value = ' ' + cMode.active;
-
-    } else {
-        mode = settings.value.find(n => n.valueType == 'CONFIGURABLE');
-        if (mode != null) {
-            const cMode = mode as ConfigurableSetting;
-            const mode1 = cMode.value.find(n => n.valueType == 'CHOICE');
-            const mode2 = cMode.value.find(n => n.valueType == 'CHOOSE');
-
-            if (mode1 != null) {
-                const cMode1 = mode1 as ChoiceSetting;
-                value = cMode1.active;
-            }
-            if (mode2 != null){
-                const cMode2 = mode1 as ChoiceSetting;
-                value = cMode2.active;
-            } 
-        }
-    }
-    return value || '';
-}
-
 
 function parseRgbString(str: string): RGBColor {
 

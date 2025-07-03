@@ -5,7 +5,7 @@ import net.ccbluex.liquidbounce.event.events.ClickGuiValueChangeEvent
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
 
-object ModulePendant : ClientModule("Pendant", Category.FUN, aliases = arrayOf("Wife")) {
+object ModulePendant : ClientModule("Pendant", Category.FUN, state = true,aliases = arrayOf("Wife")) {
     @Suppress("unused")
     private val custom by text ("CustomURL","")
         .onChanged {

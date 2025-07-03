@@ -19,6 +19,7 @@
 package net.ccbluex.liquidbounce.features.module.modules.render
 
 import net.ccbluex.liquidbounce.config.types.Configurable
+import net.ccbluex.liquidbounce.config.types.NamedChoice
 import net.ccbluex.liquidbounce.config.types.Value
 import net.ccbluex.liquidbounce.event.EventManager
 import net.ccbluex.liquidbounce.event.events.ClickGuiValueChangeEvent
@@ -30,6 +31,7 @@ import net.ccbluex.liquidbounce.features.misc.HideAppearance.isDestructed
 import net.ccbluex.liquidbounce.features.misc.HideAppearance.isHidingNow
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
+import net.ccbluex.liquidbounce.features.module.modules.misc.ModuleBetterTab
 import net.ccbluex.liquidbounce.integration.VirtualScreenType
 import net.ccbluex.liquidbounce.integration.browser.supports.tab.ITab
 import net.ccbluex.liquidbounce.integration.theme.ThemeManager
@@ -87,7 +89,25 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
     val isBlurEffectActive
         get() = blur && !(mc.options.hudHidden && mc.currentScreen == null)
 
+    @Suppress("UnusedPrivateProperty")
+    private val render = multiEnumChoice("ArraylistPerfixRender",
+        DoPrefix.CHOICE,
+        DoPrefix.CHOOSE,
+        DoPrefix.INT_RANGE,
+        DoPrefix.FLOAT_RANGE,
+        canBeNone = false
+    ).onChanged {
+        EventManager.callEvent(ClickGuiValueChangeEvent(this))
+    }
 
+    enum class DoPrefix(override val choiceName: String) : NamedChoice {
+        CHOICE("CHOICE"),
+        CHOOSE("CHOOSE"),
+        INT_RANGE("INT_RANGE"),
+        FLOAT_RANGE("FLOAT_RANGE"),
+        INT("INT"),
+        FLOAT("FLOAT")
+    }
     init {
         tree(Configurable("In-built", value = components as MutableList<Value<*>>))
         tree(Configurable("Custom", value = customComponents as MutableList<Value<*>>))

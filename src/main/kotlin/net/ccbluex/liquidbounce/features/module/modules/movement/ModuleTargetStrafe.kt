@@ -162,7 +162,11 @@ object ModuleTargetStrafe : ClientModule("TargetStrafe", Category.MOVEMENT) {
 
             val speed = player.sqrtSpeed
 
-            val speedMultiplier = if (System.currentTimeMillis() < ModuleMovePhysics.jumpTicks) BloxdDamageSpeed.Speed.toDouble() else 1.0
+            val speedMultiplier = if (System.currentTimeMillis() < ModuleMovePhysics.jumpTicks) {
+                BloxdDamageSpeed.Speed.toDouble()
+            } else {
+                1.0
+            }
             val adjustedSpeed = speed * speedMultiplier
 
             val strafeYaw = atan2(target.pos.z - player.pos.z, target.pos.x - player.pos.x)
@@ -172,7 +176,8 @@ object ModuleTargetStrafe : ClientModule("TargetStrafe", Category.MOVEMENT) {
             if (!Validation.validatePoint(pointCoords)) {
                 if (!AdaptiveRange.enabled) {
                     direction = -direction
-                    strafeVec = computeDirectionVec(strafeYaw, distance, adjustedSpeed, targetSelector.maxRange, direction)
+                    strafeVec = computeDirectionVec(
+                        strafeYaw, distance, adjustedSpeed, targetSelector.maxRange, direction)
                 } else {
                     var currentRange = AdaptiveRange.rangeStep
                     while (!Validation.validatePoint(pointCoords)) {

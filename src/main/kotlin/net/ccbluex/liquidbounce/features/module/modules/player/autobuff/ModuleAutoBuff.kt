@@ -83,7 +83,7 @@ object ModuleAutoBuff : ClientModule(
 
     internal class AutoBuffRotationsConfigurable : RotationsConfigurable(this) {
 
-        val rotationTiming by enumChoice("RotationTiming", RotationTimingMode.NORMAL)
+        val rotationTiming by enumChoice("RotationTiming", RotationTimingMode.NORMAL).apply(::tagBy)
 
         enum class RotationTimingMode(override val choiceName: String) : NamedChoice {
             NORMAL("Normal"),
