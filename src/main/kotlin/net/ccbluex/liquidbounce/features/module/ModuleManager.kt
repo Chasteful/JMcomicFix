@@ -427,7 +427,7 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleSurround,
             ModulePacketMine,
             ModuleHoleFiller,
-
+            SetbackOnRespawn,
 
             // Client
             ModuleAutoConfig,
