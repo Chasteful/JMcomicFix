@@ -20,7 +20,7 @@ import kotlin.math.abs
 
 class SpeedVulcan(override val parent: ChoiceConfigurable<*>) : SpeedBHopBase("Vulcan", parent) {
 
-    private val mode by enumChoice("VulcanMode", VulcanMode.VULCAN_GROUND_286)
+    private val mode by enumChoice("Mode", VulcanMode.VULCAN_GROUND_286)
 
     // Common properties and handlers
     private inline val goingSideways: Boolean

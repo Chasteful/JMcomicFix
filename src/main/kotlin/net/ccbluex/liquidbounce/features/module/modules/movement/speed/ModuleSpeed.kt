@@ -26,6 +26,7 @@ import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.sen
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.spartan.SpeedSpartanV4043
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.spartan.SpeedSpartanV4043FastFall
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.verus.SpeedVerusB3882
+import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.verus.SpeedVerusLowHop
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.vulcan.SpeedVulcan
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.watchdog.SpeedHypixelBHop
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.watchdog.SpeedHypixelLowHop
@@ -54,28 +55,32 @@ object ModuleSpeed : ClientModule("Speed", Category.MOVEMENT) {
         SpeedCustom(configurable),
         SpeedSpeedYPort(configurable),
 
-        SpeedVerusB3882(configurable),
+        SpeedBlocksMC(configurable),
+
+        SpeedGrimCollide(configurable),
+
+        SpeedHylexGround(configurable),
+        SpeedHylexLowHop(configurable),
 
         SpeedHypixelBHop(configurable),
         SpeedHypixelLowHop(configurable),
 
-        SpeedSpartanV4043(configurable),
-        SpeedSpartanV4043FastFall(configurable),
-
-        SpeedSentinelDamage(configurable),
-        SpeedVulcan(configurable),
-        SpeedGrimCollide(configurable),
-
-        SpeedNCP(configurable),
-
         SpeedIntave14(configurable),
         SpeedIntave14Fast(configurable),
 
-        SpeedHylexLowHop(configurable),
-        SpeedHylexGround(configurable),
+        SpeedMatrix7(configurable),
 
-        SpeedBlocksMC(configurable),
-        SpeedMatrix7(configurable)
+        SpeedNCP(configurable),
+
+        SpeedSentinelDamage(configurable),
+
+        SpeedSpartanV4043(configurable),
+        SpeedSpartanV4043FastFall(configurable),
+
+        SpeedVerusB3882(configurable),
+        SpeedVerusLowHop(configurable),
+
+        SpeedVulcan(configurable)
     )
 
     val modes = choices("Mode", 0, this::initializeSpeeds).apply(::tagBy)
