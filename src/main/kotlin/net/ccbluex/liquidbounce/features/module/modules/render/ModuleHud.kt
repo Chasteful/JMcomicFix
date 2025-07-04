@@ -114,7 +114,6 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
         INT("INT"),
         FLOAT("FLOAT"),
         TEXT("TEXT"),
-
     }
 
     init {

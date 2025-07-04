@@ -40,14 +40,18 @@ object ModuleNoFall : ClientModule("NoFall", Category.PLAYER) {
             NoFallMLG,
             NoFallRettungsplatform,
             NoFallSpartan524Flag,
+            NoFallGrim2b2t,
             NoFallVulcan,
             NoFallVulcanTP,
             NoFallVerus,
+            NoFallAACv4,
+            NoFallAACv5,
             NoFallForceJump,
             NoFallCancel,
             NoFallBlink,
             NoFallHypixelPacket,
             NoFallHypixel,
+            NoFallIntave1255
         )
     ).apply(::tagBy)
 

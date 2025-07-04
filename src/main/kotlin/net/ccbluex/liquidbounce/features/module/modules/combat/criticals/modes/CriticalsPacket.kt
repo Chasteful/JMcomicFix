@@ -29,6 +29,7 @@ import net.ccbluex.liquidbounce.features.module.modules.combat.criticals.ModuleC
 import net.ccbluex.liquidbounce.features.module.modules.combat.criticals.ModuleCriticals.modes
 import net.ccbluex.liquidbounce.utils.client.MovePacketType
 import net.minecraft.entity.LivingEntity
+import java.util.concurrent.ThreadLocalRandom
 
 /**
  * Packet criticals mode
@@ -105,6 +106,19 @@ object CriticalsPacket : Choice("Packet") {
                     showCriticals(event.entity)
                 }
             }
+            Mode.VERUS -> {
+                if (player.isOnGround) {
+                    when ((event.entity as LivingEntity).hurtTime) {
+                        17, 19 -> {
+                            p(ThreadLocalRandom.current().nextDouble(0.001, 0.0011), onGround = false)
+                        }
+                        18, 20 -> {
+                            p(0.03 + ThreadLocalRandom.current().nextDouble(0.001, 0.0011), onGround = false)
+                        }
+                    }
+                    showCriticals(event.entity)
+                }
+            }
         }
     }
 
@@ -123,5 +137,6 @@ object CriticalsPacket : Choice("Packet") {
         DOWN("Down"),
         GRIM("Grim"),
         BLOCKSMC("BlocksMC"),
+        VERUS("Verus")
     }
 }

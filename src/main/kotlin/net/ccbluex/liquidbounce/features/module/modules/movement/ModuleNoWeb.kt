@@ -6,9 +6,11 @@ import net.ccbluex.liquidbounce.event.events.NotificationEvent
 import net.ccbluex.liquidbounce.event.tickHandler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
+import net.ccbluex.liquidbounce.script.bindings.api.ScriptBlockUtil.getBlock
 import net.ccbluex.liquidbounce.utils.client.notification
 import net.ccbluex.liquidbounce.utils.entity.moving
 import net.ccbluex.liquidbounce.utils.entity.withStrafe
+import net.ccbluex.liquidbounce.utils.math.toBlockPos
 import net.minecraft.block.Blocks
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket
 import net.minecraft.util.math.BlockPos
@@ -25,7 +27,7 @@ object ModuleNoWeb : ClientModule("NoWeb", Category.MOVEMENT) {
         enableLock()
     }
 
-    private val modes = choices("Mode", Air, arrayOf(Air, GrimBreak, Intave14, Vulcan)).apply { tagBy(this) }
+    private val modes = choices("Mode", Air, arrayOf(Air, GrimBreak, Intave13, Intave14, Vulcan)).apply { tagBy(this) }
 
     val repeatable = tickHandler {
         if (ModuleAvoidHazards.enabled && ModuleAvoidHazards.cobWebs) {
@@ -93,7 +95,19 @@ object ModuleNoWeb : ClientModule("NoWeb", Category.MOVEMENT) {
             return true
         }
     }
-
+    object Intave13 : NoWebMode("Intave13") {
+        override fun handleEntityCollision(pos: BlockPos): Boolean {
+            if (getBlock(player.pos.toBlockPos()) !== Blocks.COBWEB) {
+                if (getBlock(player.pos.add(0.0, -0.1, 0.0)
+                        .toBlockPos()) == Blocks.COBWEB) {
+                    player.velocity.y = 0.0
+                }
+            } else {
+                player.velocity.y = 0.26
+            }
+            return false
+        }
+    }
     /**
      * Intave needs to improve their movement checks
      * works on intave 14.8.4
