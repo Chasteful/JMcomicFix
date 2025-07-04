@@ -7,7 +7,7 @@ import net.ccbluex.liquidbounce.features.module.modules.player.nofall.ModuleNoFa
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket
 import net.ccbluex.liquidbounce.event.handler
 
-internal object NoFallGrim2b2t : Choice("Grim2b2t") {
+internal object NoFallGrim : Choice("Grim") {
     override val parent: ChoiceConfigurable<*>
         get() = ModuleNoFall.modes
 

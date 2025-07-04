@@ -11,8 +11,8 @@ import net.ccbluex.liquidbounce.utils.client.Timer
 import net.ccbluex.liquidbounce.utils.entity.doesNotCollideBelow
 import net.ccbluex.liquidbounce.utils.kotlin.Priority
 
-internal object NoFallIntave1255 : Choice("Intave12.5.5") {
-    private val minFallDist by float("MinFallDistance", 5f, 2f..24f, "m")
+internal object NoFallIntave1255 : Choice("Intave12") {
+    private val minFallDist by float("MinFallDistance", 1.5f, 0f..1.5f)
 
     private var shouldSlowTimer = false
 
@@ -28,9 +28,8 @@ internal object NoFallIntave1255 : Choice("Intave12.5.5") {
 
     @Suppress("unused")
     val motionHandler = handler<PlayerTickEvent> {
-        if (player.fallDistance < minFallDist) return@handler
 
-        if (player.fallDistance > 0 && hasCollisionBelow()) {
+        if (player.fallDistance > minFallDist && hasCollisionBelow()) {
 
             Timer.requestTimerSpeed(0.4f, Priority.IMPORTANT_FOR_PLAYER_LIFE, ModuleNoFall)
             shouldSlowTimer = true

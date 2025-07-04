@@ -40,7 +40,7 @@ object ModuleNoFall : ClientModule("NoFall", Category.PLAYER) {
             NoFallMLG,
             NoFallRettungsplatform,
             NoFallSpartan524Flag,
-            NoFallGrim2b2t,
+            NoFallGrim,
             NoFallVulcan,
             NoFallVulcanTP,
             NoFallVerus,
