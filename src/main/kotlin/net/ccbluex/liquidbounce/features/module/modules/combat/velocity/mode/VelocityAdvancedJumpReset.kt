@@ -22,7 +22,7 @@ import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket
 import kotlin.math.cos
 import kotlin.math.sin
 
-
+@Suppress("TooManyFunctions")
 internal object VelocityAdvancedJumpReset : VelocityMode("AdvancedJumpReset") {
 
     private object TriggerSettings : ToggleableConfigurable(ModuleVelocity, "TriggerSettings", true) {
@@ -223,23 +223,66 @@ internal object VelocityAdvancedJumpReset : VelocityMode("AdvancedJumpReset") {
     private fun shouldAttemptJump(): Boolean {
         if (checkModuleEnabled()) return false
 
+        if (!checkJumpableState()) return false
+        if (!checkKeyPress()) return false
+        if (!checkHurtTimeRange()) return false
+        if (!checkJumpConditions()) return false
+        if (!checkPauseConditions()) return false
+        if (!checkEffects()) return false
+        if (!checkUI()) return false
+        if (!checkBlocking()) return false
+        if (!checkFire()) return false
+        if (!checkSneaking()) return false
+        if (!isValidToJump())return false
+
+        return true
+    }
+
+    private fun checkJumpableState(): Boolean {
+        return player.isOnGround || JumpSettings.allowJumpInAir
+    }
+
+    private fun checkKeyPress(): Boolean {
+        return !mc.options.backKey.isPressed || !CheckSettings.notSPressed
+    }
+
+    private fun checkHurtTimeRange(): Boolean {
+        return checkInRange(player.hurtTime, JumpSettings.hurtMin, JumpSettings.hurtMax)
+    }
+
+    private fun checkJumpConditions(): Boolean {
+        return canJump() && !wasJumped
+    }
+
+    private fun checkPauseConditions(): Boolean {
+        return (jumpTicks >= TriggerSettings.tick || TriggerSettings.mode != TriggerMode.Tick) &&
+            (attackTicks >= PauseSettings.combatTick || !PauseSettings.notCombating) &&
+            (flagTicks >= PauseSettings.flagDelay || !PauseSettings.onFlag) &&
+            valid
+    }
+
+    private fun checkEffects(): Boolean {
         val hasSpeed = player.hasStatusEffect(StatusEffects.SPEED)
         val hasJB = player.hasStatusEffect(StatusEffects.JUMP_BOOST)
 
-        return (player.isOnGround || JumpSettings.allowJumpInAir) &&
-            (!mc.options.backKey.isPressed || !CheckSettings.notSPressed) &&
-            (checkInRange(player.hurtTime, JumpSettings.hurtMin, JumpSettings.hurtMax)) &&
-            canJump() && !wasJumped &&
-            (jumpTicks >= TriggerSettings.tick || TriggerSettings.mode != TriggerMode.Tick) &&
-            (attackTicks >= PauseSettings.combatTick || !PauseSettings.notCombating) &&
-            (flagTicks >= PauseSettings.flagDelay || !PauseSettings.onFlag) &&
-            valid && (!CheckSettings.notJumpBoost || !hasJB) &&
-            (!CheckSettings.notSpeed || !hasSpeed) &&
-            (JumpSettings.jumpInInv || mc.currentScreen == null) &&
-            isValidToJump() &&
-            (!CheckSettings.notBlocking || !player.isUsingItem) &&
-            (!CheckSettings.ignoreFire || !player.isOnFire) &&
-            (!CheckSettings.sneaking || !player.isSneaking)
+        return (!CheckSettings.notJumpBoost || !hasJB) &&
+            (!CheckSettings.notSpeed || !hasSpeed)
+    }
+
+    private fun checkUI(): Boolean {
+        return JumpSettings.jumpInInv || mc.currentScreen == null
+    }
+
+    private fun checkBlocking(): Boolean {
+        return !CheckSettings.notBlocking || !player.isUsingItem
+    }
+
+    private fun checkFire(): Boolean {
+        return !CheckSettings.ignoreFire || !player.isOnFire
+    }
+
+    private fun checkSneaking(): Boolean {
+        return !CheckSettings.sneaking || !player.isSneaking
     }
 
     private fun performLegitJump() {
