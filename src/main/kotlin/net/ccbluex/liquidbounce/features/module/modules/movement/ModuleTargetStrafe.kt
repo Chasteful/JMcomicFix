@@ -12,6 +12,7 @@ import net.ccbluex.liquidbounce.features.module.modules.combat.ModuleAimbot
 import net.ccbluex.liquidbounce.features.module.modules.combat.killaura.ModuleKillAura
 import net.ccbluex.liquidbounce.features.module.modules.exploit.movefix.ModuleMovePhysics
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.ModuleSpeed
+import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.watchdog.SpeedHypxiel
 import net.ccbluex.liquidbounce.utils.combat.TargetSelector
 import net.ccbluex.liquidbounce.utils.entity.*
 import net.ccbluex.liquidbounce.utils.kotlin.EventPriorityConvention
@@ -202,7 +203,7 @@ object ModuleTargetStrafe : ClientModule("TargetStrafe", Category.MOVEMENT) {
                     0.281
                 }
 
-                if (SpeedHypixelLowHop.shouldStrafe) {
+                if (SpeedHypxiel.shouldStrafe) {
                     event.movement = event.movement.withStrafe(
                         yaw = toDegrees(atan2(-strafeVec.x, strafeVec.z)).toFloat(),
                         speed = adjustedSpeed.coerceAtLeast(minSpeed),

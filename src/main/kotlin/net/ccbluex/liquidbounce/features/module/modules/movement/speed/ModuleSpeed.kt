@@ -27,6 +27,7 @@ import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.ant
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.verus.SpeedVerus
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.vulcan.SpeedVulcan
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.watchdog.SpeedHypxiel
+import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.server.loyisa.SpeedLoyisa
 import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.ModuleScaffold
 import net.ccbluex.liquidbounce.utils.client.inGame
 import net.ccbluex.liquidbounce.utils.combat.CombatManager
@@ -62,7 +63,7 @@ object ModuleSpeed : ClientModule("Speed", Category.MOVEMENT) {
         SpeedHypxiel(configurable),
 
         SpeedIntave(configurable),
-
+        SpeedLoyisa(configurable),
         SpeedMatrix(configurable),
 
 

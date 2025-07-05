@@ -132,7 +132,8 @@ class SpeedBlocksMC(override val parent: ChoiceConfigurable<*>) : Choice("Blocks
     }
 
     @Suppress("unused")
-    val packetHandler = sequenceHandler<PacketEvent>(priority = EventPriorityConvention.CRITICAL_MODIFICATION) { event ->
+    val packetHandler = sequenceHandler<PacketEvent>(priority =
+        EventPriorityConvention.CRITICAL_MODIFICATION) { event ->
         val packet = event.packet
 
         if (packet is EntityVelocityUpdateS2CPacket && packet.entityId == player.id) {
