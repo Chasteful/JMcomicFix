@@ -2,6 +2,7 @@ package net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.se
 
 import net.ccbluex.liquidbounce.config.types.Choice
 import net.ccbluex.liquidbounce.config.types.ChoiceConfigurable
+import net.ccbluex.liquidbounce.config.types.NamedChoice
 import net.ccbluex.liquidbounce.event.events.MovementInputEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.event.tickHandler
@@ -31,7 +32,7 @@ class SpeedLoyisa(override val parent: ChoiceConfigurable<*>) : Choice("Loyisa")
 
     @Suppress("unused")
     private val moveInputHandler = handler<MovementInputEvent>(priority = CRITICAL_MODIFICATION) { event ->
-        if (mode == LoyisaMode.INTAVE_12 && stage == 3) {
+        if (mode == LoyisaMode.INTAVE_12 ) {
             event.directionalInput = event.directionalInput.copy(forwards = true)
         }
     }
@@ -45,39 +46,46 @@ class SpeedLoyisa(override val parent: ChoiceConfigurable<*>) : Choice("Loyisa")
 
     private fun handleIntave12Move() {
         when {
-            stage < 3 -> {
-                player.velocity.x = 0.0
-                player.velocity.z = 0.0
-
-                if (player.isOnGround) {
-                    player.jump()
-                    stage++
-                    if (stage == 3 && player.isOnGround) applySelfDamage()
-                }
-            }
-            else -> {
-                if (player.hurtTime > 0 && !hasDamaged) {
-                    hasDamaged = true
-                }
-
-                if (hasDamaged) {
-                    ticks++
-
-                    if (player.isOnGround) {
-                        player.velocity = player.velocity.withStrafe(getBaseMoveSpeed() * 3.2)
-                    } else {
-                        player.velocity = player.velocity.withStrafe(0.0)
-                    }
-
-                    if (ticks > 16) {
-                        player.velocity = player.velocity.withStrafe(0.0)
-                        ModuleSpeed.enabled = false
-                    }
-                }
-            }
+            stage < 3 -> handleInitialStage()
+            else -> handleDamageStage()
         }
     }
 
+    private fun handleInitialStage() {
+        player.velocity.x = 0.0
+        player.velocity.z = 0.0
+
+        if (player.isOnGround) {
+            player.jump()
+            stage++
+            if (stage == 3 && player.isOnGround) applySelfDamage()
+        }
+    }
+
+    private fun handleDamageStage() {
+        if (player.hurtTime > 0 && !hasDamaged) {
+            hasDamaged = true
+        }
+
+        if (!hasDamaged) return
+
+        ticks++
+
+        if (player.isOnGround) {
+            handleGroundMovement()
+        } else {
+            player.velocity = player.velocity.withStrafe(0.0)
+        }
+
+        if (ticks > 16) {
+            player.velocity = player.velocity.withStrafe(0.0)
+            ModuleSpeed.enabled = false
+        }
+    }
+
+    private fun handleGroundMovement() {
+        player.velocity = player.velocity.withStrafe(getBaseMoveSpeed() * 3.2)
+    }
     private fun applySelfDamage() {
         network.sendPacket(PlayerMoveC2SPacket.PositionAndOnGround(player.x, player.y, player.z, false, false))
         network.sendPacket(

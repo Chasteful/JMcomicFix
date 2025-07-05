@@ -738,6 +738,7 @@
   "liquidbounce.module.autoGG.description": "在你贏得勝利后自動在聊天框發送指定的資訊。",
   "liquidbounce.module.movePhysics.description": "允許你在某些特殊的伺服器反作弊下移動。",
   "liquidbounce.module.pendant.description": "顯示一張圖片在某些介面上。",
-  "liquidbounce.module.iQBoost.description": "允許你提高自己的IQ。"
+  "liquidbounce.module.iQBoost.description": "允許你提高自己的IQ。",
+  "liquidbounce.module.setbackOnRespawn.description": "重生時將你傳送到你死亡的位置。"
 
 }

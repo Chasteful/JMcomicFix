@@ -736,5 +736,6 @@
   "liquidbounce.module.autoGG.description": "Automatically send the specified message in the chat box after you win." ,
   "liquidbounce.module.movePhysics.description": "Allows you to move under certain special server anti-cheats.",
   "liquidbounce.module.pendant.description": "Display a picture on some interfaces.",
-  "liquidbounce.module.iQBoost.description": "Allows you to improve your IQ."
+  "liquidbounce.module.iQBoost.description": "Allows you to improve your IQ.",
+  "liquidbounce.module.setbackOnRespawn.description": "Teleports you to the location of your death when respawning."
 }
