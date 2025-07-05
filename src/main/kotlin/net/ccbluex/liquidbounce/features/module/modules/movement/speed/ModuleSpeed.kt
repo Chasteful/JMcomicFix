@@ -10,26 +10,23 @@ import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.features.module.modules.combat.criticals.modes.CriticalsJump
 import net.ccbluex.liquidbounce.features.module.modules.movement.fly.ModuleFly
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.ModuleSpeed.OnlyInCombat.modes
+import net.ccbluex.liquidbounce.features.module.modules.movement.speed.ModuleSpeed.OnlyOnPotionEffect.modes
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.ModuleSpeed.OnlyOnPotionEffect.potionEffects
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.SpeedCustom
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.SpeedLegitHop
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.SpeedSpeedYPort
-import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.blocksmc.SpeedBlocksMC
-import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.grim.SpeedGrimCollide
-import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.hylex.SpeedHylexGround
-import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.hylex.SpeedHylexLowHop
-import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.intave.SpeedIntave14
-import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.intave.SpeedIntave14Fast
-import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.martix.SpeedMatrix7
-import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.ncp.SpeedNCP
-import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.sentinel.SpeedSentinelDamage
-import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.spartan.SpeedSpartanV4043
-import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.spartan.SpeedSpartanV4043FastFall
-import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.verus.SpeedVerusB3882
-import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.verus.SpeedVerusLowHop
-import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.vulcan.SpeedVulcan
-import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.watchdog.SpeedHypixelBHop
-import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.watchdog.SpeedHypixelLowHop
+import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.server.blocksmc.SpeedBlocksMC
+import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.grim.SpeedGrimCollide
+import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.server.hylex.SpeedHylexGround
+import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.server.hylex.SpeedHylexLowHop
+import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.intave.SpeedIntave
+import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.martix.SpeedMatrix
+import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.ncp.SpeedNCP
+import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.sentinel.SpeedSentinelDamage
+import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.spartan.SpeedSpartan
+import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.verus.SpeedVerus
+import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.vulcan.SpeedVulcan
+import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.watchdog.SpeedHypxiel
 import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.ModuleScaffold
 import net.ccbluex.liquidbounce.utils.client.inGame
 import net.ccbluex.liquidbounce.utils.combat.CombatManager
@@ -62,24 +59,19 @@ object ModuleSpeed : ClientModule("Speed", Category.MOVEMENT) {
         SpeedHylexGround(configurable),
         SpeedHylexLowHop(configurable),
 
-        SpeedHypixelBHop(configurable),
-        SpeedHypixelLowHop(configurable),
+        SpeedHypxiel(configurable),
 
-        SpeedIntave14(configurable),
-        SpeedIntave14Fast(configurable),
+        SpeedIntave(configurable),
 
-        SpeedMatrix7(configurable),
+        SpeedMatrix(configurable),
+
 
         SpeedNCP(configurable),
 
         SpeedSentinelDamage(configurable),
+        SpeedSpartan(configurable),
 
-        SpeedSpartanV4043(configurable),
-        SpeedSpartanV4043FastFall(configurable),
-
-        SpeedVerusB3882(configurable),
-        SpeedVerusLowHop(configurable),
-
+        SpeedVerus(configurable),
         SpeedVulcan(configurable)
     )
 

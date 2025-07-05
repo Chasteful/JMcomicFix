@@ -18,7 +18,7 @@
  *
  *
  */
-package net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.ncp
+package net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.ncp
 
 import net.ccbluex.liquidbounce.config.types.ChoiceConfigurable
 import net.ccbluex.liquidbounce.config.types.ToggleableConfigurable

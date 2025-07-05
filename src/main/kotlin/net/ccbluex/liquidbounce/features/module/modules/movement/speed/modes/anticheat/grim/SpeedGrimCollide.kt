@@ -1,4 +1,4 @@
-package net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.grim
+package net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.grim
 
 import net.ccbluex.liquidbounce.config.types.Choice
 import net.ccbluex.liquidbounce.config.types.ChoiceConfigurable

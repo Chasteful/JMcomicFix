@@ -1,8 +1,9 @@
-package net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.vulcan
+package net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.vulcan
 
 
 import net.ccbluex.liquidbounce.config.types.ChoiceConfigurable
 import net.ccbluex.liquidbounce.config.types.NamedChoice
+import net.ccbluex.liquidbounce.event.Sequence
 import net.ccbluex.liquidbounce.event.events.PacketEvent
 import net.ccbluex.liquidbounce.event.events.PlayerAfterJumpEvent
 import net.ccbluex.liquidbounce.event.events.PlayerJumpEvent
@@ -60,7 +61,7 @@ class SpeedVulcan(override val parent: ChoiceConfigurable<*>) : SpeedBHopBase("V
         }
     }
 
-    private suspend fun net.ccbluex.liquidbounce.event.Sequence.handleVulcan286Jump() {
+    private suspend fun Sequence.handleVulcan286Jump() {
         val speedLevel = (player.getStatusEffect(StatusEffects.SPEED)?.amplifier ?: 0)
         waitTicks(1)
         player.velocity =
@@ -78,7 +79,7 @@ class SpeedVulcan(override val parent: ChoiceConfigurable<*>) : SpeedBHopBase("V
         }
     }
 
-    private suspend fun net.ccbluex.liquidbounce.event.Sequence.handleVulcan288Jump() {
+    private suspend fun Sequence.handleVulcan288Jump() {
         val hasSpeed = (player.getStatusEffect(StatusEffects.SPEED)?.amplifier ?: 0) != 0
         player.velocity = player.velocity.withStrafe(speed = if (hasSpeed) 0.771 else 0.5)
         waitTicks(1)

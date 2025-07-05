@@ -18,7 +18,7 @@
  *
  *
  */
-package net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.sentinel
+package net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.sentinel
 
 import net.ccbluex.liquidbounce.config.types.Choice
 import net.ccbluex.liquidbounce.config.types.ChoiceConfigurable

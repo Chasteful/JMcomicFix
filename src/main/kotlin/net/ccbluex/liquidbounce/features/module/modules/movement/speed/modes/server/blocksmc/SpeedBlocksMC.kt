@@ -1,24 +1,4 @@
-/*
- * This file is part of LiquidBounce (https://github.com/CCBlueX/LiquidBounce)
- *
- * Copyright (c) 2015 - 2025 CCBlueX
- *
- * LiquidBounce is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * LiquidBounce is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
- *
- *
- */
-package net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.blocksmc
+package net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.server.blocksmc
 
 import net.ccbluex.liquidbounce.config.types.Choice
 import net.ccbluex.liquidbounce.config.types.ChoiceConfigurable
@@ -32,7 +12,7 @@ import net.ccbluex.liquidbounce.utils.entity.airTicks
 import net.ccbluex.liquidbounce.utils.entity.moving
 import net.ccbluex.liquidbounce.utils.entity.sqrtSpeed
 import net.ccbluex.liquidbounce.utils.entity.withStrafe
-import net.ccbluex.liquidbounce.utils.kotlin.EventPriorityConvention.CRITICAL_MODIFICATION
+import net.ccbluex.liquidbounce.utils.kotlin.EventPriorityConvention
 import net.ccbluex.liquidbounce.utils.movement.stopXZVelocity
 import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket
@@ -152,7 +132,7 @@ class SpeedBlocksMC(override val parent: ChoiceConfigurable<*>) : Choice("Blocks
     }
 
     @Suppress("unused")
-    val packetHandler = sequenceHandler<PacketEvent>(priority = CRITICAL_MODIFICATION) { event ->
+    val packetHandler = sequenceHandler<PacketEvent>(priority = EventPriorityConvention.CRITICAL_MODIFICATION) { event ->
         val packet = event.packet
 
         if (packet is EntityVelocityUpdateS2CPacket && packet.entityId == player.id) {
