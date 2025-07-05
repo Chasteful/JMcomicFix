@@ -24,7 +24,7 @@ import kotlin.math.sin
 
 
 internal object VelocityAdvancedJumpReset : VelocityMode("AdvancedJumpReset") {
- 
+
     private object TriggerSettings : ToggleableConfigurable(ModuleVelocity, "TriggerSettings", true) {
         val mode by enumChoice("Mode", TriggerMode.Tick)
         val tick by int("JumpTick", 8, 1..20)
@@ -170,7 +170,8 @@ internal object VelocityAdvancedJumpReset : VelocityMode("AdvancedJumpReset") {
 
                     if (DebugSettings.packetMotion) {
                         val msg = if (!DebugSettings.advanced) {
-                            "Received S12Packet, MotionX=${event.packet.velocityX} MotionY=${event.packet.velocityY} MotionZ=${event.packet.velocityZ}"
+                            "Received S12Packet, MotionX=${event.packet.velocityX} MotionY=${event.packet.velocityY}" +
+                                " MotionZ=${event.packet.velocityZ}"
                         } else {
                             "Received S12Packet, MotionX=${event.packet.velocityX} MotionY=${event.packet.velocityY} " +
                                 "MotionZ=${event.packet.velocityZ} OnGround=${player.isOnGround} " +
@@ -201,12 +202,31 @@ internal object VelocityAdvancedJumpReset : VelocityMode("AdvancedJumpReset") {
         return moduleChecks.any { !it.testCondition() }
     }
     private fun tryJump() {
-        if (checkModuleEnabled()) return
+        if (!shouldAttemptJump()) return
+
+        when (JumpSettings.mode) {
+            JumpMode.Legit -> performLegitJump()
+            JumpMode.Motion -> performMotionJump()
+            JumpMode.Modify -> performModifiedJump()
+            JumpMode.WTF -> performWTFJump()
+            else -> {}
+        }
+
+        logJumpAttempt()
+
+        if (ReduceSettings.enable && ReduceSettings.event == ReduceEvent.Jump) {
+            reduceMotion()
+        }
+        wasJumped = true
+    }
+
+    private fun shouldAttemptJump(): Boolean {
+        if (checkModuleEnabled()) return false
 
         val hasSpeed = player.hasStatusEffect(StatusEffects.SPEED)
         val hasJB = player.hasStatusEffect(StatusEffects.JUMP_BOOST)
 
-        if ((player.isOnGround || JumpSettings.allowJumpInAir) &&
+        return (player.isOnGround || JumpSettings.allowJumpInAir) &&
             (!mc.options.backKey.isPressed || !CheckSettings.notSPressed) &&
             (checkInRange(player.hurtTime, JumpSettings.hurtMin, JumpSettings.hurtMax)) &&
             canJump() && !wasJumped &&
@@ -220,49 +240,45 @@ internal object VelocityAdvancedJumpReset : VelocityMode("AdvancedJumpReset") {
             (!CheckSettings.notBlocking || !player.isUsingItem) &&
             (!CheckSettings.ignoreFire || !player.isOnFire) &&
             (!CheckSettings.sneaking || !player.isSneaking)
-        ) {
-            when (JumpSettings.mode) {
-                JumpMode.Legit -> {
-                    if (!JumpSettings.allowJumpInAir) {
-                        mc.options.jumpKey.isPressed = true
-                    } else {
-                        player.jump()
-                    }
-                }
-                JumpMode.Motion -> {
-                    player.velocity.y = JumpSettings.motionHeight.toDouble()
-                }
-                JumpMode.Modify -> {
-                    player.jump()
-                    player.velocity.y = JumpSettings.motionHeight.toDouble()
-                }
-                JumpMode.WTF -> {
-                    network.sendPacket(PlayerMoveC2SPacket.PositionAndOnGround(
-                        player.x,
-                        player.y + 0.42,
-                        player.z,
-                        false,
-                        false,
-                    ))
-                }
-                else -> {}
-            }
+    }
 
-            if (DebugSettings.jump) {
-                val msg = if (!DebugSettings.advanced) {
-                    "Jumped"
-                } else {
-                    "Jumped, OnGround=${player.isOnGround} Sprinting=${player.isSprinting} " +
-                        "Blocking=${player.isBlocking} HurtTime=${player.hurtTime} " +
-                        "Forwarding=${mc.options.forwardKey.isPressed}"
-                }
-                debug(msg)
-            }
+    private fun performLegitJump() {
+        if (!JumpSettings.allowJumpInAir) {
+            mc.options.jumpKey.isPressed = true
+        } else {
+            player.jump()
+        }
+    }
 
-            if (ReduceSettings.enable && ReduceSettings.event == ReduceEvent.Jump) {
-                reduceMotion()
+    private fun performMotionJump() {
+        player.velocity.y = JumpSettings.motionHeight.toDouble()
+    }
+
+    private fun performModifiedJump() {
+        player.jump()
+        player.velocity.y = JumpSettings.motionHeight.toDouble()
+    }
+
+    private fun performWTFJump() {
+        network.sendPacket(PlayerMoveC2SPacket.PositionAndOnGround(
+            player.x,
+            player.y + 0.42,
+            player.z,
+            false,
+            false,
+        ))
+    }
+
+    private fun logJumpAttempt() {
+        if (DebugSettings.jump) {
+            val msg = if (!DebugSettings.advanced) {
+                "Jumped"
+            } else {
+                "Jumped, OnGround=${player.isOnGround} Sprinting=${player.isSprinting} " +
+                    "Blocking=${player.isBlocking} HurtTime=${player.hurtTime} " +
+                    "Forwarding=${mc.options.forwardKey.isPressed}"
             }
-            wasJumped = true
+            debug(msg)
         }
     }
 
