@@ -360,7 +360,14 @@ public abstract class MixinClientPlayerEntity extends MixinPlayerEntity implemen
     private boolean hookSprintIgnoreCollision(boolean original) {
         return !ModuleSprint.INSTANCE.getShouldIgnoreCollision() && original;
     }
-
+    @ModifyExpressionValue(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isTouchingWater()Z"))
+    private boolean hookSprintIgnoreLiquid(boolean original) {
+        return !ModuleSprint.INSTANCE.getShouldIgnoreLiquid() && original;
+    }
+    @ModifyExpressionValue(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isSubmergedInWater()Z"))
+    private boolean hookSprintIgnoreSneaking(boolean original) {
+        return !ModuleSprint.INSTANCE.getShouldIgnoreLiquid() && original;
+    }
     @ModifyReturnValue(method = "isWalking", at = @At("RETURN"))
     private boolean hookIsWalking(boolean original) {
         if (!ModuleSprint.INSTANCE.getShouldSprintOmnidirectional()) {

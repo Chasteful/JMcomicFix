@@ -34,6 +34,7 @@ import net.ccbluex.liquidbounce.utils.entity.getMovementDirectionOfInput
 import net.ccbluex.liquidbounce.utils.kotlin.EventPriorityConvention.CRITICAL_MODIFICATION
 import net.ccbluex.liquidbounce.utils.kotlin.Priority
 import net.ccbluex.liquidbounce.utils.movement.DirectionalInput
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
 import net.minecraft.util.math.MathHelper
 
 /**
@@ -73,6 +74,11 @@ object ModuleSprint : ClientModule("Sprint", Category.MOVEMENT) {
     val shouldIgnoreCollision
         get() = running && Ignore.COLLISION in ignore
 
+    val shouldIgnoreLiquid
+        //Swimming and sprinting cannot be done at the same time
+        get() = running && Ignore.LIQUID in ignore && !player.isSwimming
+
+
     @Suppress("unused")
     private val sprintHandler = handler<SprintEvent>(priority = CRITICAL_MODIFICATION) { event ->
         if (!event.directionalInput.isMoving) {
@@ -92,7 +98,6 @@ object ModuleSprint : ClientModule("Sprint", Category.MOVEMENT) {
             event.sprint = false
         }
     }
-
     @Suppress("unused")
     private val jumpHandler = handler<PlayerJumpEvent> { event ->
         if (sprintMode == SprintMode.OMNIDIRECTIONAL && shouldSprintOmnidirectional) {
@@ -100,7 +105,6 @@ object ModuleSprint : ClientModule("Sprint", Category.MOVEMENT) {
             event.yaw = getMovementDirectionOfInput(player.yaw, DirectionalInput(player.input))
         }
     }
-
     // DO NOT USE TREE TO MAKE SURE THAT THE ROTATIONS ARE NOT CHANGED
     private val rotationsConfigurable = RotationsConfigurable(this)
 
@@ -116,12 +120,25 @@ object ModuleSprint : ClientModule("Sprint", Category.MOVEMENT) {
         // todo: unhook pitch - AimPlan needs support for only yaw or pitch operation
         val rotation = Rotation(yaw, player.pitch)
 
-        RotationManager.setRotationTarget(rotationsConfigurable.toRotationTarget(rotation), Priority.NOT_IMPORTANT,
-            this@ModuleSprint)
+        RotationManager.setRotationTarget(
+            rotationsConfigurable.toRotationTarget(rotation), Priority.NOT_IMPORTANT,
+            this@ModuleSprint
+        )
+    }
+
+    private fun getChestScreen(): GenericContainerScreen? {
+        val screen = mc.currentScreen
+
+        return screen as? GenericContainerScreen
     }
 
     @Suppress("MagicNumber")
     fun shouldPreventSprint(): Boolean {
+        // Check if chest screen is open and StopOn.CHEST is enabled
+        if (StopOn.CHEST in stopOn && getChestScreen() != null) {
+            return true
+        }
+
         val deltaYaw = player.yaw - (RotationManager.currentRotation ?: return false).yaw
         val (forward, sideways) = Pair(player.input.movementForward, player.input.movementSideways)
 
@@ -138,11 +155,13 @@ object ModuleSprint : ClientModule("Sprint", Category.MOVEMENT) {
     private enum class Ignore(override val choiceName: String) : NamedChoice {
         BLINDNESS("Blindness"),
         HUNGER("Hunger"),
-        COLLISION("Collision")
+        COLLISION("Collision"),
+        LIQUID("Liquid"),
     }
 
     private enum class StopOn(override val choiceName: String) : NamedChoice {
         GROUND("Ground"),
-        AIR("Air")
+        AIR("Air"),
+        CHEST("Chest")
     }
 }
