@@ -31,7 +31,6 @@ import net.ccbluex.netty.http.util.httpForbidden
 import net.ccbluex.netty.http.util.httpOk
 import net.minecraft.util.Util
 import java.net.URI
-import java.text.SimpleDateFormat
 import java.util.*
 
 // GET /api/v1/client/info
@@ -63,8 +62,7 @@ fun getUpdateInfo(requestObject: RequestObject) = httpOk(JsonObject().apply {
         addProperty("minecraftVersion", updateInfo.mcVersion)
         addProperty("release", updateInfo.release)
 
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(updateInfo.date)
-        addProperty("date", SimpleDateFormat().format(dateFormat))
+        addProperty("date", updateInfo.date.toString())
         addProperty("message", updateInfo.message)
 
         addProperty("url", updateInfo.url)
