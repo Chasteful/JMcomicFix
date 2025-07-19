@@ -54,6 +54,7 @@ object ScaffoldTowerHypixel : ScaffoldTower("Hypixel") {
                 player.velocity.y = 0.42
                 player.velocity = player.velocity.withStrafe(speed = 0.247 - (Math.random() / 100f))
             }
+
             2 -> player.velocity.y = 1 - (player.y % 1.0)
         }
     }

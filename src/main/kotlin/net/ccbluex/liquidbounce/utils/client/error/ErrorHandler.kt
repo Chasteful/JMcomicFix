@@ -17,6 +17,7 @@
  * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
  */
 @file:Suppress("NOTHING_TO_INLINE")
+
 package net.ccbluex.liquidbounce.utils.client.error
 
 import net.ccbluex.liquidbounce.LiquidBounce
@@ -113,7 +114,8 @@ class ErrorHandler private constructor(
                 Please report this issue to the developers on GitHub if the error keeps occurring.
 
                 Include the following information:
-            """.trimIndent())
+            """.trimIndent()
+        )
         appendLine(2)
 
         systemSpecs()
@@ -159,7 +161,7 @@ class ErrorHandler private constructor(
         displayedItems.withIndex().forEach { (idx, item) ->
             append("  at $item")
 
-            if (idx < displayedItems.size-1) {
+            if (idx < displayedItems.size - 1) {
                 appendLine()
             }
         }

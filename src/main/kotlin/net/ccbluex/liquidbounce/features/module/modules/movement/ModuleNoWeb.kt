@@ -1,21 +1,3 @@
-/*
- * This file is part of LiquidBounce (https://github.com/CCBlueX/LiquidBounce)
- *
- * Copyright (c) 2015 - 2025 CCBlueX
- *
- * LiquidBounce is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * LiquidBounce is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
- */
 package net.ccbluex.liquidbounce.features.module.modules.movement
 
 import net.ccbluex.liquidbounce.config.types.Choice
@@ -24,9 +6,16 @@ import net.ccbluex.liquidbounce.event.events.NotificationEvent
 import net.ccbluex.liquidbounce.event.tickHandler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
+import net.ccbluex.liquidbounce.lang.translation
+import net.ccbluex.liquidbounce.script.bindings.api.ScriptBlockUtil.getBlock
+import net.ccbluex.liquidbounce.utils.client.chat
+import net.ccbluex.liquidbounce.utils.client.isNewerThan1_18_2
+import net.ccbluex.liquidbounce.utils.client.markAsError
 import net.ccbluex.liquidbounce.utils.client.notification
+import net.ccbluex.liquidbounce.utils.client.usesViaFabricPlus
 import net.ccbluex.liquidbounce.utils.entity.moving
 import net.ccbluex.liquidbounce.utils.entity.withStrafe
+import net.ccbluex.liquidbounce.utils.math.toBlockPos
 import net.minecraft.block.Blocks
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket
 import net.minecraft.util.math.BlockPos
@@ -43,7 +32,9 @@ object ModuleNoWeb : ClientModule("NoWeb", Category.MOVEMENT) {
         enableLock()
     }
 
-    private val modes = choices("Mode", Air, arrayOf(Air, GrimBreak, Intave14, Vulcan)).apply { tagBy(this) }
+    private val modes = choices("Mode",
+        Air,
+        arrayOf(Air, GrimBreak,Grim1882, Intave13, Intave14, Vulcan)).apply { tagBy(this) }
 
     val repeatable = tickHandler {
         if (ModuleAvoidHazards.enabled && ModuleAvoidHazards.cobWebs) {
@@ -92,7 +83,7 @@ object ModuleNoWeb : ClientModule("NoWeb", Category.MOVEMENT) {
      * @anticheat Grim
      * @version 2.3.65
      */
-    object GrimBreak : NoWebMode("Grim2365") {
+    object GrimBreak : NoWebMode("GrimBreak") {
 
         // Needed to bypass BadPacketsX
         private val breakOnWorld by boolean("BreakOnWorld", true)
@@ -109,6 +100,23 @@ object ModuleNoWeb : ClientModule("NoWeb", Category.MOVEMENT) {
             network.sendPacket(finish)
 
             return true
+        }
+    }
+
+    object Intave13 : NoWebMode("Intave13") {
+        override fun handleEntityCollision(pos: BlockPos): Boolean {
+            if (getBlock(player.pos.toBlockPos()) !== Blocks.COBWEB) {
+                if (getBlock(
+                        player.pos.add(0.0, -0.1, 0.0)
+                            .toBlockPos()
+                    ) == Blocks.COBWEB
+                ) {
+                    player.velocity.y = 0.0
+                }
+            } else {
+                player.velocity.y = 0.26
+            }
+            return false
         }
     }
 
@@ -143,14 +151,32 @@ object ModuleNoWeb : ClientModule("NoWeb", Category.MOVEMENT) {
         override val parent: ChoiceConfigurable<NoWebMode>
             get() = modes
 
-        private val strength by float("Strength", 0.23f,0.01f..0.8f)
 
         override fun handleEntityCollision(pos: BlockPos): Boolean {
             if (player.moving) {
-                if (player.isOnGround) player.velocity = player.velocity.withStrafe(strength.toDouble())
+                if (player.isOnGround) player.velocity = player.velocity.withStrafe(0.23)
                 if (player.velocity.y > 0) player.velocity.y = -player.velocity.y
             }
             return false
         }
+    }
+    object Grim1882 : NoWebMode("Heypixel") {
+        override val parent: ChoiceConfigurable<NoWebMode>
+            get() = modes
+        override fun handleEntityCollision(pos: BlockPos): Boolean {
+            if (player.moving) {
+                if (player.isOnGround) player.velocity = player.velocity.withStrafe(0.64)
+                if (player.velocity.y > 0) player.velocity.y = -player.velocity.y
+            }
+            return false
+        }
+        @Suppress("unused")
+        private val tick = tickHandler {
+                if (!usesViaFabricPlus || !isNewerThan1_18_2) {
+                    chat(markAsError(translation("liquidbounce.module.noweb.mode.grim.messages.Protocol")))
+                    enabled = false
+                    return@tickHandler
+                }
+            }
     }
 }

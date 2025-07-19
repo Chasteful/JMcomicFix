@@ -69,20 +69,18 @@ public abstract class MixinGameRenderer {
     @Shadow
     @Final
     private MinecraftClient client;
+    @Shadow
+    @Final
+    private Camera camera;
+    @Shadow
+    @Final
+    private LightmapTextureManager lightmapTextureManager;
 
     @Shadow
     public abstract MinecraftClient getClient();
 
     @Shadow
-    @Final
-    private Camera camera;
-
-    @Shadow
     public abstract void tick();
-
-    @Shadow
-    @Final
-    private LightmapTextureManager lightmapTextureManager;
 
     /**
      * Hook game render event

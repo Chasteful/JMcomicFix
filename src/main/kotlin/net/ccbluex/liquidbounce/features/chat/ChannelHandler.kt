@@ -34,8 +34,10 @@ import net.ccbluex.liquidbounce.event.events.ClientChatErrorEvent
 import net.ccbluex.liquidbounce.event.events.ClientChatStateChange
 import net.ccbluex.liquidbounce.utils.client.logger
 
-class ChannelHandler(private val chatClient: ChatClient,
-                     private val handshaker: WebSocketClientHandshaker) : SimpleChannelInboundHandler<Any>() {
+class ChannelHandler(
+    private val chatClient: ChatClient,
+    private val handshaker: WebSocketClientHandshaker
+) : SimpleChannelInboundHandler<Any>() {
 
     lateinit var handshakeFuture: ChannelPromise
 
@@ -74,9 +76,11 @@ class ChannelHandler(private val chatClient: ChatClient,
      */
     override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
         logger.error("LiquidChat error", cause)
-        EventManager.callEvent(ClientChatErrorEvent(
-            cause.localizedMessage ?: cause.message ?: cause.javaClass.name
-        ))
+        EventManager.callEvent(
+            ClientChatErrorEvent(
+                cause.localizedMessage ?: cause.message ?: cause.javaClass.name
+            )
+        )
 
         if (!handshakeFuture.isDone) {
             handshakeFuture.setFailure(cause)

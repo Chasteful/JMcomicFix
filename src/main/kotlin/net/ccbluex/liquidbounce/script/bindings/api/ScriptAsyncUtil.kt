@@ -85,9 +85,9 @@ class ScriptAsyncUtil(
         jsPromiseConstructor.newInstance(
             ProxyExecutable { (onResolve, onReject) ->
                 scriptFutures += this
-                this.thenAcceptAsync( { value ->
+                this.thenAcceptAsync({ value ->
                     onResolve.executeVoid(value)
-                }, mc).exceptionallyAsync( { e ->
+                }, mc).exceptionallyAsync({ e ->
                     onReject.executeVoid(e)
                     null
                 }, mc)

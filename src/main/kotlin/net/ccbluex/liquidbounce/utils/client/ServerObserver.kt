@@ -318,6 +318,7 @@ object ServerObserver : EventListener {
                     in -32773..-32762 -> "Grizzly"
                     else -> "Verus"
                 }
+
                 -1 -> when {
                     first in -8287..-8280 -> "Errata"
                     first < -3000 -> "Intave"
@@ -325,6 +326,7 @@ object ServerObserver : EventListener {
                     first in -3000..-2995 -> "Karhu"
                     else -> "Polar"
                 }
+
                 else -> null
             }
 

@@ -22,6 +22,7 @@
 
 package net.ccbluex.liquidbounce.integration.interop.protocol.rest.v1
 
+import net.ccbluex.jmcomicfix.integration.interop.protocol.rest.v1.client.getVerification
 import net.ccbluex.liquidbounce.integration.interop.protocol.rest.v1.client.*
 import net.ccbluex.liquidbounce.integration.interop.protocol.rest.v1.features.*
 import net.ccbluex.liquidbounce.integration.interop.protocol.rest.v1.game.*
@@ -45,7 +46,8 @@ internal fun registerInteropFunctions(node: Node) = node.withPath("/api/v1/clien
     // Theme Functions
     get("/theme", ::getThemeInfo)
     post("/shader", ::postToggleShader)
-
+    get("/theme/shaderEnabled", ::getShaderEnabled)
+    post("/theme/shaderEnabled", ::postSetShaderEnabled)
     // VirtualScreen Functions
     get("/virtualScreen", ::getVirtualScreenInfo)
     get("/screen", ::getScreenInfo)
@@ -71,7 +73,7 @@ internal fun registerInteropFunctions(node: Node) = node.withPath("/api/v1/clien
     // Session Functions
     get("/session", ::getSessionInfo)
     get("/location", ::getLocationInfo)
-
+    get("/verification", ::getVerification)
     // Account Functions
     get("/accounts", ::getAccounts)
     post("/accounts/new/microsoft", ::postNewMicrosoftAccount)
@@ -159,6 +161,8 @@ internal fun registerInteropFunctions(node: Node) = node.withPath("/api/v1/clien
 
     // Texture Functions
     get("/resource", ::getResource).apply {
+        get("/dyedItemTexture", ::getDyedItemTexture)
+        get("/effectTexture",::getEffectTexture)
         get("/itemTexture", ::getItemTexture)
         get("/skin", ::getSkin)
     }

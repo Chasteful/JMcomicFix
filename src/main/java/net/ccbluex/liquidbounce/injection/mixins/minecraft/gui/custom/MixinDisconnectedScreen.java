@@ -18,70 +18,53 @@
  *  * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
  *
  */
-
 package net.ccbluex.liquidbounce.injection.mixins.minecraft.gui.custom;
 
-import net.ccbluex.liquidbounce.features.misc.HideAppearance;
-import net.ccbluex.liquidbounce.injection.mixins.minecraft.gui.MixinScreen;
+import net.ccbluex.liquidbounce.event.EventManager;
+import net.ccbluex.liquidbounce.event.events.OverlayDisconnectionEvent;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.network.DisconnectionInfo;
 import net.minecraft.text.Text;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(DisconnectedScreen.class)
-public abstract class MixinDisconnectedScreen extends MixinScreen {
+public abstract class MixinDisconnectedScreen extends Screen {
 
-    @Shadow
+    @Mutable
     @Final
-    private static Text TO_TITLE_TEXT;
-
     @Shadow
-    @Final
-    private Text buttonLabel;
-
-    @Shadow
-    @Final
     private Screen parent;
-
+    @Mutable
+    @Final
+    @Shadow
+    private DisconnectionInfo info;
     @Unique
-    private ButtonWidget disconnectButton;
+    private boolean eventFired = false;
 
-    @Inject(method = "init", at = @At("HEAD"))
-    private void injectButtons(final CallbackInfo callback) {
-        if (HideAppearance.INSTANCE.isHidingNow()) {
-            return;
-        }
-
-        /*
-         * Add second quit button in-case the first one is being covered by the multiplayer message
-         * This technique is used by many servers or anti-cheats to prevent players from quitting
-         * out of the game when they are banned
-         */
-        int x = this.width - 140;
-        int y = this.height - 30;
-        disconnectButton = (this.client.isMultiplayerEnabled() ?
-                ButtonWidget.builder(this.buttonLabel, button -> this.client.setScreen(this.parent)) :
-                ButtonWidget.builder(TO_TITLE_TEXT, button -> this.client.setScreen(new TitleScreen()))
-        ).dimensions(x, y, 120, 20).build();
-        addDrawableChild(disconnectButton);
+    protected MixinDisconnectedScreen(Text title) {
+        super(title);
     }
 
-    @Inject(method = "refreshWidgetPositions", at = @At("HEAD"))
-    private void moveButtons(final CallbackInfo callback) {
-        if (disconnectButton != null) {
-            // fixes button position
-            int x = this.width - 140;
-            int y = this.height - 30;
-            disconnectButton.setPosition(x, y);
+    @Inject(method = "init", at = @At("HEAD"), cancellable = true)
+    private void onInit(CallbackInfo ci) {
+        if (!eventFired && this.parent != null && this.info != null) {
+            eventFired = true;
+
+            new Thread(() -> {
+                try {
+                    Thread.sleep(800);
+                } catch (InterruptedException ignored) {
+                }
+                EventManager.INSTANCE.callEvent(new OverlayDisconnectionEvent(
+                        parent,
+                        info.reason()
+                ));
+            }).start();
+            ci.cancel();
         }
     }
-
 }

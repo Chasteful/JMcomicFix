@@ -49,7 +49,8 @@ object ModuleVoidESP : ClientModule("VoidESP", Category.RENDER) {
     private val rangeFacing by int("RangeFacing", 8, 1..32)
 
     private val renderer = tree(
-        PlacementRenderer("Render", true, this, keep = true,
+        PlacementRenderer(
+            "Render", true, this, keep = true,
             defaultColor = Color4b(255, 0, 0, 90)
         )
     )

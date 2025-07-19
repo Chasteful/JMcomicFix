@@ -52,9 +52,9 @@ public abstract class MixinChatScreen extends MixinScreen {
     }
 
     /**
-     * Handle user chat messages
+     * Handle user ChatScreen messages
      *
-     * @param chatText chat message by client user
+     * @param chatText ChatScreen message by client user
      */
     @Inject(method = "sendMessage", at = @At("HEAD"), cancellable = true)
     private void handleChatMessage(String chatText, boolean addToHistory, CallbackInfo ci) {
@@ -74,7 +74,7 @@ public abstract class MixinChatScreen extends MixinScreen {
             return;
         }
 
-        int[] activeMessage = getActiveMessage((int)mouseX, (int)mouseY);
+        int[] activeMessage = getActiveMessage((int) mouseX, (int) mouseY);
 
         if (activeMessage == null) {
             return;

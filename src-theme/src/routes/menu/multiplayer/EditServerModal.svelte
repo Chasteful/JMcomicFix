@@ -15,7 +15,6 @@
     const dispatch = createEventDispatcher();
 
     $: disabled = validateInput(address, name);
-    $: address = address.trim();
 
     function validateInput(address: string, name: string): boolean {
         return name.length === 0 || address.length === 0;
@@ -32,8 +31,9 @@
 </script>
 
 <Modal bind:visible={visible} title="Edit Server">
-    <IconTextInput title="Name" icon="info" bind:value={name}/>
-    <IconTextInput title="Address" icon="server" bind:value={address}/>
-    <SingleSelect title="Server Resource Packs" options={["Prompt", "Enabled", "Disabled"]} bind:value={resourcePackPolicy}/>
-    <ButtonSetting title="Edit Server" on:click={editServer} {disabled} listenForEnter={true} inset={true}/>
+    <IconTextInput bind:value={name} icon="info" title="Name"/>
+    <IconTextInput bind:value={address} icon="server" title="Address"/>
+    <SingleSelect bind:value={resourcePackPolicy} options={["Prompt", "Enabled", "Disabled"]}
+                  title="Server Resource Packs"/>
+    <ButtonSetting {disabled} inset={true} listenForEnter={true} on:click={editServer} title="Edit Server"/>
 </Modal>

@@ -18,14 +18,17 @@ internal class NoSlowSneakingSwitch(override val parent: ChoiceConfigurable<*>) 
                 EventState.PRE -> {
                     network.sendPacket(ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY))
                 }
+
                 EventState.POST -> {
                     network.sendPacket(ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY))
                 }
             }
+
             TimingMode.PRE_TICK -> if (event.state == EventState.PRE) {
                 network.sendPacket(ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY))
                 network.sendPacket(ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY))
             }
+
             TimingMode.POST_TICK -> if (event.state == EventState.POST) {
                 network.sendPacket(ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY))
                 network.sendPacket(ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY))

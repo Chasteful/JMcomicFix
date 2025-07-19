@@ -36,10 +36,14 @@ import net.ccbluex.liquidbounce.utils.kotlin.random
  */
 object ModuleDerp : ClientModule("Derp", Category.FUN) {
 
-    private val yawMode = choices("Yaw", YawRandom,
-        arrayOf(YawStatic, YawOffset, YawRandom, YawJitter, YawSpin))
-    private val pitchMode = choices("Pitch", PitchRandom,
-        arrayOf(PitchStatic, PitchOffset, PitchRandom))
+    private val yawMode = choices(
+        "Yaw", YawRandom,
+        arrayOf(YawStatic, YawOffset, YawRandom, YawJitter, YawSpin)
+    )
+    private val pitchMode = choices(
+        "Pitch", PitchRandom,
+        arrayOf(PitchStatic, PitchOffset, PitchRandom)
+    )
     private val safePitch by boolean("SafePitch", true)
     private val notDuringSprint by boolean("NotDuringSprint", true)
 
@@ -60,8 +64,10 @@ object ModuleDerp : ClientModule("Derp", Category.FUN) {
             }
         }
 
-        RotationManager.setRotationTarget(rotationsConfigurable.toRotationTarget(Rotation(yaw, pitch)),
-            Priority.NOT_IMPORTANT, this@ModuleDerp)
+        RotationManager.setRotationTarget(
+            rotationsConfigurable.toRotationTarget(Rotation(yaw, pitch)),
+            Priority.NOT_IMPORTANT, this@ModuleDerp
+        )
     }
 
     private object YawStatic : YawChoice("Static") {
@@ -163,7 +169,6 @@ object ModuleDerp : ClientModule("Derp", Category.FUN) {
             get() = pitchMode
         abstract val pitch: Float
     }
-
 
 
 }

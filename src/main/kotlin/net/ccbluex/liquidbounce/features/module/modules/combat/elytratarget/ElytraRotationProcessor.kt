@@ -40,20 +40,22 @@ internal object ElytraRotationProcessor : Configurable("Rotations"), RotationPro
 
     override fun parent() = ModuleElytraTarget
 
-    private inline val baseYawSpeed: Float get() = if (sharpRotations) {
-        BASE_YAW_SPEED * 1.5f
-    } else {
-        BASE_YAW_SPEED
-    }
+    private inline val baseYawSpeed: Float
+        get() = if (sharpRotations) {
+            BASE_YAW_SPEED * 1.5f
+        } else {
+            BASE_YAW_SPEED
+        }
 
-    private inline val basePitchSpeed: Float get() = if (sharpRotations) {
-        BASE_PITCH_SPEED * 1.5f
-    } else {
-        BASE_PITCH_SPEED
-    }
+    private inline val basePitchSpeed: Float
+        get() = if (sharpRotations) {
+            BASE_PITCH_SPEED * 1.5f
+        } else {
+            BASE_PITCH_SPEED
+        }
 
     private inline val randomDirectionVector
-        get() = with (System.currentTimeMillis() / 1000.0) {
+        get() = with(System.currentTimeMillis() / 1000.0) {
             Vec3d(
                 sin(this * 1.8) * 0.04 + (Math.random() - 0.5) * 0.02,
                 sin(this * 2.2) * 0.03 + (Math.random() - 0.5) * 0.015,

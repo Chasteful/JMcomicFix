@@ -227,8 +227,8 @@ class SimulatedPlayer(
             val g = this.getRotationVector().y
             val h = if (g < -0.2) 0.085 else 0.06
             if (g <= 0.0 || this.input.playerInput.jump || !this.player.world
-                .getBlockState(BlockPos.ofFloored(this.pos.x, this.pos.y + 1.0 - 0.1, this.pos.z))
-                .fluidState.isEmpty
+                    .getBlockState(BlockPos.ofFloored(this.pos.x, this.pos.y + 1.0 - 0.1, this.pos.z))
+                    .fluidState.isEmpty
             ) {
                 velocity = velocity.add(0.0, (g - velocity.y) * h, 0.0)
             }
@@ -368,9 +368,9 @@ class SimulatedPlayer(
 
         var vec3d = this.velocity
         if ((horizontalCollision || this.isJumping) && (
-            this.isClimbing() || pos.toBlockPos().getState()
-                ?.isOf(Blocks.POWDER_SNOW) == true && PowderSnowBlock.canWalkOnPowderSnow(player)
-            )
+                this.isClimbing() || pos.toBlockPos().getState()
+                    ?.isOf(Blocks.POWDER_SNOW) == true && PowderSnowBlock.canWalkOnPowderSnow(player)
+                )
         ) {
             vec3d = Vec3d(vec3d.x, 0.2, vec3d.z)
         }
@@ -972,7 +972,7 @@ class SimulatedPlayer(
                     input,
                     jumping,
                     sprinting,
-                    sneaking=entity.isSneaking
+                    sneaking = entity.isSneaking
                 )
             }
         }

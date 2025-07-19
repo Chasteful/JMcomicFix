@@ -52,9 +52,11 @@ object ModuleCrystalAura : ClientModule(
     disableOnQuit = true
 ) {
 
-    val targetTracker = tree(TargetTracker(
-        rangeValue =  FloatValueProvider("Range", 4.5f, 1f..12f)
-    ))
+    val targetTracker = tree(
+        TargetTracker(
+            rangeValue = FloatValueProvider("Range", 4.5f, 1f..12f)
+        )
+    )
 
     object PredictFeature : Configurable("Predict") {
         init {

@@ -177,11 +177,12 @@
     <OptionBar>
         <Search on:search={handleSearch}/>
 
-        <SwitchSetting title="Online only" bind:value={onlineOnly}/>
+        <SwitchSetting bind:value={onlineOnly} title="Online only"/>
         <Divider/>
-        <SwitchSetting title="Auto Config" bind:value={autoConfig} on:change={updateAutoConfigState}/>
+        <SwitchSetting bind:value={autoConfig} on:change={updateAutoConfigState} title="Auto Config"/>
         {#if spooferConfigurable}
-            <WrappedSetting bind:value={spooferConfigurable} on:change={updateSpooferSettings} path="multiplayer.spoofer"/>
+            <WrappedSetting bind:value={spooferConfigurable} on:change={updateSpooferSettings}
+                            path="multiplayer.spoofer"/>
         {/if}
         {#if clientInfo && clientInfo.viaFabricPlus}
             <SingleSelect title="Version" value={selectedProtocol.name} options={protocols.map(p => p.name)}
@@ -192,8 +193,8 @@
         {/if}
     </OptionBar>
 
-    <MenuList sortable={renderedServers.length === servers.length} elementCount={servers.length}
-              on:sort={handleServerSort}>
+    <MenuList elementCount={servers.length} on:sort={handleServerSort}
+              sortable={renderedServers.length === servers.length}>
         {#key timesSorted}
             {#each renderedServers as server}
                 <MenuListItem imageText={server.ping > 0 ? `${server.ping}ms` : null}
@@ -220,7 +221,11 @@
                     </svelte:fragment>
 
                     <svelte:fragment slot="always-visible">
-                        <MenuListItemButton title="Join" icon="play" on:click={() => connectToServer(server.address)}/>
+                        <MenuListItemButton
+                                title="Join"
+                                icon="play"
+                                on:click={() => connectToServer(server.address)}/>
+
                     </svelte:fragment>
                 </MenuListItem>
             {/each}
@@ -229,13 +234,13 @@
 
     <BottomButtonWrapper>
         <ButtonContainer>
-            <IconTextButton icon="icon-plus-circle.svg" title="Add" on:click={() => addServerModalVisible = true}/>
-            <IconTextButton icon="icon-plane.svg" title="Direct" on:click={() => directConnectModalVisible = true}/>
-            <IconTextButton icon="icon-refresh.svg" title="Refresh" on:click={refreshServers}/>
+            <IconTextButton icon="icon-plus-circle.svg" on:click={() => addServerModalVisible = true} title="Add"/>
+            <IconTextButton icon="icon-plane.svg" on:click={() => directConnectModalVisible = true} title="Direct"/>
+            <IconTextButton icon="icon-refresh.svg" on:click={refreshServers} title="Refresh"/>
         </ButtonContainer>
 
         <ButtonContainer>
-            <IconTextButton icon="icon-back.svg" title="Back" on:click={() => openScreen("title")}/>
+            <IconTextButton icon="icon-back.svg" on:click={() => openScreen("title")} title="Back"/>
         </ButtonContainer>
     </BottomButtonWrapper>
 </Menu>

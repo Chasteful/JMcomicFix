@@ -39,12 +39,14 @@ import java.awt.Color
  */
 object ModuleTeams : ClientModule("Teams", Category.MISC) {
 
-    private val matches by multiEnumChoice("Matches",
+    private val matches by multiEnumChoice(
+        "Matches",
         Matches.SCOREBOARD_TEAM,
         Matches.NAME_COLOR
     )
 
-    private val armorColor by multiEnumChoice("ArmorColor",
+    private val armorColor by multiEnumChoice(
+        "ArmorColor",
         ArmorColor.HELMET
     )
 
@@ -78,8 +80,7 @@ object ModuleTeams : ClientModule("Teams", Category.MISC) {
     /**
      * Returns the team color of the [entity] or null if the entity is not in a team.
      */
-    private fun getTeamColor(entity: Entity)
-        = entity.displayName?.style?.color?.rgb?.let { Color4b(Color(it)) }
+    private fun getTeamColor(entity: Entity) = entity.displayName?.style?.color?.rgb?.let { Color4b(Color(it)) }
 
     @Suppress("unused")
     private enum class Matches(

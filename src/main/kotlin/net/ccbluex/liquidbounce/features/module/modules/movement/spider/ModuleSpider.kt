@@ -30,10 +30,12 @@ object ModuleSpider : ClientModule("Spider", Category.MOVEMENT, aliases = arrayO
         enableLock()
     }
 
-    internal val modes = choices("Mode", SpiderVanilla, arrayOf(
-        SpiderVanilla,
-        SpiderPolar29thMarch2025,
-        SpiderVulcan288
-    ))
+    internal val modes = choices(
+        "Mode", SpiderVanilla, arrayOf(
+            SpiderVanilla,
+            SpiderPolar29thMarch2025,
+            SpiderVulcan288
+        )
+    )
 }
 

@@ -19,7 +19,6 @@
 package net.ccbluex.liquidbounce.api.models.client
 
 import com.google.gson.annotations.SerializedName
-
 import java.time.OffsetDateTime
 
 data class Build(

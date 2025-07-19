@@ -23,12 +23,12 @@ import com.mojang.blaze3d.systems.RenderSystem
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
-import net.ccbluex.liquidbounce.api.core.ApiConfig
 import net.ccbluex.liquidbounce.api.core.scope
 import net.ccbluex.liquidbounce.api.models.auth.ClientAccount
 import net.ccbluex.liquidbounce.api.services.client.ClientUpdate.gitInfo
 import net.ccbluex.liquidbounce.api.services.client.ClientUpdate.update
 import net.ccbluex.liquidbounce.api.thirdparty.IpInfoApi
+import net.ccbluex.liquidbounce.common.SoundLoader
 import net.ccbluex.liquidbounce.config.AutoConfig
 import net.ccbluex.liquidbounce.config.ConfigSystem
 import net.ccbluex.liquidbounce.config.ConfigSystem.jsonFile
@@ -57,6 +57,7 @@ import net.ccbluex.liquidbounce.integration.IntegrationListener
 import net.ccbluex.liquidbounce.integration.backend.BrowserBackendManager
 import net.ccbluex.liquidbounce.integration.interop.ClientInteropServer
 import net.ccbluex.liquidbounce.integration.interop.protocol.rest.v1.game.ActiveServerList
+import net.ccbluex.liquidbounce.integration.interop.protocol.rest.v1.game.PlayTimeTracker
 import net.ccbluex.liquidbounce.integration.task.TaskManager
 import net.ccbluex.liquidbounce.integration.task.TaskProgressScreen
 import net.ccbluex.liquidbounce.integration.theme.ThemeManager
@@ -87,6 +88,8 @@ import net.minecraft.resource.ResourceReloader
 import net.minecraft.resource.SynchronousResourceReloader
 import org.apache.logging.log4j.LogManager
 import java.io.File
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import kotlin.time.measureTime
 
 /**
@@ -103,7 +106,7 @@ object LiquidBounce : EventListener {
      *
      * WARNING: Please read the GNU General Public License
      */
-    const val CLIENT_NAME = "LiquidBounce"
+    const val CLIENT_NAME = "JMcomicFix"
     const val CLIENT_AUTHOR = "CCBlueX"
 
     private object Client : Configurable("Client") {
@@ -154,6 +157,16 @@ object LiquidBounce : EventListener {
      *
      * The thread should be the main render thread.
      */
+    private val executor = Executors.newSingleThreadScheduledExecutor()
+
+    init {
+        SoundLoader.init()
+        executor.scheduleAtFixedRate(
+            { PlayTimeTracker.update() },
+            0, 1, TimeUnit.SECONDS
+        )
+    }
+
     private fun initializeClient() {
         if (isInitialized) {
             return
@@ -174,9 +187,11 @@ object LiquidBounce : EventListener {
 
         // Check for AMD Vega iGPU
         if (HAS_AMD_VEGA_APU) {
-            logger.info("AMD Vega iGPU detected, enabling different line smooth handling. " +
-                "If you believe this is a mistake, please create an issue at " +
-                "https://github.com/CCBlueX/LiquidBounce/issues.")
+            logger.info(
+                "AMD Vega iGPU detected, enabling different line smooth handling. " +
+                    "If you believe this is a mistake, please create an issue at " +
+                    "https://github.com/CCBlueX/LiquidBounce/issues."
+            )
         }
 
         // Do backup before loading configs
@@ -257,10 +272,6 @@ object LiquidBounce : EventListener {
      * which do not rely on the main thread.
      */
     private fun initializeResources() = runBlocking {
-        logger.info("Initializing API...")
-        // Lookup API config
-        ApiConfig.config
-
         listOf(
             scope.async {
                 // Load translations
@@ -325,7 +336,7 @@ object LiquidBounce : EventListener {
 
     /**
      * Prepares the GUI stage of the client.
-     * This will load [ThemeManager], as well as the [BrowserBackendManager] and [ClientInteropServer].
+     * This will load [ThemeManager], as well as the  [BrowserBackendManager] and [ClientInteropServer].
      */
     private fun prepareGuiStage() {
         // Load theme and component overlay

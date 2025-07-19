@@ -67,10 +67,12 @@ object ModuleBlockTrap : ClientModule("BlockTrap", Category.WORLD) {
     private val blocks by blocks("Blocks", hashSetOf())
     private val placePriority by enumChoice("PlacePriority", PlacePriority.FURTHEST)
     private val placer = tree(BlockPlacer("Place", this, Priority.NORMAL, { filter.getSlot(blocks) }))
-    private val targetTracker = tree(TargetTracker(
-        TargetPriority.DIRECTION,
-        FloatValueProvider("Range", 4f, 1f..6f)
-    ))
+    private val targetTracker = tree(
+        TargetTracker(
+            TargetPriority.DIRECTION,
+            FloatValueProvider("Range", 4f, 1f..6f)
+        )
+    )
 
     private val targetRenderer = tree(WorldTargetRenderer(this))
 

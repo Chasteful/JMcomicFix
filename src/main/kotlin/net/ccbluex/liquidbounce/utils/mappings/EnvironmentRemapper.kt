@@ -38,6 +38,7 @@ object EnvironmentRemapper {
                 logger.info("Intermediary environment detected.")
                 "intermediary"
             }
+
             else -> {
                 logger.error("No matching environment detected. Please make sure you are using a valid environment.")
                 null

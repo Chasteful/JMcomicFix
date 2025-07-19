@@ -112,7 +112,8 @@ object ModuleAnchor : ClientModule(
             if (playerBB.minX > goal.x - 0.5 &&
                 playerBB.maxX < goal.x + 0.5 &&
                 playerBB.minZ > goal.z - 0.5 &&
-                playerBB.maxZ < goal.z + 0.5) {
+                playerBB.maxZ < goal.z + 0.5
+            ) {
                 movement.x = 0.0
                 movement.z = 0.0
             }

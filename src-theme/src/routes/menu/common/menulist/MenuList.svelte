@@ -43,14 +43,16 @@
     {/if}
 </div>
 
+
 <style lang="scss">
-  @use "../../../../colors.scss" as *;
+  @import "../../../../colors";
 
   .menu-list {
-    background-color: rgba($menu-base-color, 0.68);
+    background-color: rgba($base, 0.5);
+    box-shadow: 0 0 8px rgba($base, 0.6);
     flex: 1;
-    border-radius: 5px;
-    margin-bottom: 25px;
+    border-radius: 16px;
+    margin-bottom: 32px;
     position: relative;
   }
 </style>

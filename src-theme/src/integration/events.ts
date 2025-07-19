@@ -8,6 +8,8 @@ import type {
     Server,
     TextComponent
 } from "./types";
+import {types} from "sass";
+import List = types.List;
 
 export interface ClickGuiValueChangeEvent {
     configurable: ConfigurableSetting;
@@ -53,16 +55,72 @@ export interface OverlayMessageEvent {
     tinted: boolean;
 }
 
+export interface ConnectionDetailsEvent {
+
+    result: TextComponent | string;
+
+}
+
+export interface OverlayTitleEvent {
+    title: TextComponent | string;
+    subtitle: TextComponent | string;
+}
+
+export interface PlayerEntry {
+    name: TextComponent | string;
+    uuid: string;
+    latency: TextComponent | string;
+    isFriend: boolean;
+    isStaff: boolean;
+}
+
+export interface OverlayPlayListEvent {
+    header: TextComponent | string;
+    footer: TextComponent | string;
+    players: PlayerEntry[];
+
+}
+
+export interface OverlayChatEvent {
+    content: TextComponent | string,
+    timestamp: number;
+    isSystem: Boolean;
+    id: number
+    visible: boolean
+    fadeTimeout?: number;
+}
+
+export interface OverlayDisconnectionEvent {
+    parent: "title" | "menu" | "custom";
+    info: TextComponent | string;
+}
+export interface ChatReceiveEvent {
+    message: string;
+    textData: TextComponent | string;
+    type: ChatType;
+    applyChatDecoration: (text: TextComponent | string) => TextComponent | string;
+    cancelled?: boolean;
+}
+
+export enum ChatType {
+    CHAT_MESSAGE = "ChatMessage",
+    DISGUISED_CHAT_MESSAGE = "DisguisedChatMessage",
+    GAME_MESSAGE = "GameMessage"
+}
+
+
+
 export interface NotificationEvent {
     title: string;
     message: string;
-    severity: "INFO" | "SUCCESS" | "ERROR" | "ENABLED" | "DISABLED";
+    severity: "INFO" | "SUCCESS" | "ERROR" | "ENABLED" | "DISABLED" | "BLINK" | "BLINKED" | "BLINKING";
 }
 
 export interface KeyEvent {
     key: string;
     action: number;
     mods: number;
+
 }
 
 export interface TargetChangeEvent {
@@ -76,10 +134,6 @@ export interface BlockCountChangeEvent {
 export interface AccountManagerAdditionEvent {
     username: string | null;
     error: string | null;
-}
-
-export interface AccountManagerRemovalEvent {
-    username: string | null;
 }
 
 export interface AccountManagerMessageEvent {
@@ -122,10 +176,6 @@ export interface ProxyCheckResultEvent {
 
 export interface SpaceSeperatedNamesChangeEvent {
     value: boolean;
-}
-
-export interface ClickGuiScaleChangeEvent {
-    value: number;
 }
 
 export interface BrowserUrlChangeEvent {

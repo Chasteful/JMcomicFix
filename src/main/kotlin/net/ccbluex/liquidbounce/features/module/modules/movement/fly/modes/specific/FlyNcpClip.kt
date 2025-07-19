@@ -135,8 +135,10 @@ object FlyNcpClip : Choice("NcpClip") {
             // Disable the module
             ModuleFly.enabled = false
 
-            notification("Fly", "You have exceeded the maximum distance.",
-                NotificationEvent.Severity.ERROR)
+            notification(
+                "Fly", "You have exceeded the maximum distance.",
+                NotificationEvent.Severity.ERROR
+            )
             return@tickHandler
         }
 

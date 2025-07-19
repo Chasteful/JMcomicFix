@@ -38,16 +38,16 @@
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<span contenteditable="true" class="value" bind:innerText={inputValue} on:input={handleInput} on:keydown={handleKeyDown} bind:this={inputElement}></span>
+<span bind:innerText={inputValue} bind:this={inputElement} class="value" contenteditable="true" on:input={handleInput}
+      on:keydown={handleKeyDown}></span>
 
 <style lang="scss">
   @use "../../../../colors.scss" as *;
 
   .value {
-    font-family: monospace;
-    color: $clickgui-text-color;
+    color: $text;
     font-weight: 500;
-    font-size: 12px;
+    font-size: var(--font-size);
     background-color: transparent;
     border: none;
     min-width: 5px;

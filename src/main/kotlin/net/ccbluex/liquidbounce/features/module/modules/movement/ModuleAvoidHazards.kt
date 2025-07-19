@@ -69,10 +69,10 @@ object ModuleAvoidHazards : ClientModule("AvoidHazards", Category.MOVEMENT) {
         BERRY_BUSH("BerryBush", test = { block, _, _ ->
             block is SweetBerryBushBlock
         }),
-        FIRE("Fire", test = { block, _, _, ->
+        FIRE("Fire", test = { block, _, _ ->
             block is FireBlock
         }),
-        COBWEB("Cobwebs", test = { block, _, _, ->
+        COBWEB("Cobwebs", test = { block, _, _ ->
             block is CobwebBlock
         }),
         PRESSURE_PLATES("PressurePlates", fullCube = false, test = { block, _, _ ->

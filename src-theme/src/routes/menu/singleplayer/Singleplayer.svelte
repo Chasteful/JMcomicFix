@@ -70,19 +70,22 @@
 <Menu>
     <OptionBar>
         <Search on:search={handleSearch}/>
-        <MultiSelect title="Game Mode" options={["Survival", "Creative", "Adventure", "Spectator"]}
-                     bind:values={gameModes}/>
-        <MultiSelect title="Difficulty" options={["Peaceful", "Easy", "Normal", "Hard"]} bind:values={difficulties}/>
+        <MultiSelect bind:values={gameModes} options={["Survival", "Creative", "Adventure", "Spectator"]}
+                     title="Game Mode"/>
+        <MultiSelect bind:values={difficulties} options={["Peaceful", "Easy", "Normal", "Hard"]} title="Difficulty"/>
     </OptionBar>
 
-    <MenuList sortable={false} on:sort={handleWorldSort}>
+    <MenuList on:sort={handleWorldSort} sortable={false}>
         {#each renderedWorlds as world}
             <MenuListItem
                     image={!world.icon ?
                         `${REST_BASE}/api/v1/client/resource?id=minecraft:textures/misc/unknown_server.png` :
                         `data:image/png;base64,${world.icon}`}
                     title={world.displayName}
-                    on:dblclick={() => openWorld(world.name)}>
+                    on:dblclick={() =>
+                                            openWorld(world.name)
+
+                                  }>
                 <svelte:fragment slot="subtitle">
                     <span class="world-name">{world.name}</span>
                     <span>({dateFormat(new Date(world.lastPlayed), "yyyy/mm/dd h:MM:ss TT")})</span>
@@ -100,7 +103,7 @@
                 </svelte:fragment>
 
                 <svelte:fragment slot="always-visible">
-                    <MenuListItemButton title="Open" icon="play" on:click={() => openWorld(world.name)}/>
+                    <MenuListItemButton title="Open" icon="play" on:clickk={() => openWorld(world.name)}/>
                 </svelte:fragment>
             </MenuListItem>
         {/each}
@@ -108,11 +111,11 @@
 
     <BottomButtonWrapper>
         <ButtonContainer>
-            <IconTextButton icon="icon-plus-circle.svg" title="Add" on:click={() => openScreen("create_world")}/>
+            <IconTextButton icon="icon-plus-circle.svg" on:click={() => openScreen("create_world")} title="Add"/>
         </ButtonContainer>
 
         <ButtonContainer>
-            <IconTextButton icon="icon-back.svg" title="Back" on:click={() => openScreen("title")}/>
+            <IconTextButton icon="icon-back.svg" on:click={() => openScreen("title")} title="Back"/>
         </ButtonContainer>
     </BottomButtonWrapper>
 </Menu>

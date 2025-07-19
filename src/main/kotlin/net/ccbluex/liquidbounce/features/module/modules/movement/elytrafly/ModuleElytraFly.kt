@@ -48,7 +48,6 @@ object ModuleElytraFly : ClientModule("ElytraFly", Category.MOVEMENT) {
     }
 
 
-
     private val notInFluid by boolean("NotInFluid", false)
 
     /**
@@ -61,11 +60,13 @@ object ModuleElytraFly : ClientModule("ElytraFly", Category.MOVEMENT) {
         tree(Speed)
     }
 
-    internal val modes = choices("Mode", ElytraFlyModeStatic, arrayOf(
-        ElytraFlyModeStatic,
-        ElytraFlyModeVanilla,
-        ElytraFlyModeBoost
-    ))
+    internal val modes = choices(
+        "Mode", ElytraFlyModeStatic, arrayOf(
+            ElytraFlyModeStatic,
+            ElytraFlyModeVanilla,
+            ElytraFlyModeBoost
+        )
+    )
 
     private var needsToRestart = false
 
@@ -87,9 +88,9 @@ object ModuleElytraFly : ClientModule("ElytraFly", Category.MOVEMENT) {
 
         val stop =
             mc.options.sneakKey.isPressed
-            && Instant.STOP in instant
-            && player.isOnGround
-            || notInFluid && player.isInFluid
+                && Instant.STOP in instant
+                && player.isOnGround
+                || notInFluid && player.isInFluid
 
         if (stop && player.isGliding) {
             player.stopGliding()

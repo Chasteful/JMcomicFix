@@ -157,7 +157,8 @@ object ModuleStorageESP : ClientModule("StorageESP", Category.RENDER, aliases = 
         @Suppress("unused")
         val glowRenderHandler = handler<DrawOutlinesEvent> { event ->
             if (event.type != DrawOutlinesEvent.OutlineType.MINECRAFT_GLOW
-                || StorageScanner.trackedBlockMap.isEmpty()) {
+                || StorageScanner.trackedBlockMap.isEmpty()
+            ) {
                 return@handler
             }
 

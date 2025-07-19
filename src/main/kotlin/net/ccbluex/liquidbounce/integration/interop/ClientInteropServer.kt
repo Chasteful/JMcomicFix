@@ -21,12 +21,13 @@ package net.ccbluex.liquidbounce.integration.interop
 
 import com.google.gson.JsonObject
 import net.ccbluex.liquidbounce.LiquidBounce
+import net.ccbluex.liquidbounce.config.ConfigSystem
 import net.ccbluex.liquidbounce.integration.interop.protocol.event.SocketEventListener
 import net.ccbluex.liquidbounce.integration.interop.protocol.rest.v1.registerInteropFunctions
-import net.ccbluex.liquidbounce.integration.theme.ThemeManager
 import net.ccbluex.liquidbounce.utils.client.error.ErrorHandler
 import net.ccbluex.liquidbounce.utils.client.logger
 import net.ccbluex.netty.http.HttpServer
+import net.ccbluex.liquidbounce.integration.theme.ThemeManager
 import net.ccbluex.netty.http.middleware.CorsMiddleware
 import net.ccbluex.netty.http.model.RequestObject
 import net.ccbluex.netty.http.util.httpOk
@@ -39,6 +40,7 @@ import kotlin.concurrent.thread
  *
  * Allows the browser to communicate with the client. (e.g. for UIs)
  */
+
 object ClientInteropServer {
 
     internal var httpServer = HttpServer()
@@ -76,7 +78,6 @@ object ClientInteropServer {
             ErrorHandler.fatal(it, additionalMessage = "Register endpoints")
         }
 
-        // Start the HTTP server
         thread(name = "netty-websocket", isDaemon = true, block = ::startServer)
     }
 

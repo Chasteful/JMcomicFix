@@ -1,22 +1,3 @@
-/*
- * This file is part of LiquidBounce (https://github.com/CCBlueX/LiquidBounce)
- *
- * Copyright (c) 2015 - 2025 CCBlueX
- *
- * LiquidBounce is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * LiquidBounce is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
- */
-
 package net.ccbluex.liquidbounce.injection.mixins.minecraft.gui;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
@@ -24,6 +5,7 @@ import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.ccbluex.liquidbounce.common.ClientLogoTexture;
 import net.ccbluex.liquidbounce.common.RenderLayerExtensions;
+import net.ccbluex.liquidbounce.common.SoundLoader;
 import net.ccbluex.liquidbounce.event.EventManager;
 import net.ccbluex.liquidbounce.event.events.ScreenRenderEvent;
 import net.ccbluex.liquidbounce.features.misc.HideAppearance;
@@ -37,6 +19,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.function.Function;
@@ -49,7 +32,7 @@ import java.util.function.IntSupplier;
 public class MixinSplashOverlay {
 
     @Unique
-    private static final IntSupplier CLIENT_ARGB = () -> ColorHelper.getArgb(255, 24, 26, 27);
+    private static final IntSupplier CLIENT_ARGB = () -> ColorHelper.getArgb(255, 0, 0, 0);
 
     @Inject(method = "init", at = @At("RETURN"))
     private static void initializeTexture(TextureManager textureManager, CallbackInfo ci) {
@@ -77,43 +60,52 @@ public class MixinSplashOverlay {
             @Local(name = "j", index = 6) int scaledWindowHeight,
             @Local(name = "s", index = 20) int color
     ) {
-        // Don't draw the logo if the appearance is hidden
-        if (HideAppearance.INSTANCE.isHidingNow()) {
-            return;
-        }
+        if (HideAppearance.INSTANCE.isHidingNow()) return;
+
 
         int screenWidth = context.getScaledWindowWidth();
         int screenHeight = context.getScaledWindowHeight();
+        int textureWidth = ClientLogoTexture.WIDTH;
+        int textureHeight = ClientLogoTexture.HEIGHT;
 
-        float scaleFactor = Math.min(screenWidth * 0.4f / ClientLogoTexture.WIDTH, screenHeight * 0.25f / ClientLogoTexture.HEIGHT);
-
-        int displayWidth = (int)(ClientLogoTexture.WIDTH * scaleFactor);
-        int displayHeight = (int)(ClientLogoTexture.HEIGHT * scaleFactor);
-
-        int x = (screenWidth - displayWidth) / 2;
-        int y = (screenHeight - displayHeight) / 2;
-
-        // TODO: Draw as SVG instead of PNG
         context.drawTexture(
                 RenderLayerExtensions::getSmoothTextureLayer,
                 ClientLogoTexture.CLIENT_LOGO,
-                x,
-                y,
-                0.0F,
-                0.0F,
-                displayWidth,
-                displayHeight,
-                ClientLogoTexture.WIDTH,
-                ClientLogoTexture.HEIGHT,
-                ClientLogoTexture.WIDTH,
-                ClientLogoTexture.HEIGHT,
+                0, 0, 0.0F, 0.0F,
+                screenWidth, screenHeight,
+                textureWidth, textureHeight,
+                textureWidth, textureHeight,
                 color
         );
+
+    }
+    @Redirect(
+            method = "renderProgressBar",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/gui/DrawContext;fill(IIIII)V"
+            )
+    )
+    private void redirectProgressBarFill(DrawContext instance, int x1, int y1, int x2, int y2, int color) {
+
+        int alpha = (color >> 24) & 0xFF;
+        int blackColor = (alpha << 24);
+        instance.fill(x1, y1, x2, y2, blackColor);
+    }
+    @Inject(
+            method = "render",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/resource/ResourceReload;throwException()V",
+                    shift = At.Shift.BEFORE
+            )
+    )
+    private void onReloadComplete(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        SoundLoader.tryPlay();
     }
 
     @ModifyExpressionValue(method = "render", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screen/SplashOverlay;BRAND_ARGB:Ljava/util/function/IntSupplier;"))
     private IntSupplier withClientColor(IntSupplier original) {
         return HideAppearance.INSTANCE.isHidingNow() ? original : CLIENT_ARGB;
     }
-
 }

@@ -35,7 +35,8 @@ import net.ccbluex.liquidbounce.utils.kotlin.random
  *
  * Legit trick to build faster.
  */
-object ModuleEagle : ClientModule("Eagle", Category.PLAYER,
+object ModuleEagle : ClientModule(
+    "Eagle", Category.PLAYER,
     aliases = arrayOf("FastBridge", "BridgeAssistant", "LegitScaffold")
 ) {
 
@@ -48,7 +49,8 @@ object ModuleEagle : ClientModule("Eagle", Category.PLAYER,
     private var wasSneaking = false
 
     private object Conditional : ToggleableConfigurable(this, "Conditional", true) {
-        private val conditions by multiEnumChoice("Conditions",
+        private val conditions by multiEnumChoice(
+            "Conditions",
             Conditions.ON_GROUND
         )
 

@@ -136,11 +136,11 @@ open class TargetSelector(
 
     open fun validate(entity: LivingEntity) =
         entity != player
-        && !entity.isRemoved
-        && entity.shouldBeAttacked()
-        && fov >= RotationUtil.crosshairAngleToEntity(entity)
-        && entity.hurtTime <= hurtTime
-        && validateRange(entity)
+            && !entity.isRemoved
+            && entity.shouldBeAttacked()
+            && fov >= RotationUtil.crosshairAngleToEntity(entity)
+            && entity.hurtTime <= hurtTime
+            && validateRange(entity)
 
     private fun validateRange(entity: LivingEntity): Boolean {
         if (range == null) return true
@@ -153,7 +153,8 @@ open class TargetSelector(
             FLOAT -> distanceSq <= (range as Float).sq()
             FLOAT_RANGE ->
                 distanceSq >= (range as ClosedFloatingPointRange<Float>).start.sq()
-                && distanceSq <= range.endInclusive.sq()
+                    && distanceSq <= range.endInclusive.sq()
+
             INT -> distanceSq <= (range as Int).sq()
             INT_RANGE -> distanceSq >= (range as IntRange).first.sq() && distanceSq <= range.last.sq()
             else -> true

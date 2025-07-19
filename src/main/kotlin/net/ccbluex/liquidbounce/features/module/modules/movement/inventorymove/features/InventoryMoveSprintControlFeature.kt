@@ -73,7 +73,7 @@ object InventoryMoveSprintControlFeature : ToggleableConfigurable(ModuleInventor
                     event.sprint = false
                 }
 
-                SprintMode.DO_NOT_CHANGE -> { }
+                SprintMode.DO_NOT_CHANGE -> {}
 
             }
         }
@@ -91,7 +91,7 @@ object InventoryMoveSprintControlFeature : ToggleableConfigurable(ModuleInventor
                     event.sprint = false
                 }
 
-                SprintMode.DO_NOT_CHANGE -> { }
+                SprintMode.DO_NOT_CHANGE -> {}
             }
         }
     }

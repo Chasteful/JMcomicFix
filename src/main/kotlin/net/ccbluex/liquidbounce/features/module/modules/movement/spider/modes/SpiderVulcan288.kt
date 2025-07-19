@@ -51,7 +51,7 @@ internal object SpiderVulcan288 : Choice("Vulcan288") {
                 waitTicks(2)
                 player.setVelocity(0.0, 0.0001, 0.0)
             }
-        }else if (requiresStop) {
+        } else if (requiresStop) {
             player.velocity.y = 0.0
             requiresStop = false
         }

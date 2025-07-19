@@ -9,7 +9,7 @@ import net.minecraft.util.math.Vec3d
 /**
  * Uses the best available implementation of [ProjectileAngleCalculator]
  */
-object SituationalProjectileAngleCalculator: ProjectileAngleCalculator() {
+object SituationalProjectileAngleCalculator : ProjectileAngleCalculator() {
     override fun calculateAngleFor(
         projectileInfo: TrajectoryInfo,
         sourcePos: Vec3d,

@@ -9,11 +9,11 @@
 <div class="avatar-wrapper">
     {#if !previewImageLoaded}
         <div class="loader">
-            <RippleLoader />
+            <RippleLoader/>
         </div>
     {/if}
 
-    <img class="avatar" on:load={() => previewImageLoaded = true} src={url} alt="avatar">
+    <img alt="avatar" class="avatar" draggable="false" on:load={() => previewImageLoaded = true} src={url}>
 </div>
 
 <style lang="scss">
@@ -27,7 +27,7 @@
   .avatar {
     height: 100%;
     width: 100%;
-    border-radius: 50%;
+    border-radius: 5px;
   }
 
   .loader {

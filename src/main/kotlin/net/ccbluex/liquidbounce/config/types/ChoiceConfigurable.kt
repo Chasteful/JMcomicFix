@@ -60,8 +60,10 @@ class ChoiceConfigurable<T : Choice>(
         val newChoice = choices.firstOrNull { it.choiceName == name }
 
         if (newChoice == null) {
-            throw IllegalArgumentException("ChoiceConfigurable `${this.name}` has no option named $name" +
-                " (available options are ${this.choices.joinToString { it.choiceName }})")
+            throw IllegalArgumentException(
+                "ChoiceConfigurable `${this.name}` has no option named $name" +
+                " (available options are ${this.choices.joinToString { it.choiceName }})"
+            )
         }
 
         if (activeChoice === newChoice) {
@@ -117,9 +119,9 @@ abstract class Choice(name: String) : Configurable(name), EventListener, NamedCh
 
     abstract val parent: ChoiceConfigurable<*>
 
-    open fun enable() { }
+    open fun enable() {}
 
-    open fun disable() { }
+    open fun disable() {}
 
     /**
      * Check if the choice is selected on the parent.
@@ -136,10 +138,10 @@ abstract class Choice(name: String) : Configurable(name), EventListener, NamedCh
 
     override fun parent() = this.parent.eventListener
 
-    protected fun <T: Choice> choices(name: String, active: T, choices: Array<T>) =
+    protected fun <T : Choice> choices(name: String, active: T, choices: Array<T>) =
         choices(this, name, active, choices)
 
-    protected fun <T: Choice> choices(
+    protected fun <T : Choice> choices(
         name: String,
         activeIndex: Int = 0,
         choicesCallback: (ChoiceConfigurable<T>) -> Array<T>

@@ -33,19 +33,21 @@ import net.minecraft.entity.player.PlayerEntity
 
 object ModuleAntiBot : ClientModule("AntiBot", Category.MISC) {
 
-    val modes = choices("Mode", CustomAntiBotMode, arrayOf(
-        CustomAntiBotMode,
-        MatrixAntiBotMode,
-        IntaveHeavyAntiBotMode,
-        HorizonAntiBotMode
-    ))
+    val modes = choices(
+        "Mode", CustomAntiBotMode, arrayOf(
+            CustomAntiBotMode,
+            MatrixAntiBotMode,
+            IntaveHeavyAntiBotMode,
+            HorizonAntiBotMode
+        )
+    )
 
     private val literalNPC by boolean("LiteralNPC", false)
 
     @Suppress("unused")
     private val tagHandler = handler<TagEntityEvent> {
         if (isBot(it.entity)) {
-           it.ignore()
+            it.ignore()
         }
     }
 
@@ -95,7 +97,7 @@ object ModuleAntiBot : ClientModule("AntiBot", Category.MISC) {
     }
 
     interface IAntiBotMode {
-        fun reset() { }
+        fun reset() {}
         fun isBot(entity: PlayerEntity): Boolean
     }
 }

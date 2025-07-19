@@ -164,10 +164,10 @@ object ModuleReplenish : ClientModule("Replenish", Category.PLAYER, aliases = ar
             (InsideOf.CHESTS in insideOf
                 || (mc.currentScreen !is HandledScreen<*>
                 || mc.currentScreen is InventoryScreen)
-            ) &&
+                ) &&
             (InsideOf.INVENTORIES in insideOf
                 || mc.currentScreen !is InventoryScreen
-            )
+                )
 
     private enum class Features(
         override val choiceName: String

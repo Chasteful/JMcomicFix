@@ -96,8 +96,10 @@ object InventoryManager : EventListener {
             cycles++
             // Safety check to prevent infinite loops
             if (cycles > 100) {
-                chat("InventoryManager has been running for too long ($cycles cycles) on tick, stopping now. " +
-                    "Please report this issue.")
+                chat(
+                    "InventoryManager has been running for too long ($cycles cycles) on tick, stopping now. " +
+                        "Please report this issue."
+                )
                 break
             }
 
@@ -174,7 +176,8 @@ object InventoryManager : EventListener {
                     // the action is a throw action (you cannot miss-click really when throwing)
                     if (index == 0 && action is ClickInventoryAction
                         && constraints.missChance.random() > Random.nextInt(100)
-                        && action.actionType != SlotActionType.THROW) {
+                        && action.actionType != SlotActionType.THROW
+                    ) {
                         // Simulate a miss click (this is only possible for container-type slots)
                         // TODO: Add support for inventory slots
                         if (action.performMissClick()) {
@@ -297,10 +300,12 @@ data class ClickInventoryAction(
 
     companion object {
 
-        fun click(screen: GenericContainerScreen? = null,
-                  slot: ItemSlot,
-                  button: Int,
-                  actionType: SlotActionType) = ClickInventoryAction(
+        fun click(
+            screen: GenericContainerScreen? = null,
+            slot: ItemSlot,
+            button: Int,
+            actionType: SlotActionType
+        ) = ClickInventoryAction(
             screen,
             slot = slot,
             button = button,
@@ -368,7 +373,8 @@ data class ClickInventoryAction(
 
         // Screen is null, which means we are targeting the player inventory
         if (requiresPlayerInventoryOpen() && player.currentScreenHandler.isPlayerInventory &&
-            !interaction.hasRidingInventory()) {
+            !interaction.hasRidingInventory()
+        ) {
             return true
         }
 
@@ -395,8 +401,10 @@ data class ClickInventoryAction(
             .filter { it.itemStack.isEmpty }
             .minByOrNull { slot.distance(it) } ?: return false
 
-        interaction.clickSlot(screen.syncId, closestEmptySlot.getIdForServer(screen), 0,
-            SlotActionType.PICKUP, player)
+        interaction.clickSlot(
+            screen.syncId, closestEmptySlot.getIdForServer(screen), 0,
+            SlotActionType.PICKUP, player
+        )
         return true
     }
 
@@ -455,7 +463,8 @@ data class CreativeInventoryAction(
 
         // Screen is null, which means we are targeting the player inventory
         if (requiresPlayerInventoryOpen() && player.currentScreenHandler.isPlayerInventory &&
-            !interaction.hasRidingInventory()) {
+            !interaction.hasRidingInventory()
+        ) {
             return true
         }
 

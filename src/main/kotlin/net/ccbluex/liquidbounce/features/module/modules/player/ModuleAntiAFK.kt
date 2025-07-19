@@ -79,7 +79,8 @@ object ModuleAntiAFK : ClientModule("AntiAFK", Category.PLAYER) {
 
         var randomDirection = DirectionalInput.NONE
 
-        private val interactions by multiEnumChoice("Interaction",
+        private val interactions by multiEnumChoice(
+            "Interaction",
             Interaction.YAW,
             Interaction.PITCH,
             Interaction.SWING_HAND,
@@ -104,7 +105,7 @@ object ModuleAntiAFK : ClientModule("AntiAFK", Category.PLAYER) {
         private enum class Interaction(
             override val choiceName: String,
             val perform: suspend Sequence.() -> Unit,
-        ): NamedChoice {
+        ) : NamedChoice {
             JUMP("Jump", {
                 waitNext<MovementInputEvent> { event ->
                     event.jump = true

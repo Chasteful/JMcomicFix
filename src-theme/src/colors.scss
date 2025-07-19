@@ -1,41 +1,60 @@
-$accent-color: #4677ff;
+$base: rgb(20, 20, 20);
+$mantle: #181825;
+$crust: #11111b;
+$primary-color: #3962CD;
+$secondary-color: #1F8F6A;
+$accent: rgb(44, 121, 156);
+$accent-mix: mix($primary-color, $secondary-color, 50%);
+$liquid: #3962CD;
+$bounce: #1F8F6A;
+$clickgui-base-color: rgb(20, 20, 20);
+$clickgui-text-color: rgb(20, 20, 20);
+$clickgui-text-dimmed-color: rgb(20, 20, 20);
 
-$clickgui-base-color: black;
-$clickgui-text-color: white;
-$clickgui-text-dimmed-color: rgba(211, 211, 211, 255);
-$clickgui-grid-color: rgba(128, 128, 128, 0.25);
+$rosewater: #f5e0dc;
+$flamingo: #f2cdcd;
+$pink: #f5c2e7;
+$mauve: #aa83da;
+$red: #f38ba8;
+$maroon: #eba0ac;
+$peach: #fab387;
+$yellow: #f9e2af;
+$green: #a6e3a1;
+$teal: #94e2d5;
+$sky: #89dceb;
+$sapphire: #74c7ec;
+$blue: #89b4fa;
+$lavender: #b4befe;
 
-$tabgui-base-color: black;
-$tabgui-text-color: white;
-$tabgui-text-dimmed-color: rgba(211, 211, 211, 255);
+$text: #cdd6f4;
+$subtext0: #a6acd8;
+$subtext1: #bac2de;
+$overlay0: #6c7086;
+$overlay1: #7f849c;
+$overlay2: #9399b2;
+$surface0: #313244;
+$surface1: #45475a;
+$surface2: #585b70;
 
-$arraylist-base-color: black;
-$arraylist-text-color: white;
-$arraylist-tag-color: #AAAAAA;
-
-$targethud-base-color: black;
-$targethud-text-color: white;
-$targethud-text-dimmed-color: rgba(211, 211, 211, 255);
-
-$blockcounter-base-color: black;
-
-$hotbar-base-color: black;
-$hotbar-text-color: white;
-/* TODO: currently unused */
-$hotbar-experience-color: #88C657;
-$hotbar-health-color: #FC4130;
-$hotbar-hunger-color: #B88458;
-
-$menu-account-premium-color: #67D24A;
-$menu-base-color: black;
-$menu-text-color: white;
-$menu-text-dimmed-color: rgba(211, 211, 211, 255);
-$menu-error-color: #fc4130;
-$menu-button-loader-color: white;
-
+$menu-button-loader-color: rgb(255, 255, 255);
+$clickgui-grid-color: rgba(127, 127, 127, 0.25);
+$targethud-base-color: rgba(0, 0, 0, 0.4);
+$targethud-text-color: rgba(255, 255, 255, 0);
+$targethud-text-dimmed-color: rgba(211, 211, 211, 1);
+$primary-shadow: 0 0 50px 0 rgba(0, 0, 0, 0.5);
+$hotbar-base-color: rgb(0, 0, 0);
+$hotbar-text-color: rgb(255, 255, 255);
+$hotbar-experience-color: $green;
+$hotbar-health-color: $red;
+$hotbar-hunger-color: $flamingo;
+$Items-bar: #cdd6f4;
 $scoreboard-base-color: black;
-
-$keystrokes-base-color: black;
-$keystrokes-text-color: white;
-
+$menu-account-developer: $accent;
+$menu-account-owner: $red;
+$menu-account-customer: white;
+$menu-error-color: $red;
+$border-thing: rgba(255, 255, 255, 0.1);
+$text-dimmed-color: rgba(211, 211, 211, 1);
+$text-color: rgb(255, 255, 255);
+$key-color: rgb(218, 218, 218);
 $item-damage-base-color: black;

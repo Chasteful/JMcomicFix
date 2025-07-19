@@ -42,12 +42,14 @@ object ModuleLiquidWalk : ClientModule("LiquidWalk", Category.MOVEMENT, aliases 
         enableLock()
     }
 
-    internal val modes = choices("Mode", LiquidWalkVanilla, arrayOf(
-        LiquidWalkVanilla,
-        LiquidWalkNoCheatPlus,
-        LiquidWalkVerusB3901,
-        LiquidWalkVulcan291,
-    )).apply { tagBy(this) }
+    internal val modes = choices(
+        "Mode", LiquidWalkVanilla, arrayOf(
+            LiquidWalkVanilla,
+            LiquidWalkNoCheatPlus,
+            LiquidWalkVerusB3901,
+            LiquidWalkVulcan291,
+        )
+    ).apply { tagBy(this) }
 
     /**
      * Check if player is standing on water

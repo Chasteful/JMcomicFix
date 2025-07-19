@@ -25,13 +25,17 @@ import com.mojang.blaze3d.systems.RenderCall
 import com.mojang.blaze3d.systems.RenderSystem
 import net.ccbluex.liquidbounce.utils.client.mc
 import net.ccbluex.liquidbounce.utils.client.openVfpProtocolSelection
+import net.minecraft.client.gui.screen.ChatScreen
 import net.minecraft.client.gui.screen.DisconnectedScreen
+import net.minecraft.client.gui.screen.DownloadingTerrainScreen
 import net.minecraft.client.gui.screen.GameMenuScreen
 import net.minecraft.client.gui.screen.Screen
+import net.minecraft.client.gui.screen.SplashOverlay
 import net.minecraft.client.gui.screen.TitleScreen
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
 import net.minecraft.client.gui.screen.ingame.InventoryScreen
+import net.minecraft.client.gui.screen.multiplayer.ConnectScreen
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerWarningScreen
 import net.minecraft.client.gui.screen.option.OptionsScreen
@@ -59,9 +63,15 @@ enum class VirtualScreenType(
 
     HUD("hud", isInGame = true),
     CLICK_GUI("clickgui"),
+    LAYOUT_EDITOR("layouteditor"),
     ALT_MANAGER("altmanager"),
     PROXY_MANAGER("proxymanager"),
-
+    LOGIN_MENU("loginmenu"),
+    LOCK_SCREEN("lockscreen"),
+    CHAT(
+        "chat",
+        recognizer = { it is ChatScreen }
+    ),
     TITLE(
         "title",
         recognizer = { it is TitleScreen || it.isLunar },
@@ -117,18 +127,29 @@ enum class VirtualScreenType(
         recognizer = { it is GenericContainerScreen }
     ),
 
-    DISCONNECTED("disconnected",
+    DISCONNECTED(
+        "disconnected",
         recognizer = { it is DisconnectedScreen }
     ),
 
-    VIAFABRICPLUS_PROTOCOL_SELECTION("viafabricplus_protocol_selection",
+    VIAFABRICPLUS_PROTOCOL_SELECTION(
+        "viafabricplus_protocol_selection",
         recognizer = { it::class.java.name == "de.florianmichael.viafabricplus.screen.base.ProtocolSelectionScreen" },
         open = { openVfpProtocolSelection() }
     ),
-
-    BROWSER("browser",
+    CONNECTING_TO_SERVER(
+        "connecting",
+        recognizer = { it is ConnectScreen },
+    ),
+    DOWNLOADING_TERRAIN(
+        "downloadingTerrain",
+        recognizer = { it is DownloadingTerrainScreen }
+    ),
+    BROWSER(
+        "browser",
         recognizer = { it is BrowserScreen }
     );
+
 
     fun open() = RenderSystem.recordRenderCall(open)
 

@@ -26,6 +26,6 @@
 </script>
 
 <Modal bind:visible={visible} title="Direct Connection">
-    <IconTextInput title="Address" icon="server" bind:value={address}/>
-    <ButtonSetting title="Join Server" on:click={connect} {disabled} listenForEnter={true} inset={true}/>
+    <IconTextInput bind:value={address} icon="server" title="Address"/>
+    <ButtonSetting {disabled} inset={true} listenForEnter={true} on:click={connect} title="Join Server"/>
 </Modal>

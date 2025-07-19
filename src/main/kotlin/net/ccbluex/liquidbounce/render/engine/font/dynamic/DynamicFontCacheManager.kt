@@ -142,7 +142,7 @@ class DynamicFontCacheManager(
             return
         }
 
-       freeSpace()
+        freeSpace()
 
 
         val stillUnsuccessfulAllocations =

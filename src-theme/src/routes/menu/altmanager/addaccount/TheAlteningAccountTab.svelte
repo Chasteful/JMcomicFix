@@ -22,7 +22,7 @@
 </script>
 
 <Tab>
-    <IconTextInput icon="user" title="Token" bind:value={token}/>
-    <ButtonSetting {disabled} title="Add Account" on:click={addAccount} listenForEnter={true} inset={true} {loading}/>
-    <ButtonSetting title="Get Account Token" on:click={() => browse("ALTENING_FREE")} secondary={true}/>
+    <IconTextInput bind:value={token} icon="user" title="Token"/>
+    <ButtonSetting {disabled} inset={true} listenForEnter={true} {loading} on:click={addAccount} title="Add Account"/>
+    <ButtonSetting on:click={() => browse("ALTENING_FREE")} secondary={true} title="Get Account Token"/>
 </Tab>

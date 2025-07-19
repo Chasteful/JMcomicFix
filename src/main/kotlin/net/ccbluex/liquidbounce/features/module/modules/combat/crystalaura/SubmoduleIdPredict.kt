@@ -71,15 +71,17 @@ object SubmoduleIdPredict : ToggleableConfigurable(ModuleCrystalAura, "IDPredict
             }
 
             oldRotation = RotationManager.serverRotation
-            network.sendPacket(PlayerMoveC2SPacket.Full(
-                player.x,
-                player.y,
-                player.z,
-                rotation.yaw,
-                rotation.pitch,
-                player.isOnGround,
-                player.horizontalCollision
-            ))
+            network.sendPacket(
+                PlayerMoveC2SPacket.Full(
+                    player.x,
+                    player.y,
+                    player.z,
+                    rotation.yaw,
+                    rotation.pitch,
+                    player.isOnGround,
+                    player.horizontalCollision
+                )
+            )
         }
 
         fun rotateBack() {
@@ -87,15 +89,17 @@ object SubmoduleIdPredict : ToggleableConfigurable(ModuleCrystalAura, "IDPredict
                 return
             }
 
-            network.sendPacket(PlayerMoveC2SPacket.Full(
-                player.x,
-                player.y,
-                player.z,
-                oldRotation!!.yaw,
-                oldRotation!!.pitch,
-                player.isOnGround,
-                player.horizontalCollision
-            ))
+            network.sendPacket(
+                PlayerMoveC2SPacket.Full(
+                    player.x,
+                    player.y,
+                    player.z,
+                    oldRotation!!.yaw,
+                    oldRotation!!.pitch,
+                    player.isOnGround,
+                    player.horizontalCollision
+                )
+            )
         }
 
     }
@@ -165,7 +169,7 @@ object SubmoduleIdPredict : ToggleableConfigurable(ModuleCrystalAura, "IDPredict
 
     @Suppress("unused")
     private val entitySpawnHandler = handler<PacketEvent> {
-        when(val packet = it.packet) {
+        when (val packet = it.packet) {
             is ExperienceOrbSpawnS2CPacket -> highestId = max(packet.entityId, highestId)
             is EntitySpawnS2CPacket -> highestId = max(packet.entityId, highestId)
             is GameJoinS2CPacket -> highestId = max(packet.playerEntityId, highestId)

@@ -46,13 +46,13 @@ internal object ElytraFlyModeBoost : ElytraFlyMode("Boost") {
     private val smartGround by boolean("SmartGroundBehavior", true)
     private val groundDistance by float("GroundDistance", 3.0f, 1.5f..7.0f)
     private val verticalControl by float("VerticalControl", 0.8f, 0.2f..1.0f)
-    
+
     private val diveAcceleration by float("DiveAcceleration", 0.05f, 0.01f..0.1f)
     private val diveEfficiency by float("DiveEfficiency", 0.8f, 0.4f..1.5f)
-    
+
     private var currentAcceleration = 0f
     private var currentDiveSpeed = 0f
-    
+
     private const val MAX_DIVE_SPEED_MULTIPLIER = 1.2f
     private const val DIVE_SPEED_REDUCTION = 0.01f
 
@@ -63,18 +63,18 @@ internal object ElytraFlyModeBoost : ElytraFlyMode("Boost") {
     override fun disable() {
         resetState()
     }
-    
+
     private fun resetState() {
         currentAcceleration = 0f
         currentDiveSpeed = 0f
     }
-    
-    private fun isNearGround(): Boolean = 
+
+    private fun isNearGround(): Boolean =
         smartGround && world.getBlockCollisions(
-            player, 
+            player,
             player.boundingBox.offset(0.0, -groundDistance.toDouble(), 0.0)
         ).iterator().hasNext()
-    
+
     override fun onTick() {
         if (!player.isGliding) {
             resetState()
@@ -83,28 +83,28 @@ internal object ElytraFlyModeBoost : ElytraFlyMode("Boost") {
 
         val isNearGround = isNearGround()
         val divePullUpBoost = handleDiving()
-        
-        val shouldBoost = mc.options.jumpKey.isPressed || 
+
+        val shouldBoost = mc.options.jumpKey.isPressed ||
             (autoBoost && player.pitch < -10f && !isNearGround) ||
             divePullUpBoost > 0
-            
+
         handleAcceleration(shouldBoost)
-        
+
         if (player.moving) {
             player.velocity = player.velocity.withStrafe(
                 speed = calculateEffectiveSpeed(isNearGround)
             )
         }
     }
-    
+
     private fun handleDiving(): Float {
         if (!diveMechanics) {
             currentDiveSpeed = max(0f, currentDiveSpeed - DIVE_SPEED_REDUCTION)
             return 0f
         }
-        
+
         val oldDiveSpeed = currentDiveSpeed
-        
+
         if (player.pitch > 15f) {
             val diveFactor = min(player.pitch / 90f, 1f)
             currentDiveSpeed = min(
@@ -114,15 +114,15 @@ internal object ElytraFlyModeBoost : ElytraFlyMode("Boost") {
             return 0f
         } else {
             currentDiveSpeed = max(0f, currentDiveSpeed - DIVE_SPEED_REDUCTION)
-            
+
             if (player.pitch < 0 && oldDiveSpeed > 0) {
                 return oldDiveSpeed * (-player.pitch / 90f) * diveEfficiency
             }
         }
-        
+
         return 0f
     }
-    
+
     private fun handleAcceleration(shouldBoost: Boolean) {
         if (shouldBoost && currentAcceleration < boostSpeed) {
             val accelerationFactor = 1f - currentAcceleration / boostSpeed
@@ -135,34 +135,34 @@ internal object ElytraFlyModeBoost : ElytraFlyMode("Boost") {
             }
         }
     }
-    
+
     private fun calculateEffectiveSpeed(isNearGround: Boolean): Double {
         val baseSpeed = ModuleElytraFly.Speed.horizontal.toDouble()
         var finalModifier = 1.0
-        
+
         // Apply pitch-based reduction
         if (player.pitch < 0) {
             finalModifier *= 1.0 - (abs(player.pitch / 90.0) * 0.3)
         }
-        
+
         // Apply dive speed boost
         if (currentDiveSpeed > 0) {
             finalModifier *= 1.0 + currentDiveSpeed
         }
-        
+
         // Apply ground proximity penalty
         if (isNearGround) {
             finalModifier *= 0.8
         }
-        
+
         // Apply speed potion effect
         player.getStatusEffect(StatusEffects.SPEED)?.let { effect ->
             finalModifier *= 1.0 + (effect.amplifier + 1) * 0.1
         }
-        
+
         return baseSpeed * finalModifier
     }
-    
+
     private fun calculateDivePullUpBoost(): Double {
         return if (player.pitch < 0 && currentDiveSpeed > 0) {
             (-player.pitch / 90f) * diveEfficiency * currentDiveSpeed * 0.1
@@ -170,53 +170,56 @@ internal object ElytraFlyModeBoost : ElytraFlyMode("Boost") {
             0.0
         }
     }
-    
+
     @Suppress("unused")
     private val moveHandler = handler<PlayerMoveEvent>(priority = EventPriorityConvention.MODEL_STATE) { event ->
         if (ModuleElytraFly.shouldNotOperate() || !player.isGliding) {
             return@handler
         }
-        
+
         val divePullUpBoost = calculateDivePullUpBoost()
         val nearGround = isNearGround()
-        
+
         if (currentAcceleration > 0 || currentDiveSpeed > 0) {
             val lookVec = player.getRotationVector()
-            
-            val boostFactor = currentAcceleration.toDouble() + 
+
+            val boostFactor = currentAcceleration.toDouble() +
                 (if (player.pitch > 0) currentDiveSpeed.toDouble() else divePullUpBoost * 2.0)
-            
+
             val adjustedLookVec = if (nearGround) {
                 Vec3d(lookVec.x * 1.3, lookVec.y * 0.3, lookVec.z * 1.3).normalize()
             } else {
                 lookVec
             }
-            
+
             val boostVec = adjustedLookVec.multiply(boostFactor)
             event.movement = event.movement.add(boostVec)
         }
-        
+
         val horizontalSpeed = Math.sqrt(
             event.movement.x * event.movement.x + event.movement.z * event.movement.z
         )
-        
+
         val naturalLift = horizontalSpeed * 0.005
-        
+
         event.movement = when {
             mc.options.jumpKey.isPressed && mc.options.sneakKey.isPressed -> {
                 event.movement.copy(y = event.movement.y - 0.008 + naturalLift + divePullUpBoost)
             }
+
             mc.options.jumpKey.isPressed -> {
                 val upSpeed = (ModuleElytraFly.Speed.vertical.toDouble() * verticalControl) + divePullUpBoost
                 event.movement.copy(y = event.movement.y + upSpeed)
             }
+
             mc.options.sneakKey.isPressed -> {
                 val downSpeed = ModuleElytraFly.Speed.vertical.toDouble() * verticalControl
                 event.movement.copy(y = event.movement.y - downSpeed)
             }
+
             else -> {
                 event.movement.copy(y = event.movement.y - 0.008 + naturalLift + divePullUpBoost)
             }
         }
     }
-} 
+}

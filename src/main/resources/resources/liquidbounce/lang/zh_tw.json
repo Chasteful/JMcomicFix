@@ -719,5 +719,19 @@
   "liquidbounce.module.autoPearl.description": "跟隨敵人珍珠的軌跡瞄準並投擲珍珠。",
   "liquidbounce.module.replenish.description": "自動用物品欄中的物品填充快捷欄，使物品數量保持設定的閾值。",
   "liquidbounce.module.anchor.description": "讓你移動到水晶PvP的安全點里。",
-  "liquidbounce.module.antiCheatDetect.messages.description": "Anti Cheat Detect 將嘗試在你下次加入任何伺服器/遊戲時，通過監控 ping 參數來檢測伺服器的反作弊系統。請注意，結果可能不準確，特別是當伺服器上有多個反作弊系統時。"
+  "liquidbounce.module.antiCheatDetect.messages.description": "Anti Cheat Detect 將嘗試在你下次加入任何伺服器/遊戲時，通過監控 ping 參數來檢測伺服器的反作弊系統。請注意，結果可能不準確，特別是當伺服器上有多個反作弊系統時。",
+  "liquidbounce.module.titleControl.description": "過濾伺服器的字幕上，你不想看到關鍵詞。",
+  "liquidbounce.module.capes.description": "显示一個只有你能見到的披風。",
+  "liquidbounce.module.halo.description": "在玩家頭頂放一個蔚藍案人物的光環。",
+  "liquidbounce.module.packetQueueColor.description": "設置 PacketQueue 的玩家模型顏色。",
+  "liquidbounce.module.autoGG.description": "在你贏得勝利后自動在聊天框發送指定的資訊。",
+  "liquidbounce.module.movePhysics.description": "允許你在某些特殊的伺服器反作弊下移動。",
+  "liquidbounce.module.pendant.description": "顯示一張圖片在某些介面上。",
+  "liquidbounce.module.iQBoost.description": "允許你提高自己的IQ。",
+  "liquidbounce.module.setbackOnRespawn.description": "重生時將你傳送到你死亡的位置。",
+  "liquidbounce.module.autoStuck.description": "在进入虚空娘的怀抱之前将你卡住。",
+  "liquidbounce.module.autoClutch.description ":  "基於類比退火算法的自動珍珠自救。 " ,
+  "liquidbounce.module.noweb.mode.grim.messages.Protocol ":  "請使用1.18.2以上的協定以繞過Grim高版本弱檢測！ " ,
+  "liquidbounce.module.autoRod.description ":  "自動使用魚竿控距，需要準星指向對方。 " ,
+  "liquidbounce.module.autoScreenShot.description ":  "自動在勝利時執行某些動作並截圖。 "
 }

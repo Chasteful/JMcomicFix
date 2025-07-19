@@ -91,18 +91,24 @@ class InterpolationAngleSmooth(
         ModuleDebug.debugParameter(this, "Horizontal Speed", horizontalSpeed)
         ModuleDebug.debugParameter(this, "Vertical Speed", verticalSpeed)
 
-        val horizontalFactor = calculateFactor("Yaw", abs(yawDiff), horizontalSpeed.coerceIn(0f, 1f),
-            directionChange)
-        val verticalFactor = calculateFactor("Pitch", abs(pitchDiff), verticalSpeed.coerceIn(0f, 1f),
-            directionChange)
+        val horizontalFactor = calculateFactor(
+            "Yaw", abs(yawDiff), horizontalSpeed.coerceIn(0f, 1f),
+            directionChange
+        )
+        val verticalFactor = calculateFactor(
+            "Pitch", abs(pitchDiff), verticalSpeed.coerceIn(0f, 1f),
+            directionChange
+        )
 
         // Multiplying the factor with the difference in yaw and pitch allows us
         // to bypass the linear [towardsLinear] method
         return horizontalFactor * abs(yawDiff) to verticalFactor * abs(pitchDiff)
     }
 
-    private fun calculateFactor(name: String, rotationDifference: Float, turnSpeed: Float,
-                                directionChange: Float): Float {
+    private fun calculateFactor(
+        name: String, rotationDifference: Float, turnSpeed: Float,
+        directionChange: Float
+    ): Float {
         val t = (rotationDifference / 180f).coerceIn(0f, 1f)
         ModuleDebug.debugParameter(this, "$name T", t)
 

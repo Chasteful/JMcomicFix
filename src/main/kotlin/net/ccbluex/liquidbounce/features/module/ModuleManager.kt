@@ -18,6 +18,11 @@
  */
 package net.ccbluex.liquidbounce.features.module
 
+import net.ccbluex.jmcomicfix.features.module.modules.render.ModuleHalo
+import net.ccbluex.jmcomicfix.features.module.modules.client.ModuleCapes
+import net.ccbluex.jmcomicfix.features.module.modules.misc.ModuleAutoGG
+import net.ccbluex.jmcomicfix.features.module.modules.misc.ModuleTitleControl
+import net.ccbluex.jmcomicfix.features.module.modules.render.ModuleKillEffects
 import net.ccbluex.liquidbounce.config.ConfigSystem
 import net.ccbluex.liquidbounce.event.EventListener
 import net.ccbluex.liquidbounce.event.events.DisconnectEvent
@@ -25,7 +30,15 @@ import net.ccbluex.liquidbounce.event.events.KeyboardKeyEvent
 import net.ccbluex.liquidbounce.event.events.MouseButtonEvent
 import net.ccbluex.liquidbounce.event.events.WorldChangeEvent
 import net.ccbluex.liquidbounce.event.handler
-import net.ccbluex.liquidbounce.features.module.modules.client.*
+import net.ccbluex.liquidbounce.features.module.modules.client.ModuleAutoConfig
+import net.ccbluex.jmcomicfix.features.module.modules.client.ModuleHudEditor
+import net.ccbluex.jmcomicfix.features.module.modules.combat.ModuleAutoRod
+import net.ccbluex.jmcomicfix.features.module.modules.`fun`.ModuleIQBoost
+import net.ccbluex.jmcomicfix.features.module.modules.`fun`.ModulePendant
+import net.ccbluex.liquidbounce.features.module.modules.client.ModuleLiquidChat
+import net.ccbluex.liquidbounce.features.module.modules.client.ModuleRichPresence
+import net.ccbluex.liquidbounce.features.module.modules.client.ModuleTargets
+import net.ccbluex.jmcomicfix.features.module.modules.render.ModulePacketQueue
 import net.ccbluex.liquidbounce.features.module.modules.combat.*
 import net.ccbluex.liquidbounce.features.module.modules.combat.aimbot.ModuleAutoBow
 import net.ccbluex.liquidbounce.features.module.modules.combat.autoarmor.ModuleAutoArmor
@@ -39,6 +52,7 @@ import net.ccbluex.liquidbounce.features.module.modules.combat.velocity.ModuleVe
 import net.ccbluex.liquidbounce.features.module.modules.exploit.*
 import net.ccbluex.liquidbounce.features.module.modules.exploit.disabler.ModuleDisabler
 import net.ccbluex.liquidbounce.features.module.modules.exploit.dupe.ModuleDupe
+import net.ccbluex.liquidbounce.features.module.modules.exploit.movefix.ModuleMovePhysics
 import net.ccbluex.liquidbounce.features.module.modules.exploit.phase.ModulePhase
 import net.ccbluex.liquidbounce.features.module.modules.exploit.servercrasher.ModuleServerCrasher
 import net.ccbluex.liquidbounce.features.module.modules.`fun`.*
@@ -48,7 +62,7 @@ import net.ccbluex.liquidbounce.features.module.modules.misc.betterchat.ModuleBe
 import net.ccbluex.liquidbounce.features.module.modules.misc.debugrecorder.ModuleDebugRecorder
 import net.ccbluex.liquidbounce.features.module.modules.misc.nameprotect.ModuleNameProtect
 import net.ccbluex.liquidbounce.features.module.modules.movement.*
-import net.ccbluex.liquidbounce.features.module.modules.movement.autododge.ModuleAutoDodge
+import net.ccbluex.liquidbounce.features.module.modules.combat.autododge.ModuleAutoDodge
 import net.ccbluex.liquidbounce.features.module.modules.movement.elytrafly.ModuleElytraFly
 import net.ccbluex.liquidbounce.features.module.modules.movement.fly.ModuleFly
 import net.ccbluex.liquidbounce.features.module.modules.movement.highjump.ModuleHighJump
@@ -72,6 +86,10 @@ import net.ccbluex.liquidbounce.features.module.modules.player.nofall.ModuleNoFa
 import net.ccbluex.liquidbounce.features.module.modules.player.offhand.ModuleOffhand
 import net.ccbluex.liquidbounce.features.module.modules.render.*
 import net.ccbluex.liquidbounce.features.module.modules.render.esp.ModuleESP
+import net.ccbluex.jmcomicfix.features.module.modules.render.jumpeffect.ModuleJumpEffect
+import net.ccbluex.jmcomicfix.features.module.modules.combat.tpbow.ModuleBowAura
+import net.ccbluex.jmcomicfix.features.module.modules.misc.ModuleAutoScreenShot
+import net.ccbluex.jmcomicfix.features.module.modules.player.autoClutch.ModuleAutoClutch
 import net.ccbluex.liquidbounce.features.module.modules.render.murdermystery.ModuleMurderMystery
 import net.ccbluex.liquidbounce.features.module.modules.render.nametags.ModuleNametags
 import net.ccbluex.liquidbounce.features.module.modules.render.trajectories.ModuleTrajectories
@@ -82,6 +100,8 @@ import net.ccbluex.liquidbounce.features.module.modules.world.fucker.ModuleFucke
 import net.ccbluex.liquidbounce.features.module.modules.world.nuker.ModuleNuker
 import net.ccbluex.liquidbounce.features.module.modules.world.packetmine.ModulePacketMine
 import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.ModuleScaffold
+import net.ccbluex.jmcomicfix.features.module.modules.world.stuck.ModuleAutoStuck
+import net.ccbluex.liquidbounce.features.module.modules.client.ModuleTranslation
 import net.ccbluex.liquidbounce.features.module.modules.world.traps.ModuleAutoTrap
 import net.ccbluex.liquidbounce.script.ScriptApiRequired
 import net.ccbluex.liquidbounce.utils.client.logger
@@ -112,11 +132,11 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
     private val keyboardKeyHandler = handler<KeyboardKeyEvent> { event ->
         when (event.action) {
             GLFW.GLFW_PRESS -> if (mc.currentScreen == null) {
-                    filter { m -> m.bind.matchesKey(event.keyCode, event.scanCode) }
+                filter { m -> m.bind.matchesKey(event.keyCode, event.scanCode) }
                     .forEach { m ->
                         m.enabled = !m.enabled || m.bind.action == InputBind.BindAction.HOLD
                     }
-                }
+            }
             GLFW.GLFW_RELEASE ->
                 filter { m ->
                     m.bind.matchesKey(event.keyCode, event.scanCode) &&
@@ -200,6 +220,7 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleCriticals,
             ModuleHitbox,
             ModuleKillAura,
+            ModuleBowAura,
             ModuleTpAura,
             ModuleSuperKnockback,
             ModuleTimerRange,
@@ -208,6 +229,7 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleBacktrack,
             ModuleSwordBlock,
             ModuleAutoShoot,
+            ModuleAutoRod,
             ModuleKeepSprint,
             ModuleMaceKill,
             ModuleNoMissCooldown,
@@ -234,6 +256,7 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleVehicleOneHit,
             ModuleServerCrasher,
             ModuleDupe,
+            ModuleMovePhysics,
             ModuleClickTp,
             ModuleTimeShift,
             ModuleTeleport,
@@ -242,12 +265,15 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             // Fun
             ModuleDankBobbing,
             ModuleDerp,
-            ModuleSkinDerp,
+            ModuleIQBoost,
             ModuleHandDerp,
+            ModulePendant,
+            ModuleSkinDerp,
             ModuleTwerk,
             ModuleVomit,
 
             // Misc
+            ModuleAutoGG,
             ModuleBookBot,
             ModuleAntiBot,
             ModuleBetterTab,
@@ -265,14 +291,17 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleAutoChatGame,
             ModuleTargetLock,
             ModuleAutoPearl,
+            ModuleTitleControl,
             ModuleAntiStaff,
             ModuleFlagCheck,
             ModulePacketLogger,
             ModuleDebugRecorder,
             ModuleAntiCheatDetect,
             ModuleEasyPearl,
+            ModuleNoBooks,
+            ModuleBetterTitle,
 
-            // Movement
+           // Movement
             ModuleAirJump,
             ModuleAntiBounce,
             ModuleAntiLevitation,
@@ -331,15 +360,17 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleAutoQueue,
             ModuleSmartEat,
             ModuleReplenish,
-
+            ModuleAutoClutch,
             // Render
             ModuleAnimations,
             ModuleAntiBlind,
+            ModuleHalo,
             ModuleBlockESP,
             ModuleBlockOutline,
             ModuleBreadcrumbs,
             ModuleCameraClip,
             ModuleClickGui,
+            ModuleHudEditor,
             ModuleDamageParticles,
             ModuleParticles,
             ModuleESP,
@@ -355,10 +386,12 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleMobOwners,
             ModuleMurderMystery,
             ModuleAttackEffects,
+            ModuleKillEffects,
             ModuleNametags,
             ModuleCombineMobs,
             ModuleAspect,
             ModuleAutoF5,
+            ModuleAutoScreenShot,
             ModuleChams,
             ModuleBedPlates,
             ModuleNoBob,
@@ -368,6 +401,7 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleNoSwing,
             ModuleCustomAmbience,
             ModuleProphuntESP,
+            ModuleSkinChanger,
             ModuleQuickPerspectiveSwap,
             ModuleRotations,
             ModuleSilentHotbar,
@@ -382,7 +416,6 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleZoom,
             ModuleItemChams,
             ModuleCrystalView,
-            ModuleSkinChanger,
 
             // World
             ModuleAutoBuild,
@@ -402,18 +435,22 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleTimer,
             ModuleNuker,
             ModuleExtinguish,
+            ModuleAutoStuck,
             ModuleBedDefender,
             ModuleBlockIn,
             ModuleSurround,
             ModulePacketMine,
             ModuleHoleFiller,
+            SetbackOnRespawn,
 
             // Client
             ModuleAutoConfig,
             ModuleRichPresence,
+            ModulePacketQueue,
             ModuleTargets,
+            ModuleLiquidChat,
+            ModuleCapes,
             ModuleTranslation,
-            ModuleLiquidChat
         )
 
         builtin.forEach { module ->

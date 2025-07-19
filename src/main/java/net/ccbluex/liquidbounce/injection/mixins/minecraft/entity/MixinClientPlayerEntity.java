@@ -66,23 +66,19 @@ public abstract class MixinClientPlayerEntity extends MixinPlayerEntity implemen
     @Shadow
     @Final
     public ClientPlayNetworkHandler networkHandler;
-
-    @Shadow
-    public abstract boolean isSubmergedInWater();
-
     @Unique
     private PlayerData lastKnownStatistics = null;
-
     @Unique
     private PlayerInventoryData lastKnownInventory = null;
-
     @Unique
     private PlayerNetworkMovementTickEvent eventMotion;
-
     @Unique
     private int onGroundTicks = 0;
     @Unique
     private int airTicks = 0;
+
+    @Shadow
+    public abstract boolean isSubmergedInWater();
 
     /**
      * Hook entity tick event

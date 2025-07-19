@@ -7,14 +7,13 @@
     const dispatch = createEventDispatcher();
 </script>
 
-<label class="switch-container">
-    <div class="switch">
-        <input type="checkbox" bind:checked={value} on:change={() => dispatch("change")}/>
-        <span class="slider"></span>
-    </div>
-
-    <div class="name">{name}</div>
-</label>
+<div class="switch-container">
+    <label class="switch">
+        <input bind:checked={value} on:change={() => dispatch("change")} type="checkbox"/>
+        <span class="checkbox"></span>
+    </label>
+    <div class="title">{name}</div>
+</div>
 
 <style lang="scss">
   @use "sass:color";
@@ -23,59 +22,75 @@
   .switch-container {
     display: flex;
     align-items: center;
-    cursor: pointer;
+    justify-content: flex-start;
+    transition: all 0.3s ease;
   }
 
-  .name {
+  .title {
+    color: $text;
+    font-size: var(--font-size);
+    margin-left: 6px;
     font-weight: 500;
-    color: $clickgui-text-color;
-    font-size: 12px;
-    margin-left: 7px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .slider {
-    position: absolute;
-    top: 2px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: color.adjust($clickgui-text-color, $lightness: -55%);
-    transition: ease 0.4s;
-    height: 8px;
-    border-radius: 4px;
-
-    &::before {
-      position: absolute;
-      content: "";
-      height: 12px;
-      width: 12px;
-      top: -2px;
-      left: 0;
-      background-color: $clickgui-text-color;
-      transition: ease 0.4s;
-      border-radius: 50%;
-    }
+    transition: color 0.2s ease-in-out;
   }
 
   .switch {
     position: relative;
-    width: 22px;
-    height: 12px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
 
-    input {
-      display: none;
+  .checkbox {
+    display: block;
+    position: relative;
+    width: 20px;
+    height: 20px;
+    background-color: rgba($mantle, 0.6);
+    border-radius: 6px;
+    border: 1px solid rgba(white, 0.15);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.05);
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform, background-color, box-shadow;
+    cursor: pointer;
+
+
+    &:hover {
+      background-color: rgba($mantle, 0.8);
+      border-color: rgba(white, 0.25);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4),
+      inset 0 1px 2px rgba(255, 255, 255, 0.1);
     }
 
-    input:checked + .slider {
-      background-color: color.adjust($accent-color, $saturation: -60%, $lightness: -15%);
-    }
-
-    input:checked + .slider:before {
-      transform: translateX(10px);
-      background-color: $accent-color;
+    &:active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3),
+      inset 0 1px 3px rgba(0, 0, 0, 0.2);
     }
   }
+
+  input {
+    display: none;
+  }
+
+  input:checked + .checkbox {
+    background-color: color-mix(in srgb, var(--primary-color) 50%, transparent);
+    border-color: color-mix(in srgb, var(--primary-color) 50%, transparent);
+    box-shadow: 0 0 12px 3px color-mix(in srgb, var(--primary-color) 40%, transparent),
+    inset 0 1px 2px rgba(255, 255, 255, 0.1);
+
+    &:hover {
+      background-color: color-mix(in srgb, var(--primary-color) 95%, white 5%);
+      box-shadow: 0 0 16px 4px color-mix(in srgb, var(--primary-color) 50%, transparent),
+      inset 0 1px 2px rgba(255, 255, 255, 0.15);
+    }
+  }
+
+  .switch:focus-within .checkbox {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+  }
+
+
 </style>

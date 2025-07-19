@@ -82,11 +82,13 @@ object KillAuraAutoBlock : ToggleableConfigurable(ModuleKillAura, "AutoBlocking"
     var blockingStateEnforced = false
         set(value) {
             ModuleDebug.debugParameter(this, "BlockingStateEnforced", value)
-            ModuleDebug.debugParameter(this, if (value) {
-                "Block Age"
-            } else {
-                "Unblock Age"
-            }, player.age)
+            ModuleDebug.debugParameter(
+                this, if (value) {
+                    "Block Age"
+                } else {
+                    "Unblock Age"
+                }, player.age
+            )
 
             field = value
         }
@@ -158,11 +160,13 @@ object KillAuraAutoBlock : ToggleableConfigurable(ModuleKillAura, "AutoBlocking"
                     interaction.interactEntity(player, target, Hand.MAIN_HAND)
                 }
             }
+
             BlockMode.FAKE -> {
                 blockVisual = true
                 return
             }
-            else -> { }
+
+            else -> {}
         }
 
         if (blockMode == BlockMode.INTERACT || blockMode == BlockMode.HYPIXEL) {
@@ -269,6 +273,7 @@ object KillAuraAutoBlock : ToggleableConfigurable(ModuleKillAura, "AutoBlocking"
                 blockingStateEnforced = false
                 true
             }
+
             else -> false
         }
     }
@@ -293,7 +298,7 @@ object KillAuraAutoBlock : ToggleableConfigurable(ModuleKillAura, "AutoBlocking"
         val entityHitResult = raytraceEntity(range.toDouble(), rotationToTheServer, filter = {
             when (raycast) {
                 TRACE_NONE -> false
-                TRACE_ONLYENEMY -> it.shouldBeAttacked()
+                TRACE_ONLY_ENEMY -> it.shouldBeAttacked()
                 TRACE_ALL -> true
             }
         })

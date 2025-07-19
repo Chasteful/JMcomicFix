@@ -17,6 +17,7 @@
  * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
  */
 @file:Suppress("WildcardImport")
+
 package net.ccbluex.liquidbounce.features.module.modules.combat.killaura
 
 import com.google.gson.JsonObject
@@ -49,6 +50,7 @@ import net.ccbluex.liquidbounce.render.renderEnvironmentForWorld
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.aiming.data.Rotation
 import net.ccbluex.liquidbounce.utils.aiming.data.RotationWithVector
+import net.ccbluex.jmcomicfix.utils.aiming.features.processors.NeuralNetworkRotationProcessor
 import net.ccbluex.liquidbounce.utils.aiming.point.PointTracker
 import net.ccbluex.liquidbounce.utils.aiming.preference.LeastDifferencePreference
 import net.ccbluex.liquidbounce.utils.aiming.utils.facingEnemy
@@ -59,7 +61,6 @@ import net.ccbluex.liquidbounce.utils.combat.attack
 import net.ccbluex.liquidbounce.utils.combat.shouldBeAttacked
 import net.ccbluex.liquidbounce.utils.entity.rotation
 import net.ccbluex.liquidbounce.utils.entity.squaredBoxedDistanceTo
-import net.ccbluex.liquidbounce.utils.inventory.InventoryManager
 import net.ccbluex.liquidbounce.utils.inventory.InventoryManager.isInventoryOpen
 import net.ccbluex.liquidbounce.utils.inventory.isInContainerScreen
 import net.ccbluex.liquidbounce.utils.kotlin.Priority
@@ -96,7 +97,7 @@ object ModuleKillAura : ClientModule("KillAura", Category.COMBAT) {
         currentScanExtraRange = range.random()
     }
     private var currentScanExtraRange: Float = scanExtraRange.random()
-
+    private var neuralNetworkProcessor: NeuralNetworkRotationProcessor? = null
     // Target
     val targetTracker = tree(KillAuraTargetTracker)
 
@@ -159,9 +160,9 @@ object ModuleKillAura : ClientModule("KillAura", Category.COMBAT) {
 
     @Suppress("unused")
     private val rotationUpdateHandler = handler<RotationUpdateEvent> {
-        // Make sure killaura-logic is not running while inventory is open
+
         val isInInventoryScreen =
-            InventoryManager.isInventoryOpen || mc.currentScreen is GenericContainerScreen
+            isInventoryOpen || mc.currentScreen is GenericContainerScreen
 
         val shouldResetTarget = player.isSpectator || player.isDead || !requirementsMet
 
@@ -220,12 +221,13 @@ object ModuleKillAura : ClientModule("KillAura", Category.COMBAT) {
             raycast != TRACE_NONE -> {
                 raytraceEntity(range.toDouble(), rotation, filter = {
                     when (raycast) {
-                        TRACE_ONLYENEMY -> it.shouldBeAttacked()
+                        TRACE_ONLY_ENEMY -> it.shouldBeAttacked()
                         TRACE_ALL -> true
                         else -> false
                     }
                 })?.entity ?: target
             }
+
             else -> target
         }
 
@@ -243,7 +245,8 @@ object ModuleKillAura : ClientModule("KillAura", Category.COMBAT) {
     @Suppress("unused")
     private val sprintHandler = handler<SprintEvent> { event ->
         if (shouldBlockSprinting && (event.source == SprintEvent.Source.MOVEMENT_TICK ||
-                event.source == SprintEvent.Source.INPUT)) {
+                event.source == SprintEvent.Source.INPUT)
+        ) {
             event.sprint = false
         }
     }
@@ -254,9 +257,11 @@ object ModuleKillAura : ClientModule("KillAura", Category.COMBAT) {
         KillAuraAutoBlock.makeSeemBlock()
 
         // Are we actually facing the [chosenEntity]
-        val isFacingEnemy = facingEnemy(toEntity = target, rotation = rotation,
+        val isFacingEnemy = facingEnemy(
+            toEntity = target, rotation = rotation,
             range = range.toDouble(),
-            wallsRange = wallRange.toDouble()) || ModuleElytraTarget.canIgnoreKillAuraRotations
+            wallsRange = wallRange.toDouble()
+        ) || ModuleElytraTarget.canIgnoreKillAuraRotations
 
         ModuleDebug.debugParameter(ModuleKillAura, "Is Facing Enemy", isFacingEnemy)
         ModuleDebug.debugParameter(ModuleKillAura, "Rotation", rotation)
@@ -265,7 +270,8 @@ object ModuleKillAura : ClientModule("KillAura", Category.COMBAT) {
         // Check if our target is in range, otherwise deal with auto block
         if (!isFacingEnemy) {
             if (KillAuraAutoBlock.enabled && KillAuraAutoBlock.onScanRange &&
-                player.squaredBoxedDistanceTo(target) <= (range + currentScanExtraRange).pow(2)) {
+                player.squaredBoxedDistanceTo(target) <= (range + currentScanExtraRange).pow(2)
+            ) {
                 KillAuraAutoBlock.startBlocking()
                 return
             }
@@ -298,6 +304,7 @@ object ModuleKillAura : ClientModule("KillAura", Category.COMBAT) {
                 target.attack(true, keepSprint && !shouldBlockSprinting)
                 currentScanExtraRange = scanExtraRange.random()
                 KillAuraNotifyWhenFail.failedHitsIncrement = 0
+                neuralNetworkProcessor?.onAttack(RotationManager.serverRotation)
 
                 GenericDebugRecorder.recordDebugInfo(ModuleKillAura, "attackEntity", JsonObject().apply {
                     add("player", GenericDebugRecorder.debugObject(player))
@@ -307,7 +314,8 @@ object ModuleKillAura : ClientModule("KillAura", Category.COMBAT) {
                 true
             }
         } else if (KillAuraAutoBlock.currentTickOff > 0 && clickScheduler.willClickAt(KillAuraAutoBlock.currentTickOff)
-            && KillAuraAutoBlock.shouldUnblockToHit) {
+            && KillAuraAutoBlock.shouldUnblockToHit
+        ) {
             KillAuraAutoBlock.stopBlocking(pauses = true)
         } else {
             KillAuraAutoBlock.startBlocking()
@@ -319,6 +327,7 @@ object ModuleKillAura : ClientModule("KillAura", Category.COMBAT) {
         val situation = when {
             clickScheduler.isClickTick || clickScheduler.willClickAt(1)
                 -> PointTracker.AimSituation.FOR_NEXT_TICK
+
             else -> PointTracker.AimSituation.FOR_THE_FUTURE
         }
         ModuleDebug.debugParameter(ModuleKillAura, "AimSituation", situation)
@@ -360,6 +369,7 @@ object ModuleKillAura : ClientModule("KillAura", Category.COMBAT) {
     }
 
     @Suppress("ReturnCount")
+
     private fun processTarget(
         entity: LivingEntity,
         maximumRange: Float,
@@ -414,8 +424,10 @@ object ModuleKillAura : ClientModule("KillAura", Category.COMBAT) {
      *
      *  @return The best spot to attack the entity
      */
-    private fun getSpot(entity: LivingEntity, range: Double,
-                        situation: PointTracker.AimSituation): RotationWithVector? {
+    private fun getSpot(
+        entity: LivingEntity, range: Double,
+        situation: PointTracker.AimSituation
+    ): RotationWithVector? {
         val point = pointTracker.gatherPoint(
             entity,
             situation
@@ -424,10 +436,14 @@ object ModuleKillAura : ClientModule("KillAura", Category.COMBAT) {
         val eyes = point.fromPoint
         val nextPoint = point.toPoint
 
-        ModuleDebug.debugGeometry(this, "Box",
-            ModuleDebug.DebuggedBox(point.box, Color4b.RED.with(a = 60)))
-        ModuleDebug.debugGeometry(this, "CutOffBox",
-            ModuleDebug.DebuggedBox(point.cutOffBox, Color4b.GREEN.with(a = 90)))
+        ModuleDebug.debugGeometry(
+            this, "Box",
+            ModuleDebug.DebuggedBox(point.box, Color4b.RED.with(a = 60))
+        )
+        ModuleDebug.debugGeometry(
+            this, "CutOffBox",
+            ModuleDebug.DebuggedBox(point.cutOffBox, Color4b.GREEN.with(a = 90))
+        )
         ModuleDebug.debugGeometry(this, "Point", ModuleDebug.DebuggedPoint(nextPoint, Color4b.WHITE))
 
         val rotationPreference = LeastDifferencePreference.leastDifferenceToLastPoint(eyes, nextPoint)
@@ -478,7 +494,7 @@ object ModuleKillAura : ClientModule("KillAura", Category.COMBAT) {
 
     enum class RaycastMode(override val choiceName: String) : NamedChoice {
         TRACE_NONE("None"),
-        TRACE_ONLYENEMY("Enemy"),
+        TRACE_ONLY_ENEMY("Enemy"),
         TRACE_ALL("All")
     }
 

@@ -57,12 +57,12 @@ object ModuleSkinDerp : ClientModule("SkinDerp", Category.FUN) {
         waitTicks(delay)
 
         parts.forEach {
-                if (sync) {
-                    mc.options.setPlayerModelPart(it.part, !mc.options.isPlayerModelPartEnabled(it.part))
-                } else {
-                    mc.options.setPlayerModelPart(it.part, Random.nextBoolean())
-                }
+            if (sync) {
+                mc.options.setPlayerModelPart(it.part, !mc.options.isPlayerModelPartEnabled(it.part))
+            } else {
+                mc.options.setPlayerModelPart(it.part, Random.nextBoolean())
             }
+        }
     }
 
     private enum class DerpParts(

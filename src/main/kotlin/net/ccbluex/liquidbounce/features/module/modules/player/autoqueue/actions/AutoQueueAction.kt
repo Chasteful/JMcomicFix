@@ -28,5 +28,6 @@ import net.ccbluex.liquidbounce.features.module.modules.player.autoqueue.presets
 abstract class AutoQueueAction(name: String) : Choice(name) {
     override val parent: ChoiceConfigurable<*>
         get() = triggers
+
     abstract suspend fun execute(sequence: Sequence)
 }

@@ -19,6 +19,7 @@ import type {
     Registries,
     Server,
     Session,
+    Verification,
     VirtualScreen,
     World
 } from "./types";
@@ -108,11 +109,11 @@ export async function setPersistentStorageItems(items: PersistentStorageItem[]) 
     })
 }
 
-export async function getVirtualScreen(): Promise<VirtualScreen> {
+export async function getVirtualScreen(): Promise<{ showingSplash: boolean; name: string | null }> {
     const response = await fetch(`${API_BASE}/client/virtualScreen`);
-    const data: VirtualScreen = await response.json();
+    const data = await response.json();
 
-    return data;
+    return data as { showingSplash: boolean; name: string | null };
 }
 
 export async function confirmVirtualScreen(name: string) {
@@ -172,6 +173,13 @@ export async function getRegistries(): Promise<Registries> {
 export async function getSession(): Promise<Session> {
     const response = await fetch(`${API_BASE}/client/session`);
     const data: Session = await response.json();
+
+    return data;
+}
+
+export async function getVerification(): Promise<Verification> {
+    const response = await fetch(`${API_BASE}/client/Verification`);
+    const data: Verification = await response.json();
 
     return data;
 }
@@ -502,23 +510,23 @@ export async function setProxyFavorite(id: number, favorite: boolean) {
     }
 }
 
-export async function addProxy(host: string, port: number, username: string, password: string, type: string, forwardAuthentication: boolean) {
+export async function addProxy(host: string, port: number, username: string, password: string, forwardAuthentication: boolean) {
     await fetch(`${API_BASE}/client/proxies/add`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({host, port, username, password, type, forwardAuthentication})
+        body: JSON.stringify({host, port, username, password, forwardAuthentication})
     });
 }
 
-export async function editProxy(id: number, host: string, port: number, username: string, password: string, type: string, forwardAuthentication: boolean) {
+export async function editProxy(id: number, host: string, port: number, username: string, password: string, forwardAuthentication: boolean) {
     await fetch(`${API_BASE}/client/proxies/edit`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({id, host, port, username, password, type, forwardAuthentication})
+        body: JSON.stringify({id, host, port, username, password, forwardAuthentication})
     })
 }
 
@@ -583,6 +591,28 @@ export async function reconnectToServer() {
 export async function toggleBackgroundShaderEnabled() {
     await fetch(`${API_BASE}/client/shader`, {
         method: "POST",
+    });
+}
+
+export async function getShaderEnabled(): Promise<boolean> {
+    const response = await fetch(`${API_BASE}/client/theme/shaderEnabled`, {
+        method: "GET",
+        headers: {"Accept": "application/json"}
+    });
+    if (!response.ok) {
+        throw new Error(`getShaderEnabled failed: ${response.status}`);
+    }
+    const json = await response.json();
+    return json.enabled === true;
+}
+
+export async function setShaderEnabled(enabled: boolean) {
+    await fetch(`${API_BASE}/client/theme/shaderEnabled`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({enabled}),
     });
 }
 
@@ -651,3 +681,4 @@ export async function setTyping(typing: boolean) {
         body: JSON.stringify({typing})
     });
 }
+

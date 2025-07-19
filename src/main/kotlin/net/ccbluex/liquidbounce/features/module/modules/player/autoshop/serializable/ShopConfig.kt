@@ -18,7 +18,7 @@
  */
 package net.ccbluex.liquidbounce.features.module.modules.player.autoshop.serializable
 
-data class ShopConfig (
+data class ShopConfig(
     val traderTitles: List<String>,
     val initialCategorySlot: Int,
     val itemsWithTiers: Map<String, List<String>>? = emptyMap(),

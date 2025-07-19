@@ -94,8 +94,8 @@ object ModuleTimerRange : ClientModule("TimerRange", Category.COMBAT) {
         }
 
         if (world.findEnemy(0f..distanceToStartWorking) == null
-            || chance != 100 && Random.nextInt(100) > chance)
-        {
+            || chance != 100 && Random.nextInt(100) > chance
+        ) {
             return null
         }
 

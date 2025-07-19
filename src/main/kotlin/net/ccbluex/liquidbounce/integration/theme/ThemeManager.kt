@@ -25,6 +25,7 @@ import com.mojang.blaze3d.systems.RenderSystem
 import net.ccbluex.liquidbounce.config.ConfigSystem
 import net.ccbluex.liquidbounce.config.gson.util.decode
 import net.ccbluex.liquidbounce.config.types.Configurable
+import net.ccbluex.jmcomicfix.features.module.modules.client.ModuleHudEditor
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleClickGui
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleHud
 import net.ccbluex.liquidbounce.integration.IntegrationListener
@@ -44,6 +45,7 @@ import net.ccbluex.liquidbounce.utils.io.extractZip
 import net.ccbluex.liquidbounce.utils.io.resource
 import net.ccbluex.liquidbounce.utils.io.resourceToString
 import net.ccbluex.liquidbounce.utils.math.Vec2i
+import net.ccbluex.liquidbounce.utils.render.refreshRate
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.ChatScreen
 import net.minecraft.client.render.RenderLayer
@@ -85,22 +87,17 @@ object ThemeManager : Configurable("theme") {
 
             // Update components
             ComponentOverlay.insertDefaultComponents()
-
-            // Update integration browser
             IntegrationListener.update()
             ModuleHud.reopen()
             ModuleClickGui.reload(true)
         }
-
     private val takesInputHandler = InputAcceptor { mc.currentScreen != null && mc.currentScreen !is ChatScreen }
-
     init {
         ConfigSystem.root(this)
     }
 
     /**
      * Open [Browser] with the given [VirtualScreenType] and mark as static if [markAsStatic] is true.
-     * This tab will be locked to 60 FPS since it is not input aware.
      */
     fun openImmediate(
         virtualScreenType: VirtualScreenType? = null,
@@ -128,7 +125,6 @@ object ThemeManager : Configurable("theme") {
         priority = priority,
         inputAcceptor = inputAcceptor
     )
-
     fun updateImmediate(
         browser: Browser?,
         virtualScreenType: VirtualScreenType? = null,
@@ -136,6 +132,7 @@ object ThemeManager : Configurable("theme") {
     ) {
         browser?.url = route(virtualScreenType, markAsStatic).url
     }
+
 
     fun route(virtualScreenType: VirtualScreenType? = null, markAsStatic: Boolean = false): Route {
         val theme = if (virtualScreenType == null || activeTheme.doesAccept(virtualScreenType.routeName)) {
@@ -154,13 +151,19 @@ object ThemeManager : Configurable("theme") {
 
     fun initializeBackground() {
         // Load background image of active theme and fallback to default theme if not available
+        if (!RenderSystem.isOnRenderThread()) {
+            RenderSystem.recordRenderCall(::initializeBackground)
+            return
+        }
+
         if (!activeTheme.loadBackgroundImage()) {
             defaultTheme.loadBackgroundImage()
         }
 
-        // Compile shader of active theme and fallback to default theme if not available
-        if (shaderEnabled && !activeTheme.compileShader()) {
-            defaultTheme.compileShader()
+        if (shaderEnabled) {
+            if (!activeTheme.compileShader()) {
+                defaultTheme.compileShader()
+            }
         }
     }
 
@@ -244,8 +247,10 @@ class Theme(val name: String) : Closeable {
         }
 
         readShaderBackground()?.let { shaderBackground ->
-            compiledShaderBackground = CanvasShader(resourceToString("/resources/liquidbounce/shaders/vertex.vert"),
-                shaderBackground)
+            compiledShaderBackground = CanvasShader(
+                resourceToString("/resources/liquidbounce/shaders/vertex.vert"),
+                shaderBackground
+            )
             logger.info("Compiled background shader for theme $name")
             return true
         }

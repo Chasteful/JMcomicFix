@@ -20,6 +20,7 @@ package net.ccbluex.liquidbounce.render.utils
 
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import java.awt.Color
+import kotlin.math.abs
 
 object ColorUtils {
     @JvmField
@@ -43,7 +44,35 @@ fun rainbow(): Color4b {
 
     return Color4b(currentColor)
 }
+fun rainbow(angle: Float = System.currentTimeMillis() % 2000 / 2000f): Color4b {
+    return fromHSB(angle % 1f)
+}
+fun fromHSB(hue: Float, saturation: Float = 1f, brightness: Float = 1f, alpha: Int = 255): Color4b {
 
+    val h = hue.coerceIn(0f, 1f)
+    val s = saturation.coerceIn(0f, 1f)
+    val v = brightness.coerceIn(0f, 1f)
+
+    val c = v * s
+    val x = c * (1 - abs((h * 6) % 2 - 1))
+    val m = v - c
+
+    val (r1, g1, b1) = when ((h * 6).toInt()) {
+        0 -> Triple(c, x, 0f)
+        1 -> Triple(x, c, 0f)
+        2 -> Triple(0f, c, x)
+        3 -> Triple(0f, x, c)
+        4 -> Triple(x, 0f, c)
+        else -> Triple(c, 0f, x)
+    }
+
+    return Color4b(
+        ((r1 + m) * 255).toInt().coerceIn(0, 255),
+        ((g1 + m) * 255).toInt().coerceIn(0, 255),
+        ((b1 + m) * 255).toInt().coerceIn(0, 255),
+        alpha.coerceIn(0, 255)
+    )
+}
 fun shiftHue(color4b: Color4b, shift: Int): Color4b {
     val hsb = Color.RGBtoHSB(color4b.r, color4b.g, color4b.b, null)
     val shiftedColor = Color(Color.HSBtoRGB((hsb[0] + shift.toFloat() / 360) % 1F, hsb[1], hsb[2]))
@@ -54,7 +83,7 @@ fun shiftHue(color4b: Color4b, shift: Int): Color4b {
 fun interpolateHue(primaryColor: Color4b, otherColor: Color4b, percentageOther: Float): Color4b {
     val hsb1 = FloatArray(3)
     val hsb2 = FloatArray(3)
-    Color.RGBtoHSB(primaryColor.r,primaryColor.g, primaryColor.b, hsb1)
+    Color.RGBtoHSB(primaryColor.r, primaryColor.g, primaryColor.b, hsb1)
     Color.RGBtoHSB(otherColor.r, otherColor.g, otherColor.b, hsb2)
 
     val h = hsb1[0] + (hsb2[0] - hsb1[0]) * percentageOther

@@ -80,12 +80,15 @@ class PolyglotScript(
 
                         chat(
                             regular(translation("liquidbounce.scripts.debug.support", variable(file.toString())))
-                                .append(variable(devtoolURL)
-                                    .copyable(copyContent = devtoolURL, hover = HoverEvent(
-                                        HoverEvent.Action.SHOW_TEXT,
-                                        regular(translation("liquidbounce.scripts.debug.inspect.url"))
-                                    ))
-                                    .underline(true)
+                                .append(
+                                    variable(devtoolURL)
+                                        .copyable(
+                                            copyContent = devtoolURL, hover = HoverEvent(
+                                                HoverEvent.Action.SHOW_TEXT,
+                                                regular(translation("liquidbounce.scripts.debug.inspect.url"))
+                                            )
+                                        )
+                                        .underline(true)
                                 )
                         )
                     }
@@ -99,10 +102,15 @@ class PolyglotScript(
                         }
 
                         chat(
-                            regular(translation("liquidbounce.scripts.debug.support", variable(file.toString())).append(
-                                translation("liquidbounce.scripts.debug.dap", variable(debugOptions.port.toString()))
+                            regular(
+                                translation("liquidbounce.scripts.debug.support", variable(file.toString())).append(
+                                    translation(
+                                        "liquidbounce.scripts.debug.dap",
+                                        variable(debugOptions.port.toString())
+                                    )
+                                )
                             )
-                        ))
+                        )
                     }
                 }
             }
@@ -116,6 +124,7 @@ class PolyglotScript(
             // Global functions
             bindings.putMember("registerScript", RegisterScript())
         }
+
 
     // Script information
     lateinit var scriptName: String
@@ -142,7 +151,6 @@ class PolyglotScript(
     fun initScript() {
         // Evaluate script
         context.eval(Source.newBuilder(language, file).build())
-
         // Call load event
         callGlobalEvent("load")
 

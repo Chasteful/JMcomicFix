@@ -25,6 +25,7 @@ import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.event.tickHandler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
+import net.ccbluex.jmcomicfix.features.module.modules.world.stuck.ModuleAutoStuck.shouldEnableStuck
 import net.ccbluex.liquidbounce.render.*
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
@@ -71,6 +72,7 @@ object ModuleEasyPearl :
      */
     @Suppress("unused")
     private val interactItemHandler = handler<PlayerInteractItemEvent> { event ->
+        if (shouldEnableStuck) return@handler
         if (!isHoldingPearl() || !mc.options.useKey.isPressed) {
             return@handler
         }
@@ -79,7 +81,8 @@ object ModuleEasyPearl :
         // While reachable check is enabled, we will check if the player
         // is looking at a block father than pearl can reach
         if (reachableCheck && getTargetRotation(hitResult.pos) == null
-            && hitResult.type != HitResult.Type.MISS) {
+            && hitResult.type != HitResult.Type.MISS
+        ) {
             chat(markAsError(message("noInReachWarning")))
             event.cancelEvent()
             targetPosition = null
@@ -97,6 +100,7 @@ object ModuleEasyPearl :
 
     @Suppress("unused")
     private val rotationHandler = handler<RotationUpdateEvent> {
+        if (shouldEnableStuck) return@handler
         /**
          * handler for rotation update event,and rotate to the target rotation
          */
@@ -111,6 +115,7 @@ object ModuleEasyPearl :
 
     @Suppress("unused")
     private val tickHandler = tickHandler {
+        if (shouldEnableStuck) return@tickHandler
         /**
          * handler for tick event,and check if we are rotating to the target rotation correctly,if yes,throw the pearl
          */
@@ -132,6 +137,8 @@ object ModuleEasyPearl :
      */
     @Suppress("unused")
     private val worldRenderHandler = handler<WorldRenderEvent> { event ->
+        if (shouldEnableStuck) return@handler
+
         if (!isHoldingPearl()) {
             return@handler
         }

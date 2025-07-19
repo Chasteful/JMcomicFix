@@ -155,12 +155,16 @@ object ModuleTeleport : ClientModule("Teleport", Category.EXPLOIT, aliases = arr
             entity.velocity = entity.velocity.multiply(0.0, 0.0, 0.0)
         }
 
-        chat(regular(
-            message("teleported",
-            variable(decimalFormat.format(x)),
-            variable(decimalFormat.format(y)),
-            variable(decimalFormat.format(z)))
-        ))
+        chat(
+            regular(
+                message(
+                    "teleported",
+                    variable(decimalFormat.format(x)),
+                    variable(decimalFormat.format(y)),
+                    variable(decimalFormat.format(z))
+                )
+            )
+        )
         this.enabled = false
     }
 

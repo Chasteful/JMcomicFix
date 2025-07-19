@@ -33,10 +33,14 @@ class LinearAngleSmooth(
     verticalTurnSpeed: ClosedFloatingPointRange<Float> = 180f..180f,
 ) : FactorAngleSmooth("Linear", parent) {
 
-    private val horizontalTurnSpeed by floatRange("HorizontalTurnSpeed", horizontalTurnSpeed,
-        0.0f..180f)
-    private val verticalTurnSpeed by floatRange("VerticalTurnSpeed", verticalTurnSpeed,
-        0.0f..180f)
+    private val horizontalTurnSpeed by floatRange(
+        "HorizontalTurnSpeed", horizontalTurnSpeed,
+        0.0f..180f
+    )
+    private val verticalTurnSpeed by floatRange(
+        "VerticalTurnSpeed", verticalTurnSpeed,
+        0.0f..180f
+    )
 
     override fun calculateFactors(
         rotationTarget: RotationTarget?,

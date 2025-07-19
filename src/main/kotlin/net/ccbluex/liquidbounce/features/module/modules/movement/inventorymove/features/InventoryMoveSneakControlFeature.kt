@@ -66,10 +66,12 @@ object InventoryMoveSneakControlFeature : ToggleableConfigurable(ModuleInventory
             SneakMode.FORCE_SNEAK -> {
                 event.sneak = true
             }
+
             SneakMode.FORCE_NO_SNEAK -> {
                 event.sneak = false
             }
-            SneakMode.DO_NOT_CHANGE -> { }
+
+            SneakMode.DO_NOT_CHANGE -> {}
         }
     }
 
@@ -81,10 +83,12 @@ object InventoryMoveSneakControlFeature : ToggleableConfigurable(ModuleInventory
             SneakMode.FORCE_SNEAK -> {
                 event.sneak = true
             }
+
             SneakMode.FORCE_NO_SNEAK -> {
                 event.sneak = false
             }
-            SneakMode.DO_NOT_CHANGE -> { }
+
+            SneakMode.DO_NOT_CHANGE -> {}
         }
     }
 

@@ -99,6 +99,7 @@ object ScaffoldMovementPrediction : ToggleableConfigurable(ModuleScaffold, "Pred
                 // edge distance of 0.2 or so
                 fallOffPoint - fallOffPointToPlayer.normalize() * optimalEdgeDist
             }
+
             else -> {
                 val lineDirAngle = atan2(optimalLine.direction.z, optimalLine.direction.x).toFloat()
 

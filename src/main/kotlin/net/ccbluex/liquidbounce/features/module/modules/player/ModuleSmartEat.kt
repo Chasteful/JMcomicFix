@@ -104,20 +104,24 @@ object ModuleSmartEat : ClientModule("SmartEat", Category.PLAYER) {
                         null
                     }
                 }
+
                 prefersHealthPot && item == Items.GOLDEN_APPLE -> {
                     FoodEstimationData(
                         healthThreshold = preferHealthPotHealth.toInt(),
                         restoredHunger = itemStack.foodComponent!!.nutrition
                     )
                 }
+
                 prefersNotchApple && item == Items.ENCHANTED_GOLDEN_APPLE -> {
                     FoodEstimationData(
                         healthThreshold = preferNotchAppleHealth.toInt(),
                         restoredHunger = itemStack.foodComponent!!.nutrition
                     )
                 }
+
                 itemStack.foodComponent != null ->
                     FoodEstimationData(restoredHunger = itemStack.foodComponent!!.nutrition)
+
                 else -> null
             }
         }
@@ -126,31 +130,47 @@ object ModuleSmartEat : ClientModule("SmartEat", Category.PLAYER) {
     private object SilentOffhand : ToggleableConfigurable(this, "SilentOffhand", true) {
         private object RenderSlot : ToggleableConfigurable(this, "RenderSlot", true) {
 
-            private val offset by int("Offset", 40, 30..70)
+            private val offsetX by int("OffsetX", 0, -500..500)
+            private val offsetY by int("OffsetY", 0, -500..500)
+            private val scale by int("Scale", 1, 0..2)
+            private val guiTexture by boolean("GuiTexture", true)
+
 
             @Suppress("unused")
             private val renderHandler = handler<OverlayRenderEvent> {
                 renderEnvironmentForGUI {
-                    // MC-Rendering code for off-hand
-
                     val currentFood = Estimator.findBestFood() ?: return@renderEnvironmentForGUI
                     val dc = DrawContext(mc, mc.bufferBuilders.entityVertexConsumers)
                     val scaledWidth = dc.scaledWindowWidth
                     val scaledHeight = dc.scaledWindowHeight
-                    val i: Int = scaledWidth / 2
-                    val x = i - 91 - 26 - offset
-                    val y = scaledHeight - 16 - 3
-                    dc.drawStackOverlay(mc.textRenderer, currentFood.itemStack, x, y)
-                    dc.drawItem(currentFood.itemStack, x, y)
-                    dc.drawGuiTexture(
-                        RenderLayer::getGuiTextured,
-                        HOTBAR_OFFHAND_LEFT_TEXTURE, i - 91 - 29 - offset,
-                        scaledHeight - 23, 29, 24
-                    )
+                    val i = scaledWidth / 2
+
+                    val baseX = i - 91 - 26 - offsetX
+                    val baseY = scaledHeight - 16 - 3 + offsetY
+
+                    dc.matrices.push()
+                    dc.matrices.translate(baseX.toFloat(), baseY.toFloat(), 0f)
+                    dc.matrices.scale(scale.toFloat(), scale.toFloat(), 1f)
+
+
+                    dc.drawStackOverlay(mc.textRenderer, currentFood.itemStack, 0, 0)
+                    dc.drawItem(currentFood.itemStack, 0, 0)
+
+
+                    if (guiTexture) {
+                        dc.drawGuiTexture(
+                            RenderLayer::getGuiTextured,
+                            HOTBAR_OFFHAND_LEFT_TEXTURE,
+                            -3, -4,
+                            29, 24
+                        )
+                    }
+
+                    dc.matrices.pop()
                 }
             }
-
         }
+
 
         @Suppress("unused")
         private val interactionHandler = handler<PlayerInteractedItemEvent> { event ->

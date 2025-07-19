@@ -39,7 +39,7 @@ internal object AutoFirework : ToggleableConfigurable(ModuleElytraTarget, "AutoF
             || !syncCooldownWithKillAura
             || (
                 KillAura.clickScheduler.isClickTick
-                && KillAura.targetTracker.target
+                    && KillAura.targetTracker.target
                     ?.squaredBoxedDistanceTo(player)
                     ?.takeIf { it >= KillAura.range * KillAura.range } != null
                 )

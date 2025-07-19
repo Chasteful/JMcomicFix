@@ -45,21 +45,20 @@ import javax.annotation.Nullable;
 @Mixin(Screen.class)
 public abstract class MixinScreen {
     @Shadow
-    protected abstract void remove(Element child);
-
-    @Shadow
-    protected TextRenderer textRenderer;
-    @Shadow
     public int height;
     @Shadow
     public int width;
-
     @Shadow
-    protected abstract <T extends Element & Drawable> T addDrawableChild(T drawableElement);
-
+    protected TextRenderer textRenderer;
     @Shadow
     @Nullable
     protected MinecraftClient client;
+
+    @Shadow
+    protected abstract void remove(Element child);
+
+    @Shadow
+    protected abstract <T extends Element & Drawable> T addDrawableChild(T drawableElement);
 
     @Inject(method = "init(Lnet/minecraft/client/MinecraftClient;II)V", at = @At("TAIL"))
     private void objInit(CallbackInfo ci) {

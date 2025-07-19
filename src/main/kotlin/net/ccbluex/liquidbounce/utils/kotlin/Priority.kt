@@ -26,11 +26,13 @@ enum class Priority(val priority: Int) {
     NORMAL(0),
 
     IMPORTANT_FOR_USAGE_1(20),
+
     /**
      * KillAura, etc.
      */
     IMPORTANT_FOR_USAGE_2(30),
     IMPORTANT_FOR_USAGE_3(35),
+
     /**
      * Scaffold, etc.
      */

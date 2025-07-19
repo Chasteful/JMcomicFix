@@ -112,10 +112,12 @@ fun postEditWorld(requestObject: RequestObject): FullHttpResponse {
                     SystemToast.addWorldAccessFailureToast(mc, request.name)
                     logger.error("Failed to access level ${request.name}", exception)
                 }
+
                 is SymlinkValidationException -> {
                     logger.warn(exception.message)
                     mc.setScreen(SymlinkWarningScreen.world { mc.setScreen(SelectWorldScreen(TitleScreen())) })
                 }
+
                 else -> {
                     logger.error("Failed to access level ${request.name}", exception)
                 }

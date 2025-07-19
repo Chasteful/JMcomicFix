@@ -49,7 +49,7 @@ import net.minecraft.util.math.Vec3i
  *
  * Automatically extinguishes yourself when you're burning.
  */
-object ModuleExtinguish: ClientModule("Extinguish", Category.WORLD) {
+object ModuleExtinguish : ClientModule("Extinguish", Category.WORLD) {
 
     private val cooldown by float("Cooldown", 1.0F, 0.0F..20.0F, "s")
     private val notDuringCombat by boolean("NotDuringCombat", true)
@@ -149,8 +149,10 @@ object ModuleExtinguish: ClientModule("Extinguish", Category.WORLD) {
             true
         }
 
-        doPlacement(rayTraceResult, hand = target.hotbarItemSlot.useHand,
-            onItemUseSuccess = successFunction, onPlacementSuccess = successFunction)
+        doPlacement(
+            rayTraceResult, hand = target.hotbarItemSlot.useHand,
+            onItemUseSuccess = successFunction, onPlacementSuccess = successFunction
+        )
     }
 
     private fun planExtinguishing(): PlacementPlan? {

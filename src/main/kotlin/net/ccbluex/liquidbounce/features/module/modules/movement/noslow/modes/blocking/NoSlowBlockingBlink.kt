@@ -22,7 +22,7 @@ internal object NoSlowBlockingBlink : Choice("Blink") {
         }
 
         event.action = if (event.packet is PlayerMoveC2SPacket) {
-             PacketQueueManager.Action.QUEUE
+            PacketQueueManager.Action.QUEUE
         } else if (event.action == PacketQueueManager.Action.FLUSH) {
             PacketQueueManager.Action.PASS
         } else {

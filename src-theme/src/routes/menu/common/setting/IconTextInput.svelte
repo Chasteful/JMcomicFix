@@ -9,15 +9,17 @@
 
 <div class="icon-text-input">
     <div class="icon">
-        <img src="img/menu/icon-{icon}.svg" alt={icon}>
+        <img alt={icon} src="img/menu/icon-{icon}.svg">
     </div>
     {#if type === "text"}
-        <input {pattern} maxlength={maxLength} class="input" spellcheck="false" type="text" placeholder={title} bind:value={value} autocomplete="off">
+        <input {pattern} maxlength={maxLength} class="input" spellcheck="false" type="text" placeholder={title}
+               bind:value={value} autocomplete="off">
     {:else if type === "password"}
-        <input {pattern} maxlength={maxLength} class="input" type="password" placeholder={title} bind:value={value} autocomplete="off">
+        <input {pattern} maxlength={maxLength} class="input" type="password" placeholder={title} bind:value={value}
+               autocomplete="off">
     {/if}
     <div class="button-container">
-        <slot />
+        <slot/>
     </div>
 </div>
 
@@ -26,37 +28,55 @@
 
   .icon-text-input {
     display: grid;
-    grid-template-columns: max-content 1fr max-content;
+    grid-template-columns: 64px 1fr auto;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .icon {
     height: 64px;
     width: 64px;
-    background-color: $accent-color;
+    background: rgba(255, 255, 255, 0.06);
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 5px 0 0 5px;
+
+    img {
+      width: 28px;
+      height: 28px;
+      opacity: 0.8;
+    }
   }
 
   .input {
-    color: $menu-text-color;
-    font-family: "Inter", sans-serif;
-    font-size: 20px;
-    background-color: rgba($menu-base-color, .36);
+    color: #e2e6eb;
+    font-size: 18px;
+    font-weight: 500;
+    background: transparent;
     border: none;
-    padding: 0 20px 0 18px;
-    border-radius: 0 5px 5px 0;
-    border-left: solid 2px $menu-base-color;
-    width: 100%;
+    padding: 0 18px;
+    outline: none;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
 
     &:invalid {
-      border: solid 2px $menu-error-color;
+      border: none;
+      box-shadow: inset 0 0 0 2px $menu-error-color;
     }
   }
 
   .button-container {
+    padding-right: 12px;
     display: flex;
     align-items: center;
+    gap: 6px;
   }
+
 </style>

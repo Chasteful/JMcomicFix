@@ -52,7 +52,7 @@ class VirtualItemSlot(
     override val itemStack: ItemStack,
     override val slotType: ItemSlotType,
     val id: Int
-): ItemSlot() {
+) : ItemSlot() {
     override fun getIdForServer(screen: GenericContainerScreen?): Int? {
         throw NotImplementedError()
     }

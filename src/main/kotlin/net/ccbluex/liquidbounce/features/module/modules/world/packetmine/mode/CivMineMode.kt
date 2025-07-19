@@ -42,11 +42,13 @@ object CivMineMode : MineMode("Civ", stopOnStateChange = false) {
 
     override fun onCannotLookAtTarget(mineTarget: MineTarget) {
         // send always a packet to keep the target
-        network.sendPacket(PlayerActionC2SPacket(
-            PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK,
-            mineTarget.targetPos,
-            Direction.DOWN
-        ))
+        network.sendPacket(
+            PlayerActionC2SPacket(
+                PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK,
+                mineTarget.targetPos,
+                Direction.DOWN
+            )
+        )
     }
 
     override fun shouldTarget(blockPos: BlockPos, state: BlockState): Boolean {

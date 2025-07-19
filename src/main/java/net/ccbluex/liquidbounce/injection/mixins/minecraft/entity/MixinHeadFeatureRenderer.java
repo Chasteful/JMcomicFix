@@ -18,7 +18,8 @@ public class MixinHeadFeatureRenderer<S extends LivingEntityRenderState> {
             method = "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/render/entity/state/LivingEntityRenderState;FF)V",
             at = @At("HEAD"),
             cancellable = true
-    ) private void onRender(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, S livingEntityRenderState, float f, float g, CallbackInfo ci) {
+    )
+    private void onRender(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, S livingEntityRenderState, float f, float g, CallbackInfo ci) {
         if (livingEntityRenderState instanceof PlayerEntityRenderState && !ModuleAntiBlind.canRender(DoRender.ARMOR)) {
             ci.cancel();
         }

@@ -1,21 +1,3 @@
-/*
- * This file is part of LiquidBounce (https://github.com/CCBlueX/LiquidBounce)
- *
- * Copyright (c) 2015 - 2025 CCBlueX
- *
- * LiquidBounce is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * LiquidBounce is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
- */
 package net.ccbluex.liquidbounce.features.module.modules.render.nametags
 
 import com.mojang.blaze3d.systems.RenderSystem
@@ -44,51 +26,51 @@ import net.ccbluex.liquidbounce.utils.client.mc
 
 private object EnchantmentDisplayHelper {
     private val enchantmentAbbreviationCache = LruCache<RegistryKey<Enchantment>, String>(100)
-    
+
     private val knownCurses = setOf(
         Enchantments.BINDING_CURSE,
         Enchantments.VANISHING_CURSE
     )
-    
+
     fun getEnchantmentInfo(enchantment: RegistryKey<Enchantment>): EnchantmentInfo {
         return EnchantmentInfo(
             displayName = getAbbreviation(enchantment),
             isCurse = isCurse(enchantment)
         )
     }
-    
+
     private fun getEnchantmentName(enchantment: RegistryKey<Enchantment>): String {
         val idPath = enchantment.value.toString().substringAfter(':')
         val translationKey = "enchantment.minecraft.$idPath"
         return I18n.translate(translationKey)
     }
-    
+
     private fun getSingleWordAbbreviation(word: String): String = word.take(3)
-    
-    private fun getInitialsAbbreviation(words: List<String>): String = 
+
+    private fun getInitialsAbbreviation(words: List<String>): String =
         words.joinToString("") { it.first().toString() }
-    
+
     private fun getCompoundAbbreviation(words: List<String>): String {
         val firstWord = words[0]
-        
+
         if (firstWord.length >= 3) {
             return firstWord.take(3)
         }
-        
+
         val remainingChars = 3 - firstWord.length
         return firstWord + words.getOrNull(1)?.take(remainingChars).orEmpty()
     }
-    
+
     private fun processMultiWordName(words: List<String>): String {
         val initials = getInitialsAbbreviation(words)
-        
+
         return if (initials.length >= 3) {
             initials
         } else {
             getCompoundAbbreviation(words)
         }
     }
-    
+
     private fun processName(name: String): String {
         if (name.length <= 3) {
             return name
@@ -102,14 +84,14 @@ private object EnchantmentDisplayHelper {
             getSingleWordAbbreviation(words.getOrNull(0) ?: "")
         }
     }
-    
+
     private fun getAbbreviation(enchantment: RegistryKey<Enchantment>): String {
         return enchantmentAbbreviationCache.getOrPut(enchantment) {
             val name = getEnchantmentName(enchantment)
             processName(name)
         }
     }
-    
+
     private fun isCurse(enchantment: RegistryKey<Enchantment>): Boolean = enchantment in knownCurses
 }
 
@@ -198,7 +180,7 @@ object NametagEnchantmentRenderer {
 
     private fun processItemEnchantments(itemStack: ItemStack): List<EnchantCell> {
         val enchantmentList = mutableListOf<Pair<EnchantmentInfo, Int>>()
-        
+
         for (enchantmentKey in supportedEnchantments) {
             val level = itemStack.getEnchantment(enchantmentKey)
             if (level > 0) {

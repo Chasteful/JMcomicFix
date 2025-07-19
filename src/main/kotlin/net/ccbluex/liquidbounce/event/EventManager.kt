@@ -34,9 +34,15 @@ val ALL_EVENT_CLASSES: Array<KClass<out Event>> = arrayOf(
     TickPacketProcessEvent::class,
     BlockChangeEvent::class,
     ChunkLoadEvent::class,
+    OverlayTitleEvent::class,
+    OverlayDisconnectionEvent::class,
+    ConnectionDetailsEvent::class,
     ChunkDeltaUpdateEvent::class,
+    OverlayPlayListEvent::class,
+    OverlayChatEvent::class,
     ChunkUnloadEvent::class,
     DisconnectEvent::class,
+    SneakNetworkEvent::class,
     GameRenderEvent::class,
     WorldRenderEvent::class,
     OverlayRenderEvent::class,
@@ -51,7 +57,6 @@ val ALL_EVENT_CLASSES: Array<KClass<out Event>> = arrayOf(
     InputHandleEvent::class,
     MovementInputEvent::class,
     SprintEvent::class,
-    SneakNetworkEvent::class,
     KeyEvent::class,
     MouseRotationEvent::class,
     KeybindChangeEvent::class,
@@ -69,6 +74,7 @@ val ALL_EVENT_CLASSES: Array<KClass<out Event>> = arrayOf(
     EntityMarginEvent::class,
     HealthUpdateEvent::class,
     DeathEvent::class,
+    VirtualTypeEvent::class,
     PlayerTickEvent::class,
     PlayerPostTickEvent::class,
     PlayerMovementTickEvent::class,
@@ -128,7 +134,10 @@ val ALL_EVENT_CLASSES: Array<KClass<out Event>> = arrayOf(
     ScheduleInventoryActionEvent::class,
     SelectHotbarSlotSilentlyEvent::class,
     SpaceSeperatedNamesChangeEvent::class,
-    ClickGuiScaleChangeEvent::class,
+    TitleControlChangeEvent::class,
+    BetterTabChangeEvent::class,
+    HudValueChangeEvent::class,
+    HudLayoutEditorValueChangeEvent::class,
     BrowserUrlChangeEvent::class,
     TagEntityEvent::class,
     MouseScrollInHotbarEvent::class,
@@ -191,6 +200,7 @@ object EventManager {
             it.removeIf { it.handlerClass == eventListener }
         }
     }
+
 
     fun unregisterAll() {
         registry.values.forEach {

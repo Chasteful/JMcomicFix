@@ -36,9 +36,9 @@ import net.minecraft.util.math.Vec3d
 
 object CrystalAuraDamageOptions : Configurable("Damage") {
 
-    private val maxSelfDamage by float("MaxSelfDamage", 2.0F, 0.0F..10.0F)
-    private val maxFriendDamage by float("MaxFriendDamage", 1.0F, 0.0F..10.0F)
-    private val minEnemyDamage by float("MinEnemyDamage", 5.0F, 0.0F..10.0F)
+    private val maxSelfDamage by float("MaxSelfDamage", 1000.0F, 0.0F..1000.0F)
+    private val maxFriendDamage by float("MaxFriendDamage", 1000.0F, 0.0F..1000.0F)
+    private val minEnemyDamage by float("MinEnemyDamage", 0.0F, 0.0F..1000.0F)
 
     /**
      * Won't place / break crystals that would kill us.
@@ -85,8 +85,8 @@ object CrystalAuraDamageOptions : Configurable("Damage") {
                     .filterIsInstance<LivingEntity>()
 
             if (friends.any {
-                it.getDamage(pos, requestingSubmodule, CheckedEntity.OTHER).isGreaterThan(maxFriendDamage)
-            }) {
+                    it.getDamage(pos, requestingSubmodule, CheckedEntity.OTHER).isGreaterThan(maxFriendDamage)
+                }) {
                 tooMuchDamageForFriend = true
             }
         }
@@ -187,11 +187,13 @@ object CrystalAuraDamageOptions : Configurable("Damage") {
                 maxBlastResistance: Float?,
                 include: BlockPos?
             ): DamageProvider {
-                return NormalDamageProvider(entity.getDamageFromExplosion(
-                    crystal,
-                    include = include,
-                    maxBlastResistance = maxBlastResistance
-                ))
+                return NormalDamageProvider(
+                    entity.getDamageFromExplosion(
+                        crystal,
+                        include = include,
+                        maxBlastResistance = maxBlastResistance
+                    )
+                )
             }
         };
 

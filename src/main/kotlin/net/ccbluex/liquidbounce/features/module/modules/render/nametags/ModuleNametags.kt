@@ -77,7 +77,6 @@ object ModuleNametags : ClientModule("Nametags", Category.RENDER) {
         if (nametagsToRender.isEmpty()) {
             return@handler
         }
-
         renderEnvironmentForGUI {
             val nametagRenderer = NametagRenderer()
 
@@ -109,6 +108,8 @@ object ModuleNametags : ClientModule("Nametags", Category.RENDER) {
      * add what should be rendered ([Nametag]). The nametags are sorted in order of rendering.
      */
     private fun collectAndSortNametagsToRender(list: MutableList<Nametag>) {
+        val nametagsToRender = mutableListOf<Nametag>()
+
         val maximumDistanceSquared = maximumDistance.sq()
 
         for (entity in RenderedEntities) {

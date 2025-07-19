@@ -18,7 +18,10 @@
  */
 package net.ccbluex.liquidbounce.config.gson.adapter
 
+import com.google.gson.*
 import net.minecraft.block.Block
 import net.minecraft.registry.Registries
+import net.minecraft.util.Identifier
+import java.lang.reflect.Type
 
 object BlockAdapter : IdentifierAsStringAdapter<Block>(Registries.BLOCK)

@@ -84,18 +84,22 @@ class Alignment(
      */
     fun toStyle() = """
         position: fixed;
-        ${when (horizontalAlignment) {
-        ScreenAxisX.LEFT -> "left: ${horizontalOffset}px"
-        ScreenAxisX.RIGHT -> "right: ${horizontalOffset}px"
-        ScreenAxisX.CENTER -> "left: calc(50% + ${horizontalOffset}px)"
-        ScreenAxisX.CENTER_TRANSLATED -> "left: calc(50% + ${horizontalOffset}px)"
-    }};
-        ${when (verticalAlignment) {
-        ScreenAxisY.TOP -> "top: ${verticalOffset}px"
-        ScreenAxisY.BOTTOM -> "bottom: ${verticalOffset}px"
-        ScreenAxisY.CENTER -> "top: calc(50% + ${verticalOffset}px)"
-        ScreenAxisY.CENTER_TRANSLATED -> "top: calc(50% + ${verticalOffset}px)"
-    }};
+        ${
+        when (horizontalAlignment) {
+            ScreenAxisX.LEFT -> "left: ${horizontalOffset}px"
+            ScreenAxisX.RIGHT -> "right: ${horizontalOffset}px"
+            ScreenAxisX.CENTER -> "left: calc(50% + ${horizontalOffset}px)"
+            ScreenAxisX.CENTER_TRANSLATED -> "left: calc(50% + ${horizontalOffset}px)"
+        }
+    };
+        ${
+        when (verticalAlignment) {
+            ScreenAxisY.TOP -> "top: ${verticalOffset}px"
+            ScreenAxisY.BOTTOM -> "bottom: ${verticalOffset}px"
+            ScreenAxisY.CENTER -> "top: calc(50% + ${verticalOffset}px)"
+            ScreenAxisY.CENTER_TRANSLATED -> "top: calc(50% + ${verticalOffset}px)"
+        }
+    };
         transform: translate(
             ${if (horizontalAlignment == ScreenAxisX.CENTER_TRANSLATED) "-50%" else "0"},
             ${if (verticalAlignment == ScreenAxisY.CENTER_TRANSLATED) "-50%" else "0"}

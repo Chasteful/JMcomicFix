@@ -13,7 +13,7 @@ import java.util.*
  */
 class LegacyTextSanitizer(
     private val innerVisitor: StyledVisitor<Unit>
-): StyledVisitor<Unit> {
+) : StyledVisitor<Unit> {
 
     override fun accept(style: Style, text: String): Optional<Unit> {
         var currentStyle = style
@@ -67,7 +67,7 @@ class LegacyTextSanitizer(
         }
     }
 
-    class SanitizedLegacyText(private val text: Text): OrderedText {
+    class SanitizedLegacyText(private val text: Text) : OrderedText {
         override fun accept(visitor: CharacterVisitor): Boolean {
             var idx = 0
 

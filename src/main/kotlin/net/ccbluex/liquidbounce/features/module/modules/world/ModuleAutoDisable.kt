@@ -58,8 +58,8 @@ object ModuleAutoDisable : ClientModule("AutoDisable", Category.WORLD) {
     }
 
     private fun disableAndNotify(reason: String) {
-        val modules = listOfModules.filter {
-            module -> module.running
+        val modules = listOfModules.filter { module ->
+            module.running
         }
 
         if (modules.isNotEmpty()) {

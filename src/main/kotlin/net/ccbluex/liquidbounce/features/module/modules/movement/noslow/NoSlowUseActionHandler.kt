@@ -31,7 +31,7 @@ abstract class NoSlowUseActionHandler(name: String) : ToggleableConfigurable(Mod
         val DEFAULT_USE_MUL = FloatFloatImmutablePair(0.2f, 0.2f)
     }
 
-    open fun getMultiplier() : FloatFloatPair {
+    open fun getMultiplier(): FloatFloatPair {
         if (!this.enabled) {
             return DEFAULT_USE_MUL
         }

@@ -179,6 +179,7 @@ fun getRegistries(requestObject: RequestObject) = httpOk(JsonObject().apply {
                     parentMap[id] = Registries.BLOCK.getId(item.block)
                 }
             }
+
             else -> {
                 if (!pickStack.isNothing()) {
                     logger.warn("Invalid pick stack for $id: $pickStack")

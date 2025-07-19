@@ -28,10 +28,9 @@ import org.spongepowered.asm.mixin.Unique;
 public abstract class MixinChatHudLine implements ChatMessageAddition, ChatHudLineAddition {
 
     @Unique
-    private String liquid_bounce$id = null;
-
-    @Unique
     int liquid_bounce$count = 1;
+    @Unique
+    private String liquid_bounce$id = null;
 
     @Unique
     @Override

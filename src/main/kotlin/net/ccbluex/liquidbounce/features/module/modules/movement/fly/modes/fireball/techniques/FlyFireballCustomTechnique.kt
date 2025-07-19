@@ -55,6 +55,7 @@ object FlyFireballCustomTechnique : Choice("Custom") {
     }
 
     val sprint by boolean("Sprint", true)
+
     //  Stop moving when module is active to avoid falling off, for example a bridge
     val stopMove by boolean("StopMove", true)
 

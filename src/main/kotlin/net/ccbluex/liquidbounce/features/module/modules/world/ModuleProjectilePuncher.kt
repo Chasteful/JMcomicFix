@@ -81,7 +81,8 @@ object ModuleProjectilePuncher : ClientModule("ProjectilePuncher", Category.WORL
                 rotation = RotationManager.serverRotation,
                 range = range.toDouble(),
                 wallsRange = 0.0
-            )) {
+            )
+        ) {
             return@tickHandler
         }
 

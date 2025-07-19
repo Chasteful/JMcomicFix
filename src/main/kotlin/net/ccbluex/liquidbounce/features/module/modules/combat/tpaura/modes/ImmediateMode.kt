@@ -47,10 +47,12 @@ object ImmediateMode : TpAuraChoice("Immediate") {
         renderEnvironmentForWorld(matrixStack) {
             desyncPlayerPosition?.let { playerPosition ->
                 withColor(Color4b.WHITE) {
-                    drawLineStrip(listOf(
-                        relativeToCamera(player.pos.add(0.0, 1.0, 0.0)).toVec3(),
-                        relativeToCamera(playerPosition.add(0.0, 1.0, 0.0)).toVec3()
-                    ))
+                    drawLineStrip(
+                        listOf(
+                            relativeToCamera(player.pos.add(0.0, 1.0, 0.0)).toVec3(),
+                            relativeToCamera(playerPosition.add(0.0, 1.0, 0.0)).toVec3()
+                        )
+                    )
                 }
             }
         }

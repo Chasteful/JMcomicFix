@@ -5,7 +5,6 @@
     import ButtonSetting from "../common/setting/ButtonSetting.svelte";
     import {addProxy as addProxyRest} from "../../../integration/rest";
     import {listen} from "../../../integration/ws";
-    import SingleSelect from "../common/setting/select/SingleSelect.svelte";
 
     export let visible: boolean;
 
@@ -18,7 +17,6 @@
     }
 
     let requiresAuthentication = false;
-    let proxyType = "SOCKS5";
     let hostPort = "";
     let username = "";
     let password = "";
@@ -42,7 +40,7 @@
         const [host, port] = hostPort.split(":");
 
         loading = true;
-        await addProxyRest(host, parseInt(port), username, password, proxyType, forwardAuthentication);
+        await addProxyRest(host, parseInt(port), username, password, forwardAuthentication);
     }
 
     listen("proxyAdditionResult", () => {
@@ -53,7 +51,6 @@
 
     function cleanup() {
         requiresAuthentication = false;
-        proxyType = "SOCKS5";
         hostPort = "";
         username = "";
         password = "";
@@ -61,14 +58,13 @@
     }
 </script>
 
-<Modal title="Add Proxy" bind:visible={visible} on:close={cleanup}>
-    <IconTextInput title="Host:Port" icon="server" pattern=".+:[0-9]+" bind:value={hostPort}/>
-    <SingleSelect title="Proxy Type" options={["HTTP", "SOCKS5"]} bind:value={proxyType}/>
-    <SwitchSetting title="Requires Authentication" bind:value={requiresAuthentication}/>
+<Modal bind:visible={visible} on:close={cleanup} title="Add Proxy">
+    <IconTextInput bind:value={hostPort} icon="server" pattern=".+:[0-9]+" title="Host:Port"/>
+    <SwitchSetting bind:value={requiresAuthentication} title="Requires Authentication"/>
     {#if requiresAuthentication}
         <IconTextInput title="Username" icon="user" bind:value={username}/>
         <IconTextInput title="Password" icon="lock" type="password" bind:value={password}/>
     {/if}
-    <SwitchSetting title="Forward Microsoft Authentication" bind:value={forwardAuthentication}/>
-    <ButtonSetting title="Add Proxy" {disabled} on:click={addProxy} listenForEnter={true} {loading}/>
+    <SwitchSetting bind:value={forwardAuthentication} title="Forward Microsoft Authentication"/>
+    <ButtonSetting {disabled} listenForEnter={true} {loading} on:click={addProxy} title="Add Proxy"/>
 </Modal>

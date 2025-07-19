@@ -86,10 +86,10 @@ private enum class ShowIn(
         result.translation
             .asText()
             .formatted(Formatting.WHITE)
-        .let {
-            event.text = it
-            type.setText(it)
-        }
+            .let {
+                event.text = it
+                type.setText(it)
+            }
     })
 }
 

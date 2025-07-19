@@ -56,7 +56,7 @@ fun interface AutoCompletionProvider {
     fun autocomplete(begin: String, args: List<String>): List<String>
 }
 
-class Parameter<T: Any>(
+class Parameter<T : Any>(
     val name: String,
     val required: Boolean,
     val vararg: Boolean,
@@ -69,7 +69,6 @@ class Parameter<T: Any>(
 
     val description: MutableText
         get() = translation("$translationBaseKey.description")
-
     fun interface Verificator<T: Any> {
         /**
          * Verifies and parses parameter.

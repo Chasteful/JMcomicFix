@@ -38,7 +38,7 @@ object ScaffoldTowerVulcan : ScaffoldTower("Vulcan") {
         if (player.age % 2 == 0) {
             player.velocity.y = 0.7
         } else {
-            player.velocity.y = if(player.moving) 0.42f.toDouble() else 0.6
+            player.velocity.y = if (player.moving) 0.42f.toDouble() else 0.6
             player.incrementStat(Stats.JUMP)
         }
     }
@@ -47,7 +47,7 @@ object ScaffoldTowerVulcan : ScaffoldTower("Vulcan") {
     private val packetHandler = handler<PacketEvent> { event ->
         val packet = event.packet
 
-        if(packet is PlayerMoveC2SPacket && !player.moving) {
+        if (packet is PlayerMoveC2SPacket && !player.moving) {
             if (player.age % 2 == 0) {
                 packet.x += 0.1
                 packet.z += 0.1

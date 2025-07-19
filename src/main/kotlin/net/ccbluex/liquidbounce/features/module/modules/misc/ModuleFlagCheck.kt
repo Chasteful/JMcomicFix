@@ -26,6 +26,9 @@ import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.event.tickHandler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
+import net.ccbluex.liquidbounce.render.GenericRainbowColorMode
+import net.ccbluex.liquidbounce.render.GenericStaticColorMode
+import net.ccbluex.liquidbounce.render.GenericSyncColorMode
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.ccbluex.liquidbounce.utils.client.MessageMetadata
 import net.ccbluex.liquidbounce.utils.client.chat
@@ -51,7 +54,6 @@ object ModuleFlagCheck : ClientModule("FlagCheck", Category.MISC, aliases = arra
     private var invalidAttributes by boolean("InvalidAttributes", false)
 
     private object ResetFlags : ToggleableConfigurable(this, "ResetFlags", true) {
-
         private var afterSeconds by int("After", 30, 1..300, "s")
 
         @Suppress("unused")
@@ -59,17 +61,24 @@ object ModuleFlagCheck : ClientModule("FlagCheck", Category.MISC, aliases = arra
             flagCount = 0
             waitSeconds(afterSeconds)
         }
-
     }
 
     private object Render : ToggleableConfigurable(this, "Render", true) {
-
         private val notInFirstPerson by boolean("NotInFirstPerson", true)
         private val renderTime by int("Alive", 1000, 0..3000, "ms")
         private val fadeOut by curve("FadeOut", Easing.QUAD_OUT)
         private val outTime by int("OutTime", 500, 0..2000, "ms")
-        private var color by color("Color", Color4b.RED.with(a = 100).darker())
-        private var outlineColor by color("OutlineColor", Color4b.RED.darker())
+
+        private val alpha by int("Alpha", 100, 0..255)
+        private val outlineAlpha by int("OutlineAlpha", 180, 0..255)
+
+        private val colorMode = choices("ColorMode", 2) {
+            arrayOf(
+                GenericStaticColorMode(it, Color4b.RED),
+                GenericRainbowColorMode(it),
+                GenericSyncColorMode(it)
+            )
+        }
 
         val wireframePlayer = WireframePlayer(Vec3d.ZERO, 0f, 0f)
         var creationTime = 0L
@@ -81,23 +90,23 @@ object ModuleFlagCheck : ClientModule("FlagCheck", Category.MISC, aliases = arra
 
         @Suppress("unused")
         val renderHandler = handler<WorldRenderEvent> {
-            if (finished || notInFirstPerson && mc.options.perspective.isFirstPerson) {
-                return@handler
-            }
+            if (finished || (notInFirstPerson && mc.options.perspective.isFirstPerson)) return@handler
 
             val time = System.currentTimeMillis()
             val withinRenderDuration = time - creationTime < renderTime
 
+            val baseColor = colorMode.activeChoice.getColor(player).withAlpha(alpha)
+            val baseOutline = colorMode.activeChoice.getColor(player).withAlpha(outlineAlpha)
+
             if (withinRenderDuration) {
-                wireframePlayer.render(it, color, outlineColor)
+                wireframePlayer.render(it, baseColor, baseOutline)
             } else {
                 val factor = 1f - fadeOut.getFactor(creationTime + renderTime, time, outTime.toFloat())
                 if (factor == 0f) {
                     finished = true
                     return@handler
                 }
-
-                wireframePlayer.render(it, color.fade(factor), outlineColor.fade(factor))
+                wireframePlayer.render(it, baseColor.fade(factor), baseOutline.fade(factor))
             }
         }
 
@@ -105,7 +114,6 @@ object ModuleFlagCheck : ClientModule("FlagCheck", Category.MISC, aliases = arra
             creationTime = System.currentTimeMillis()
             finished = false
         }
-
     }
 
     init {
@@ -114,14 +122,12 @@ object ModuleFlagCheck : ClientModule("FlagCheck", Category.MISC, aliases = arra
     }
 
     private var flagCount = 0
-    private var lastYaw = 0F
-    private var lastPitch = 0F
+    private var lastYaw = 0f
+    private var lastPitch = 0f
 
     @Suppress("unused")
     private val packetHandler = handler<PacketEvent> { event ->
-        if (player.age <= 25) {
-            return@handler
-        }
+        if (player.age <= 25) return@handler
 
         when (val packet = event.packet) {
             is PlayerPositionLookS2CPacket -> {
@@ -152,49 +158,33 @@ object ModuleFlagCheck : ClientModule("FlagCheck", Category.MISC, aliases = arra
 
     @Suppress("unused")
     private val repeatable = tickHandler {
-        if (!invalidAttributes) {
-            return@tickHandler
-        }
+        if (!invalidAttributes) return@tickHandler
 
-        val invalidHeath = player.health <= 0f && player.isAlive
+        val invalidHealth = player.health <= 0f && player.isAlive
         val invalidHunger = player.hungerManager.foodLevel <= 0
 
-        if (!invalidHeath && !invalidHunger) {
-            return@tickHandler
-        }
+        if (!invalidHealth && !invalidHunger) return@tickHandler
 
         val invalidReasons = mutableListOf<String>()
-
-        if (invalidHeath) {
-            invalidReasons.add("Health")
-        }
-
-        if (invalidHunger) {
-            invalidReasons.add("Hunger")
-        }
+        if (invalidHealth) invalidReasons.add("Health")
+        if (invalidHunger) invalidReasons.add("Hunger")
 
         if (invalidReasons.isNotEmpty()) {
             flagCount++
-
             val reasonString = invalidReasons.joinToString()
             alert(AlertReason.INVALID, reasonString)
         }
     }
 
     private fun alert(reason: AlertReason, extra: String? = null) {
-        val message = if (StringUtils.isEmpty(extra)) {
+        val message = if (extra == null) {
             message("alert", message(reason.key), flagCount)
         } else {
-            message("alertWithExtra", message(reason.key), extra!!, flagCount)
+            message("alertWithExtra", message(reason.key), extra, flagCount)
         }
 
-        if (notification) {
-            notification(name, message, NotificationEvent.Severity.INFO)
-        }
-
-        if (chatMessage) {
-            chat(message, metadata = MessageMetadata(id = "$name#${reason.key}"))
-        }
+        if (notification) notification(name, message, NotificationEvent.Severity.INFO)
+        if (chatMessage) chat(message, metadata = MessageMetadata(id = "$name#${reason.key}"))
     }
 
     private fun calculateAngleDelta(newAngle: Float, oldAngle: Float): Float {
@@ -204,11 +194,9 @@ object ModuleFlagCheck : ClientModule("FlagCheck", Category.MISC, aliases = arra
         return abs(delta)
     }
 
-    @Suppress("SpellCheckingInspection")
     private enum class AlertReason(val key: String) {
         INVALID("invalid"),
         FORCEROTATE("forceRotate"),
         LAGBACK("lagback")
     }
-
 }

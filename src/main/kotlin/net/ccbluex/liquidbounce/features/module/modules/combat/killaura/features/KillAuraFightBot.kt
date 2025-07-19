@@ -185,7 +185,7 @@ object KillAuraFightBot : NavigationBaseConfigurable<CombatContext>(ModuleKillAu
                 val position = leaderPosition.add(rotation.directionVector * LeaderFollower.radius.toDouble())
                 ModuleDebug.debugGeometry(
                     this,
-                    "Possible Position $yaw",
+                    "Possible Information $yaw",
                     ModuleDebug.DebuggedPoint(position, Color4b.MAGENTA)
                 )
                 position
@@ -218,7 +218,7 @@ object KillAuraFightBot : NavigationBaseConfigurable<CombatContext>(ModuleKillAu
                 val isInAngle = rotation.angleTo(combatTarget.targetRotation) <= dangerousYawDiff
                 ModuleDebug.debugGeometry(
                     this,
-                    "Possible Position $yaw",
+                    "Possible Information $yaw",
                     ModuleDebug.DebuggedPoint(position, if (!isInAngle) Color4b.GREEN else Color4b.RED)
                 )
 

@@ -72,14 +72,20 @@ object ModuleSwordBlock : ClientModule("SwordBlock", Category.COMBAT, aliases = 
                     waitTicks(1)
                     interaction.sendSequencedPacket(world) { sequence ->
                         // This time we use a new sequence
-                        PlayerInteractItemC2SPacket(Hand.OFF_HAND, sequence,
-                            player.yaw, player.pitch)
+                        PlayerInteractItemC2SPacket(
+                            Hand.OFF_HAND, sequence,
+                            player.yaw, player.pitch
+                        )
                     }
                 } else {
                     it.cancelEvent()
                     // We use the old sequence
-                    network.sendPacket(PlayerInteractItemC2SPacket(Hand.OFF_HAND, packet.sequence,
-                        player.yaw, player.pitch))
+                    network.sendPacket(
+                        PlayerInteractItemC2SPacket(
+                            Hand.OFF_HAND, packet.sequence,
+                            player.yaw, player.pitch
+                        )
+                    )
                 }
             }
         }

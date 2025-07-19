@@ -91,7 +91,8 @@ internal object NoFallBlink : Choice("Blink") {
                 event.jump,
                 player.isSprinting,
                 true
-            ))
+            )
+        )
 
         repeat(PEEK_TICKS) {
             simulatedPlayer.tick()
@@ -116,12 +117,18 @@ internal object NoFallBlink : Choice("Blink") {
             simulatedPlayer.tick()
 
             if (simulatedPlayer.fallDistance > triggerFallDistance) {
-                notification("NoFall", "Detected possible fall damage, blinking...",
-                    NotificationEvent.Severity.INFO)
+                notification(
+                    "NoFall", "Detected possible fall damage, blinking...",
+                    NotificationEvent.Severity.INFO
+                )
                 blinkFall = true
 
-                ModuleDebug.debugGeometry(ModuleNoFall, "Ground", ModuleDebug.DebuggedPoint(player.pos,
-                    Color4b(0, 0, 255, 255), size = 0.2))
+                ModuleDebug.debugGeometry(
+                    ModuleNoFall, "Ground", ModuleDebug.DebuggedPoint(
+                        player.pos,
+                        Color4b(0, 0, 255, 255), size = 0.2
+                    )
+                )
                 break
             }
         }

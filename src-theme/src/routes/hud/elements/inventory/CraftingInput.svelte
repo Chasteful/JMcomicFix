@@ -2,9 +2,11 @@
     import type {ItemStack} from "../../../../integration/types";
     import {listen} from "../../../../integration/ws";
     import type {PlayerInventory, PlayerInventoryEvent} from "../../../../integration/events";
-    import ItemStackView from "./ItemStackView.svelte";
+    import ItemStackView from "../../common/ItemView/ItemStackView.svelte";
     import {onMount} from "svelte";
     import {getPlayerInventory} from "../../../../integration/rest";
+    import {fly} from "svelte/transition";
+    import {expoInOut} from "svelte/easing";
 
     let stacks: ItemStack[] = [];
 
@@ -15,28 +17,28 @@
     listen("clientPlayerInventory", (data: PlayerInventoryEvent) => {
         updateStacks(data.inventory);
     });
-
     onMount(async () => {
         const inventory = await getPlayerInventory();
         updateStacks(inventory);
     });
+
 </script>
 
-<div class="container">
+<div class="container hud-container" transition:fly|global={{duration: 500, y: -50, easing: expoInOut}}>
     {#each stacks as stack (stack)}
         <ItemStackView {stack}/>
     {/each}
 </div>
-
 <style lang="scss">
   @use "../../../../colors" as *;
 
   .container {
-    background-color: rgba($hotbar-base-color, 0.5);
     grid-template-columns: repeat(2, 1fr);
     padding: 4px;
-    border-radius: 5px;
+    min-width: 72px;
+    min-height: 72px;
     display: grid;
     gap: 0.5rem;
   }
+
 </style>

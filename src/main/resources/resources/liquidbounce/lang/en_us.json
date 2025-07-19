@@ -723,5 +723,22 @@
   "liquidbounce.module.betterTitle.description": "Improvements to the title and subtitle.",
   "liquidbounce.module.autoPearl.description": "Aims and throws a pearl at an enemies pearl trajectory.",
   "liquidbounce.module.replenish.description": "Automatically refills your hotbar with items from your inventory when the count drops to a certain threshold.",
-  "liquidbounce.module.anchor.description": "Pulls you into safe holes for crystal PvP."
+  "liquidbounce.module.anchor.description": "Pulls you into safe holes for crystal PvP.",
+  "liquidbounce.module.titleControl.description": "Filter the title of the server for keywords you don't want to see.",
+  "liquidbounce.module.capes.description": "Customize a cape that is only visible to you.",
+  "liquidbounce.module.halo.description": "Displays the aura of a BlueArchive character above the player's head.",
+  "liquidbounce.module.packetQueueColor.description": "Setting the player Wireframe model color for the PacketQueue.",
+  "liquidbounce.module.autoGG.description": "Automatically send the specified message in the chat box after you win.",
+  "liquidbounce.module.movePhysics.description": "Allows you to move under certain special server anti-cheats.",
+  "liquidbounce.module.pendant.description": "Display a picture on some interfaces.",
+  "liquidbounce.module.iQBoost.description": "Allows you to improve your IQ.",
+  "liquidbounce.module.hudLayoutEditor.description": "The HUD editing interface is displayed for quick configuration of the HUD layout.",
+  "liquidbounce.module.setbackOnRespawn.description": "Teleports you to the location of your death when respawning.",
+  "liquidbounce.module.autoStuck.description": "Got, stuck before jumping into the Void Girl's embrace.",
+  "liquidbounce.module.autoClutch.description": "Automatic pearl cultch based on simulated annealing algorithm.",
+  "liquidbounce.module.killEffects.description": "Displays an effect when you kill a target.",
+  "liquidbounce.module.noweb.mode.grim.messages.Protocol": "Please use a protocol version 1.18.2 or later to bypass Grim version weak detection!",
+  "liquidbounce.module.autoRod.description": "Automatically use the rod to control the distance, need the crosshair to point at the opponent." ,
+  "liquidbounce.module.autoScreenShot.description": "Automatically perform certain actions on victory and take screenshots.",
+  "liquidbounce.module.noBooks.description": "Intercept and close the book interface opened by the server."
 }

@@ -114,12 +114,34 @@ data class Rotation(
     fun towardsLinear(other: Rotation, horizontalFactor: Float, verticalFactor: Float): Rotation {
         val diff = rotationDeltaTo(other)
         val rotationDifference = diff.length()
-        val straightLineYaw = abs(diff.deltaYaw / rotationDifference) * horizontalFactor
-        val straightLinePitch = abs(diff.deltaPitch / rotationDifference) * verticalFactor
+
+        val safeHorizontalFactor = horizontalFactor.coerceAtLeast(0f)
+        val safeVerticalFactor = verticalFactor.coerceAtLeast(0f)
+
+        val straightLineYaw = if (rotationDifference < 0.0001f) {
+            safeHorizontalFactor
+        } else {
+            abs(diff.deltaYaw / rotationDifference) * safeHorizontalFactor
+        }
+
+        val straightLinePitch = if (rotationDifference < 0.0001f) {
+            safeVerticalFactor
+        } else {
+            abs(diff.deltaPitch / rotationDifference) * safeVerticalFactor
+        }
+
+        val yawChange = diff.deltaYaw.coerceIn(
+            -straightLineYaw.coerceAtLeast(0f),
+            straightLineYaw.coerceAtLeast(0f)
+        )
+        val pitchChange = diff.deltaPitch.coerceIn(
+            -straightLinePitch.coerceAtLeast(0f),
+            straightLinePitch.coerceAtLeast(0f)
+        )
 
         return Rotation(
-            this.yaw + diff.deltaYaw.coerceIn(-straightLineYaw, straightLineYaw),
-            this.pitch + diff.deltaPitch.coerceIn(-straightLinePitch, straightLinePitch)
+            this.yaw + yawChange,
+            this.pitch + pitchChange
         )
     }
 

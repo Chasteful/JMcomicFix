@@ -45,8 +45,10 @@ object CommandClientDestructSubcommand {
             val confirm = args.getOrNull(0) as Boolean? == true
             if (!confirm) {
                 chat(
-                    regular("Do you really want to destruct the client? " +
-                    "If so, type the command again with 'yes' at the end.")
+                    regular(
+                        "Do you really want to destruct the client? " +
+                            "If so, type the command again with 'yes' at the end."
+                    )
                 )
                 chat(markAsError("If you also want to wipe the client, add an additional 'yes' at the end."))
                 chat(regular("For full destruct: .client destruct yes yes"))
@@ -59,15 +61,20 @@ object CommandClientDestructSubcommand {
             chat(regular("LiquidBounce is being destructed from your client..."))
             if (!wipe) {
                 chat(
-                    regular("WARNING: You have not wiped the client (missing wipe parameter) - therefore " +
-                    "some files may still be present!")
+                    regular(
+                        "WARNING: You have not wiped the client (missing wipe parameter) - therefore " +
+                            "some files may still be present!"
+                    )
                 )
             }
 
             destructClient()
             chat(
-                regular("LiquidBounce has been destructed from your client. " +
-                "You can clear your chat using F3+D. If wipe was enabled, the chat will be cleared automatically.")
+                regular(
+                    "LiquidBounce has been destructed from your client. " +
+                        "You can clear your chat using F3+D. If wipe was enabled," +
+                        " the chat will be cleared automatically."
+                )
             )
 
             if (wipe) {

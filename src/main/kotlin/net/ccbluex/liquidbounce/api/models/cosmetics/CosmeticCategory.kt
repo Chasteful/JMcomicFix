@@ -24,8 +24,10 @@ import com.google.gson.annotations.SerializedName
 enum class CosmeticCategory {
     @SerializedName("Cape")
     CAPE,
+
     @SerializedName("Deadmau5Ears")
     DEADMAU5_EARS,
+
     @SerializedName("Dinnerbone")
     DINNERBONE,
 }

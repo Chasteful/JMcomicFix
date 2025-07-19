@@ -48,5 +48,4 @@ object ModuleProjectileAimbot : ClientModule("ProjectileAimbot", Category.COMBAT
     }
 
 
-
 }

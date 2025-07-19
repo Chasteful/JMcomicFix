@@ -100,7 +100,7 @@ object ScaffoldSprintControlFeature : ToggleableConfigurable(ModuleScaffold, "Sp
                     event.sprint = false
                 }
 
-                SprintMode.DO_NOT_CHANGE -> { }
+                SprintMode.DO_NOT_CHANGE -> {}
 
             }
         }
@@ -122,7 +122,7 @@ object ScaffoldSprintControlFeature : ToggleableConfigurable(ModuleScaffold, "Sp
                     event.sprint = false
                 }
 
-                SprintMode.DO_NOT_CHANGE -> { }
+                SprintMode.DO_NOT_CHANGE -> {}
             }
         }
     }

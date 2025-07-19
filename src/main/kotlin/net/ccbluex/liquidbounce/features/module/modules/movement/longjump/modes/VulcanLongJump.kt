@@ -81,6 +81,7 @@ internal object VulcanLongJump : Choice("Vulcan289") {
                 10 -> {
                     player.setPosition(player.pos.x, player.pos.y - 0.5, player.pos.z)
                 }
+
                 5 -> {
                     player.setPosition(player.pos.x, player.pos.y + 8, player.pos.z)
                     player.velocity = player.velocity.withStrafe(strength = 1.0, speed = 0.3)
@@ -97,7 +98,7 @@ internal object VulcanLongJump : Choice("Vulcan289") {
             player.velocity.z
         )
 
-        val didLongJump = ModuleLongJump.autoDisable && ModuleLongJump.jumped
+        val didLongJump = ModuleLongJump.AutoDisable.onBoosted && ModuleLongJump.jumped
 
         if (player.isOnGround && !recievedLagback && player.hurtTime == 0 && !didLongJump) {
             repeat(3) {

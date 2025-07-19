@@ -62,8 +62,10 @@ private fun BlockPlacer.placeInstant(blockPos: BlockPos?, state: BlockState, blo
     if (rotationMode.send) {
         val rotation = placementTarget.rotation.normalize()
         network.sendPacket(
-            PlayerMoveC2SPacket.LookAndOnGround(rotation.yaw, rotation.pitch, player.isOnGround,
-                player.horizontalCollision)
+            PlayerMoveC2SPacket.LookAndOnGround(
+                rotation.yaw, rotation.pitch, player.isOnGround,
+                player.horizontalCollision
+            )
         )
     }
 

@@ -29,10 +29,13 @@ import net.minecraft.entity.FallingBlockEntity
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket
 import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket
 
-object ModuleProphuntESP : ClientModule("ProphuntESP", Category.RENDER,
-    aliases = arrayOf("BlockUpdateDetector", "FallingBlockESP")) {
+object ModuleProphuntESP : ClientModule(
+    "ProphuntESP", Category.RENDER,
+    aliases = arrayOf("BlockUpdateDetector", "FallingBlockESP")
+) {
 
-    private val renderer = PlacementRenderer("RenderBlockUpdates", true, this,
+    private val renderer = PlacementRenderer(
+        "RenderBlockUpdates", true, this,
         defaultColor = Color4b(255, 179, 72, 90), keep = false
     )
 
@@ -57,6 +60,7 @@ object ModuleProphuntESP : ClientModule("ProphuntESP", Category.RENDER,
             is BlockUpdateS2CPacket -> mc.renderTaskQueue.add {
                 renderer.addBlock(packet.pos)
             }
+
             is ChunkDeltaUpdateS2CPacket -> mc.renderTaskQueue.add {
                 packet.visitUpdates { pos, _ -> renderer.addBlock(pos.toImmutable()) }
             }

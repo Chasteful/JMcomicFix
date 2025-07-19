@@ -99,10 +99,12 @@ object ModuleCriticals : ClientModule("Criticals", Category.COMBAT) {
                     if (event.source == SprintEvent.Source.MOVEMENT_TICK || event.source == SprintEvent.Source.INPUT) {
                         event.sprint = false
                     }
+
                 StopSprintingMode.ON_NETWORK ->
                     if (event.source == SprintEvent.Source.NETWORK || event.source == SprintEvent.Source.INPUT) {
                         event.sprint = false
                     }
+
                 else -> {}
             }
         }

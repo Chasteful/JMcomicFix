@@ -27,12 +27,14 @@ import net.ccbluex.liquidbounce.utils.kotlin.random
 /**
  * Short stop temporarily halts aiming at the target based on a specified rate.
  */
-class ShortStopRotationProcessor(owner: EventListener? = null)
-    : ToggleableConfigurable(owner, "ShortStop", false), RotationProcessor {
+class ShortStopRotationProcessor(owner: EventListener? = null) : ToggleableConfigurable(owner, "ShortStop", false),
+    RotationProcessor {
 
     private val rate by int("Rate", 3, 1..25, "%")
-    private var stopDuration by intRange("Duration", 1..2, 1..5,
-        "ticks")
+    private var stopDuration by intRange(
+        "Duration", 1..2, 1..5,
+        "ticks"
+    )
 
     private var ticksElapsed = 0
     private var currentTransitionInDuration = stopDuration.random()

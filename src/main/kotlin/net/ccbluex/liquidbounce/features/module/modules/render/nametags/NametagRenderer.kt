@@ -54,7 +54,6 @@ class NametagRenderer {
 
     fun drawNametag(env: RenderEnvironment, nametag: Nametag, pos: Vec3) = with(env) {
         val fontSize = FontManager.DEFAULT_FONT_SIZE
-
         val scale = 1f / (fontSize * 0.15f) * ModuleNametags.scale
 
         matrixStack.push()
@@ -78,7 +77,10 @@ class NametagRenderer {
         val q1 = Vec3(-0.1f * fontSize, ModuleNametags.fontRenderer.height * -0.1f, 0f)
         val q2 = Vec3(x + 0.2f * fontSize, ModuleNametags.fontRenderer.height * 1.1f, 0f)
 
-        quadBuffers.drawQuad(env, q1, q2)
+        // Only draw background if BACKGROUND option is showing
+        if (NametagShowOptions.BACKGROUND.isShowing()) {
+            quadBuffers.drawQuad(env, q1, q2)
+        }
 
         if (NametagShowOptions.BORDER.isShowing()) {
             lineBuffers.drawQuadOutlines(env, q1, q2)
@@ -87,7 +89,6 @@ class NametagRenderer {
         if (NametagShowOptions.ITEMS.isShowing()) {
             drawItemList(pos, nametag.items)
         }
-
         // Draw enchantments directly for the entity (regardless of whether items are shown)
         if (NametagShowOptions.ENCHANTMENTS.isShowing() && nametag.entity is LivingEntity) {
             NametagEnchantmentRenderer.drawEntityEnchantments(
@@ -120,7 +121,6 @@ class NametagRenderer {
         dc.matrices.translate(0.0F, 0.0F, 100.0F)
 
         val itemInfo = NametagShowOptions.ITEM_INFO.isShowing()
-
         itemsToRender.forEachIndexed { index, itemStack ->
             itemStack ?: return@forEachIndexed
 
@@ -137,12 +137,7 @@ class NametagRenderer {
         GL11.glEnable(GL11.GL_DEPTH_TEST)
 
         RenderSystem.enableBlend()
-        RenderSystem.blendFuncSeparate(
-            GL11.GL_SRC_ALPHA,
-            GL11.GL_ONE_MINUS_SRC_ALPHA,
-            GL11.GL_ONE,
-            GL11.GL_ZERO
-        )
+        RenderSystem.defaultBlendFunc()
 
         env.withColor(Color4b(0, 0, 0, 120)) {
             quadBuffers.draw()
@@ -150,8 +145,9 @@ class NametagRenderer {
         env.withColor(Color4b(0, 0, 0, 255)) {
             lineBuffers.draw()
         }
-        env.withColor(Color4b.WHITE) {
+        env.withColor(Color4b(205, 214, 244, 255)) {
             fontBuffers.draw()
         }
     }
+
 }

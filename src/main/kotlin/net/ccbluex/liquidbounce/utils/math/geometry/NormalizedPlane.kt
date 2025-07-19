@@ -70,6 +70,7 @@ class NormalizedPlane(val pos: Vec3d, val normalVec: Vec3d) {
                     )
                 )
             }
+
             !MathHelper.approximatelyEquals(dXZ, 0.0) -> {
                 return Line(
                     Vec3d(
@@ -84,6 +85,7 @@ class NormalizedPlane(val pos: Vec3d, val normalVec: Vec3d) {
                     )
                 )
             }
+
             else -> return null
         }
     }

@@ -25,6 +25,7 @@ import net.ccbluex.liquidbounce.features.misc.FriendManager
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.render.*
+import net.ccbluex.liquidbounce.render.GenericSyncColorMode
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.ccbluex.liquidbounce.render.engine.type.Vec3
 import net.ccbluex.liquidbounce.utils.combat.EntityTaggingManager
@@ -45,11 +46,13 @@ import java.awt.Color
 
 object ModuleTracers : ClientModule("Tracers", Category.RENDER) {
 
-    private val modes = choices("ColorMode", 0) {
+    private val modes = choices("ColorMode", 4) {
         arrayOf(
             DistanceColor,
+            GenericCustomColorMode(it, Color4b.WHITE.with(a = 80), Color4b.WHITE.with(a = 100)),
             GenericStaticColorMode(it, Color4b(0, 160, 255, 255)),
-            GenericRainbowColorMode(it)
+            GenericRainbowColorMode(it),
+            GenericSyncColorMode(it),
         )
     }
 
@@ -60,12 +63,13 @@ object ModuleTracers : ClientModule("Tracers", Category.RENDER) {
         val useViewDistance by boolean("UseViewDistance", true)
         val customViewDistance by float("CustomViewDistance", 128.0F, 1.0F..512.0F)
 
-        override fun getColor(param: LivingEntity): Color4b = throw NotImplementedError()
+        override fun getColors(param: LivingEntity): Pair<Color4b, Color4b> {
+            return Color4b(255, 0, 0, 255) to Color4b(0, 255, 0, 255)
+        }
     }
 
     val renderHandler = handler<WorldRenderEvent> { event ->
         val matrixStack = event.matrixStack
-
         val useDistanceColor = DistanceColor.isSelected
 
         val viewDistance = 16.0F * MathHelper.SQUARE_ROOT_OF_TWO *
@@ -74,49 +78,82 @@ object ModuleTracers : ClientModule("Tracers", Category.RENDER) {
             } else {
                 DistanceColor.customViewDistance
             })
-        val filteredEntities = world.entities.filter(this::shouldRenderTrace)
+        val entities = world.entities.filter(this::shouldRenderTrace)
         val camera = mc.gameRenderer.camera
 
-        if (filteredEntities.isEmpty()) {
-            return@handler
-        }
+        if (entities.isEmpty()) return@handler
 
         renderEnvironmentForWorld(matrixStack) {
-            val eyeVector = Vec3(0.0, 0.0, 1.0)
+            val eyeVec = Vec3(0.0, 0.0, 1.0)
                 .rotatePitch((-Math.toRadians(camera.pitch.toDouble())).toFloat())
                 .rotateYaw((-Math.toRadians(camera.yaw.toDouble())).toFloat())
 
             longLines {
-                for (entity in filteredEntities) {
-                    if (entity !is LivingEntity) {
-                        continue
-                    }
+                for (entity in entities) {
+                    if (entity !is LivingEntity) continue
 
                     val dist = player.distanceTo(entity) * 2.0F
-
-                    val color = if (useDistanceColor) {
-                        Color4b(
-                            Color.getHSBColor(
-                                (dist.coerceAtMost(viewDistance) / viewDistance) * (120.0f / 360.0f),
-                                1.0f,
-                                1.0f
-                            )
-                        )
-                    } else if (entity is PlayerEntity && FriendManager.isFriend(entity.gameProfile.name)) {
+                    val tagColor = EntityTaggingManager.getTag(entity).color
+                    val friendColor = if (entity is PlayerEntity &&
+                        FriendManager.isFriend(entity.gameProfile.name)
+                    ) {
                         Color4b.BLUE
                     } else {
-                        EntityTaggingManager.getTag(entity).color ?: modes.activeChoice.getColor(entity)
+                        null
+                    }
+                    val activeMode = modes.activeChoice
+                    val (startColor, endColor) = when (activeMode) {
+                        is GenericCustomColorMode -> activeMode.getColors(entity)
+                        is GenericSyncColorMode -> activeMode.getColors(entity)
+                        else -> {
+                            val baseColor = tagColor ?: friendColor ?: if (useDistanceColor) {
+                                Color4b(
+                                    Color.getHSBColor(
+                                        (dist.coerceAtMost(viewDistance) / viewDistance) * (120.0f / 360.0f),
+                                        1.0f, 1.0f
+                                    )
+                                )
+                            } else {
+                                activeMode.getColor(entity)
+                            }
+                            baseColor to baseColor
+                        }
                     }
 
-                    val pos = relativeToCamera(entity.interpolateCurrentPosition(event.partialTicks)).toVec3()
+                    val entityPos = relativeToCamera(entity.interpolateCurrentPosition(event.partialTicks)).toVec3()
+                    val entityTop = entityPos + Vec3(0f, entity.height, 0f)
 
-                    withColor(color) {
-                        drawLines(eyeVector, pos, pos, pos + Vec3(0f, entity.height, 0f))
+                    if (startColor == endColor) {
+                        withColor(startColor) {
+                            drawLines(eyeVec, entityPos, entityPos, entityTop)
+                        }
+                    } else {
+
+                        val segments = 10
+                        val points = List(segments + 1) { i ->
+                            val t = i / segments.toDouble()
+                            Vec3(
+                                eyeVec.x + (entityPos.x - eyeVec.x) * t,
+                                eyeVec.y + (entityPos.y - eyeVec.y) * t,
+                                eyeVec.z + (entityPos.z - eyeVec.z) * t
+                            )
+                        }
+
+                        for (i in 0 until segments) {
+                            val t = i / (segments - 1.0)
+                            val color = startColor.interpolateTo(endColor, t)
+                            withColor(color) {
+                                drawLines(points[i], points[i + 1])
+                            }
+                        }
+
+                        withColor(endColor) {
+                            drawLines(entityPos, entityTop)
+                        }
                     }
                 }
             }
         }
-
     }
 
     @JvmStatic

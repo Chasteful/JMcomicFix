@@ -24,10 +24,15 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
+import net.ccbluex.liquidbounce.event.EventManager;
+import net.ccbluex.liquidbounce.event.events.OverlayPlayListEvent;
+import net.ccbluex.liquidbounce.event.events.PlayerEntry;
 import net.ccbluex.liquidbounce.features.misc.FriendManager;
 import net.ccbluex.liquidbounce.features.module.modules.misc.ModuleAntiStaff;
 import net.ccbluex.liquidbounce.features.module.modules.misc.ModuleBetterTab;
 import net.ccbluex.liquidbounce.features.module.modules.misc.Visibility;
+import net.ccbluex.liquidbounce.integration.theme.component.ComponentOverlay;
+import net.ccbluex.liquidbounce.integration.theme.component.FeatureTweak;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -36,8 +41,10 @@ import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.math.MathHelper;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -46,10 +53,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Mixin(PlayerListHud.class)
 public abstract class MixinPlayerListHud {
+
+    @Shadow
+    @Nullable
+    public Text footer;
+    @Shadow
+    @Nullable
+    public Text header;
+
+    @Unique
+    private static int getLatencyColor(int latency) {
+        return latency < 150 ? 0x00E970 : latency < 300 ? 0xE7D020 : 0xD74238;
+    }
 
     @Shadow
     protected abstract List<PlayerListEntry> collectPlayerEntries();
@@ -152,6 +172,45 @@ public abstract class MixinPlayerListHud {
             String text = latency + (accurateLatency.getSuffix() ? "ms" : "");
             context.drawTextWithShadow(textRenderer, text, x + width - textRenderer.getWidth(text), y, color);
             ci.cancel();
+        }
+    }
+
+    @Inject(
+            method = "render",
+            at = @At("HEAD"),
+            cancellable = true)
+    private void onRenderHead(CallbackInfo ci) {
+        if (ComponentOverlay.isTweakEnabled(FeatureTweak.DISABLE_PLAYERLIST_HUD)) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(
+            method = "setVisible",
+            at = @At("HEAD"))
+    private void onsetVisibleHead(CallbackInfo ci) {
+
+        Text hudHeader = this.header;
+        Text hudFooter = this.footer;
+        PlayerListHud self = (PlayerListHud) (Object) this;
+        List<PlayerEntry> players = collectPlayerEntries().stream().map(entry -> {
+            Text fullName = self.getPlayerName(entry);
+            Text latency = Text.literal(entry.getLatency() + "ms")
+                    .styled(style -> style.withColor(getLatencyColor(entry.getLatency())));
+            boolean isFriend = FriendManager.INSTANCE.isFriend(entry.getProfile().getName());
+            boolean isStaff = ModuleAntiStaff.INSTANCE.shouldShowAsStaffOnTab(entry.getProfile().getName());
+            String uuid = entry.getProfile().getId().toString();
+            return new PlayerEntry(fullName, uuid, latency, isFriend, isStaff);
+        }).collect(Collectors.toList());
+
+
+        if (hudHeader != null) {
+            if (hudFooter != null) {
+                EventManager.INSTANCE.callEvent(
+                        new OverlayPlayListEvent(hudHeader, hudFooter, players
+                        )
+                );
+            }
         }
     }
 

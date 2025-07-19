@@ -22,7 +22,7 @@ import net.ccbluex.liquidbounce.features.module.modules.combat.crystalaura.trigg
 
 /**
  * Addition to {@link net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket}
- *
+ * <p>
  * Exclusively for {@link CrystalAuraTriggerer}.
  */
 public interface EntitiesDestroyS2CPacketAddition {

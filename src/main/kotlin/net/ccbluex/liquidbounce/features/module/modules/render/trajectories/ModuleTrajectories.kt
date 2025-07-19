@@ -41,7 +41,8 @@ import net.minecraft.util.math.Vec3d
 @Suppress("MagicNumber")
 object ModuleTrajectories : ClientModule("Trajectories", Category.RENDER) {
     private val maxSimulatedTicks by int("MaxSimulatedTicks", 240, 1..1000, "ticks")
-    private val show by multiEnumChoice("Show",
+    private val show by multiEnumChoice(
+        "Show",
         Show.OTHER_PLAYERS,
         Show.ACTIVE_TRAJECTORY_ARROW
     )

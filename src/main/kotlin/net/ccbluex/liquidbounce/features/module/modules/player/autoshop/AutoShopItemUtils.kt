@@ -25,13 +25,13 @@ import net.minecraft.item.Item
 import net.minecraft.item.Items
 import net.minecraft.registry.Registries
 
-const val WOOL_ID           = "wool"
-const val TERRACOTTA_ID     = "terracotta"
-const val STAINED_GLASS_ID  = "stained_glass"
-const val CONCRETE_ID       = "concrete"
-const val POTION_PREFIX     = "potion:"     //usage example: potion:speed
-const val EXPERIENCE_ID     = "experience"
-const val TIER_ID           = ":tier:"      //usage example: sword:tier:2
+const val WOOL_ID = "wool"
+const val TERRACOTTA_ID = "terracotta"
+const val STAINED_GLASS_ID = "stained_glass"
+const val CONCRETE_ID = "concrete"
+const val POTION_PREFIX = "potion:"     //usage example: potion:speed
+const val EXPERIENCE_ID = "experience"
+const val TIER_ID = ":tier:"      //usage example: sword:tier:2
 
 /**
  * The items usually used to buy other items in BedWars.
@@ -46,19 +46,19 @@ fun Item.isWool(): Boolean {
     return this is BlockItem && this in WOOL_BLOCKS
 }
 
-fun Item.isTerracotta() : Boolean {
+fun Item.isTerracotta(): Boolean {
     return this is BlockItem && this in TERRACOTTA_BLOCKS
 }
 
-fun Item.isStainedGlass() : Boolean {
+fun Item.isStainedGlass(): Boolean {
     return this is BlockItem && this in STAINED_GLASS_BLOCKS
 }
 
-fun Item.isConcrete() : Boolean {
+fun Item.isConcrete(): Boolean {
     return this is BlockItem && this in CONCRETE_BLOCKS
 }
 
-fun String.isArmorItem() : Boolean {
+fun String.isArmorItem(): Boolean {
     // example: armor:tier:3 -> diamond_boots:protection:2 -> diamond_boots
     if (this.isItemWithTiers()) {
         val actualTierItem = actualTierItem(this)
@@ -70,8 +70,10 @@ fun String.isArmorItem() : Boolean {
 
 fun GenericContainerScreen.stacks(): List<String> {
     return this.screenHandler.slots
-        .filter { !it.stack.isNothing() &&
-            it.inventory === this.screenHandler.inventory }
+        .filter {
+            !it.stack.isNothing() &&
+                it.inventory === this.screenHandler.inventory
+        }
         .mapNotNull { Registries.ITEM.getId(it.stack.item).path }
 }
 

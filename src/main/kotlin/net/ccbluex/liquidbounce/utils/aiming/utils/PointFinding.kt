@@ -201,7 +201,8 @@ object ArrowVisibilityPredicate : VisibilityPredicate {
     override fun isVisible(eyesPos: Vec3d, targetSpot: Vec3d): Boolean {
         val arrowEntity = ArrowEntity(
             world, eyesPos.x, targetSpot.y, targetSpot.z, ItemStack(Items.ARROW),
-            null)
+            null
+        )
 
         return world.raycast(
             RaycastContext(

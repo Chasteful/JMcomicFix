@@ -54,7 +54,7 @@ object ModuleAutoAccount : ClientModule("AutoAccount", Category.MISC, aliases = 
     private var registerRegex = Regex(registerRegexString)
     private var loginRegex = Regex(loginRegexString)
 
-    // We can receive chat messages before the world is initialized,
+    // We can receive ChatScreen messages before the world is initialized,
     // so we have to handle events even before that
     override val running
         get() = !HideAppearance.isDestructed && enabled
@@ -95,6 +95,7 @@ object ModuleAutoAccount : ClientModule("AutoAccount", Category.MISC, aliases = 
             registerRegex.containsMatchIn(msg) -> {
                 action(::register)
             }
+
             loginRegex.containsMatchIn(msg) -> {
                 action(::login)
             }

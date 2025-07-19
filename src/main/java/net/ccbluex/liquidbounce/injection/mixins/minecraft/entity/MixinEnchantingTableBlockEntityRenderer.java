@@ -15,7 +15,8 @@ public class MixinEnchantingTableBlockEntityRenderer {
     @WrapWithCondition(
             method = "render(Lnet/minecraft/block/entity/EnchantingTableBlockEntity;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;II)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/model/BookModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;II)V")
-    ) private boolean hookRenderBook(BookModel instance, MatrixStack matrixStack, VertexConsumer vertexConsumer, int unused, int i) {
+    )
+    private boolean hookRenderBook(BookModel instance, MatrixStack matrixStack, VertexConsumer vertexConsumer, int unused, int i) {
         return ModuleAntiBlind.canRender(DoRender.ENCHANT_TABLE_BOOK);
     }
 }

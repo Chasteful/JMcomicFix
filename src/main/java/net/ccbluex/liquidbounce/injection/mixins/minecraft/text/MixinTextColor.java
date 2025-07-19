@@ -51,6 +51,7 @@ public class MixinTextColor implements ClientTextColorAdditions {
             }
         }
     }
+
     /**
      * @author superblaubeere27
      * @reason Nobody will ever overwrite this method too fr.

@@ -57,7 +57,7 @@ import net.minecraft.util.math.MathHelper
 object ModuleAimbot : ClientModule("Aimbot", Category.COMBAT, aliases = arrayOf("AimAssist", "AutoAim")) {
 
     private val range = float("Range", 4.2f, 1f..8f)
-
+    private val onRotate by boolean("OnlyRotate",true)
     val targetTracker = tree(TargetTracker(TargetPriority.DIRECTION, range = range))
     private val targetRenderer = tree(WorldTargetRenderer(this))
     private val pointTracker = tree(PointTracker())
@@ -70,7 +70,6 @@ object ModuleAimbot : ClientModule("Aimbot", Category.COMBAT, aliases = arrayOf(
     private var angleSmooth = choices(this, "AngleSmooth") {
         arrayOf(
             InterpolationAngleSmooth(it),
-            SigmoidAngleSmooth(it),
             LinearAngleSmooth(it)
         )
     }
@@ -79,7 +78,8 @@ object ModuleAimbot : ClientModule("Aimbot", Category.COMBAT, aliases = arrayOf(
 
     private var targetRotation: Rotation? = null
     private var playerRotation: Rotation? = null
-
+    private var mouseDeltaX = 0f
+    private var mouseDeltaY = 0f
     @Suppress("unused", "ComplexCondition")
     private val tickHandler = handler<RotationUpdateEvent> { _ ->
         playerRotation = player.rotation
@@ -90,26 +90,34 @@ object ModuleAimbot : ClientModule("Aimbot", Category.COMBAT, aliases = arrayOf(
             return@handler
         }
 
-        targetRotation = findNextTargetRotation()?.let { (target, rotation) ->
-            angleSmooth.activeChoice.process(
-                RotationTarget(
-                    rotation = rotation.rotation,
-                    entity = target,
-                    processors = listOf(angleSmooth.activeChoice),
-                    ticksUntilReset = 1,
-                    resetThreshold = 1f,
-                    considerInventory = true,
-                    movementCorrection = MovementCorrection.CHANGE_LOOK
-                ),
-                player.rotation,
-                rotation.rotation
-            )
+        // Only find target rotation if not in OnlyRotate mode or if mouse is moving
+        if (!onRotate || (mouseDeltaX != 0f || mouseDeltaY != 0f)) {
+            targetRotation = findNextTargetRotation()?.let { (target, rotation) ->
+                angleSmooth.activeChoice.process(
+                    RotationTarget(
+                        rotation = rotation.rotation,
+                        entity = target,
+                        processors = listOf(angleSmooth.activeChoice),
+                        ticksUntilReset = 1,
+                        resetThreshold = 1f,
+                        considerInventory = true,
+                        movementCorrection = MovementCorrection.CHANGE_LOOK
+                    ),
+                    player.rotation,
+                    rotation.rotation
+                )
+            }
+        } else {
+            targetRotation = null
         }
+
+        // Reset mouse delta after checking
+        mouseDeltaX = 0f
+        mouseDeltaY = 0f
 
         // Update Auto Weapon
         ModuleAutoWeapon.prepare(targetTracker.target)
     }
-
     override fun disable() {
         targetTracker.reset()
     }
@@ -125,7 +133,8 @@ object ModuleAimbot : ClientModule("Aimbot", Category.COMBAT, aliases = arrayOf(
         }
 
         if (IgnoreOpened.CONTAINER !in ignores && (InventoryManager.isInventoryOpen ||
-                mc.currentScreen is HandledScreen<*>)) {
+                mc.currentScreen is HandledScreen<*>)
+        ) {
             return@handler
         }
 
@@ -148,6 +157,10 @@ object ModuleAimbot : ClientModule("Aimbot", Category.COMBAT, aliases = arrayOf(
 
     @Suppress("unused", "MagicNumber")
     private val mouseMovement = handler<MouseRotationEvent> { event ->
+        // Track mouse movement delta for OnlyRotate
+        mouseDeltaX = event.cursorDeltaX.toFloat()
+        mouseDeltaY = event.cursorDeltaY.toFloat()
+
         val f = event.cursorDeltaY.toFloat() * 0.15f
         val g = event.cursorDeltaX.toFloat() * 0.15f
 

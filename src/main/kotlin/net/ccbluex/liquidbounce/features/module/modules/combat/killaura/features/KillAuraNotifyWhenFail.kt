@@ -80,7 +80,8 @@ internal object KillAuraNotifyWhenFail {
                 // Maybe a custom sound would be better
                 val pitch = Sound.pitch
 
-                world.playSound(player, player.x, player.y, player.z, SoundEvents.UI_BUTTON_CLICK.value(),
+                world.playSound(
+                    player, player.x, player.y, player.z, SoundEvents.UI_BUTTON_CLICK.value(),
                     player.soundCategory, Sound.volume / 100f, pitch
                 )
             }

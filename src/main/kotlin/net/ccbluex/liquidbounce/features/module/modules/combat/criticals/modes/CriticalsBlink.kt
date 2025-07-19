@@ -63,6 +63,7 @@ object CriticalsBlink : Choice("Blink") {
                 is PlayerInteractEntityC2SPacket,
                 is HandSwingC2SPacket,
                 is ResourcePackStatusC2SPacket -> PacketQueueManager.Action.PASS
+
                 else -> PacketQueueManager.Action.QUEUE
             }
             isInState = true

@@ -107,6 +107,7 @@ object ScaffoldBreezilyTechnique : ScaffoldTechnique("Breezily") {
                 if (modZ > ma) currentSideways = 1f
                 if (modZ < currentEdgeDistanceRandom) currentSideways = -1f
             }
+
             else -> {
                 // do nothing
             }

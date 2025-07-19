@@ -86,7 +86,8 @@ object AimDebugRecorder : ModuleDebugRecorder.DebugRecorderMode<JsonObject>("Aim
                 addProperty("yaw_target", rotation.yaw)
                 addProperty("pitch_target", rotation.pitch)
 
-                addProperty("crosshair",
+                addProperty(
+                    "crosshair",
                     if (crosshairTarget?.type == HitResult.Type.ENTITY && crosshairTarget is EntityHitResult) {
                         crosshairTarget.entity.id == it.id
                     } else {

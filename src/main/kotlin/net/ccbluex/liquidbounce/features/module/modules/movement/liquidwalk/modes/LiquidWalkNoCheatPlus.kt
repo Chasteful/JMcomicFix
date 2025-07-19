@@ -77,7 +77,7 @@ internal object LiquidWalkNoCheatPlus : Choice("NoCheatPlus") {
                 !player.isTouchingWater &&
                 standingOnWater() &&
                 !collidesWithAnythingElse()
-                ) {
+            ) {
                 if (shiftDown) {
                     packet.y -= 0.001
                 }

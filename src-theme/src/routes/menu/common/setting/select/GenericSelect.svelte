@@ -14,7 +14,7 @@
         }
     }
 
-    function handleSelectClick(e:MouseEvent) {
+    function handleSelectClick(e: MouseEvent) {
         if (closeOnInternalClick) {
             expanded = !expanded;
         } else {
@@ -26,17 +26,22 @@
         }
     }
 </script>
-
 <svelte:window on:click={handleWindowClick}/>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class="select" class:expanded bind:this={selectElement} on:click={handleSelectClick}>
-    <div class="header" bind:this={headerElement}>
+<div bind:this={selectElement} class="select" class:expanded on:click={handleSelectClick}>
+    <div bind:this={headerElement} class="header">
         <span class="title">
             <slot name="title"/>
         </span>
-        <img src="img/menu/icon-select-arrow.svg" alt="expand">
+        <img
+                alt="expand"
+                class="arrow"
+                class:expanded
+                draggable="false"
+                src="img/menu/icon-select-arrow.svg"
+        >
     </div>
     {#if expanded}
         <div class="options" transition:fade|global={{ duration: 200, easing: quintOut }}>
@@ -46,6 +51,7 @@
 </div>
 
 <style lang="scss">
+  @use "sass:color";
   @use "../../../../../colors.scss" as *;
 
   .select {
@@ -55,25 +61,37 @@
 
     &.expanded {
       .header {
-        border-radius: 5px 5px 0 0;
+        border-radius: 12px 12px 0 0;
       }
     }
   }
 
   .header {
-    background-color: $accent-color;
+    background: rgba($base, 0.5);
+    box-shadow: 0 0 8px rgba($base, 0.6);
     padding: 20px;
     display: flex;
     column-gap: 20px;
     align-items: center;
     justify-content: space-between;
-    border-radius: 5px;
+    border-radius: 12px;
     transition: ease border-radius .2s;
 
+
     .title {
-      color: $menu-text-color;
+      color: $text;
       font-size: 20px;
-      font-weight: 500;
+      font-weight: 900;
+    }
+  }
+
+  .arrow {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &.expanded {
+      transform: rotate(180deg);
     }
   }
 
@@ -81,9 +99,13 @@
     position: absolute;
     z-index: 1000;
     width: 100%;
-    border-radius: 0 0 5px 5px;
+    border-radius: 0 0 12px 12px;
     max-height: 250px;
+    border-top: 1px solid rgba(white, 0.1);
     overflow: auto;
-    background-color: rgba($menu-base-color, 0.9);
+    color: $text;
+    background-color: rgba($base, 0.5);
+    border-left: $text;
+    box-shadow: 0 4px 8px rgba($base, 0.6);
   }
 </style>

@@ -50,7 +50,7 @@ class ParameterBuilder<T: Any> private constructor(val name: String) {
         }
         val POSITIVE_INTEGER_VALIDATOR: Parameter.Verificator<Int> = Parameter.Verificator { sourceText ->
             val integer = sourceText.toIntOrNull() ?:
-                return@Verificator ParameterValidationResult.error("'$sourceText' is not a valid integer")
+            return@Verificator ParameterValidationResult.error("'$sourceText' is not a valid integer")
 
             if (integer >= 0) {
                 ParameterValidationResult.ok(integer)

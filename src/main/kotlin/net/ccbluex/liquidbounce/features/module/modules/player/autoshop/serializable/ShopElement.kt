@@ -25,7 +25,7 @@ import com.google.gson.JsonParseException
 import net.ccbluex.liquidbounce.features.module.modules.player.autoshop.serializable.conditions.ConditionNode
 import java.lang.reflect.Type
 
-data class ShopElement (
+data class ShopElement(
     val item: ItemInfo,
     val amountPerClick: Int = 1,
     val categorySlot: Int,

@@ -114,7 +114,8 @@ object SubmoduleBasePlace : ToggleableConfigurable(ModuleCrystalAura, "BasePlace
 
     val minAdvantage by float("MinAdvantage", 2.0f, 0.1f..10f)
 
-    private val placer = tree(BlockPlacer(
+    private val placer = tree(
+        BlockPlacer(
         "Placing",
         ModuleCrystalAura,
         Priority.IMPORTANT_FOR_USAGE_2,

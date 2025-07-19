@@ -332,3 +332,4 @@ object ModuleBedPlates : ClientModule("BedPlates", Category.RENDER) {
         }
     }
 }
+

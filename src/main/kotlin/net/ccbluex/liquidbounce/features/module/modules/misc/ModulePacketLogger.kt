@@ -216,18 +216,22 @@ object ModulePacketLogger : ClientModule("PacketLogger", Category.MISC) {
                     val args = actualTypeArguments
                     args.joinToString(", ", prefix = "$rawType<", postfix = ">") { it.parse() }
                 }
+
                 is WildcardType -> {
                     when {
                         lowerBounds.isNotEmpty() -> "? super ${lowerBounds.first().parse()}"
                         upperBounds.isNotEmpty() && upperBounds.first() !== Object::class.java ->
                             upperBounds.joinToString(" & ", prefix = "? extends ") { it.parse() }
+
                         else -> "?"
                     }
                 }
+
                 is TypeVariable<*> -> when {
                     bounds.size == 1 && bounds[0] === Object::class.java -> name
                     else -> bounds.joinToString(" & ", prefix = "$name extends ") { it.parse() }
                 }
+
                 is GenericArrayType -> "${genericComponentType.parse()}[]"
                 else -> this.toString()
             }

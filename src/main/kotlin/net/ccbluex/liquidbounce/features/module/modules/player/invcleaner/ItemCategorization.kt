@@ -200,6 +200,7 @@ class ItemCategorization(
                     arrayOf(ItemFacet(slot))
                 }
             }
+
             Items.MILK_BUCKET -> arrayOf(PrimitiveItemFacet(slot, ItemCategory(ItemType.BUCKET, 2)))
             is BucketItem -> {
                 when (item.fluid) {
@@ -208,6 +209,7 @@ class ItemCategorization(
                     else -> arrayOf(PrimitiveItemFacet(slot, ItemCategory(ItemType.BUCKET, 3)))
                 }
             }
+
             is PotionItem -> {
                 val areAllEffectsGood =
                     slot.itemStack.getPotionEffects()
@@ -219,6 +221,7 @@ class ItemCategorization(
                     arrayOf(ItemFacet(slot))
                 }
             }
+
             is EnderPearlItem -> arrayOf(PrimitiveItemFacet(slot, ItemCategory(ItemType.PEARL, 0)))
             Items.GOLDEN_APPLE -> {
                 arrayOf(
@@ -226,12 +229,14 @@ class ItemCategorization(
                     PrimitiveItemFacet(slot, ItemCategory(ItemType.GAPPLE, 0)),
                 )
             }
+
             Items.ENCHANTED_GOLDEN_APPLE -> {
                 arrayOf(
                     FoodItemFacet(slot),
                     PrimitiveItemFacet(slot, ItemCategory(ItemType.GAPPLE, 0), 1),
                 )
             }
+
             Items.SNOWBALL, Items.EGG, Items.WIND_CHARGE -> arrayOf(ThrowableItemFacet(slot))
             else -> {
                 if (slot.itemStack.isFood) {

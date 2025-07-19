@@ -2,12 +2,11 @@
     import {listen} from "../../../integration/ws";
     import type {ClientPlayerDataEvent} from "../../../integration/events";
     import type {PlayerData} from "../../../integration/types";
-    import {rgbaToHex} from "../../../integration/util";
-    import {intToRgba} from "../../../integration/util.js";
+    import {intToRgba, rgbaToHex} from "../../../util/color_utils";
+
 
     let playerData: PlayerData | null = null;
     let processedText: string = '';
-
     export let settings: { [name: string]: any };
 
     listen("clientPlayerData", (event: ClientPlayerDataEvent) => {
@@ -25,25 +24,24 @@
             const keys = p1.split(".");
             let value: any = playerData;
 
+            // Traverse playerData to get the correct value
             for (const key of keys) {
                 value = value ? value[key] : null;
             }
 
+            // Format the value based on type
             if (value !== null && value !== undefined) {
                 switch (typeof value) {
-                    case 'number':
-                        if (value % 1 === 0) {
-                            return value.toString();
-                        }
-
+                    case 'number': // Round numbers to two decimal places
                         return value.toFixed(2);
-                    case 'object':
+                    case 'object': // Convert objects to JSON strings
                         return JSON.stringify(value);
                     default:
                         return value.toString();
                 }
             }
 
+            // Return original tag if value is null or undefined
             return match;
         });
     }
@@ -71,13 +69,13 @@
 </div>
 
 <style lang="scss">
-    @use "../../../colors.scss" as *;
+  @use "../../../colors.scss" as *;
 
-    .text {
-        position: absolute;
-        white-space: nowrap;
-        user-select: none;
-        pointer-events: none;
-        z-index: 1000;
-    }
+  .text {
+    position: absolute;
+    white-space: nowrap;
+    user-select: none;
+    pointer-events: none;
+    z-index: 1000;
+  }
 </style>

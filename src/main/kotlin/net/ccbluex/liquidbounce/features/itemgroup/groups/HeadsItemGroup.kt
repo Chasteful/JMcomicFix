@@ -38,18 +38,18 @@ data class Head(val name: String, val uuid: UUID, val value: String) {
             "\"underlined\":false," +
             "\"bold\":true," +
             "\"italic\":false" +
-        "}',minecraft:lore=['{" +
+            "}',minecraft:lore=['{" +
             "\"text\":\"UUID: $uuid\"," +
             "\"color\":\"gray\"," +
             "\"italic\":false" +
-        "}','{" +
+            "}','{" +
             "\"text\":\"liquidbounce.net\"," +
             "\"color\":\"blue\"," +
             "\"italic\":false" +
-        "}'],profile={id:[I;0,0,0,0],properties:[{" +
+            "}'],profile={id:[I;0,0,0,0],properties:[{" +
             "name:\"textures\"," +
             "value:\"$value\"" +
-        "}]}]"
+            "}]}]"
 
     fun asItemStack() =
         createItem("minecraft:player_head${asNbt()}")

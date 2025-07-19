@@ -112,7 +112,8 @@ object ModuleRotations : ClientModule("Rotations", Category.RENDER) {
             val previousRotation = RotationManager.previousRotation ?: currentRotation
             val camera = mc.gameRenderer.camera
 
-            val interpolatedRotationVec = previousRotation.directionVector.lerp(currentRotation.directionVector,
+            val interpolatedRotationVec = previousRotation.directionVector.lerp(
+                currentRotation.directionVector,
                 partialTicks.toDouble()
             )
 

@@ -108,7 +108,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends MixinS
         var handle = this.client.getWindow().getHandle();
 
         return (InputUtil.isKeyPressed(handle, GLFW.GLFW_KEY_LEFT_SHIFT)
-                        || InputUtil.isKeyPressed(handle, GLFW.GLFW_KEY_RIGHT_SHIFT))
+                || InputUtil.isKeyPressed(handle, GLFW.GLFW_KEY_RIGHT_SHIFT))
                 && getSlotAt(mouseX, mouseY) != null
                 && ModuleItemScroller.INSTANCE.getRunning()
                 && GLFW.glfwGetMouseButton(handle, GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS

@@ -29,8 +29,10 @@ import net.ccbluex.liquidbounce.utils.movement.getDegreesRelativeToView
 import net.ccbluex.liquidbounce.utils.movement.getDirectionalInputForDegrees
 import net.minecraft.util.math.Vec3d
 
-object ScaffoldStabilizeMovementFeature : ToggleableConfigurable(ScaffoldNormalTechnique, "StabilizeMovement",
-    true) {
+object ScaffoldStabilizeMovementFeature : ToggleableConfigurable(
+    ScaffoldNormalTechnique, "StabilizeMovement",
+    true
+) {
     private const val MAX_CENTER_DEVIATION: Double = 0.2
     private const val MAX_CENTER_DEVIATION_IF_MOVING_TOWARDS: Double = 0.075
 

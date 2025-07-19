@@ -71,8 +71,10 @@ class SimulatedArrow(
     private fun updateCollision(pos: Vec3d, newPos: Vec3d): HitResult? {
         val world = this.world
 
-        val arrowEntity = ArrowEntity(this.world, this.pos.x, this.pos.y, this.pos.z, ItemStack(Items.ARROW),
-            null)
+        val arrowEntity = ArrowEntity(
+            this.world, this.pos.x, this.pos.y, this.pos.z, ItemStack(Items.ARROW),
+            null
+        )
 
         // Get landing position
         val blockHitResult = world.raycast(

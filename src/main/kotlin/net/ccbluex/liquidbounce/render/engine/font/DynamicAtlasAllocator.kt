@@ -138,18 +138,21 @@ class DynamicAtlasAllocator(
                     AtlasSlice(slice.x + dimension.width, slice.y, brotherSlice.x, slice.height - brotherSlice.y),
                 )
             }
+
             brotherSlice.x >= minDimension.width -> {
                 return listOf(
                     AtlasSlice(slice.x, slice.y, dimension.width, slice.height),
                     AtlasSlice(slice.x + dimension.width, slice.y, brotherSlice.x, slice.height),
                 )
             }
+
             brotherSlice.y >= minDimension.height -> {
                 return listOf(
                     AtlasSlice(slice.x, slice.y, slice.width, dimension.height),
                     AtlasSlice(slice.x, slice.y + dimension.height, slice.width, brotherSlice.y),
                 )
             }
+
             else -> {
                 return null
             }
@@ -192,7 +195,7 @@ class AtlasSlice(
     val width: Int,
     val height: Int,
 
-) {
+    ) {
     var parent: AtlasSlice? = null
     val childeren = ArrayList<AtlasSlice>()
 

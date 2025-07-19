@@ -49,16 +49,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(HeldItemRenderer.class)
 public abstract class MixinHeldItemRenderer {
 
-    @Final
-    @Shadow
-    private MinecraftClient client;
-
-    @Shadow
-    private ItemStack offHand;
-
     @Shadow
     @Final
     private static float EQUIP_OFFSET_TRANSLATE_Y;
+    @Final
+    @Shadow
+    private MinecraftClient client;
+    @Shadow
+    private ItemStack offHand;
 
     @Inject(method = "renderFirstPersonItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;push()V", shift = At.Shift.AFTER))
     private void hookRenderFirstPersonItem(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand, float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
@@ -95,9 +93,9 @@ public abstract class MixinHeldItemRenderer {
 
     @Inject(method = "renderFirstPersonItem", at = @At("HEAD"), cancellable = true)
     private void hideShield(AbstractClientPlayerEntity player, float tickDelta, float pitch,
-                                                Hand hand, float swingProgress, ItemStack item, float equipProgress,
-                                                MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light,
-                                                CallbackInfo ci) {
+                            Hand hand, float swingProgress, ItemStack item, float equipProgress,
+                            MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light,
+                            CallbackInfo ci) {
         if (hand == Hand.OFF_HAND && ModuleSwordBlock.INSTANCE.shouldHideOffhand(player, item.getItem())) {
             ci.cancel();
         }

@@ -26,24 +26,39 @@ import net.ccbluex.liquidbounce.config.types.NamedChoice
 /**
  * A set of tweaks that can be applied to the Original HUD by the component
  */
+object FeatureTweakManager {
+    private val disabledTweaks = mutableSetOf<FeatureTweak>()
+
+    fun isDisabled(tweak: FeatureTweak): Boolean {
+        return tweak in disabledTweaks
+    }
+
+    fun setDisabled(tweak: FeatureTweak, disabled: Boolean) {
+        if (disabled) {
+            disabledTweaks.add(tweak)
+        } else {
+            disabledTweaks.remove(tweak)
+        }
+    }
+}
+
 enum class FeatureTweak(override val choiceName: String) : NamedChoice {
 
-    /**
-     * Disables the Item Hotbar and draws only the items instead
-     * after drawing the overlay
-     *
-     * TODO: Might disable completely and make a way to draw
-     *   items in the overlay or via component
-     */
     TWEAK_HOTBAR("tweakHotbar"),
-
+    DISABLE_ITEM_ICONS("disableItemIcons"),
     DISABLE_CROSSHAIR("disableCrosshair"),
     DISABLE_SCOREBOARD("disableScoreboard"),
     DISABLE_STATUS_BAR("disableStatusBar"),
     DISABLE_EXP_BAR("disableExpBar"),
     DISABLE_HELD_ITEM_TOOL_TIP("disableHeldItemToolTip"),
     DISABLE_OVERLAY_MESSAGE("disableOverlayMessage"),
+    DISABLE_TITLE("disableTitle"),
     DISABLE_STATUS_EFFECT_OVERLAY("disableStatusEffectOverlay"),
+    DISABLE_CHAT_HUD("disableChat"),
+    DISABLE_PLAYERLIST_HUD("disablePlayerList"),
+    DISABLE_ALL_GAME_HUD("disableAllGameHud");
 
-
+    fun isDisabled(): Boolean {
+        return FeatureTweakManager.isDisabled(this)
+    }
 }

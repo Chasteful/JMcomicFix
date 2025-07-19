@@ -55,7 +55,8 @@ open class InventoryConstraints : Configurable("Constraints") {
     internal val closeDelay by intRange("CloseDelay", 1..2, 0..20, "ticks")
     internal val missChance by intRange("MissChance", 0..0, 0..100, "%")
 
-    internal val requirements by multiEnumChoice<InventoryRequirements>("Requires",
+    internal val requirements by multiEnumChoice<InventoryRequirements>(
+        "Requires",
         default = emptyEnumSet(),
         choices = EnumSet.of(
             InventoryRequirements.NO_MOVEMENT,

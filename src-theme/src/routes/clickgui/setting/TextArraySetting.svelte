@@ -24,6 +24,7 @@
         cSetting.value = ["", ...cSetting.value];
         handleChange();
     }
+
 </script>
 
 <div class="setting">
@@ -33,7 +34,8 @@
         <div class="inputs">
             {#each cSetting.value as _, index}
                 <div class="input-wrapper">
-                    <input type="text" class="value" spellcheck="false" placeholder={setting.name} bind:value={cSetting.value[index]}
+                    <input type="text" class="value" spellcheck="false" placeholder={setting.name}
+                           bind:value={cSetting.value[index]}
                            on:input={handleChange}>
                     <button class="button-remove" title="Remove" on:click={() => removeValueIndex(index)}>
                         <img src="img/clickgui/icon-cross.svg" alt="remove">
@@ -62,7 +64,7 @@
   }
 
   .setting {
-    padding: 7px 0px;
+    padding: 7px 0;
   }
 
   .inputs {
@@ -74,39 +76,43 @@
 
   .name {
     font-weight: 500;
-    color: $clickgui-text-color;
-    font-size: 12px;
+    color: $text;
+    font-size: var(--font-size);
     margin-bottom: 5px;
   }
 
   .button-add {
-    font-family: monospace;
-    font-size: 12px;
-    color: $clickgui-text-color;
-    background-color: $accent-color;
+
+    font-size: var(--font-size);
+    color: $text;
+    background: linear-gradient(to right,
+            color-mix(in srgb, var(--primary-color) 30%, transparent) 0%,
+            color-mix(in srgb, var(--secondary-color) 30%, transparent) 51%,
+            color-mix(in srgb, var(--primary-color) 30%, transparent) 100%
+    );
     border: none;
     padding: 6px 10px;
-    border-radius: 3px;
+    transition: 0.5s;
+    text-align: center;
+    background-size: 200% auto;
     width: 100%;
     cursor: pointer;
-    transition: ease background-color .2s;
+    border-radius: 3px;
 
     &:hover {
-        background-color: color.adjust(color.adjust($accent-color, $saturation: -30%), $lightness: -10%);
+      background-position: right center;
     }
   }
 
   .value {
     width: 100%;
-    background-color: rgba($clickgui-base-color, .36);
-    font-family: monospace;
-    font-size: 12px;
-    color: $clickgui-text-color;
-    border: none;
-    border-bottom: solid 2px $accent-color;
+    background: rgba($base, 0.3);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    font-size: var(--font-size);
+    color: $text;
     padding: 6px;
     border-radius: 3px;
-    transition: ease border-color .2s;
 
     &::-webkit-scrollbar {
       background-color: transparent;

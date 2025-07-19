@@ -85,6 +85,7 @@ class MinimapHeightmapManager {
                 // Do nothing, the change is under the current height
                 null
             }
+
             currentHeight == pos.y -> {
                 // The changed block is the world surface. If it is not a surface block anymore,
                 // we need to find a new surface block under it
@@ -95,6 +96,7 @@ class MinimapHeightmapManager {
                 }
 
             }
+
             else -> {
                 if (isSurface(pos, newState)) {
                     // If the block is a surface block, and it is above the current height, we know that it must be

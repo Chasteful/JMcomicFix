@@ -53,7 +53,8 @@ object ModuleVomit : ClientModule("Vomit", Category.FUN) {
             }
 
             // Fill and throw - this bypasses the creative drop limit
-            event.schedule(inventoryConstraints, if (inventoryConstraints.clickDelay.last <= 0) {
+            event.schedule(
+                inventoryConstraints, if (inventoryConstraints.clickDelay.last <= 0) {
                 // Depending on how many empty slots we have, this might kick in the packet rate limit
                 // of ViaVersion or Minecraft/Paper itself
                 emptySlots.map { slot -> CreativeInventoryAction.performFillSlot(randomStack, slot) } +

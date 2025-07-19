@@ -27,40 +27,110 @@ import net.ccbluex.liquidbounce.integration.theme.component.types.minimap.Minima
 
 enum class ComponentType(
     override val choiceName: String,
-    val tweaks: Array<FeatureTweak> = emptyArray(),
-    val createComponent: () -> Component = { IntegratedComponent(choiceName, tweaks) }
+    private val componentTweaks: Array<FeatureTweak> = emptyArray(),
+
+    val createComponent: () -> Component = { IntegratedComponent(choiceName, componentTweaks) }
 ) : NamedChoice {
 
     WATERMARK("Watermark"),
     TAB_GUI("TabGui"),
     ARRAY_LIST("ArrayList"),
-    NOTIFICATIONS("Notifications"),
-    HOTBAR("Hotbar", tweaks = arrayOf(
-        FeatureTweak.TWEAK_HOTBAR,
-        FeatureTweak.DISABLE_STATUS_BAR,
-        FeatureTweak.DISABLE_EXP_BAR,
-        FeatureTweak.DISABLE_HELD_ITEM_TOOL_TIP,
-        FeatureTweak.DISABLE_OVERLAY_MESSAGE
-    )),
-    EFFECTS("Effects", tweaks = arrayOf(
-        FeatureTweak.DISABLE_STATUS_EFFECT_OVERLAY
-    )),
-    SCOREBOARD("Scoreboard", tweaks = arrayOf(
-        FeatureTweak.DISABLE_SCOREBOARD
-    )),
-    MINIMAP("Minimap", createComponent = { MinimapComponent }),
+    LOGO("Logo"),
+    KEY_BINDS("KeyBinds"),
+    MOTION_GRAPH("MotionGraph"),
+    SESSIONINFO("SessionInfo"),
+    PLAYERLIST(
+        "PlayerListHUD",
+        componentTweaks = arrayOf(
+            FeatureTweak.DISABLE_PLAYERLIST_HUD,
+        )
+    ),
+
+    CHAT_HUD(
+        "ChatHUD", componentTweaks = arrayOf(
+            FeatureTweak.DISABLE_CHAT_HUD,
+        )
+    ),
+
+    ITEMCOLUMN_HUD(
+        "ItemColumnHUD", componentTweaks = arrayOf(
+            FeatureTweak.TWEAK_HOTBAR,
+            FeatureTweak.DISABLE_EXP_BAR,
+            FeatureTweak.DISABLE_HELD_ITEM_TOOL_TIP,
+            FeatureTweak.DISABLE_OVERLAY_MESSAGE,
+            FeatureTweak.DISABLE_ITEM_ICONS
+
+        )
+    ),
+    ITEMCOLUMN(
+        "ItemColumn", componentTweaks = arrayOf(
+            FeatureTweak.TWEAK_HOTBAR,
+            FeatureTweak.DISABLE_EXP_BAR,
+            FeatureTweak.DISABLE_HELD_ITEM_TOOL_TIP,
+            FeatureTweak.DISABLE_OVERLAY_MESSAGE,
+            FeatureTweak.DISABLE_ITEM_ICONS
+
+        )
+    ),
+
+    TITLE_CONTROL(
+        "TitleControl", componentTweaks = arrayOf(
+            FeatureTweak.DISABLE_TITLE
+        )
+    ),
+    HEALTH_BAR(
+        "HealthBar", componentTweaks = arrayOf(
+            FeatureTweak.DISABLE_STATUS_BAR,
+            FeatureTweak.DISABLE_EXP_BAR,
+            FeatureTweak.DISABLE_HELD_ITEM_TOOL_TIP,
+            FeatureTweak.DISABLE_OVERLAY_MESSAGE
+        )
+    ),
+    STATUS(
+        "StatusBar", componentTweaks = arrayOf(
+            FeatureTweak.DISABLE_HELD_ITEM_TOOL_TIP,
+            FeatureTweak.DISABLE_STATUS_BAR,
+            FeatureTweak.DISABLE_OVERLAY_MESSAGE
+
+        )
+    ),
+    MESSAGE(
+        "Message", componentTweaks = arrayOf(
+            FeatureTweak.DISABLE_HELD_ITEM_TOOL_TIP,
+            FeatureTweak.DISABLE_OVERLAY_MESSAGE
+
+        )
+    ),
+    EFFECTS(
+        "Effects",
+        componentTweaks = arrayOf(
+            FeatureTweak.DISABLE_STATUS_EFFECT_OVERLAY
+        )
+    ),
+
+    SCOREBOARD(
+        "Scoreboard",
+        componentTweaks = arrayOf(
+            FeatureTweak.DISABLE_SCOREBOARD
+        )
+    ),
+    MINIMAP(
+        "Minimap",
+        createComponent = { MinimapComponent }
+    ),
     TARGET_HUD("TargetHud"),
+    HJ_HUD("SFZ"),
     BLOCK_COUNTER("BlockCounter"),
     ARMOR_ITEMS("ArmorItems"),
-    INVENTORY("Inventory"),
-    CRAFTING_INVENTORY("CraftingInventory"),
+    INVENTORY("InventoryContainer"),
+    INFORMATION("Information"),
+    CRAFTING_INVENTORY("CraftingInput"),
     KEYSTROKES("Keystrokes"),
-    TACO("Taco");
+    ISLAND("Island"),
+    NOTIFICATIONS("Notifications"),
+    VIGNETTE("Vignette");
 
     companion object {
-
         fun byName(name: String) = entries.find { it.choiceName == name }
-
     }
-
 }

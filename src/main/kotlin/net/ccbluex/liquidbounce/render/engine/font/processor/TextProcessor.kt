@@ -31,6 +31,7 @@ abstract class TextProcessor(obfuscationSeed: Long?) {
             Color4b(red, green, blue, 255)
         }
     }
+
     data class ProcessedTextCharacter(val char: Char, val font: Int, val obfuscated: Boolean, val color: Color4b)
     data class ProcessedText(
         val chars: List<ProcessedTextCharacter>,

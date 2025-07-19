@@ -80,7 +80,9 @@ object ModuleHandDerp : ClientModule("HandDerp", Category.FUN) {
         val packet = it.packet
         if (silent && packet is EntityTrackerUpdateS2CPacket &&
             packet.trackedValues.any { data ->
-                data.id == MixinPlayerEntityAccessor.getTrackedMainArm().id }) {
+                data.id == MixinPlayerEntityAccessor.getTrackedMainArm().id
+            }
+        ) {
             it.cancelEvent()
         }
     }

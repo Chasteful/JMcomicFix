@@ -31,8 +31,10 @@ internal object NoSlowBlockingSwitch : Choice("Switch") {
                 TimingMode.PRE_TICK -> {
                     if (event.state == EventState.PRE) {
                         untracked {
-                            network.sendPacket(UpdateSelectedSlotC2SPacket(
-                                (player.inventory.selectedSlot + 1) % 8)
+                            network.sendPacket(
+                                UpdateSelectedSlotC2SPacket(
+                                    (player.inventory.selectedSlot + 1) % 8
+                                )
                             )
                             network.sendPacket(UpdateSelectedSlotC2SPacket(player.inventory.selectedSlot))
 
@@ -41,11 +43,14 @@ internal object NoSlowBlockingSwitch : Choice("Switch") {
                         }
                     }
                 }
+
                 TimingMode.POST_TICK -> {
                     if (event.state == EventState.POST) {
                         untracked {
-                            network.sendPacket(UpdateSelectedSlotC2SPacket(
-                                (player.inventory.selectedSlot + 1) % 8)
+                            network.sendPacket(
+                                UpdateSelectedSlotC2SPacket(
+                                    (player.inventory.selectedSlot + 1) % 8
+                                )
                             )
                             network.sendPacket(UpdateSelectedSlotC2SPacket(player.inventory.selectedSlot))
 
@@ -63,8 +68,10 @@ internal object NoSlowBlockingSwitch : Choice("Switch") {
                     when (event.state) {
                         EventState.PRE -> {
                             untracked {
-                                network.sendPacket(UpdateSelectedSlotC2SPacket(
-                                    (player.inventory.selectedSlot + 1) % 8)
+                                network.sendPacket(
+                                    UpdateSelectedSlotC2SPacket(
+                                        (player.inventory.selectedSlot + 1) % 8
+                                    )
                                 )
                             }
                         }

@@ -21,7 +21,7 @@
 </script>
 
 <div class="tabs">
-    <div class="available-tabs" bind:this={availableTabsElement}>
+    <div bind:this={availableTabsElement} class="available-tabs">
         {#each tabs as {title, icon}, index}
             <button class="tab-button" class:active={tabs[activeTab].title === title}
                     on:click={() => setActiveTab(index)}>
@@ -46,9 +46,9 @@
   }
 
   .tab-button {
-    font-family: "Inter", sans-serif;
-    background-color: rgba($menu-base-color, .36);
-    color: $menu-text-color;
+
+    background-color: rgba($base, .36);
+    color: $text;
     padding: 10px;
     border: solid 2px transparent;
     border-radius: 5px;
@@ -65,7 +65,7 @@
     }
 
     &.active {
-      border-color: $accent-color;
+      border-color: rgba($text, 0.7);
     }
   }
 </style>

@@ -38,9 +38,7 @@ internal object SpiderPolar29thMarch2025 : Choice("Polar-29.03.2025") {
 
     override val parent: ChoiceConfigurable<Choice>
         get() = ModuleSpider.modes
-
     private val fast by boolean("Fast", true)
-
     @Suppress("unused")
     private val boxHandler = handler<BlockShapeEvent> { event ->
         if (event.pos.y >= player.pos.y || player.isSneaking && player.isOnGround) {
@@ -50,7 +48,6 @@ internal object SpiderPolar29thMarch2025 : Choice("Polar-29.03.2025") {
             )
         }
     }
-
     /**
      * Could also count as 2-Block Step. Probably could be abused further
      * to go even faster.
@@ -61,5 +58,4 @@ internal object SpiderPolar29thMarch2025 : Choice("Polar-29.03.2025") {
             player.velocity = player.velocity.copy(y = 0.6)
         }
     }
-
 }

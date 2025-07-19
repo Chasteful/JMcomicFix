@@ -29,9 +29,10 @@ import java.lang.reflect.Type
 
 object ScreenSerializer : JsonSerializer<Screen> {
     override fun serialize(src: Screen?, typeOfSrc: Type, context: JsonSerializationContext) =
-        src?.let { JsonObject().apply {
-            addProperty("class", EnvironmentRemapper.remapClass(it::class.java))
-            addProperty("title", it.title.convertToString())
+        src?.let {
+            JsonObject().apply {
+                addProperty("class", EnvironmentRemapper.remapClass(it::class.java))
+                addProperty("title", it.title.convertToString())
+            }
         }
-    }
 }

@@ -16,7 +16,7 @@ import kotlin.math.sqrt
 class StaticGlyphPage(
     override val texture: NativeImageBackedTexture,
     val glyphs: Set<Pair<FontManager.FontId, GlyphRenderInfo>>
-): GlyphPage() {
+) : GlyphPage() {
     companion object {
         fun createGlyphPages(chars: List<FontGlyph>): List<StaticGlyphPage> {
             val glyphPages = mutableListOf<StaticGlyphPage>()
@@ -43,8 +43,10 @@ class StaticGlyphPage(
             val (res, remainingGlyphs) = result ?: error("Unable to create static atlas.")
 
             if (res.glyphsToRender.size < chars.size) {
-                logger.warn("Failed to place all characters (${chars.size}) on the atlas, " +
-                        "using a reduced charset (${res.glyphsToRender.size}) instead!")
+                logger.warn(
+                    "Failed to place all characters (${chars.size}) on the atlas, " +
+                        "using a reduced charset (${res.glyphsToRender.size}) instead!"
+                )
             }
 
             return renderGlyphPage(res) to remainingGlyphs

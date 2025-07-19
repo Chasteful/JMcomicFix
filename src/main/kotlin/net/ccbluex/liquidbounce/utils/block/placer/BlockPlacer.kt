@@ -113,12 +113,14 @@ class BlockPlacer(
     /**
      * Renders all placements.
      */
-    val placedRenderer = tree(PlacementRenderer(
-        "PlacedRendering",
-        true,
-        module,
-        keep = false
-    ))
+    val placedRenderer = tree(
+        PlacementRenderer(
+            "PlacedRendering",
+            true,
+            module,
+            keep = false
+        )
+    )
 
     /**
      * Stores all block positions where blocks should be placed paired with a boolean that is `true`

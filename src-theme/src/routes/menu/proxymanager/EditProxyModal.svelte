@@ -6,11 +6,9 @@
     import {editProxy as editProxyRest} from "../../../integration/rest";
     import {afterUpdate} from "svelte";
     import {listen} from "../../../integration/ws";
-    import SingleSelect from "../common/setting/select/SingleSelect.svelte";
 
     export let visible: boolean;
     export let id: number;
-    export let proxyType: string;
     export let host: string;
     export let port: number;
     export let username: string;
@@ -18,7 +16,8 @@
     export let requiresAuthentication: boolean;
     export let forwardAuthentication: boolean;
 
-    let hostPort = `${host}:${port}`;
+    let hostPort = "";
+
     let loading = false;
 
     $: disabled = validateInput(requiresAuthentication, hostPort, username, password);
@@ -28,6 +27,10 @@
             password = "";
         }
     }
+
+    afterUpdate(() => {
+        hostPort = `${host}:${port}`;
+    });
 
     function validateInput(requiresAuthentication: boolean, hostPort: string, username: string, password: string): boolean {
         let valid = /.+:[0-9]+/.test(hostPort);
@@ -47,7 +50,7 @@
         const [host, port] = hostPort.split(":");
 
         loading = true;
-        await editProxyRest(id, host, parseInt(port), username, password, proxyType, forwardAuthentication);
+        await editProxyRest(id, host, parseInt(port), username, password, forwardAuthentication);
     }
 
     listen("proxyEditResult", () => {
@@ -56,14 +59,13 @@
     });
 </script>
 
-<Modal title="Edit Proxy" bind:visible={visible}>
-    <IconTextInput title="Host:Port" icon="server" pattern=".+:[0-9]+" bind:value={hostPort}/>
-    <SingleSelect title="Proxy Type" options={["HTTP", "SOCKS5"]} bind:value={proxyType}/>
-    <SwitchSetting title="Requires Authentication" bind:value={requiresAuthentication}/>
+<Modal bind:visible={visible} title="Edit Proxy">
+    <IconTextInput bind:value={hostPort} icon="server" pattern=".+:[0-9]+" title="Host:Port"/>
+    <SwitchSetting bind:value={requiresAuthentication} title="Requires Authentication"/>
     {#if requiresAuthentication}
         <IconTextInput title="Username" icon="user" bind:value={username}/>
         <IconTextInput title="Password" icon="lock" type="password" bind:value={password}/>
     {/if}
-    <SwitchSetting title="Forward Microsoft Authentication" bind:value={forwardAuthentication}/>
-    <ButtonSetting title="Edit Proxy" {disabled} on:click={editProxy} listenForEnter={true} {loading}/>
+    <SwitchSetting bind:value={forwardAuthentication} title="Forward Microsoft Authentication"/>
+    <ButtonSetting {disabled} listenForEnter={true} {loading} on:click={editProxy} title="Edit Proxy"/>
 </Modal>

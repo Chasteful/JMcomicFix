@@ -28,7 +28,7 @@ abstract class TrapPlanner<T>(
     parent: EventListener,
     name: String,
     enabled: Boolean
-): ToggleableConfigurable(parent, name, enabled), BlockIntentProvider<T> {
+) : ToggleableConfigurable(parent, name, enabled), BlockIntentProvider<T> {
     /**
      * Called during simulated tick event
      */

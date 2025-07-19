@@ -23,6 +23,7 @@ package net.ccbluex.liquidbounce.injection.mixins.minecraft.gui.custom;
 
 import net.ccbluex.liquidbounce.api.thirdparty.IpInfoApi;
 import net.ccbluex.liquidbounce.event.EventManager;
+import net.ccbluex.liquidbounce.event.events.ConnectionDetailsEvent;
 import net.ccbluex.liquidbounce.event.events.ServerConnectEvent;
 import net.ccbluex.liquidbounce.features.misc.HideAppearance;
 import net.ccbluex.liquidbounce.features.misc.proxy.ProxyManager;
@@ -40,10 +41,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.net.InetSocketAddress;
@@ -55,38 +53,58 @@ public abstract class MixinConnectScreen extends MixinScreen {
 
     @Shadow
     volatile @Nullable ClientConnection connection;
+    @Unique
+    private ServerAddress serverAddress = null;
+
+    @Unique
+    private static String getSocketAddress(ClientConnection clientConnection, ServerAddress serverAddress) {
+        if (clientConnection.getAddress() instanceof InetSocketAddress addr) {
+            String hostString = addr.getHostString();
+            String hostAddress = addr.isUnresolved() ? "<unresolved>" : addr.getAddress().getHostAddress();
+            if (hostString.equals(serverAddress.getAddress())) {
+                return hostAddress + ":" + addr.getPort();
+            } else {
+                return hostString + "/" + hostAddress + ":" + addr.getPort();
+            }
+        }
+        return "<unknown>";
+    }
 
     @Shadow
     public abstract void connect(MinecraftClient client, ServerAddress address, ServerInfo info, @Nullable CookieStorage cookieStorage);
 
-    @Unique
-    private ServerAddress serverAddress = null;
+    @Inject(
+            method = "render",
+            at = @At("HEAD"),
+            cancellable = true
+    )
+    private void onRenderHead(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawCenteredTextWithShadow(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;III)V"))
-    private void injectRender(DrawContext context, int mouseX, int mouseY, float delta, final CallbackInfo callback) {
-        /*
-         * Make a text demonstration of the connection status
-         * This is useful for debugging the connection trace
-         * 
-         * Looks like this: Client <> Proxy <> Server
-         * 
-         * For client it should show the actual client IP
-         * For Proxy it should show the proxy IP
-         * For Server it should show the server IP
-         */
-        
-        var clientConnection = this.connection;
-        var serverAddress = this.serverAddress;
-        
-        if (clientConnection == null || this.serverAddress == null || HideAppearance.INSTANCE.isHidingNow()) {
-            return;
+        if (this.connection != null && this.serverAddress != null && !HideAppearance.INSTANCE.isHidingNow()) {
+            Text details = getConnectionDetails(this.connection, this.serverAddress);
+            EventManager.INSTANCE.callEvent(new ConnectionDetailsEvent(details));
         }
 
-        var connectionDetails = getConnectionDetails(clientConnection, serverAddress);
-        context.drawCenteredTextWithShadow(this.textRenderer, connectionDetails, this.width / 2,
-                this.height / 2 - 60, 0xFFFFFF);
+        ci.cancel();
     }
 
+    @Redirect(
+            method = "connect(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/network/ServerAddress;Lnet/minecraft/client/network/ServerInfo;Lnet/minecraft/client/network/CookieStorage;)V",
+            at = @At(
+                    value = "INVOKE",
+
+                    target = "Ljava/lang/Thread;start()V"
+            )
+    )
+    private void delayConnectorStart(Thread originalConnectorThread) {
+        new Thread(() -> {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ignored) {
+            }
+            originalConnectorThread.start();
+        }, "Delayed-Connector-Starter").start();
+    }
 
     @Inject(method = "connect(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/network/ServerAddress;Lnet/minecraft/client/network/ServerInfo;Lnet/minecraft/client/network/CookieStorage;)V", at = @At("HEAD"), cancellable = true)
     private void injectConnect(MinecraftClient client, ServerAddress address, ServerInfo info, CookieStorage cookieStorage, CallbackInfo ci) {
@@ -103,65 +121,41 @@ public abstract class MixinConnectScreen extends MixinScreen {
         return original + 30;
     }
 
+    /**
+     * 组装并返回当前连接详情文本，同时内部也会触发一次 ConnectionDetailsEvent（以防有人直接调用此方法）。
+     */
     @Unique
     private Text getConnectionDetails(ClientConnection clientConnection, ServerAddress serverAddress) {
-        // This will either be the socket address or the server address
         var socketAddr = getSocketAddress(clientConnection, serverAddress);
         var serverAddr = String.format(
                 "%s:%s",
                 hideSensitiveAddress(serverAddress.getAddress()),
                 serverAddress.getPort()
         );
+
         var ipInfo = IpInfoApi.INSTANCE.getCurrent();
-
         var client = Text.literal("Client").formatted(Formatting.BLUE);
-        if (ipInfo != null) {
-            var country = ipInfo.getCountry();
-
-            if (country != null) {
-                client.append(Text.literal(" (").formatted(Formatting.DARK_GRAY));
-                client.append(Text.literal(country).formatted(Formatting.BLUE));
-                client.append(Text.literal(")").formatted(Formatting.DARK_GRAY));
-            }
+        if (ipInfo != null && ipInfo.getCountry() != null) {
+            client.append(Text.literal(" (").formatted(Formatting.DARK_GRAY))
+                    .append(Text.literal(ipInfo.getCountry()).formatted(Formatting.BLUE))
+                    .append(Text.literal(")").formatted(Formatting.DARK_GRAY));
         }
+
         var spacer = Text.literal(" ⟺ ").formatted(Formatting.DARK_GRAY);
-
-        var socket = Text.literal(socketAddr);
-        if (ProxyManager.INSTANCE.getCurrentProxy() != null) {
-            socket.formatted(Formatting.GOLD); // Proxy good
-        } else {
-            socket.formatted(Formatting.RED); // No proxy - shows server address
-        }
-
+        var socket = Text.literal(socketAddr).formatted(
+                ProxyManager.INSTANCE.getCurrentProxy() != null ? Formatting.GOLD : Formatting.RED
+        );
         var server = Text.literal(serverAddr).formatted(Formatting.GREEN);
 
-        return Text.empty()
+        Text result = Text.empty()
                 .append(client)
                 .append(spacer.copy())
                 .append(socket)
                 .append(spacer.copy())
                 .append(server);
+
+
+        EventManager.INSTANCE.callEvent(new ConnectionDetailsEvent(result));
+        return result;
     }
-
-    @Unique
-    private static String getSocketAddress(ClientConnection clientConnection, ServerAddress serverAddress) {
-        String socketAddr;
-        if (clientConnection.getAddress() instanceof InetSocketAddress address) {
-            // In this we do not redact the host string - it is usually not sensitive
-            var hostString = address.getHostString();
-            var hostAddress = address.isUnresolved() ?
-                    "<unresolved>" :
-                    address.getAddress().getHostAddress();
-
-            if (hostString.equals(serverAddress.getAddress())) {
-                socketAddr = String.format("%s:%s", hostAddress, address.getPort());
-            } else {
-                socketAddr = String.format("%s/%s:%s", hostString, hostAddress, address.getPort());
-            }
-        } else {
-            socketAddr = "<unknown>";
-        }
-        return socketAddr;
-    }
-
 }

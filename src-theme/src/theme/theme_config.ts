@@ -5,11 +5,9 @@ import type {SpaceSeperatedNamesChangeEvent} from "../integration/events";
 
 export let spaceSeperatedNames = writable(false);
 
-/**
- * Handles space seperated names if enabled.
- */
-export function convertToSpacedString(name: string): string {
+export function convertToSpacedString(name: unknown): string {
     const regex = /[A-Z]?[a-z]+|[0-9]+|[A-Z]+(?![a-z])/g;
+    // @ts-ignore
     return (name.match(regex) as string[]).join(" ");
 }
 
@@ -19,6 +17,6 @@ async function updateSettings() {
 }
 
 listenAlways("spaceSeperatedNamesChange", (e: SpaceSeperatedNamesChangeEvent) => {
-   spaceSeperatedNames.set(e.value);
+    spaceSeperatedNames.set(e.value);
 });
 updateSettings();

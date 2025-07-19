@@ -83,8 +83,10 @@ object ClientItemGroups : Configurable("tabs") {
         runCatching {
             Class.forName("net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup")
         }.onFailure {
-            logger.error("FabricAPI is not installed, please install it to use the page buttons " +
-                "in the creative inventory")
+            logger.error(
+                "FabricAPI is not installed, please install it to use the page buttons " +
+                    "in the creative inventory"
+            )
         }.onSuccess {
             runCatching {
                 // Create item groups

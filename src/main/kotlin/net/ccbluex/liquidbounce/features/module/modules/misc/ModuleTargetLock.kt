@@ -55,6 +55,7 @@ object ModuleTargetLock : ClientModule("TargetLock", Category.MISC) {
     private sealed class LockChoice(name: String) : Choice(name) {
         override val parent: ChoiceConfigurable<*>
             get() = mode
+
         abstract fun isLockedOn(playerEntity: AbstractClientPlayerEntity): Boolean
     }
 
@@ -169,7 +170,7 @@ object ModuleTargetLock : ClientModule("TargetLock", Category.MISC) {
         if (combatOnly) {
             event.dontTarget()
         } else {
-           event.ignore()
+            event.ignore()
         }
     }
 

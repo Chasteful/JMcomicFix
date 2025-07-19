@@ -6,68 +6,83 @@
 </script>
 
 <div class="category" class:selected>
-    <div class="icon">
-        {#if selected}
-            <img
-                transition:fade={{ duration: 200 }}
-                src="img/hud/tabgui/{name.toLowerCase()}-active.svg"
+    <div class="background" class:selected/>
+    <div class="icon" class:selected>
+        <img
                 alt="icon"
-            />
-        {:else}
-            <img
-                transition:fade={{ duration: 200 }}
                 src="img/hud/tabgui/{name.toLowerCase()}.svg"
-                alt="icon"
-            />
-        {/if}
+                transition:fade={{ duration: 200 }}
+        />
     </div>
     <div class="name">
         {name}
     </div>
 </div>
 
+
 <style lang="scss">
-    @use "../../../../colors.scss" as *;
+  @use "../../../../colors.scss" as *;
 
-    .name {
-        font-weight: 500;
-        color: $tabgui-text-color;
-        font-size: 14px;
-        width: 100%;
-        padding: 7px 12px 7px 12px;
+  .category {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+  }
 
-        background: linear-gradient(
-            to left,
-            rgba(0, 0, 0, 0.5) 50%,
-            $accent-color 50%
-        );
-        background-size: 200% 100%;
-        background-position: right bottom;
-        will-change: background-position;
-        transition: background-position 0.2s ease-out;
-        overflow: hidden;
+  .name {
+    position: relative;
+    z-index: 1;
+    font-weight: 500;
+    color: $text;
+    font-size: 16px;
+    width: 100%;
+    padding: 7px 12px 7px 12px;
+    transition: all 0.2s ease-out;
+    overflow: hidden;
+  }
+
+  .background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, rgba($base, 0.5) 0%, color-mix(in srgb, var(--primary-color) 40%, transparent) 100%);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-out;
+  }
+
+  .background.selected {
+    transform: translateX(0);
+  }
+
+
+  .icon {
+    width: 62px;
+    position: relative;
+
+    img {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin: auto;
+      width: 24px;
+      height: 24px;
+      filter: brightness(0) invert(1);
     }
 
-    .category {
-        display: flex;
+    &.selected {
 
-        &.selected .name {
-            background-position: left bottom;
-        }
+      background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 20%, transparent) 0%,
+              color-mix(in srgb, var(--secondary-color) 20%, transparent) 100%);
+
+      img {
+
+        mix-blend-mode: screen;
+        filter: none;
+      }
     }
-
-    .icon {
-        background-color: rgba($tabgui-base-color, 0.68);
-        width: 62px;
-        position: relative;
-
-        img {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            margin: auto;
-        }
-    }
+  }
 </style>

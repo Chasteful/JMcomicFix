@@ -20,6 +20,7 @@ package net.ccbluex.liquidbounce.features.module.modules.movement.inventorymove
 
 import net.ccbluex.liquidbounce.config.types.NamedChoice
 import net.ccbluex.liquidbounce.event.events.KeyboardKeyEvent
+import net.ccbluex.liquidbounce.event.events.PacketEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
@@ -36,6 +37,8 @@ import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen
 import net.minecraft.client.gui.screen.ingame.HandledScreen
 import net.minecraft.client.gui.screen.ingame.InventoryScreen
 import net.minecraft.client.option.KeyBinding
+import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket
+import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket
 import net.minecraft.item.ItemGroups
 import org.lwjgl.glfw.GLFW
 
@@ -57,7 +60,10 @@ object ModuleInventoryMove : ClientModule("InventoryMove", Category.MOVEMENT) {
     }
 
     private val passthroughSneak by boolean("PassthroughSneak", false)
-
+    private val saveC0E by boolean("SaveC0E", false)
+    private val noSprintWhenClosed by boolean("NoSprintWhenClosed", false)
+    private val clickWindowList = ArrayDeque<ClickSlotC2SPacket>()
+    private var isHandlingClosePacket = false
     // states of movement keys, using mc.options.<key>.isPressed doesn't work for some reason
     private val movementKeys = mc.options.run {
         arrayOf(forwardKey, leftKey, backKey, rightKey, jumpKey, sneakKey).associateWith { false }.toMutableMap()
@@ -93,7 +99,45 @@ object ModuleInventoryMove : ClientModule("InventoryMove", Category.MOVEMENT) {
         return behavior == Behaviour.NORMAL || screen !is HandledScreen<*>
             || behavior == Behaviour.SAFE && screen is InventoryScreen
     }
+    @Suppress("unused")
+    val onPacket = handler<PacketEvent> { event ->
+        val packet = event.packet
+        val player = mc.player ?: return@handler
+        val screen = mc.currentScreen ?: return@handler
 
+        if (!saveC0E) return@handler
+
+        if (noSprintWhenClosed) {
+            if (clickWindowList.isNotEmpty() && screen !is InventoryScreen) {
+                player.isSprinting = false
+            }
+            if (packet is CloseHandledScreenC2SPacket) {
+                if (isHandlingClosePacket) return@handler
+                isHandlingClosePacket = true
+                event.cancelEvent()
+                player.isSprinting = false
+                mc.networkHandler?.sendPacket(CloseHandledScreenC2SPacket(packet.syncId))
+                isHandlingClosePacket = false
+            }
+        }
+
+        if (screen is InventoryScreen) {
+            if (packet is ClickSlotC2SPacket) {
+                clickWindowList.add(packet)
+                event.cancelEvent()
+            }
+        } else {
+
+            if (clickWindowList.isNotEmpty()) {
+                val packetsToSend = clickWindowList.toList()
+                clickWindowList.clear()
+
+                packetsToSend.forEach { pkt ->
+                    mc.networkHandler?.sendPacket(pkt)
+                }
+            }
+        }
+    }
     @Suppress("unused")
     private val keyHandler = handler<KeyboardKeyEvent> { event ->
         val key = movementKeys.keys.find { it.matchesKey(event.keyCode, event.scanCode) }
@@ -102,7 +146,8 @@ object ModuleInventoryMove : ClientModule("InventoryMove", Category.MOVEMENT) {
         movementKeys[key] = pressed
 
         if (behavior == Behaviour.SAFE && isInInventoryScreen && InventoryManager.isInventoryOpenServerSide
-            && pressed) {
+            && pressed
+        ) {
             closeInventorySilently()
         }
     }

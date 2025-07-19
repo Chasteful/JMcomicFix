@@ -47,11 +47,13 @@ object ReadOnlyComponentSerializer : JsonSerializer<Component> {
         context: JsonSerializationContext
     ): JsonObject = JsonObject().apply {
         for (v in configurable.inner) {
-            add(v.name.toLowerCamelCase(), when (v) {
-                is Alignment -> JsonPrimitive(v.toStyle())
-                is Configurable -> serializeReadOnly(v, context)
-                else -> context.serialize(v.inner)
-            })
+            add(
+                v.name.toLowerCamelCase(), when (v) {
+                    is Alignment -> JsonPrimitive(v.toStyle())
+                    is Configurable -> serializeReadOnly(v, context)
+                    else -> context.serialize(v.inner)
+                }
+            )
         }
     }
 

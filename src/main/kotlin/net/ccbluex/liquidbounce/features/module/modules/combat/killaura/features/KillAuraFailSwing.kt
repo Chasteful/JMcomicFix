@@ -60,7 +60,7 @@ internal object KillAuraFailSwing : ToggleableConfigurable(ModuleKillAura, "Fail
     private var currentAdditionalRange: Float = this.additionalRange.random()
 
     @Suppress("unused")
-    private val attackHandler = handler<AttackEntityEvent>{
+    private val attackHandler = handler<AttackEntityEvent> {
         currentAdditionalRange = this.additionalRange.random()
     }
 
@@ -74,7 +74,8 @@ internal object KillAuraFailSwing : ToggleableConfigurable(ModuleKillAura, "Fail
         val raycastType = mc.crosshairTarget?.type
 
         if (entity.isRemoved || entity.squaredBoxedDistanceTo(player) > range.pow(2)
-            || raycastType != HitResult.Type.MISS) {
+            || raycastType != HitResult.Type.MISS
+        ) {
             return
         }
 
@@ -90,8 +91,10 @@ internal object KillAuraFailSwing : ToggleableConfigurable(ModuleKillAura, "Fail
             player.swingHand(Hand.MAIN_HAND)
 
             // Notify the user about the failed hit
-            KillAuraNotifyWhenFail.notifyForFailedHit(entity, RotationManager.currentRotation
-                ?: player.rotation)
+            KillAuraNotifyWhenFail.notifyForFailedHit(
+                entity, RotationManager.currentRotation
+                    ?: player.rotation
+            )
             true
         }
     }

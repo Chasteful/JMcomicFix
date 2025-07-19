@@ -35,7 +35,6 @@ import java.util.function.Predicate
  * Allows you to place blocks faster.
  */
 object ModuleFastPlace : ClientModule("FastPlace", Category.WORLD) {
-
     private val cooldown by intRange("Cooldown", 0..0, 0..4, "ticks")
     private val applyTo by multiEnumChoice("ApplyTo", ApplyTo.entries)
     private val startDelay by int("StartDelay", 0, 0..1000, "ms")
@@ -56,7 +55,7 @@ object ModuleFastPlace : ClientModule("FastPlace", Category.WORLD) {
     private enum class ApplyTo(
         override val choiceName: String,
         val condition: Predicate<Item>
-    ): NamedChoice {
+    ) : NamedChoice {
         PROJECTILES("Projectiles", { item -> item is ProjectileItem }),
         BLOCKS("Blocks", { item -> item is BlockItem })
     }

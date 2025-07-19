@@ -416,7 +416,7 @@ class ChooseListValue<T : NamedChoice>(
         if (newValue == null) {
             throw IllegalArgumentException(
                 "ChooseListValue `${this.name}` has no option named $string" +
-                    " (available options are ${this.choices.joinToString { it.choiceName }})"
+                        " (available options are ${this.choices.joinToString { it.choiceName }})"
             )
         }
 
