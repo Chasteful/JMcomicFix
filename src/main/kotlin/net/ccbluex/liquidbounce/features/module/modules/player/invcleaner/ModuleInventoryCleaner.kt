@@ -18,6 +18,8 @@
  */
 package net.ccbluex.liquidbounce.features.module.modules.player.invcleaner
 
+import net.ccbluex.liquidbounce.config.types.ToggleableConfigurable
+import net.ccbluex.liquidbounce.event.events.PlayerTickEvent
 import net.ccbluex.liquidbounce.event.events.ScheduleInventoryActionEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
@@ -28,6 +30,7 @@ import net.ccbluex.liquidbounce.utils.inventory.*
 import net.ccbluex.liquidbounce.utils.kotlin.Priority
 import net.ccbluex.liquidbounce.utils.kotlin.component1
 import net.ccbluex.liquidbounce.utils.kotlin.component2
+import net.minecraft.block.Blocks
 import net.minecraft.screen.slot.SlotActionType
 
 /**
@@ -48,7 +51,12 @@ object ModuleInventoryCleaner : ClientModule(
     private val maxFoods by int("MaximumFoodPoints", 200, 0..2000)
 
     private val isGreedy by boolean("Greedy", true)
-
+    internal object OnlyGaming : ToggleableConfigurable(ModuleInventoryCleaner, "OnlyGaming", true) {
+        val checkGlass by boolean("CheckGlass", true)
+    }
+    init {
+        tree(OnlyGaming)
+    }
     private val offHandItem by enumChoice("OffHandItem", ItemSortChoice.SHIELD)
     private val slotItem1 by enumChoice("SlotItem-1", ItemSortChoice.WEAPON)
     private val slotItem2 by enumChoice("SlotItem-2", ItemSortChoice.BOW)
@@ -112,9 +120,24 @@ object ModuleInventoryCleaner : ClientModule(
                 isGreedy = isGreedy,
             )
         }
+    var OnGlass : Boolean = false
 
+    @Suppress("UNUSED_PARAMETER")
+    val blockCheckHandler = handler<PlayerTickEvent> { event ->
+        if (!OnlyGaming.enabled || !OnlyGaming.checkGlass) {
+            return@handler
+        }
+
+        val blockPos = player.blockPos.down()
+        val block = world.getBlockState(blockPos).block
+
+        OnGlass  = block == Blocks.GLASS || block == Blocks.TINTED_GLASS
+    }
     @Suppress("unused")
     private val handleInventorySchedule = handler<ScheduleInventoryActionEvent> { event ->
+        if (OnlyGaming.enabled && OnGlass) {
+            return@handler
+        }
         val cleanupPlan = CleanupPlanGenerator(cleanupTemplateFromSettings, findNonEmptySlotsInInventory())
             .generatePlan()
 

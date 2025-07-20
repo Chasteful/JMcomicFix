@@ -89,7 +89,7 @@ import net.ccbluex.liquidbounce.features.module.modules.render.esp.ModuleESP
 import net.ccbluex.jmcomicfix.features.module.modules.render.jumpeffect.ModuleJumpEffect
 import net.ccbluex.jmcomicfix.features.module.modules.combat.tpbow.ModuleBowAura
 import net.ccbluex.jmcomicfix.features.module.modules.misc.ModuleAutoScreenShot
-import net.ccbluex.jmcomicfix.features.module.modules.player.autoClutch.ModuleAutoClutch
+import net.ccbluex.liquidbounce.features.module.modules.player.ModuleAutoClutch
 import net.ccbluex.liquidbounce.features.module.modules.render.murdermystery.ModuleMurderMystery
 import net.ccbluex.liquidbounce.features.module.modules.render.nametags.ModuleNametags
 import net.ccbluex.liquidbounce.features.module.modules.render.trajectories.ModuleTrajectories
