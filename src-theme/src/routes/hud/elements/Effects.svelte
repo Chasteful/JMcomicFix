@@ -6,6 +6,7 @@
     import { REST_BASE } from "../../../integration/host";
     import {expoOut} from "svelte/easing";
     import {flip} from "svelte/animate";
+    import {springTransition} from "../../../util/animate_utils";
 
     let effects: StatusEffect[] = [];
 
@@ -35,19 +36,7 @@
         const effectId = effect.replace(/^minecraft:/, '');
         return `${REST_BASE}/api/v1/client/resource/effectTexture?id=minecraft:${effectId}`;
     }
-    function springTransition(node: HTMLElement, params: { delay?: number }) {
-        return {
-            delay: params.delay || 0,
-            duration: 400,
-            css: (t: number) => {
-                const eased = 1 - Math.pow(1 - t, 3);
-                return `
-          transform: scale(${eased});
-          opacity: ${eased};
-        `;
-            }
-        };
-    }
+
 </script>
 
 <div class="effects">

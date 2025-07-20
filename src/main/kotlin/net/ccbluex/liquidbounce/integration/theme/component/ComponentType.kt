@@ -39,6 +39,7 @@ enum class ComponentType(
     KEY_BINDS("KeyBinds"),
     MOTION_GRAPH("MotionGraph"),
     SESSIONINFO("SessionInfo"),
+    PROGRESS("ProgressBar"),
     PLAYERLIST(
         "PlayerListHUD",
         componentTweaks = arrayOf(

@@ -21,6 +21,8 @@
 package net.ccbluex.liquidbounce.features.module.modules.player.cheststealer
 
 import net.ccbluex.liquidbounce.config.types.NamedChoice
+import net.ccbluex.liquidbounce.event.EventManager
+import net.ccbluex.liquidbounce.event.events.ProgressEvent
 import net.ccbluex.liquidbounce.event.events.ScheduleInventoryActionEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
@@ -47,24 +49,42 @@ object ModuleChestStealer : ClientModule("ChestStealer", Category.PLAYER) {
     private val selectionMode by enumChoice("SelectionMode", SelectionMode.DISTANCE)
     private val itemMoveMode by enumChoice("MoveMode", ItemMoveMode.QUICK_MOVE)
     private val quickSwaps by boolean("QuickSwaps", true)
-
+    private val showProgress by boolean("ShowProgress", true)
     var checkTitle by boolean("CheckTitle", true)
+    @JvmStatic
+    var stealingStartTime: Long = 0L
+    @JvmStatic
+    var initialItemCount: Int = 0
+    @JvmStatic
+    var remainingItems: Int = 0
 
     init {
         tree(FeatureChestAura)
-        tree(FeatureProgress)
     }
 
     override fun disable() {
         FeatureChestAura.interactedBlocksSet.clear()
+        initialItemCount = 0
+        remainingItems = 0
         super.disable()
     }
 
     val scheduleInventoryAction = handler<ScheduleInventoryActionEvent> { event ->
         val screen = getChestScreen()
         if (screen == null) {
-            FeatureProgress.initialItemCount = 0
-            FeatureProgress.remainingItems = 0
+            if (initialItemCount > 0) {
+                initialItemCount = 0
+                remainingItems = 0
+                if (showProgress) {
+                    EventManager.callEvent(
+                        ProgressEvent(
+                            title = "ChestStealer",
+                            progress = 1f,
+                            maxProgress = 1f
+                        )
+                    )
+                }
+            }
             return@handler
         }
 
@@ -73,11 +93,15 @@ object ModuleChestStealer : ClientModule("ChestStealer", Category.PLAYER) {
             .filterIsInstance<ContainerItemSlot>()
             .distinctBy { it.slotInContainer }
 
-
-        if (itemsToCollect.isNotEmpty() && FeatureProgress.initialItemCount == 0) {
-            FeatureProgress.onStartStealing(itemsToCollect.size)
+        if (itemsToCollect.isNotEmpty()) {
+            if (initialItemCount == 0) {
+                onStartStealing(itemsToCollect.size)
+            }
+            updateRemainingItems(itemsToCollect.size)
+        } else if (initialItemCount > 0) {
+            updateRemainingItems(0)
         }
-
+        updateRemainingItems(itemsToCollect.size)
 
         FeatureProgress.updateRemainingItems(itemsToCollect.size)
 
@@ -107,6 +131,40 @@ object ModuleChestStealer : ClientModule("ChestStealer", Category.PLAYER) {
             event.schedule(inventoryConstrains, CloseContainerAction(screen))
         }
     }
+    fun onStartStealing(total: Int) {
+        stealingStartTime = System.currentTimeMillis()
+        initialItemCount = total
+        remainingItems = total
+    }
+
+
+    fun updateRemainingItems(count: Int) {
+        remainingItems = count
+            if (!showProgress) return
+
+            val progress = if (initialItemCount <= 0) {
+                0f
+            } else {
+                val stolenItems = (initialItemCount - remainingItems).coerceAtLeast(0)
+                (stolenItems.toFloat() / initialItemCount).coerceIn(0f..1f)
+            }
+
+            if (initialItemCount <= 0 || remainingItems <= 0) return
+
+            val elapsed = System.currentTimeMillis() - stealingStartTime
+            val timePerItem = elapsed.toFloat() / (initialItemCount - remainingItems)
+            if (progress > 0 || (initialItemCount > 0 && remainingItems == 0)) {
+                EventManager.callEvent(
+                    ProgressEvent(
+                        title = "ChestStealer",
+                        progress = progress,
+                        maxProgress = 1f,
+                        timeRemaining = if (progress < 1)  (timePerItem * remainingItems).toLong() else null
+                    )
+                )
+            }
+        }
+
 
     /**
      * Create a list of actions that will move the item in the slot [from] to the slot [to].

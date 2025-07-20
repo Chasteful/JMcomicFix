@@ -134,3 +134,16 @@ export function shrinkOut(node: Element, {delay = 0, duration = 300} = {}) {
         }
     };
 }
+export function springTransition(node: HTMLElement, params: { delay?: number }) {
+    return {
+        delay: params.delay || 0,
+        duration: 400,
+        css: (t: number) => {
+            const eased = 1 - Math.pow(1 - t, 3);
+            return `
+          transform: scale(${eased});
+          opacity: ${eased};
+        `;
+        }
+    };
+}

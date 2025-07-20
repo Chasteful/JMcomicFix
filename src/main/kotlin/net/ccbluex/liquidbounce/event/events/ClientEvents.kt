@@ -99,7 +99,14 @@ class NotificationEvent(val title: String, val message: String, val severity: Se
         INFO, SUCCESS, ERROR, ENABLED, DISABLED, BLINK, BLINKED, BLINKING
     }
 }
-
+@Nameable("progress")
+@WebSocketEvent
+class ProgressEvent(
+    val title: String,
+    val progress: Float,
+    val maxProgress: Float = 1f,
+    val timeRemaining: Long? = null,
+) : Event()
 @Nameable("gameModeChange")
 @WebSocketEvent
 class GameModeChangeEvent(val gameMode: GameMode) : Event()

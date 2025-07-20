@@ -38,6 +38,7 @@
     import {WindowSize} from "../../util/WindowSize";
     import {hudScaleFactor} from "../../util/Theme/ThemeManager";
     import {calcResolutionCoefficient} from "../../util/ResolutionScaler";
+    import ProgressBar from "./elements/progressBar/ProgressBar.svelte";
 
     const {width, height, destroy} = WindowSize();
     let components: Component[] = [];
@@ -155,6 +156,9 @@
             {/if}
             {#if component.name === 'PlayerListHUD'}
                 <PlayerListHUD/>
+            {/if}
+            {#if component.name === 'ProgressBar'}
+                <ProgressBar/>
             {/if}
             {#if component.name === 'Scoreboard'}
                 <Scoreboard/>

@@ -116,6 +116,13 @@ export interface NotificationEvent {
     severity: "INFO" | "SUCCESS" | "ERROR" | "ENABLED" | "DISABLED" | "BLINK" | "BLINKED" | "BLINKING";
 }
 
+export interface ProgressEvent {
+    title: string;
+    progress: number;
+    maxProgress: number;
+    timeRemaining: number;
+}
+
 export interface KeyEvent {
     key: string;
     action: number;

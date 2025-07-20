@@ -23,6 +23,7 @@ package net.ccbluex.liquidbounce.utils.client
 
 import net.ccbluex.liquidbounce.event.EventManager
 import net.ccbluex.liquidbounce.event.events.NotificationEvent
+import net.ccbluex.liquidbounce.event.events.ProgressEvent
 import net.ccbluex.liquidbounce.features.command.Command
 import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.injection.mixins.minecraft.gui.MixinChatScreenAccessor
@@ -227,6 +228,11 @@ fun notification(title: String, message: Text, severity: NotificationEvent.Sever
 fun notification(title: String, message: String, severity: NotificationEvent.Severity) =
     EventManager.callEvent(NotificationEvent(title, message, severity))
 
+fun progress(title: String, progress: Float, maxProgress: Float = 1f, timeRemaining: Long? = null) =
+    EventManager.callEvent(ProgressEvent(title, progress, maxProgress, timeRemaining))
+
+fun progress(title: Text, progress: Float, maxProgress: Float = 1f, timeRemaining: Long? = null) =
+    EventManager.callEvent(ProgressEvent(title.string, progress, maxProgress, timeRemaining))
 /**
  * Joins a list of [Text] into a single [Text] with the given [separator].
  */
