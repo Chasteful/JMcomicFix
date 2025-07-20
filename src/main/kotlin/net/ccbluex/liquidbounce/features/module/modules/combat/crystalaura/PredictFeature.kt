@@ -109,11 +109,13 @@ abstract class PredictFeature(name: String) : ToggleableConfigurable(ModuleCryst
         include: BlockPos? = null
     ): DamageProvider {
         if (!enabled) {
-            return NormalDamageProvider(player.getDamageFromExplosion(
-                crystal,
-                include = include,
-                maxBlastResistance = maxBlastResistance
-            ))
+            return NormalDamageProvider(
+                player.getDamageFromExplosion(
+                    crystal,
+                    include = include,
+                    maxBlastResistance = maxBlastResistance
+                )
+            )
         }
 
         val simulated = getSnapshotPos(player, ticks)

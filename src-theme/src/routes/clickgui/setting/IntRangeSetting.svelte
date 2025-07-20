@@ -34,7 +34,7 @@
                 from: newValue[0],
                 to: newValue[1]
             };
-            setting = { ...cSetting };
+            setting = {...cSetting};
         });
 
 
@@ -47,11 +47,11 @@
 <div class="setting" class:has-suffix={cSetting.suffix !== ""}>
     <div class="name">{$spaceSeperatedNames ? convertToSpacedString(cSetting.name) : cSetting.name}</div>
     <div class="value">
-        <ValueInput valueType="int" value={cSetting.value.from}
-                    on:change={(e) => apiSlider.set([e.detail.value, cSetting.value.to])}/>
+        <ValueInput on:change={(e) => apiSlider.set([e.detail.value, cSetting.value.to])} value={cSetting.value.from}
+                    valueType="int"/>
         -
-        <ValueInput valueType="int" value={cSetting.value.to}
-                    on:change={(e) => apiSlider.set([cSetting.value.from, e.detail.value])}/>
+        <ValueInput on:change={(e) => apiSlider.set([cSetting.value.from, e.detail.value])} value={cSetting.value.to}
+                    valueType="int"/>
     </div>
     {#if cSetting.suffix !== ""}
         <div class="suffix">{cSetting.suffix}</div>
@@ -60,50 +60,50 @@
 </div>
 
 <style lang="scss">
-    @use "../../../colors.scss" as *;
+  @use "../../../colors.scss" as *;
 
-    .setting {
-        padding: 7px 0 2px 0;
-        display: grid;
-        grid-template-areas:
+  .setting {
+    padding: 7px 0 2px 0;
+    display: grid;
+    grid-template-areas:
             "a b"
             "d d";
-        grid-template-columns: 1fr max-content;
-        column-gap: 5px;
+    grid-template-columns: 1fr max-content;
+    column-gap: 5px;
 
-        /* animation fix */
-        min-height: 46px;
-    }
 
-    .setting.has-suffix {
-        grid-template-areas:
+    min-height: 46px;
+  }
+
+  .setting.has-suffix {
+    grid-template-areas:
             "a b c"
             "d d d";
-        grid-template-columns: 1fr max-content max-content;
-    }
+    grid-template-columns: 1fr max-content max-content;
+  }
 
-    .suffix,
-    .setting {
-        color: $clickgui-text-color;
-        font-weight: 500;
-        font-size: 12px;
-    }
+  .suffix,
+  .setting {
+    color: $text;
+    font-weight: 500;
+    font-size: var(--font-size);
+  }
 
-    .name {
-        grid-area: a;
-        font-weight: 500;
-    }
+  .name {
+    grid-area: a;
+    font-weight: 500;
+  }
 
-    .value {
-        grid-area: b;
-    }
+  .value {
+    grid-area: b;
+  }
 
-    .suffix {
-        grid-area: c;
-    }
+  .suffix {
+    grid-area: c;
+  }
 
-    .slider {
-        grid-area: d;
-        padding-right: 10px;
-    }
+  .slider {
+    grid-area: d;
+    padding-right: 10px;
+  }
 </style>

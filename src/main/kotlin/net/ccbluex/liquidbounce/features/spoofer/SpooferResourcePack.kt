@@ -43,7 +43,8 @@ object SpooferResourcePack : ToggleableConfigurable(name = "ResourceSpoofer", en
             network.sendPacket(ResourcePackStatusC2SPacket(id, SUCCESSFULLY_LOADED))
             event.cancelEvent()
         } else if (packet is ResourcePackStatusC2SPacket && (packet.status == DECLINED ||
-                packet.status == FAILED_DOWNLOAD)) {
+                packet.status == FAILED_DOWNLOAD)
+        ) {
             event.cancelEvent()
         }
     }

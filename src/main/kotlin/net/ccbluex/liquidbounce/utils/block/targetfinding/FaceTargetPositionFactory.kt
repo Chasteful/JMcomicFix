@@ -121,10 +121,12 @@ class NearestRotationTargetPositionFactory(val config: PositionFactoryConfigurat
         ModuleDebug.debugGeometry(
             ModuleScaffold,
             "targetFace",
-            ModuleDebug.DebuggedBox(Box(
-                face.from,
-                face.to
-            ).offset(Vec3d.of(targetPos)), Color4b(255, 0, 0, 255))
+            ModuleDebug.DebuggedBox(
+                Box(
+                    face.from,
+                    face.to
+                ).offset(Vec3d.of(targetPos)), Color4b(255, 0, 0, 255)
+            )
         )
         ModuleDebug.debugGeometry(
             ModuleScaffold,
@@ -138,10 +140,12 @@ class NearestRotationTargetPositionFactory(val config: PositionFactoryConfigurat
         ModuleDebug.debugGeometry(
             ModuleScaffold,
             "daLine",
-            ModuleDebug.DebuggedLine(Line(
-                config.eyePos,
-                currentRotation.directionVector
-            ), Color4b(0, 0, 255, 255))
+            ModuleDebug.DebuggedLine(
+                Line(
+                    config.eyePos,
+                    currentRotation.directionVector
+                ), Color4b(0, 0, 255, 255)
+            )
         )
 
         return pointOnFace
@@ -302,6 +306,7 @@ abstract class BaseYawTargetPositionFactory(
             highTolerance <= yawTolerance && lowTolerance <= yawTolerance -> {
                 if (highTolerance < lowTolerance) highClosestPoint else lowClosestPoint
             }
+
             highTolerance <= yawTolerance -> highClosestPoint
             lowTolerance <= yawTolerance -> lowClosestPoint
             else -> null
@@ -383,10 +388,12 @@ class EdgePointTargetPositionFactory(
         ModuleDebug.debugGeometry(
             ModuleScaffold,
             "Face",
-            ModuleDebug.DebuggedBox(Box(
-                face.from,
-                face.to
-            ).offset(Vec3d.of(targetPos)), Color4b(255, 0, 0, 255))
+            ModuleDebug.DebuggedBox(
+                Box(
+                    face.from,
+                    face.to
+                ).offset(Vec3d.of(targetPos)), Color4b(255, 0, 0, 255)
+            )
         )
 
         ModuleDebug.debugGeometry(

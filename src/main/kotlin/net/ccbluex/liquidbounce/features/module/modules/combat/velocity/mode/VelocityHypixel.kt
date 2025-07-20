@@ -31,7 +31,7 @@ internal object VelocityHypixel : VelocityMode("Hypixel") {
     @Suppress("unused")
     private val packetHandler = handler<PacketEvent> { event ->
         val packet = event.packet
-        
+
         if (ModuleFly.enabled) {
             return@handler
         }

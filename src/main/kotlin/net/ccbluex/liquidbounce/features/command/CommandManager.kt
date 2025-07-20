@@ -306,6 +306,7 @@ object CommandManager : Iterable<Command> by commands {
             CommandPlayerTeleport,
             CommandTps,
             CommandServerInfo,
+            CommandTheme,
             CommandModels,
             CommandTranslate,
             CommandAutoTranslate,

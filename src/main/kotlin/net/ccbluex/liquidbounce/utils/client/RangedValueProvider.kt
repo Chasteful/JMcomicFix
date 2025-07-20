@@ -64,7 +64,7 @@ class FloatValueProvider(
     val suffix: String = ""
 ) : RangedValueProvider {
 
-    override fun register(offeredConfigurable: Configurable) : RangedValue<*> {
+    override fun register(offeredConfigurable: Configurable): RangedValue<*> {
         return offeredConfigurable.float(name, default, range, suffix)
     }
 

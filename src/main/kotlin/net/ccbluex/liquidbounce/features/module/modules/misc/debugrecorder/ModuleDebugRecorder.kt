@@ -1,27 +1,6 @@
-/*
- * This file is part of LiquidBounce (https://github.com/CCBlueX/LiquidBounce)
- *
- * Copyright (c) 2015 - 2025 CCBlueX
- *
- * LiquidBounce is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * LiquidBounce is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
- *
- *
- */
 package net.ccbluex.liquidbounce.features.module.modules.misc.debugrecorder
 
 import net.ccbluex.liquidbounce.config.ConfigSystem
-import net.ccbluex.liquidbounce.config.gson.adapter.toUnderlinedString
 import net.ccbluex.liquidbounce.config.gson.publicGson
 import net.ccbluex.liquidbounce.config.types.Choice
 import net.ccbluex.liquidbounce.config.types.ChoiceConfigurable
@@ -31,7 +10,8 @@ import net.ccbluex.liquidbounce.features.module.modules.misc.debugrecorder.modes
 import net.ccbluex.liquidbounce.utils.client.*
 import net.minecraft.text.ClickEvent
 import net.minecraft.text.HoverEvent
-import java.time.LocalDateTime
+import java.text.SimpleDateFormat
+import java.util.*
 
 object ModuleDebugRecorder : ClientModule("DebugRecorder", Category.MISC, disableOnQuit = true) {
 
@@ -40,15 +20,17 @@ object ModuleDebugRecorder : ClientModule("DebugRecorder", Category.MISC, disabl
         doNotIncludeAlways()
     }
 
-    val modes = choices("Mode", GenericDebugRecorder, arrayOf(
-        MinaraiCombatRecorder,
-        MinaraiTrainer,
+    val modes = choices(
+        "Mode", GenericDebugRecorder, arrayOf(
+            MinaraiCombatRecorder,
+            MinaraiTrainer,
 
-        GenericDebugRecorder,
-        DebugCPSRecorder,
-        AimDebugRecorder,
-        BoxDebugRecorder
-    ))
+            GenericDebugRecorder,
+            DebugCPSRecorder,
+            AimDebugRecorder,
+            BoxDebugRecorder
+        )
+    )
 
     abstract class DebugRecorderMode<T>(name: String) : Choice(name) {
         override val parent: ChoiceConfigurable<*>
@@ -72,6 +54,8 @@ object ModuleDebugRecorder : ClientModule("DebugRecorder", Category.MISC, disabl
             chat(regular("Recording "), variable(name), regular("..."))
         }
 
+        internal val dateFormat = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss")
+
         override fun disable() {
             if (this.packets.isEmpty()) {
                 chat(regular("No packets recorded."))
@@ -82,7 +66,7 @@ object ModuleDebugRecorder : ClientModule("DebugRecorder", Category.MISC, disabl
                 // Create parent folder
                 folder.mkdirs()
 
-                val baseName = LocalDateTime.now().toUnderlinedString()
+                val baseName = dateFormat.format(Date())
                 var file = folder.resolve("${baseName}.json")
 
                 var idx = 0

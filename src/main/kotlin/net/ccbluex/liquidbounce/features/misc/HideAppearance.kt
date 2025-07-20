@@ -32,6 +32,8 @@ import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.command.CommandManager
 import net.ccbluex.liquidbounce.features.module.ModuleManager
 import net.ccbluex.liquidbounce.integration.IntegrationListener
+import net.ccbluex.liquidbounce.integration.VirtualDisplayScreen
+import net.ccbluex.liquidbounce.integration.VirtualScreenType
 import net.ccbluex.liquidbounce.utils.client.Chronometer
 import net.ccbluex.liquidbounce.utils.client.inGame
 import net.ccbluex.liquidbounce.utils.client.mc
@@ -72,6 +74,7 @@ object HideAppearance : EventListener {
 
     var isHidingNow = false
         set(value) {
+
             field = value
             RenderSystem.recordRenderCall(::updateClient)
 
@@ -102,15 +105,15 @@ object HideAppearance : EventListener {
         mc.updateWindowTitle()
         mc.window.setIcon(
             mc.defaultResourcePack,
-            if (SharedConstants.getGameVersion().isStable) Icons.RELEASE else Icons.SNAPSHOT)
+            if (SharedConstants.getGameVersion().isStable) Icons.RELEASE else Icons.SNAPSHOT
+        )
     }
 
     @Suppress("unused")
     private val keyHandler = handler<KeyboardKeyEvent> { event ->
         val keyCode = event.keyCode
         val modifier = event.mods
-
-        if (inGame) {
+        if (inGame || isLockScreenActive()) {
             return@handler
         }
 
@@ -121,6 +124,11 @@ object HideAppearance : EventListener {
 
             shiftChronometer.reset()
         }
+    }
+
+    private fun isLockScreenActive(): Boolean {
+        val currentScreen = mc.currentScreen
+        return currentScreen is VirtualDisplayScreen && currentScreen.screenType == VirtualScreenType.LOCK_SCREEN
     }
 
     /**

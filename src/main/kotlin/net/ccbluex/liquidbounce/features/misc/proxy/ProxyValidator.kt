@@ -145,7 +145,8 @@ private fun Proxy.connect(
         override fun initChannel(channel: Channel) {
             try {
                 channel.config().setOption(ChannelOption.TCP_NODELAY, true)
-            } catch (_: ChannelException) {}
+            } catch (_: ChannelException) {
+            }
 
             val channelPipeline = channel.pipeline().addLast("timeout", ReadTimeoutHandler(PING_TIMEOUT))
             // Assign proxy before [ClientConnection.addHandlers] to avoid overriding the proxy

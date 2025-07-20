@@ -130,6 +130,7 @@ object Pot : Buff("Pot") {
 
                 rotation = rotation.normalize()
             }
+
             ON_TICK -> {
                 rotation = rotation.normalize()
                 network.sendPacket(MovePacketType.FULL.generatePacket().apply {
@@ -137,6 +138,7 @@ object Pot : Buff("Pot") {
                     pitch = rotation.pitch
                 })
             }
+
             ON_USE -> {
                 rotation = rotation.normalize()
             }
@@ -155,7 +157,8 @@ object Pot : Buff("Pot") {
                     pitch = currentRotation?.pitch ?: player.pitch
                 })
             }
-            else -> { }
+
+            else -> {}
         }
 
         // Wait at least 1 tick to make sure, we do not continue with something else too early
@@ -179,10 +182,12 @@ object Pot : Buff("Pot") {
             StatusEffects.INSTANT_HEALTH -> HealthPotion.enabled && playerHealth <= HealthPotion.health
             StatusEffects.REGENERATION -> RegenPotion.enabled && playerHealth <= RegenPotion.health
                 && !player.hasStatusEffect(StatusEffects.REGENERATION)
+
             StatusEffects.STRENGTH -> strengthPotion && !player.hasStatusEffect(StatusEffects.STRENGTH)
             StatusEffects.SPEED -> speedPotion && !player.hasStatusEffect(StatusEffects.SPEED)
             StatusEffects.FIRE_RESISTANCE -> fireResistancePotion &&
                 !player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE)
+
             else -> false
         }
 
@@ -210,9 +215,9 @@ object Pot : Buff("Pot") {
         world.entities.filterIsInstance<AreaEffectCloudEntity>().any {
             it.squaredDistanceTo(player) <= BENEFICIAL_SQUARE_RANGE &&
                 it.potionContentsComponent.effects.any { effect ->
-                effect.effectType == StatusEffects.REGENERATION || effect.effectType == StatusEffects.INSTANT_HEALTH
-                    || effect.effectType == StatusEffects.STRENGTH
-            }
+                    effect.effectType == StatusEffects.REGENERATION || effect.effectType == StatusEffects.INSTANT_HEALTH
+                        || effect.effectType == StatusEffects.STRENGTH
+                }
         }
 
     /**

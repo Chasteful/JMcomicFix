@@ -26,6 +26,7 @@ import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.render.*
+import net.ccbluex.liquidbounce.render.GenericSyncColorMode
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.ccbluex.liquidbounce.utils.block.AbstractBlockLocationTracker
 import net.ccbluex.liquidbounce.utils.block.ChunkScanner
@@ -46,6 +47,16 @@ import net.minecraft.util.math.BlockPos
 object ModuleBlockESP : ClientModule("BlockESP", Category.RENDER) {
 
     private val modes = choices("Mode", Glow, arrayOf(Box, Glow, Outline))
+
+    private val colorMode = choices("ColorMode", 4) {
+        arrayOf(
+            MapColorMode(it),
+            GenericStaticColorMode(it, Color4b(255, 179, 72, 50)),
+            GenericCustomColorMode(it, Color4b.WHITE.with(a = 80), Color4b.WHITE.with(a = 100)),
+            GenericRainbowColorMode(it),
+            GenericSyncColorMode(it),
+        )
+    }
     private val targets by blocks(
         "Targets",
         findBlocksEndingWith("_BED", "DRAGON_EGG").toHashSet()
@@ -57,13 +68,6 @@ object ModuleBlockESP : ClientModule("BlockESP", Category.RENDER) {
         it
     }
 
-    private val colorMode = choices("ColorMode", 0) {
-        arrayOf(
-            MapColorMode(it),
-            GenericStaticColorMode(it, Color4b(255, 179, 72, 50)),
-            GenericRainbowColorMode(it)
-        )
-    }
 
     private object Box : Choice("Box") {
         override val parent: ChoiceConfigurable<Choice>
@@ -106,30 +110,23 @@ object ModuleBlockESP : ClientModule("BlockESP", Category.RENDER) {
             BoxRenderer.drawWith(this) {
                 for (blockPos in blocks) {
                     val blockState = blockPos.getState() ?: continue
+                    if (blockState.isAir) continue
 
-                    if (blockState.isAir) {
-                        continue
-                    }
+                    val shape = blockState.getOutlineShape(world, blockPos)
+                    val boundingBox = if (shape.isEmpty) FULL_BOX else shape.boundingBox
 
-                    val outlineShape = blockState.getOutlineShape(world, blockPos)
-                    val boundingBox = if (outlineShape.isEmpty) {
-                        FULL_BOX
-                    } else {
-                        outlineShape.boundingBox
-                    }
 
-                    var color = colorMode.getColor(Pair(blockPos, blockState))
-
+                    val (startColRaw, endColRaw) = colorMode.getColors(Pair(blockPos, blockState))
+                    var startCol = startColRaw
+                    var endCol = endColRaw
                     if (fullAlpha) {
-                        color = color.with(a = 255)
+                        startCol = startCol.with(a = 255)
+                        endCol = endCol.with(a = 255)
                     }
+                    val outlineCol = startCol.with(a = 150).takeIf { drawOutline }
 
                     withPositionRelativeToCamera(blockPos.toVec3d()) {
-                        drawBox(
-                            boundingBox,
-                            faceColor = color,
-                            outlineColor = color.with(a = 150).takeIf { drawOutline }
-                        )
+                        drawGradientBox(boundingBox, startCol, endCol, outlineCol)
                     }
 
                     dirty = true

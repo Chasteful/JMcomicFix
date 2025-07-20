@@ -1,16 +1,9 @@
 <script lang="ts">
     import MainButton from "./buttons/MainButton.svelte";
-    import ChildButton from "./buttons/ChildButton.svelte";
     import ButtonContainer from "../common/buttons/ButtonContainer.svelte";
     import IconTextButton from "../common/buttons/IconTextButton.svelte";
     import IconButton from "../common/buttons/IconButton.svelte";
-    import {
-        browse,
-        exitClient,
-        getClientUpdate,
-        openScreen,
-        toggleBackgroundShaderEnabled
-    } from "../../../integration/rest";
+    import {browse, getClientUpdate, openScreen} from "../../../integration/rest";
     import Menu from "../common/Menu.svelte";
     import {fly} from "svelte/transition";
     import {onMount} from "svelte";
@@ -18,7 +11,6 @@
 
     let regularButtonsShown = true;
     let clientButtonsShown = false;
-
     onMount(() => {
         setTimeout(async () => {
             const clientUpdate = await getClientUpdate();
@@ -26,9 +18,9 @@
             if (clientUpdate.update) {
                 notification.set({
                     title: `LiquidBounce ${clientUpdate.update.clientVersion} has been released!`,
-                    message: `Download it from liquidbounce.net!`,
+                    message: `Go and notify KotlinModule!`,
                     error: false,
-                    delay: 99999999
+                    delay: 999999
                 });
             }
         }, 2000);
@@ -47,7 +39,9 @@
             }, 750);
         }
     }
+
 </script>
+
 
 <Menu>
     <div class="content">
@@ -55,44 +49,35 @@
             {#if regularButtonsShown}
                 <MainButton title="Singleplayer" icon="singleplayer" index={0}
                             on:click={() => openScreen("singleplayer")}/>
-
-                <MainButton title="Multiplayer" icon="multiplayer" let:parentHovered
-                            on:click={() => openScreen("multiplayer")} index={1}>
-                    <ChildButton title="Realms" icon="realms" {parentHovered}
-                                 on:click={() => openScreen("multiplayer_realms")}/>
-                </MainButton>
-                <MainButton title="LiquidBounce" icon="liquidbounce" on:click={toggleButtons} index={2}/>
-                <MainButton title="Options" icon="options" on:click={() => openScreen("options")} index={3}/>
+                <MainButton title="Multiplayer" icon="multiplayer" index={1}
+                            on:click={() => openScreen("multiplayer")}/>
+                <MainButton title="LiquidBounce" icon="liquidbounce" index={2} on:click={toggleButtons}/>
+                <MainButton title="Options" icon="options" index={3} on:click={() => openScreen("options")}/>
             {:else if clientButtonsShown}
-                <MainButton title="Proxy Manager" icon="proxymanager" on:click={() => openScreen("proxymanager")}
-                            index={0}/>
-                <MainButton title="Click GUI" icon="clickgui" on:click={() => openScreen("clickgui")} index={1}/>
-                <!-- <MainButton title="Scripts" icon="scripts" index={2}/> -->
-                <MainButton title="Back" icon="back-large" on:click={toggleButtons} index={2}/>
+                <MainButton title="Proxy Manager" icon="proxymanager" index={0}
+                            on:click={() => openScreen("proxymanager")}/>
+                <MainButton title="Click GUI" icon="clickgui" index={1} on:click={() => openScreen("clickgui")}/>
+                <MainButton title="HUD" icon="layout" index={2} on:click={() => openScreen("layouteditor")}/>
+                <MainButton title="Back" icon="back-large" index={3} on:click={toggleButtons}/>
             {/if}
         </div>
-
         <div class="additional-buttons" transition:fly|global={{duration: 700, y: 100}}>
-            <ButtonContainer>
-                <IconTextButton icon="icon-exit.svg" title="Exit" on:click={exitClient}/>
-                <IconTextButton icon="icon-change-background.svg" title="Toggle Shader"
-                                on:click={toggleBackgroundShaderEnabled}/>
-            </ButtonContainer>
         </div>
-
-        <div class="social-buttons" transition:fly|global={{duration: 700, y: 100}}>
+        <div class="social-buttons" transition:fly|global={{duration:300, y:100}}>
             <ButtonContainer>
-                <IconButton title="Forum" icon="nodebb" on:click={() => browse("MAINTAINER_FORUM")}/>
-                <IconButton title="GitHub" icon="github" on:click={() => browse("MAINTAINER_GITHUB")}/>
-                <IconButton title="Discord" icon="discord" on:click={() => browse("MAINTAINER_DISCORD")}/>
-                <IconButton title="Twitter" icon="twitter" on:click={() => browse("MAINTAINER_TWITTER")}/>
-                <IconButton title="YouTube" icon="youtube" on:click={() => browse("MAINTAINER_YOUTUBE")}/>
-                <IconTextButton title="liquidbounce.net" icon="icon-liquidbounce.net.svg"
-                                on:click={() => browse("CLIENT_WEBSITE")}/>
+                <IconButton icon="nodebb" on:click={() => browse("MAINTAINER_FORUM")} title="Forum"/>
+                <IconButton icon="github" on:click={() => browse("MAINTAINER_GITHUB")} title="GitHub"/>
+                <IconButton icon="discord" on:click={() => browse("MAINTAINER_DISCORD")} title="Discord"/>
+                <IconButton icon="twitter" on:click={() => browse("MAINTAINER_TWITTER")} title="Twitter"/>
+                <IconButton icon="youtube" on:click={() => browse("MAINTAINER_YOUTUBE")} title="YouTube"/>
+                <IconButton icon="bili" on:click={() => browse("MAINTAINER_BILIBILI")} title="BiliBili"/>
+                <IconTextButton icon="icon-liquidbounce.net.svg" on:click={() => browse("CLIENT_WEBSITE")}
+                                title="DevLog"/>
             </ButtonContainer>
         </div>
     </div>
 </Menu>
+
 
 <style>
     .content {

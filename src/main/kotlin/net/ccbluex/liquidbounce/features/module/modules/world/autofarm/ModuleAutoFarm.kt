@@ -186,7 +186,7 @@ object ModuleAutoFarm : ClientModule("AutoFarm", Category.WORLD) {
     private fun updateTargetToBreakable(radius: Float, radiusSquared: Float, eyesPos: Vec3d): Boolean {
         val blocksToBreak = eyesPos.searchBlocksInCuboid(radius) { pos, state ->
             !state.isAir && isTargeted(state, pos) &&
-                    getNearestPoint(eyesPos, Box(pos)).squaredDistanceTo(eyesPos) <= radiusSquared
+                getNearestPoint(eyesPos, Box(pos)).squaredDistanceTo(eyesPos) <= radiusSquared
         }.sortedBy { it.first.getCenterDistanceSquared() }
 
         for ((pos, state) in blocksToBreak) {
@@ -226,7 +226,7 @@ object ModuleAutoFarm : ClientModule("AutoFarm", Category.WORLD) {
         val blocksToPlace =
             eyesPos.searchBlocksInCuboid(radius) { pos, state ->
                 !state.isAir && isFarmBlockWithAir(state, pos, allowFarmland, allowSoulsand)
-                        && getNearestPoint(eyesPos, Box(pos)).squaredDistanceTo(eyesPos) <= radiusSquared
+                    && getNearestPoint(eyesPos, Box(pos)).squaredDistanceTo(eyesPos) <= radiusSquared
             }.map { it.first }.sortedBy { it.getCenterDistanceSquared() }
 
         for (pos in blocksToPlace) {

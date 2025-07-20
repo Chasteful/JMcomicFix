@@ -52,8 +52,10 @@ import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket
  */
 class SpeedCustom(override val parent: ChoiceConfigurable<*>) : SpeedBHopBase("Custom", parent) {
 
-    private class HorizontalModification(parent: EventListener?) : ToggleableConfigurable(parent,
-        "HorizontalModification", true) {
+    private class HorizontalModification(parent: EventListener?) : ToggleableConfigurable(
+        parent,
+        "HorizontalModification", true
+    ) {
 
         private val horizontalAcceleration by float("HorizontalAcceleration", 0f, -0.1f..0.2f)
         private val horizontalJumpOffModifier by float("HorizontalJumpOff", 0f, -0.5f..1f)
@@ -87,8 +89,10 @@ class SpeedCustom(override val parent: ChoiceConfigurable<*>) : SpeedBHopBase("C
 
     }
 
-    private class VerticalModification(parent: EventListener?) : ToggleableConfigurable(parent,
-        "VerticalModification", true) {
+    private class VerticalModification(parent: EventListener?) : ToggleableConfigurable(
+        parent,
+        "VerticalModification", true
+    ) {
 
         private val jumpHeight by float("JumpHeight", 0.42f, 0.0f..3f)
 
@@ -139,7 +143,8 @@ class SpeedCustom(override val parent: ChoiceConfigurable<*>) : SpeedBHopBase("C
 
             when {
                 customSpeed -> player.velocity =
-                        player.velocity.withStrafe(speed = speed.toDouble(), strength = strength.toDouble())
+                    player.velocity.withStrafe(speed = speed.toDouble(), strength = strength.toDouble())
+
                 else ->
                     player.velocity = player.velocity.withStrafe(strength = strength.toDouble())
             }

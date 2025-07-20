@@ -176,7 +176,7 @@ object CommandDebug : CommandFactory {
     private suspend fun uploadToPaste(content: String): String {
         val form = "content=$content"
         return HttpClient.request("https://paste.ccbluex.net/api.php", HttpMethod.POST, body = form.asForm())
-                .parse<String>()
+            .parse<String>()
     }
 
 }

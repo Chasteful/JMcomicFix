@@ -46,7 +46,7 @@ object ScaffoldExpandTechnique : ScaffoldTechnique("Expand") {
         optimalLine: Line?,
         bestStack: ItemStack
     ): BlockPlacementTarget? {
-        for(i in 0..expandLength) {
+        for (i in 0..expandLength) {
             val position = getTargetedPosition(expandPos(predictedPos, i))
 
             val searchOptions = BlockPlacementTargetFindingOptions(

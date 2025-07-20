@@ -33,20 +33,22 @@ object ModuleElytraTarget : ClientModule("ElytraTarget", Category.COMBAT) {
 
     @JvmStatic
     @get:JvmName("canAlwaysGlide")
-    val canAlwaysGlide get() =
-        alwaysGlide
-        && target != null
-        && super.running
-        && !player.abilities.flying
+    val canAlwaysGlide
+        get() =
+            alwaysGlide
+                && target != null
+                && super.running
+                && !player.abilities.flying
 
-    val canIgnoreKillAuraRotations get() =
-        running
-        && ElytraRotationProcessor.ignoreKillAura
+    val canIgnoreKillAuraRotations
+        get() =
+            running
+                && ElytraRotationProcessor.ignoreKillAura
 
     fun isSameTargetRendering(target: LivingEntity) =
         running
-        && targetRenderer.enabled
-        && targetTracker.target
+            && targetRenderer.enabled
+            && targetTracker.target
             ?.takeIf { it == target } != null
 
     override val running: Boolean

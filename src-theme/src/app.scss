@@ -1,59 +1,165 @@
 @use "colors.scss" as *;
 
 @font-face {
-    font-family: "Inter";
-    src: url("./assets/font/inter/Inter-Bold.ttf") format("truetype");
-    font-weight: 600;
-    font-style: normal;
+  font-family: "Inter";
+  src: url("./assets/font/inter/Inter-Bold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: "Inter";
-    src: url("./assets/font/inter/Inter-Medium.ttf") format("truetype");
-    font-weight: 500;
-    font-style: normal;
+  font-family: "Inter";
+  src: url("./assets/font/inter/Inter-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: "Inter";
-    src: url("./assets/font/inter/Inter-Regular.ttf") format("truetype");
-    font-weight: normal;
-    font-style: normal;
+  font-family: "Inter";
+  src: url("./assets/font/inter/Inter-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: "Inter";
-    src: url("./assets/font/inter/Inter-Light.ttf") format("truetype");
-    font-weight: 300;
-    font-style: normal;
+  font-family: "Inter";
+  src: url("./assets/font/inter/Inter-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Product Sans";
+  src: url("./assets/font/product/Product-Sans-Medium.ttf") format("opentype");
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Genshin';
+  src: url('./assets/font/mihoyo/hk4e_zh-cn.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Minecraftia';
+  src: url('./assets/font/other/Minecraftia.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Museo Sans 700';
+  src: url('./assets/font/tenacity/neverlose.ttf') format('opentype');
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Greycliff CF Bold';
+  src: url('./assets/font/tenacity/tenacity-bold.ttf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Greycliff CF Bold';
+  src: url('./assets/font/tenacity/tenacity.ttf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DreamScape';
+  src: url('./assets/font/rise/DreamScape.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Alibaba';
+  src: url('./assets/font/alibaba/Alibaba-PuHuiTi-Bold.ttf') format('truetype');
+  font-style: normal;
 }
 
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 *:focus {
-    outline: none;
+  outline: none;
 }
 
 body {
-    font-family: "Inter", sans-serif;
-    user-select: none;
-    overflow: hidden;
-}
-
-
-::-webkit-scrollbar-track {
-    background-color: transparent;
+  font-family: 'Alibaba', serif;
+  user-select: none;
+  overflow: hidden;
 }
 
 ::-webkit-scrollbar {
-    width: 10px;
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+  border-radius: 10px;
+  margin: 4px 0;
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: $accent-color;
-    border-radius: 10px;
+  background-color: rgba(100, 100, 100, 0.4);
+  border-radius: 10px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+  transition: background-color 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(100, 100, 100, 0.6);
+}
+
+::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
+
+.reset-button {
+  all: unset;
+  outline: none;
+}
+.hud-container{
+  border-radius: 6px;
+  padding: 6px 10px;
+  background-color: rgba($base, 0.5);
+  box-shadow: 0 4px 16px rgba($base, 0.6),
+  inset 0 0 10px rgba(255, 255, 255, 0.05);
+}
+
+.enchant-glint {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+
+  background-image: url('./shaders/glint.png');
+  background-size: 200% 200%;
+  animation: enchantGlint 1.5s linear infinite;
+
+  mix-blend-mode: screen;
+  opacity: 0.5;
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  z-index: 1;
+}
+
+@keyframes enchantGlint {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
 }

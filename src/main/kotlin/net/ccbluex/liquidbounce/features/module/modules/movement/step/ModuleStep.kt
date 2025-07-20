@@ -47,13 +47,15 @@ import net.minecraft.stat.Stats
 
 object ModuleStep : ClientModule("Step", Category.MOVEMENT) {
 
-    var modes = choices("Mode", Instant, arrayOf(
-        Instant,
-        Legit,
-        Vulcan286,
-        BlocksMC,
-        Hypixel
-    )).apply { tagBy(this) }
+    var modes = choices(
+        "Mode", Instant, arrayOf(
+            Instant,
+            Legit,
+            Vulcan286,
+            BlocksMC,
+            Hypixel
+        )
+    ).apply { tagBy(this) }
 
     object Legit : Choice("Legit") {
         override val parent: ChoiceConfigurable<Choice>
@@ -103,11 +105,15 @@ object ModuleStep : ClientModule("Step", Category.MOVEMENT) {
          * Simulates a jump by sending multiple packets. The range of the jump order is configured by the user.
          * 0..2 is the default - it bypasses common anti-cheats like NoCheatPlus.
          */
-        private val simulateJumpOrder by intRange("SimulateJumpOrder", 0..2,
-            jumpOrder.indices)
+        private val simulateJumpOrder by intRange(
+            "SimulateJumpOrder", 0..2,
+            jumpOrder.indices
+        )
         private val wait by intRange("Wait", 0..0, 0..60, "ticks")
-        private val packetType by enumChoice("PacketType", MovePacketType.FULL,
-            arrayOf(MovePacketType.FULL, MovePacketType.POSITION_AND_ON_GROUND))
+        private val packetType by enumChoice(
+            "PacketType", MovePacketType.FULL,
+            arrayOf(MovePacketType.FULL, MovePacketType.POSITION_AND_ON_GROUND)
+        )
 
         private var ticksWait = 0
 
@@ -278,11 +284,12 @@ object ModuleStep : ClientModule("Step", Category.MOVEMENT) {
 
         private var stepping = false
 
-        private val stepHeight get() = when {
-            player.canStep(1.0) -> 1.0
-            player.canStep(1.25) -> 1.25
-            else -> 1.5
-        }
+        private val stepHeight
+            get() = when {
+                player.canStep(1.0) -> 1.0
+                player.canStep(1.25) -> 1.25
+                else -> 1.5
+            }
 
         @Suppress("unused")
         private val movementInputHandler = sequenceHandler<MovementInputEvent> { event ->
@@ -293,7 +300,7 @@ object ModuleStep : ClientModule("Step", Category.MOVEMENT) {
                 stepping = true
                 player.velocity.y = 0.42
                 waitTicks(1)
-                if(currentStepHeight > 1.0) {
+                if (currentStepHeight > 1.0) {
                     player.velocity.y += 0.061
                 }
                 waitTicks(2)
@@ -303,7 +310,7 @@ object ModuleStep : ClientModule("Step", Category.MOVEMENT) {
                     player.velocity.y -= 0.095
                     if (currentStepHeight > 1.25) {
                         waitTicks(5)
-                        if(alternateBypass) {
+                        if (alternateBypass) {
                             player.isOnGround = true
                         } else {
                             player.velocity.y = 0.42
@@ -317,7 +324,7 @@ object ModuleStep : ClientModule("Step", Category.MOVEMENT) {
 
         @Suppress("unused")
         private val networkTickHandler = handler<PlayerNetworkMovementTickEvent> { event ->
-            if(spoof && player.airTicks == 8) {
+            if (spoof && player.airTicks == 8) {
                 event.ground = true
             }
         }

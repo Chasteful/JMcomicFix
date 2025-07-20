@@ -28,7 +28,6 @@ class Chronometer(private var lastUpdate: Long = 0) {
     fun hasElapsed(ms: Long = 0) = lastUpdate + ms < System.currentTimeMillis()
 
     fun hasAtLeastElapsed(ms: Long = 0) = lastUpdate + ms <= System.currentTimeMillis()
-
     @JvmOverloads
     fun reset(lastUpdate: Long = System.currentTimeMillis()) {
         this.lastUpdate = lastUpdate

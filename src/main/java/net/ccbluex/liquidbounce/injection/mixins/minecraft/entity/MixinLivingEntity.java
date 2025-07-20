@@ -61,6 +61,10 @@ public abstract class MixinLivingEntity extends MixinEntity {
 
     @Shadow
     public int jumpingCooldown;
+    @Unique
+    private boolean previousElytra = false;
+    @Unique
+    private boolean previousIsGliding = false;
 
     @Shadow
     public abstract float getJumpVelocity();
@@ -74,11 +78,11 @@ public abstract class MixinLivingEntity extends MixinEntity {
     @Shadow
     public abstract void tick();
 
-    @Shadow public abstract void swingHand(Hand hand, boolean fromServerPlayer);
+    @Shadow
+    public abstract void swingHand(Hand hand, boolean fromServerPlayer);
 
     @Shadow
     public abstract void setHealth(float health);
-
 
     @Shadow
     public abstract boolean isGliding();
@@ -138,7 +142,6 @@ public abstract class MixinLivingEntity extends MixinEntity {
             cir.cancel();
         }
     }
-
     @Unique
     private PlayerJumpEvent jumpEvent;
 
@@ -148,7 +151,8 @@ public abstract class MixinLivingEntity extends MixinEntity {
             return;
         }
 
-        jumpEvent = EventManager.INSTANCE.callEvent(new PlayerJumpEvent(getJumpVelocity(), this.getYaw()));
+        jumpEvent = EventManager.INSTANCE.callEvent(new
+                PlayerJumpEvent(getJumpVelocity(), this.getYaw()));
         if (jumpEvent.isCancelled()) {
             ci.cancel();
         }
@@ -163,7 +167,6 @@ public abstract class MixinLivingEntity extends MixinEntity {
 
         return jumpEvent.getMotion();
     }
-
     @ModifyExpressionValue(method = "jump", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getYaw()F"))
     private float hookJumpYaw(float original) {
         // Replaces ((Object) this) != MinecraftClient.getInstance().player
@@ -222,8 +225,8 @@ public abstract class MixinLivingEntity extends MixinEntity {
 
         // The jumping cooldown would lead to very slow tower building
         var towerActive = ModuleScaffold.INSTANCE.getRunning() &&
-        ModuleScaffold.INSTANCE.getTowerMode().getActiveChoice() != ScaffoldTowerNone.INSTANCE &&
-        ModuleScaffold.INSTANCE.getTowerMode().getActiveChoice().getRunning();
+                ModuleScaffold.INSTANCE.getTowerMode().getActiveChoice() != ScaffoldTowerNone.INSTANCE &&
+                ModuleScaffold.INSTANCE.getTowerMode().getActiveChoice().getRunning();
 
         if (noJumpDelay || towerActive) {
             jumpingCooldown = 0;
@@ -237,9 +240,6 @@ public abstract class MixinLivingEntity extends MixinEntity {
             jumpingCooldown = 10;
         }
     }
-
-    @Unique
-    private boolean previousElytra = false;
 
     @Inject(method = "tickGliding", at = @At("TAIL"))
     public void recastIfLanded(CallbackInfo callbackInfo) {
@@ -302,9 +302,6 @@ public abstract class MixinLivingEntity extends MixinEntity {
 
         return rotation.getDirectionVector();
     }
-
-    @Unique
-    private boolean previousIsGliding = false;
 
     @Inject(method = "isGliding", at = @At("RETURN"), cancellable = true)
     private void hookIsGliding(CallbackInfoReturnable<Boolean> cir) {

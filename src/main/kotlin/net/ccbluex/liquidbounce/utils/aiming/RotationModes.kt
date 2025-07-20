@@ -97,8 +97,8 @@ class NormalRotationMode(
 
 }
 
-class NoRotationMode(configurable: ChoiceConfigurable<RotationMode>, module: ClientModule)
-    : RotationMode("None", configurable, module) {
+class NoRotationMode(configurable: ChoiceConfigurable<RotationMode>, module: ClientModule) :
+    RotationMode("None", configurable, module) {
 
     val send by boolean("SendRotationPacket", false)
 

@@ -144,27 +144,35 @@ abstract class ModelWrapper<I, O>(
  * Create a block for the model. This is a simple Multi-Layer Perceptron (MLP) model.
  */
 private fun createMlpBlock(outputs: Long) = SequentialBlock()
-    .add(Linear.builder()
-        .setUnits(128)
-        .build())
+    .add(
+        Linear.builder()
+            .setUnits(128)
+            .build()
+    )
     .add(Blocks.batchFlattenBlock())
     .add(BatchNorm.builder().build())
     .add(Activation.reluBlock())
 
-    .add(Linear.builder()
-        .setUnits(64)
-        .build())
+    .add(
+        Linear.builder()
+            .setUnits(64)
+            .build()
+    )
     .add(Blocks.batchFlattenBlock())
     .add(BatchNorm.builder().build())
     .add(Activation.reluBlock())
 
-    .add(Linear.builder()
-        .setUnits(32)
-        .build())
+    .add(
+        Linear.builder()
+            .setUnits(32)
+            .build()
+    )
     .add(Blocks.batchFlattenBlock())
     .add(BatchNorm.builder().build())
     .add(Activation.reluBlock())
 
-    .add(Linear.builder()
-        .setUnits(outputs)
-        .build())
+    .add(
+        Linear.builder()
+            .setUnits(outputs)
+            .build()
+    )

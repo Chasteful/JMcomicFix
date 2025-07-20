@@ -29,8 +29,10 @@ import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket
 
 internal object NoFallCancel : Choice("Cancel") {
 
-    private val fallDistance = choices("FallDistance", Smart,
-        arrayOf(Smart, Constant))
+    private val fallDistance = choices(
+        "FallDistance", Smart,
+        arrayOf(Smart, Constant)
+    )
     private val resetFallDistance by boolean("ResetFallDistance", true)
     private val cancelSetback by boolean("CancelSetbackPacket", false)
 

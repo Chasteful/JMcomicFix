@@ -2,7 +2,7 @@
 <!--
   - This file is part of LiquidBounce (https://github.com/CCBlueX/LiquidBounce)
   -
-  - Copyright (c) 2015 - 2025 CCBlueX
+  - Copyright (c) 2024 CCBlueX
   -
   - LiquidBounce is free software: you can redistribute it and/or modify
   - it under the terms of the GNU General Public License as published by
@@ -21,36 +21,36 @@
   -->
 
 <svg
-   width="32"
-   height="32"
-   viewBox="0 0 263.18201 263.18079"
-   fill="none"
-   version="1.1"
-   id="svg13"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg">
-  <g
-     clip-path="url(#clip0)"
-     id="g13"
-     transform="translate(0,-15.8192)">
-    <path
-       fill-rule="evenodd"
-       clip-rule="evenodd"
-       d="M 263.182,147.409 C 263.182,74.7827 204.217,15.8192 131.59,15.8192 H 0 V 147.409 C 0,220.037 58.9635,279 131.59,279 c 72.627,0 131.592,-58.963 131.592,-131.591 z"
-       fill="#ffffff"
-       id="path13" />
-  </g>
-  <defs
-     id="defs13">
-    <clipPath
-       id="clip0">
-      <rect
-         width="947.07001"
-         height="279"
-         fill="#ffffff"
-         id="rect13"
-         x="0"
-         y="0" />
-    </clipPath>
-  </defs>
+        xmlns:svg="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        viewBox="0 0 263.18201 263.18079"
+        fill="none"
+        version="1.1"
+        id="svg13"
+        xmlns="http://www.w3.org/2000/svg">
+    <g
+            clip-path="url(#clip0)"
+            id="g13"
+            transform="translate(0,-15.8192)">
+        <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M 263.182,147.409 C 263.182,74.7827 204.217,15.8192 131.59,15.8192 H 0 V 147.409 C 0,220.037 58.9635,279 131.59,279 c 72.627,0 131.592,-58.963 131.592,-131.591 z"
+                fill="#ffffff"
+                id="path13"/>
+    </g>
+    <defs
+            id="defs13">
+        <clipPath
+                id="clip0">
+            <rect
+                    width="947.07001"
+                    height="279"
+                    fill="#ffffff"
+                    id="rect13"
+                    x="0"
+                    y="0"/>
+        </clipPath>
+    </defs>
 </svg>

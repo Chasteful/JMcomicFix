@@ -30,7 +30,8 @@ import net.ccbluex.liquidbounce.features.module.ClientModule
  * Disables pushing from other players and some other situations where someone/something can push.
  */
 object ModuleNoPush : ClientModule("NoPush", Category.MOVEMENT) {
-    private val noPushBy = multiEnumChoice("PushBy",
+    private val noPushBy = multiEnumChoice(
+        "PushBy",
         NoPushBy.ENTITIES,
         NoPushBy.LIQUIDS
     )
@@ -54,7 +55,7 @@ object ModuleNoPush : ClientModule("NoPush", Category.MOVEMENT) {
     }
 }
 
-enum class NoPushBy(override val choiceName: String): NamedChoice {
+enum class NoPushBy(override val choiceName: String) : NamedChoice {
     ENTITIES("Entities"),
     BLOCKS("Blocks"),
     FISHING_ROD("FishingRod"),

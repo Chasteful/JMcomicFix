@@ -20,9 +20,11 @@
 
 package net.ccbluex.liquidbounce.event.events
 
+import com.sun.jna.platform.unix.LibCAPI
 import net.ccbluex.liquidbounce.config.types.NamedChoice
 import net.ccbluex.liquidbounce.event.CancellableEvent
 import net.ccbluex.liquidbounce.event.Event
+import net.ccbluex.liquidbounce.integration.VirtualScreenType
 import net.ccbluex.liquidbounce.integration.interop.protocol.event.WebSocketEvent
 import net.ccbluex.liquidbounce.utils.client.Nameable
 import net.ccbluex.liquidbounce.utils.movement.DirectionalInput
@@ -38,6 +40,7 @@ import net.minecraft.client.util.InputUtil
 import net.minecraft.item.ItemStack
 import net.minecraft.text.Text
 
+
 @Nameable("gameTick")
 object GameTickEvent : Event()
 
@@ -51,6 +54,12 @@ object GameRenderTaskQueueEvent : Event()
 
 @Nameable("tickPacketProcess")
 object TickPacketProcessEvent : Event()
+
+@Nameable("sneakNetwork")
+class SneakNetworkEvent(
+    val directionalInput: DirectionalInput,
+    var sneak: Boolean,
+) : Event()
 
 @Nameable("key")
 @WebSocketEvent
@@ -82,12 +91,6 @@ class SprintEvent(
         NETWORK,
     }
 }
-
-@Nameable("sneakNetwork")
-class SneakNetworkEvent(
-    val directionalInput: DirectionalInput,
-    var sneak: Boolean,
-) : Event()
 
 @Nameable("mouseRotation")
 class MouseRotationEvent(
@@ -133,6 +136,11 @@ class ScreenEvent(
     val screen: Screen?,
 ) : CancellableEvent()
 
+@Nameable("virtualScreen")
+class VirtualTypeEvent(
+    val virtualScreenType: VirtualScreenType?,
+) : CancellableEvent()
+
 @Nameable("chatSend")
 @WebSocketEvent
 class ChatSendEvent(
@@ -154,6 +162,7 @@ class ChatReceiveEvent(
     }
 }
 
+
 @Nameable("serverConnect")
 class ServerConnectEvent(
     val connectScreen: ConnectScreen,
@@ -170,10 +179,11 @@ object DisconnectEvent : Event()
 @WebSocketEvent
 class OverlayMessageEvent(
     val text: Text,
-    val tinted: Boolean,
+    val tinted: Boolean
 ) : Event()
 
 @Nameable("perspective")
+
 class PerspectiveEvent(
     var perspective: Perspective,
 ) : Event()
@@ -182,4 +192,57 @@ class PerspectiveEvent(
 class ItemLoreQueryEvent(
     val itemStack: ItemStack,
     val lore: ArrayList<Text>,
+) : Event()
+
+@Nameable("overlayTitle")
+@WebSocketEvent
+class OverlayTitleEvent(
+    var title: Text,
+    var subtitle: Text
+) : Event() {
+    var isCancelled = false
+
+    fun cancel() {
+        isCancelled = true
+        title = Text.empty()
+        subtitle = Text.empty()
+    }
+}
+
+@Nameable("overlayDisconnection")
+@WebSocketEvent
+class OverlayDisconnectionEvent(
+    var parent: Screen,
+    var info: Text
+) : Event()
+
+@Nameable("connectionDetails")
+@WebSocketEvent
+class ConnectionDetailsEvent(
+    val result: Text,
+) : Event()
+
+@Nameable("overlayPlayList")
+@WebSocketEvent
+class OverlayPlayListEvent(
+    var header: Text,
+    var footer: Text,
+    var players: List<PlayerEntry>
+) : Event()
+
+data class PlayerEntry(
+    val name: Text,
+    val uuid: String,
+    val latency: Text,
+    val isFriend: Boolean,
+    val isStaff: Boolean
+)
+
+@Nameable("overlayChatMessage")
+@WebSocketEvent
+
+class OverlayChatEvent(
+    val content: Text,
+    val timestamp: Long,
+    val isSystem: Boolean
 ) : Event()

@@ -27,6 +27,7 @@ import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.render.GenericColorMode
 import net.ccbluex.liquidbounce.render.GenericRainbowColorMode
 import net.ccbluex.liquidbounce.render.GenericStaticColorMode
+import net.ccbluex.liquidbounce.render.GenericSyncColorMode
 import net.ccbluex.liquidbounce.render.engine.font.processor.LegacyTextSanitizer
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.ccbluex.liquidbounce.utils.client.bypassesNameProtection
@@ -49,11 +50,15 @@ object ModuleNameProtect : ClientModule("NameProtect", Category.MISC) {
 
     private val colorMode = choices<GenericColorMode<Unit>>(
         "ColorMode",
-        0,
-        {
-            arrayOf(GenericStaticColorMode(it, Color4b(255, 179, 72, 50)), GenericRainbowColorMode(it))
-        }
-    )
+        0
+    ) {
+        arrayOf(
+            GenericStaticColorMode(it, Color4b(255, 179, 72, 50)),
+            GenericRainbowColorMode(it),
+            GenericSyncColorMode(it),
+        )
+
+    }
 
     private object ReplaceFriendNames : ToggleableConfigurable(this, "ObfuscateFriends", true) {
         val colorMode = choices<GenericColorMode<Unit>>(
@@ -61,17 +66,25 @@ object ModuleNameProtect : ClientModule("NameProtect", Category.MISC) {
             "ColorMode",
             0
         ) {
-            arrayOf(GenericStaticColorMode(it, Color4b(0, 241, 255)), GenericRainbowColorMode(it))
+            arrayOf(
+                GenericStaticColorMode(it, Color4b(0, 241, 255)),
+                GenericRainbowColorMode(it),
+                GenericSyncColorMode(it),
+            )
         }
     }
 
     private object ReplaceOthers : ToggleableConfigurable(this, "ObfuscateOthers", false) {
-        val colorMode = ReplaceOthers.choices<GenericColorMode<Unit>>(
+        val colorMode = choices<GenericColorMode<Unit>>(
             ReplaceOthers,
             "ColorMode",
             0
         ) {
-            arrayOf(GenericStaticColorMode(it, Color4b(71, 71, 71)), GenericRainbowColorMode(it))
+            arrayOf(
+                GenericStaticColorMode(it, Color4b(71, 71, 71)),
+                GenericRainbowColorMode(it),
+                GenericSyncColorMode(it),
+            )
         }
     }
 
@@ -109,7 +122,9 @@ object ModuleNameProtect : ClientModule("NameProtect", Category.MISC) {
 
                 if (otherName != playerName) otherName else null
             }
-        } else { null } ?: emptyList()
+        } else {
+            null
+        } ?: emptyList()
 
         this.replacementMappings.update(
             mc.session.username to this.replacement,
@@ -161,76 +176,74 @@ object ModuleNameProtect : ClientModule("NameProtect", Category.MISC) {
         private val mappedCharacters = ArrayList<MappedCharacter>(64)
 
         init {
-            val originalCharacters = ArrayList<MappedCharacter>(64)
-
-            original.accept { _, style, codePoint ->
-                originalCharacters += MappedCharacter(
-                    style,
-                    style.color?.bypassesNameProtection ?: false,
-                    codePoint
-                )
-
-                true
+            val originalCharacters = buildList {
+                original.accept { _, style, codePoint ->
+                    add(
+                        MappedCharacter(
+                            style = style,
+                            bypass = style.color?.bypassesNameProtection ?: false,
+                            codePoint = codePoint
+                        )
+                    )
+                    true
+                }
             }
 
-            val text = originalCharacters.mapString {
-                it.codePoint.toChar()
-            }
-            val replacements = replacementMappings.findReplacements(text)
+            val rawText = originalCharacters.mapString { it.codePoint.toChar() }
+            val replacements = replacementMappings.findReplacements(rawText)
 
-            var currReplacementIndex = 0
-            var currentIndex = 0
+            var currentIdx = 0
+            var replacementIdx = 0
 
-            while (currentIndex < originalCharacters.size) {
-                val replacement = replacements.getOrNull(currReplacementIndex)
+            while (currentIdx < originalCharacters.size) {
+                val rep = replacements.getOrNull(replacementIdx)
+                val repStart = rep?.first?.start
 
-                val replacementStartIdx = replacement?.first?.start
-
-                if (replacementStartIdx == currentIndex) {
-                    if (originalCharacters[replacementStartIdx].bypassesNameProtection) {
-                        currReplacementIndex++
-
+                if (repStart == currentIdx) {
+                    val target = rep
+                    if (originalCharacters[repStart].bypass) {
+                        replacementIdx++
                         continue
                     }
 
-                    val color = replacement.second.colorGetter()
+                    val (startColor, endColor) = target.second.colorGetter().let {
 
-                    replacement.second.newName.mapTo(this.mappedCharacters) { ch ->
-                        MappedCharacter(
-                            originalCharacters[currentIndex].style.withColor(color.toARGB()),
-                            false,
-                            ch.code
+                        it to it
+                    }
+
+                    val chars = target.second.newName
+
+                    chars.forEachIndexed { i, ch ->
+                        val factor = if (chars.length > 1) i.toDouble() / (chars.length - 1) else 0.0
+                        val interpColor = startColor.interpolateTo(endColor, factor)
+
+                        mappedCharacters += MappedCharacter(
+                            style = originalCharacters[currentIdx].style.withColor(interpColor.toARGB()),
+                            bypass = false,
+                            codePoint = ch.code
                         )
                     }
 
-                    currentIndex = replacement.first.end + 1
-                    currReplacementIndex += 1
+                    currentIdx = target.first.end + 1
+                    replacementIdx++
                 } else {
-                    val maxCopyIdx = replacementStartIdx ?: originalCharacters.size
-
-                    this.mappedCharacters.addAll(originalCharacters.subList(currentIndex, maxCopyIdx))
-
-                    currentIndex = maxCopyIdx
+                    val end = repStart ?: originalCharacters.size
+                    mappedCharacters += originalCharacters.subList(currentIdx, end)
+                    currentIdx = end
                 }
             }
         }
 
         override fun accept(visitor: CharacterVisitor): Boolean {
-            var index = 0
-
-            for ((style, _, codePoint) in this.mappedCharacters) {
-                if (!visitor.accept(index, style, codePoint)) {
-                    return false
-                }
-
-                index++
+            var idx = 0
+            for ((style, _, cp) in mappedCharacters) {
+                if (!visitor.accept(idx++, style, cp)) return false
             }
-
             return true
         }
 
         @JvmRecord
-        private data class MappedCharacter(val style: Style, val bypassesNameProtection: Boolean, val codePoint: Int)
+        private data class MappedCharacter(val style: Style, val bypass: Boolean, val codePoint: Int)
     }
 }
 

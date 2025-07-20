@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
+    import {createEventDispatcher} from "svelte";
     import type {
         ModuleSetting,
         BooleanSetting,
@@ -14,7 +14,7 @@
     const dispatch = createEventDispatcher();
 
     function handleChange() {
-        setting = { ...cSetting };
+        setting = {...cSetting};
 
         dispatch("change");
     }
@@ -22,14 +22,14 @@
 
 <div class="setting">
     <Switch
-        name={$spaceSeperatedNames ? convertToSpacedString(cSetting.name) : cSetting.name}
-        bind:value={cSetting.value}
-        on:change={handleChange}
+            bind:value={cSetting.value}
+            name={$spaceSeperatedNames ? convertToSpacedString(cSetting.name) : cSetting.name}
+            on:change={handleChange}
     />
 </div>
 
 <style lang="scss">
-    .setting {
-        padding: 7px 0px;
-    }
+  .setting {
+    padding: 7px 0;
+  }
 </style>

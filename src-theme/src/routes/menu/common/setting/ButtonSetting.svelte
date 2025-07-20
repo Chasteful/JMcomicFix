@@ -22,7 +22,7 @@
 </script>
 
 <svelte:window on:keydown={handleKeyDown}/>
-<button class="button-setting" class:inset type="button" on:click={() => dispatch("click")} {disabled} class:secondary>
+<button class="button-setting" class:inset class:secondary {disabled} on:click={() => dispatch("click")} type="button">
     {#if loading}
         <CircleLoader/>
     {/if}
@@ -35,29 +35,26 @@
 
   .button-setting {
     position: relative;
-    border: none;
-    background-color: $accent-color;
-    color: $menu-text-color;
-    font-family: "Inter", sans-serif;
-    padding: 20px;
-    border-radius: 5px;
+    color: $text;
+    font-weight: 600;
     font-size: 20px;
-    transition: ease background-color .2s, ease opacity .2s;
+    padding: 20px;
+    border: none;
+    border-radius: 12px;
+    transition: ease background-color .2s, ease opacity .2s, border-bottom .2s ease;
+    background: rgba($base, 0.5);
+    box-shadow: 0 0 8px rgba($base, 0.6);
 
     &.inset {
       margin: 0 30px;
     }
 
-    &.secondary {
-      background-color: rgba($menu-base-color, .36);
-    }
-
     &:not([disabled]):hover {
-      background-color: color.adjust(color.adjust($accent-color, $saturation: -30%), $lightness: -10%);
+      background-color: color.adjust(color.adjust(rgba($accent-mix, 0.4), $saturation: -30%), $lightness: -10%);
       cursor: pointer;
 
       &.secondary {
-        background-color: color.adjust(color.adjust($menu-base-color, $saturation: -30%), $lightness: -10%);
+        background-color: color.adjust(color.adjust($base, $saturation: -30%), $lightness: -10%);
       }
     }
 

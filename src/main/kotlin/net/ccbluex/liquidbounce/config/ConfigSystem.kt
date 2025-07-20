@@ -195,7 +195,7 @@ object ConfigSystem {
     /**
      * Serialize a configurable to a writer
      */
-    private fun serializeConfigurable(configurable: Configurable, writer: Writer, gson: Gson = fileGson) {
+    fun serializeConfigurable(configurable: Configurable, writer: Writer, gson: Gson = fileGson) {
         gson.newJsonWriter(writer).use {
             gson.toJson(configurable, Configurable::class.javaObjectType, it)
         }
@@ -253,7 +253,7 @@ object ConfigSystem {
             else -> {
                 for (value in configurable.inner) {
                     val currentElement = values[value.name]
-                        // Alias support
+                    // Alias support
                         ?: values.entries.firstOrNull { entry -> entry.key in value.aliases }?.value
                         ?: continue
 
@@ -284,7 +284,7 @@ object ConfigSystem {
                     for (choice in value.choices) {
                         runCatching {
                             val choiceElement = choices[choice.name]
-                                // Alias support
+                            // Alias support
                                 ?: choice.aliases.firstNotNullOfOrNull { alias -> choices[alias] }
                                 ?: error("Choice ${choice.name} not found")
 

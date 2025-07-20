@@ -1,4 +1,4 @@
-import { WS_BASE } from "./host";
+import {WS_BASE} from "./host";
 
 console.log("Connecting to server at: ", WS_BASE);
 
@@ -9,7 +9,11 @@ function connect() {
 
     ws.onopen = () => {
         console.log("[WS] Connected to server");
-        alwaysListeners.get("socketReady")?.forEach(callback => callback());
+        if (alwaysListeners["socketReady"]) {
+            for (const h of alwaysListeners["socketReady"]) {
+                h();
+            }
+        }
     };
 
     ws.onclose = () => {
@@ -28,42 +32,42 @@ function connect() {
         const eventName = json.name;
         const eventData = json.event;
 
-        alwaysListeners.get(eventName)?.forEach(callback => callback(eventData));
-        listeners.get(eventName)?.forEach(callback => callback(eventData));
+        if (alwaysListeners[eventName]) {
+            for (const callback of alwaysListeners[eventName]) {
+                callback(eventData);
+            }
+        }
+
+        if (listeners[eventName]) {
+            for (const callback of listeners[eventName]) {
+                callback(eventData);
+            }
+        }
     }
 }
 
-const alwaysListeners = new Map<string, Function[]>();
-const listeners = new Map<string, Function[]>();
+const alwaysListeners: { [name: string]: Function[] } = {};
+let listeners: { [name: string]: Function[] } = {};
 
 export function listenAlways(eventName: string, callback: Function) {
-    if (!alwaysListeners.has(eventName)) {
-        alwaysListeners.set(eventName, []);
-    }
+    if (!alwaysListeners[eventName]) alwaysListeners[eventName] = [];
 
-    alwaysListeners.get(eventName)!!.push(callback);
+    alwaysListeners[eventName].push(callback)
 }
 
 export function listen(eventName: string, callback: Function) {
-    if (!listeners.has(eventName)) {
-        listeners.set(eventName, []);
-    }
+    if (!listeners[eventName]) listeners[eventName] = [];
 
-    listeners.get(eventName)!!.push(callback);
-
-    return () => deleteListener(eventName, callback);
+    listeners[eventName].push(callback)
 }
 
 export function cleanupListeners() {
-    listeners.clear();
+    listeners = {};
     console.log("[WS] Cleaned up event listeners");
 }
 
 export function deleteListener(eventName: string, cb: Function) {
-    listeners.set(
-        eventName,
-        listeners.get(eventName)?.filter(handler => handler !== cb) ?? []
-    );
+    listeners[eventName] = listeners[eventName].filter(handler => handler !== cb);
 }
 
 // Send ping to server every 5 seconds

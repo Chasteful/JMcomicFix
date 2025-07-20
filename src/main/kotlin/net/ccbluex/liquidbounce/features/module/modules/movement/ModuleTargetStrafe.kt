@@ -10,8 +10,9 @@ import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.features.module.modules.combat.ModuleAimbot
 import net.ccbluex.liquidbounce.features.module.modules.combat.killaura.ModuleKillAura
+import net.ccbluex.liquidbounce.features.module.modules.exploit.movefix.ModuleMovePhysics
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.ModuleSpeed
-import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.watchdog.SpeedHypixelLowHop
+import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.watchdog.SpeedHypxiel
 import net.ccbluex.liquidbounce.utils.combat.TargetSelector
 import net.ccbluex.liquidbounce.utils.entity.*
 import net.ccbluex.liquidbounce.utils.kotlin.EventPriorityConvention
@@ -47,7 +48,13 @@ object ModuleTargetStrafe : ClientModule("TargetStrafe", Category.MOVEMENT) {
         private val controlDirection by boolean("ControlDirection", true)
         private val hypixel by boolean("Hypixel", false)
 
+        object BloxdDamageSpeed : ToggleableConfigurable(this, "BloxdDamageSpeed", true) {
+            val Speed by float("BloxdDamageSpeed", 5f, 1f..10f)
+
+        }
+
         init {
+            tree(BloxdDamageSpeed)
             tree(Validation)
             tree(AdaptiveRange)
         }
@@ -123,7 +130,6 @@ object ModuleTargetStrafe : ClientModule("TargetStrafe", Category.MOVEMENT) {
         // Event handler for player movement
         @Suppress("unused")
         private val moveHandler = handler<PlayerMoveEvent>(priority = EventPriorityConvention.MODEL_STATE) { event ->
-            // If the player is not pressing any movement keys, we exit early
             if (!player.input.initial.any) {
                 return@handler
             }
@@ -156,24 +162,34 @@ object ModuleTargetStrafe : ClientModule("TargetStrafe", Category.MOVEMENT) {
             }
 
             val speed = player.sqrtSpeed
+
+            val speedMultiplier = if (System.currentTimeMillis() < ModuleMovePhysics.jumpTicks) {
+                BloxdDamageSpeed.Speed.toDouble()
+            } else {
+                1.0
+            }
+            val adjustedSpeed = speed * speedMultiplier
+
             val strafeYaw = atan2(target.pos.z - player.pos.z, target.pos.x - player.pos.x)
-            var strafeVec = computeDirectionVec(strafeYaw, distance, speed, targetSelector.maxRange, direction)
+            var strafeVec = computeDirectionVec(strafeYaw, distance, adjustedSpeed, targetSelector.maxRange, direction)
             var pointCoords = player.pos.add(strafeVec)
 
             if (!Validation.validatePoint(pointCoords)) {
                 if (!AdaptiveRange.enabled) {
                     direction = -direction
-                    strafeVec = computeDirectionVec(strafeYaw, distance, speed, targetSelector.maxRange, direction)
+                    strafeVec = computeDirectionVec(
+                        strafeYaw, distance, adjustedSpeed, targetSelector.maxRange, direction
+                    )
                 } else {
                     var currentRange = AdaptiveRange.rangeStep
                     while (!Validation.validatePoint(pointCoords)) {
-                        strafeVec = computeDirectionVec(strafeYaw, distance, speed, currentRange, direction)
+                        strafeVec = computeDirectionVec(strafeYaw, distance, adjustedSpeed, currentRange, direction)
                         pointCoords = player.pos.add(strafeVec)
                         currentRange += AdaptiveRange.rangeStep
                         if (currentRange > AdaptiveRange.maxRange) {
                             direction = -direction
                             strafeVec = computeDirectionVec(
-                                strafeYaw, distance, speed, targetSelector.maxRange, direction
+                                strafeYaw, distance, adjustedSpeed, targetSelector.maxRange, direction
                             )
                             break
                         }
@@ -189,16 +205,16 @@ object ModuleTargetStrafe : ClientModule("TargetStrafe", Category.MOVEMENT) {
                     0.281
                 }
 
-                if (SpeedHypixelLowHop.shouldStrafe) {
+                if (SpeedHypxiel.shouldStrafe) {
                     event.movement = event.movement.withStrafe(
                         yaw = toDegrees(atan2(-strafeVec.x, strafeVec.z)).toFloat(),
-                        speed = player.sqrtSpeed.coerceAtLeast(minSpeed),
+                        speed = adjustedSpeed.coerceAtLeast(minSpeed),
                         input = null
                     )
                 } else {
                     event.movement = event.movement.withStrafe(
                         yaw = toDegrees(atan2(-strafeVec.x, strafeVec.z)).toFloat(),
-                        speed = player.sqrtSpeed.coerceAtLeast(minSpeed),
+                        speed = adjustedSpeed.coerceAtLeast(minSpeed),
                         strength = 0.02,
                         input = null
                     )
@@ -206,7 +222,7 @@ object ModuleTargetStrafe : ClientModule("TargetStrafe", Category.MOVEMENT) {
             } else {
                 event.movement = event.movement.withStrafe(
                     yaw = toDegrees(atan2(-strafeVec.x, strafeVec.z)).toFloat(),
-                    speed = player.sqrtSpeed,
+                    speed = adjustedSpeed,
                     input = null
                 )
             }
@@ -248,7 +264,7 @@ object ModuleTargetStrafe : ClientModule("TargetStrafe", Category.MOVEMENT) {
             ModuleKillAura.running
         }),
         GROUND("Ground", {
-           player.isOnGround
-        });
+            player.isOnGround
+        }),
     }
 }

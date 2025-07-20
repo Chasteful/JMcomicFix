@@ -31,10 +31,14 @@ import kotlin.math.exp
 @Deprecated("Interpolation mode combines Sigmoid and Bezier interpolation", ReplaceWith("InterpolationAngleSmooth"))
 class SigmoidAngleSmooth(parent: ChoiceConfigurable<*>) : FactorAngleSmooth("Sigmoid", parent) {
 
-    private val horizontalTurnSpeed by floatRange("HorizontalTurnSpeed", 180f..180f,
-        0.0f..180f)
-    private val verticalTurnSpeed by floatRange("VerticalTurnSpeed", 180f..180f,
-        0.0f..180f)
+    private val horizontalTurnSpeed by floatRange(
+        "HorizontalTurnSpeed", 180f..180f,
+        0.0f..180f
+    )
+    private val verticalTurnSpeed by floatRange(
+        "VerticalTurnSpeed", 180f..180f,
+        0.0f..180f
+    )
 
     private val steepness by float("Steepness", 10f, 0.0f..20f)
     private val midpoint by float("Midpoint", 0.3f, 0.0f..1.0f)

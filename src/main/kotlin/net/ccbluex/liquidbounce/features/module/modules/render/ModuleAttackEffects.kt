@@ -57,7 +57,8 @@ object ModuleAttackEffects : ClientModule("AttackEffects", Category.RENDER) {
         Particle.FIRE
     )
 
-    private val sound by multiEnumChoice("Sound",
+    private val sound by multiEnumChoice(
+        "Sound",
         Sound.ORB
     )
 

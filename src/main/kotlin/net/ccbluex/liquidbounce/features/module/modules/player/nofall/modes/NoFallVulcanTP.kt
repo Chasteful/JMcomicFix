@@ -46,7 +46,8 @@ internal object NoFallVulcanTP : Choice("VulcanTP288") {
         if (packet is PlayerMoveC2SPacket && player.fallDistance in 2.5..50.0
             // Check if the player is falling into the void and set safety expand to 0.0 - otherwise,
             // the player will be teleported to the void and flag
-            && !player.doesNotCollideBelow(until = voidThreshold.toDouble())) {
+            && !player.doesNotCollideBelow(until = voidThreshold.toDouble())
+        ) {
             // Rewrite the packet to make the server think we're on the ground
             packet.onGround = true
 

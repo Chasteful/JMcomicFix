@@ -129,8 +129,8 @@ object ModuleBedDefender : ClientModule("BedDefender", category = Category.WORLD
         }
 
         // Get the closest bed block
-        val (blockPos, state) = bedBlocks.minByOrNull {
-            (blockPos, _) -> blockPos.getSquaredDistance(eyesPos)
+        val (blockPos, state) = bedBlocks.minByOrNull { (blockPos, _) ->
+            blockPos.getSquaredDistance(eyesPos)
         } ?: return@handler
 
         val placementPositions = blockPos.searchBedLayer(state, maxLayers).filter { (_, pos) ->

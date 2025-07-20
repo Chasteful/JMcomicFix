@@ -89,7 +89,7 @@ class ArmorKitParameters(
 class ArmorComparator(
     private val expectedDamage: Float,
     private val armorKitParametersForSlot: ArmorKitParameters,
-    private val durabilityThreshold : Int = Int.MIN_VALUE
+    private val durabilityThreshold: Int = Int.MIN_VALUE
 ) : Comparator<ArmorPiece> {
     companion object {
         private val DAMAGE_REDUCTION_ENCHANTMENTS: Array<RegistryKey<Enchantment>> = arrayOf(

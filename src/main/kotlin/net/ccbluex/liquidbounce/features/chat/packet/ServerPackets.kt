@@ -106,7 +106,7 @@ data class ServerPrivateMessagePacket(
 ) : Packet
 
 /**
- * A client can send this packet to ban other users from using this chat.
+ * A client can send this packet to ban other users from using this ChatScreen.
  *
  * @param user user is an ID.
  */

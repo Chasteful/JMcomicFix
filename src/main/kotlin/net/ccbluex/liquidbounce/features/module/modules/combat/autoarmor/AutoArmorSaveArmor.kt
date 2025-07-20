@@ -131,14 +131,14 @@ object AutoArmorSaveArmor : ToggleableConfigurable(ModuleAutoArmor, "SaveArmor",
     /**
      * Closes the previous game screen and opens the inventory.
      */
-    private suspend fun Sequence.openInventory(hasArmorToReplace : Boolean) {
+    private suspend fun Sequence.openInventory(hasArmorToReplace: Boolean) {
         while (hasArmorToReplace && mc.currentScreen !is InventoryScreen) {
 
             if (mc.currentScreen is HandledScreen<*>) {
                 // closes chests/crating tables/etc. (it never happens)
                 player.closeHandledScreen()
             } else if (mc.currentScreen != null) {
-                // closes ClickGUI, game chat, etc. to save some armor :)
+                // closes ClickGUI, game ChatScreen, etc. to save some armor :)
                 mc.currentScreen!!.close()
             }
 
@@ -152,6 +152,6 @@ object AutoArmorSaveArmor : ToggleableConfigurable(ModuleAutoArmor, "SaveArmor",
         }
     }
 
-    private val shouldTrackArmor : Boolean
+    private val shouldTrackArmor: Boolean
         get() = mc.currentScreen !is InventoryScreen && mc.currentScreen is HandledScreen<*>
 }

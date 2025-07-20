@@ -78,7 +78,8 @@ class MinaraiAngleSmooth(
              * Not recommended to use this one, as it completely eliminates any acceleration
              * effects from the model.
              */
-            LinearAngleSmooth(it,
+            LinearAngleSmooth(
+                it,
                 horizontalTurnSpeed = 5f..5f,
                 verticalTurnSpeed = 5f..5f
             ),
@@ -101,10 +102,14 @@ class MinaraiAngleSmooth(
         if (!DeepLearningEngine.isInitialized) {
             if (notificationChronometer.hasElapsed(UNSUPPORTED_NOTIFICATION_TIME)) {
                 chat(markAsError(translation("liquidbounce.unsupportedDeepLearning")))
-                chat(markAsError(translation(
-                    "liquidbounce.rotationSystem.angleSmooth.minarai.fallback",
-                    fallback.name
-                )))
+                chat(
+                    markAsError(
+                        translation(
+                            "liquidbounce.rotationSystem.angleSmooth.minarai.fallback",
+                            fallback.name
+                        )
+                    )
+                )
                 notificationChronometer.reset()
             }
 
@@ -128,7 +133,7 @@ class MinaraiAngleSmooth(
             playerDiff = player.pos.subtract(player.prevPos),
             targetDiff = entity?.let { entity.pos.subtract(entity.prevPos) } ?: Vec3d.ZERO,
 
-            hurtTime = entity?.let {entity.hurtTime } ?: 10,
+            hurtTime = entity?.let { entity.hurtTime } ?: 10,
             distance = entity?.let { player.squaredBoxedDistanceTo(entity).toFloat() } ?: 3f,
             age = 0
         )

@@ -184,10 +184,11 @@ object ModuleDebug : ClientModule("Debug", Category.RENDER) {
                         is ClientModule -> owner.name.asText().formatted(Formatting.GOLD).bold(true)
                         is Command -> "Command ${owner.name}".asText().formatted(Formatting.GOLD).underline(true)
                         is EventListener -> owner.parent()?.let { ownerName(it) } ?: "".asText()
-                                .append("::".asText().formatted(Formatting.GRAY))
-                                .append(
-                                    owner.javaClass.simpleName.asText().formatted(Formatting.DARK_AQUA).italic(true)
-                                )
+                            .append("::".asText().formatted(Formatting.GRAY))
+                            .append(
+                                owner.javaClass.simpleName.asText().formatted(Formatting.DARK_AQUA).italic(true)
+                            )
+
                         is Sequence -> ownerName(owner.owner)
                         else -> owner.javaClass.simpleName.asText().formatted(Formatting.BLUE)
                     }

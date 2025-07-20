@@ -66,23 +66,19 @@ public abstract class MixinClientPlayerEntity extends MixinPlayerEntity implemen
     @Shadow
     @Final
     public ClientPlayNetworkHandler networkHandler;
-
-    @Shadow
-    public abstract boolean isSubmergedInWater();
-
     @Unique
     private PlayerData lastKnownStatistics = null;
-
     @Unique
     private PlayerInventoryData lastKnownInventory = null;
-
     @Unique
     private PlayerNetworkMovementTickEvent eventMotion;
-
     @Unique
     private int onGroundTicks = 0;
     @Unique
     private int airTicks = 0;
+
+    @Shadow
+    public abstract boolean isSubmergedInWater();
 
     /**
      * Hook entity tick event
@@ -360,7 +356,14 @@ public abstract class MixinClientPlayerEntity extends MixinPlayerEntity implemen
     private boolean hookSprintIgnoreCollision(boolean original) {
         return !ModuleSprint.INSTANCE.getShouldIgnoreCollision() && original;
     }
-
+    @ModifyExpressionValue(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isTouchingWater()Z"))
+    private boolean hookSprintIgnoreLiquid(boolean original) {
+        return !ModuleSprint.INSTANCE.getShouldIgnoreLiquid() && original;
+    }
+    @ModifyExpressionValue(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isSubmergedInWater()Z"))
+    private boolean hookSprintIgnoreSneaking(boolean original) {
+        return !ModuleSprint.INSTANCE.getShouldIgnoreLiquid() && original;
+    }
     @ModifyReturnValue(method = "isWalking", at = @At("RETURN"))
     private boolean hookIsWalking(boolean original) {
         if (!ModuleSprint.INSTANCE.getShouldSprintOmnidirectional()) {

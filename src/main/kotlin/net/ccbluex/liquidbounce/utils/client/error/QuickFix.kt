@@ -7,7 +7,7 @@ class Instructions(
     val steps: (error: Throwable) -> Array<String>?
 )
 
-enum class QuickFix (
+enum class QuickFix(
     val description: String,
     val testError: (error: Throwable) -> Boolean = { false },
     val whatYouNeed: Instructions? = null,

@@ -26,7 +26,7 @@ import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.event.tickHandler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
-import net.ccbluex.liquidbounce.features.module.modules.movement.autododge.ModuleAutoDodge
+import net.ccbluex.liquidbounce.features.module.modules.combat.autododge.ModuleAutoDodge
 import net.ccbluex.liquidbounce.utils.client.Chronometer
 import net.ccbluex.liquidbounce.utils.client.PacketQueueManager
 import net.ccbluex.liquidbounce.utils.client.PacketQueueManager.positions
@@ -65,11 +65,11 @@ object ModuleFakeLag : ClientModule("FakeLag", Category.COMBAT) {
     ) : NamedChoice {
         ENTITY_INTERACT("EntityInteract", {
             it is PlayerInteractEntityC2SPacket
-            || it is HandSwingC2SPacket
+                || it is HandSwingC2SPacket
         }),
         BLOCK_INTERACT("BlockInteract", {
             it is PlayerInteractBlockC2SPacket
-            || it is UpdateSignC2SPacket
+                || it is UpdateSignC2SPacket
         }),
         ACTION("Action", {
             it is PlayerActionC2SPacket

@@ -216,7 +216,7 @@ fun ItemStack.getBlock(): Block? {
         return null
     }
 
-   return item.block
+    return item.block
 }
 
 fun ItemStack.isFullBlock(): Boolean {

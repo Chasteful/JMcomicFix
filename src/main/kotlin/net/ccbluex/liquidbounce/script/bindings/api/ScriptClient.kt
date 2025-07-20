@@ -49,7 +49,7 @@ object ScriptClient {
     val combatManager = CombatManager
 
     /**
-     * Shows [message] in the client-chat
+     * Shows [message] in the client-ChatScreen
      */
     @Suppress("unused")
     @JvmName("displayChatMessage")

@@ -63,7 +63,7 @@ object ModuleAutoWeapon : ClientModule("AutoWeapon", Category.COMBAT) {
     private enum class WeaponType(
         override val choiceName: String,
         val filter: (WeaponItemFacet) -> Boolean
-    ): NamedChoice {
+    ) : NamedChoice {
         ANY("Any", { true }),
         SWORD("Sword", { it.itemStack.item is SwordItem }),
         AXE("Axe", { it.itemStack.item is AxeItem }),

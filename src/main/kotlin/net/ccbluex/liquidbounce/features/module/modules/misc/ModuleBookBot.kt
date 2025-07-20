@@ -96,10 +96,12 @@ object ModuleBookBot : ClientModule("BookBot", Category.EXPLOIT, disableOnQuit =
         }
 
         if (!isCandidate(player.mainHandStack)) {
-            event.schedule(inventoryConstraints, ClickInventoryAction.performSwap(
-                from = book,
-                to = HotbarItemSlot(player.inventory.selectedSlot),
-            ))
+            event.schedule(
+                inventoryConstraints, ClickInventoryAction.performSwap(
+                    from = book,
+                    to = HotbarItemSlot(player.inventory.selectedSlot),
+                )
+            )
         }
 
         if (chronometer.hasElapsed((delay * 1000L).toLong())) {

@@ -19,6 +19,7 @@ public class MixinGameOptions {
     private void injectKeyBindRegisterStart(MinecraftClient client, File optionsFile, CallbackInfo ci) {
         VanillaTranslationRecognizer.INSTANCE.setBuildingVanillaKeybinds(true);
     }
+
     @Inject(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/option/GameOptions;client:Lnet/minecraft/client/MinecraftClient;"), require = 1)
     private void injectKeyBindRegisterEnd(MinecraftClient client, File optionsFile, CallbackInfo ci) {
         VanillaTranslationRecognizer.INSTANCE.setBuildingVanillaKeybinds(false);

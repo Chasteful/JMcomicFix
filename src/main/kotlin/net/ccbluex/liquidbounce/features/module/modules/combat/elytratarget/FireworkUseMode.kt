@@ -20,7 +20,7 @@ internal enum class FireworkUseMode(
         useHotbarSlotOrOffhand(slot, resetDelay)
     }),
     PACKET("Packet", { slot, _ ->
-        with (player.inventory.selectedSlot) {
+        with(player.inventory.selectedSlot) {
             val slotUpdateFlag = slot !is OffHandSlot && slot.hotbarSlotForServer != this
 
             if (slotUpdateFlag) {

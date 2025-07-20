@@ -227,6 +227,7 @@ object ModuleAutoShoot : ClientModule("AutoShoot", Category.COMBAT) {
                 // Should not happen, we convert [gravityType] to LINEAR or PROJECTILE before.
                 return null
             }
+
             GravityType.LINEAR -> Rotation.lookingAt(pointOnHitbox.toPoint, pointOnHitbox.fromPoint)
             // Determines the required yaw and pitch angles to hit a target with a projectile,
             // considering gravity's effect on the projectile's motion.

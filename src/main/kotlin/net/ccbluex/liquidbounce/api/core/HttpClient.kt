@@ -46,8 +46,8 @@ fun withScope(block: suspend CoroutineScope.() -> Unit) = scope.launch { block()
 object HttpClient {
 
     val DEFAULT_AGENT = "${LiquidBounce.CLIENT_NAME}/${LiquidBounce.clientVersion}" +
-        " (${LiquidBounce.clientCommit}, ${LiquidBounce.clientBranch}, " +
-        "${if (LiquidBounce.IN_DEVELOPMENT) "dev" else "release"}, ${System.getProperty("os.name")})"
+            " (${LiquidBounce.clientCommit}, ${LiquidBounce.clientBranch}, " +
+            "${if (LiquidBounce.IN_DEVELOPMENT) "dev" else "release"}, ${System.getProperty("os.name")})"
 
     val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
     val FORM_MEDIA_TYPE = "application/x-www-form-urlencoded".toMediaType()
@@ -73,7 +73,7 @@ object HttpClient {
                 } else {
                     // Response is not successful (code is not 2xx)
                     throw HttpException(enumValueOf(request.method),
-                                        request.url.toString(), response.code, response.body.string())
+                        request.url.toString(), response.code, response.body.string())
                 }
             } catch (e: IOException) {
                 // Failed to request

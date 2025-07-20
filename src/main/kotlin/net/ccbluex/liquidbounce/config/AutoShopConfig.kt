@@ -43,11 +43,12 @@ object AutoShopConfig {
     /**
      * Loads [shopConfigPreset] and displays a notification depending on the result
      */
-    fun loadAutoShopConfig(shopConfigPreset: ShopConfigPreset) : Boolean {
+    fun loadAutoShopConfig(shopConfigPreset: ShopConfigPreset): Boolean {
         val result = load(shopConfigPreset)
         val message = ModuleAutoShop.message(if (result) "reloadSuccess" else "loadError")
 
-        notification(message, ModuleAutoShop.name,
+        notification(
+            message, ModuleAutoShop.name,
             if (result) NotificationEvent.Severity.INFO else NotificationEvent.Severity.ERROR
         )
         return result

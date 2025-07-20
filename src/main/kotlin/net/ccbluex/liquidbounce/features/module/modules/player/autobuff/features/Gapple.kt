@@ -25,6 +25,8 @@ import net.ccbluex.liquidbounce.event.Sequence
 import net.ccbluex.liquidbounce.event.events.KeybindIsPressedEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.modules.player.autobuff.HealthBasedBuff
+import net.ccbluex.liquidbounce.features.module.modules.player.autobuff.ModuleAutoBuff.startEating
+import net.ccbluex.liquidbounce.features.module.modules.player.autobuff.ModuleAutoBuff.stopEating
 import net.ccbluex.liquidbounce.utils.inventory.HotbarItemSlot
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
@@ -39,8 +41,14 @@ object Gapple : HealthBasedBuff("Gapple") {
 
     override suspend fun execute(sequence: Sequence, slot: HotbarItemSlot) {
         forceUseKey = true
-        sequence.waitUntil { !passesRequirements }
-        forceUseKey = false
+        startEating(this, 32)
+
+        try {
+            sequence.waitUntil { !passesRequirements }
+        } finally {
+            forceUseKey = false
+            stopEating(this)
+        }
     }
 
     override fun disable() {

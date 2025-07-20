@@ -190,8 +190,10 @@ open class Configurable(
         this@Configurable.inner.add(this)
     }
 
-    fun <T : Any> rangedValue(name: String, defaultValue: T, range: ClosedRange<*>, suffix: String,
-                              valueType: ValueType) =
+    fun <T : Any> rangedValue(
+        name: String, defaultValue: T, range: ClosedRange<*>, suffix: String,
+        valueType: ValueType
+    ) =
         RangedValue(name, defaultValue = defaultValue, range = range, suffix = suffix, valueType = valueType).apply {
             this@Configurable.inner.add(this)
         }

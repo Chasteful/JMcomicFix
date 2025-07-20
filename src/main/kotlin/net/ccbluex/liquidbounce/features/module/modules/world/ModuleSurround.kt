@@ -63,7 +63,8 @@ object ModuleSurround : ClientModule("Surround", Category.WORLD, disableOnQuit =
      */
     private val DEFAULT_BLOCKS = hashSetOf(Blocks.OBSIDIAN, Blocks.ENDER_CHEST, Blocks.CRYING_OBSIDIAN)
 
-    private val features by multiEnumChoice("Features",
+    private val features by multiEnumChoice(
+        "Features",
         Features.EXTEND,
         Features.DOWN,
     )
@@ -202,7 +203,8 @@ object ModuleSurround : ClientModule("Surround", Category.WORLD, disableOnQuit =
 
     private val filter by enumChoice("Filter", Filter.WHITELIST)
     private val blocks by blocks("Blocks", DEFAULT_BLOCKS)
-    private val placer = tree(BlockPlacer(
+    private val placer = tree(
+        BlockPlacer(
         "Placing",
         this,
         Priority.IMPORTANT_FOR_PLAYER_LIFE,

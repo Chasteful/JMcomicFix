@@ -33,22 +33,26 @@ import net.minecraft.item.Items
 object ModuleNoFall : ClientModule("NoFall", Category.PLAYER) {
     internal val modes = choices(
         "Mode", NoFallSpoofGround, arrayOf(
-            NoFallSpoofGround,
+            NoFallBlink,
+            NoFallBlocksMC,
+            NoFallCancel,
             NoFallNoGround,
+            NoFallMLG,
+            NoFallSpoofGround,
             NoFallPacket,
             NoFallPacketJump,
-            NoFallMLG,
             NoFallRettungsplatform,
             NoFallSpartan524Flag,
             NoFallVulcan,
             NoFallVulcanTP,
+            NoFallGrim2365,
             NoFallVerus,
+            NoFallAACv4,
+            NoFallAACv5,
             NoFallForceJump,
-            NoFallCancel,
-            NoFallBlink,
             NoFallHypixelPacket,
             NoFallHypixel,
-            NoFallBlocksMC
+            NoFallIntave1255,
         )
     ).apply(::tagBy)
 

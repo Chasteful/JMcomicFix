@@ -31,7 +31,6 @@
             component: SessionAccountTab
         }
     ];
-
     let activeTab = parseInt(localStorage.getItem("altmanager_add_account_active_tab") ?? "0");
 
     async function handleChangeTab(e: CustomEvent<{ activeTab: number }>) {
@@ -40,6 +39,6 @@
     }
 </script>
 
-<Modal title="Add Account" bind:visible={visible}>
-    <Tabs {tabs} {activeTab} on:changeTab={handleChangeTab}/>
+<Modal bind:visible={visible} title="Add Account">
+    <Tabs {activeTab} on:changeTab={handleChangeTab} {tabs}/>
 </Modal>

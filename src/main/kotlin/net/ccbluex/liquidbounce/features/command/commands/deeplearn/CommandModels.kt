@@ -40,6 +40,7 @@ import net.ccbluex.liquidbounce.utils.client.chat
 import net.ccbluex.liquidbounce.utils.client.clickablePath
 import net.ccbluex.liquidbounce.utils.client.markAsError
 import net.ccbluex.liquidbounce.utils.client.regular
+import net.ccbluex.liquidbounce.utils.client.variable
 import net.ccbluex.liquidbounce.utils.kotlin.mapArray
 import net.minecraft.util.Util
 import kotlin.time.DurationUnit
@@ -101,8 +102,9 @@ object CommandModels : CommandFactory {
             )
             .suspendHandler { command, args ->
                 val name = args[0] as String
-                val model = models.choices.find { model -> model.name.equals(name, true) } ?:
-                    throw CommandException(command.result("modelNotFound", name))
+                val model = models.choices.find { model -> model.name.equals(name, true) } ?: throw CommandException(
+                    command.result("modelNotFound", name)
+                )
 
                 chat(command.result("trainingStart", name))
                 withContext(Dispatchers.Default) {

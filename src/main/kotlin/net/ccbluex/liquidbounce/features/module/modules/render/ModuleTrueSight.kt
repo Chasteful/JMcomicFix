@@ -51,10 +51,10 @@ object ModuleTrueSight : ClientModule("TrueSight", Category.RENDER) {
         val livingEntity = entity as? LivingEntity
 
         return ((enabled
-                || livingEntity != null
-                && ModuleESP.running
-                && ModuleESP.requiresTrueSight(livingEntity))
-                && entity.isInvisible)
+            || livingEntity != null
+            && ModuleESP.running
+            && ModuleESP.requiresTrueSight(livingEntity))
+            && entity.isInvisible)
     }
 
     private enum class Sight(

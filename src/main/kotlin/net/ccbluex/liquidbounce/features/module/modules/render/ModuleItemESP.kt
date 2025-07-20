@@ -29,8 +29,8 @@ import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.ccbluex.liquidbounce.utils.entity.interpolateCurrentPosition
 import net.minecraft.entity.Entity
 import net.minecraft.entity.ItemEntity
-import net.minecraft.entity.projectile.ArrowEntity
 import net.minecraft.util.math.Box
+import net.minecraft.item.Items.*
 
 /**
  * ItemESP module
@@ -43,13 +43,77 @@ object ModuleItemESP : ClientModule("ItemESP", Category.RENDER) {
     override val baseKey: String
         get() = "liquidbounce.module.itemEsp"
 
+    @Suppress("unused")
+    private val showName by boolean("ShowName", true)
+
+    @Suppress("unused")
+    private val textShadow by boolean("TextShadow", true)
+
+    @Suppress("unused")
+    private val textColor by color("TextColor", Color4b(255, 255, 255, 255))
+
     private val modes = choices("Mode", OutlineMode, arrayOf(GlowMode, OutlineMode, BoxMode))
-    private val colorMode = choices("ColorMode", 0) {
+    private val colorMode = choices("ColorMode", 2) {
         arrayOf(
             GenericStaticColorMode(it, Color4b(255, 179, 72, 255)),
-            GenericRainbowColorMode(it)
+            GenericRainbowColorMode(it),
+            GenericSyncColorMode(it),
         )
     }
+    private val defaultItems = setOf(
+        DIAMOND,
+        IRON_INGOT,
+        GOLD_INGOT,
+        EMERALD,
+        NETHERITE_INGOT,
+        ENCHANTED_BOOK,
+
+        TRIDENT,
+        BOW,
+        CROSSBOW,
+        SHIELD,
+        TOTEM_OF_UNDYING,
+
+
+        DIAMOND_SWORD,
+        DIAMOND_PICKAXE,
+        DIAMOND_AXE,
+        DIAMOND_SHOVEL,
+        DIAMOND_HELMET,
+        DIAMOND_CHESTPLATE,
+        DIAMOND_LEGGINGS,
+        DIAMOND_BOOTS,
+
+        // Utility items
+        ELYTRA,
+        ENDER_PEARL,
+        FIREWORK_ROCKET,
+        WATER_BUCKET,
+        LAVA_BUCKET,
+        OBSIDIAN,
+        ENDER_CHEST,
+
+        POTION,
+        SPLASH_POTION,
+        LINGERING_POTION,
+
+        ARROW,
+        SPECTRAL_ARROW,
+
+
+        ENCHANTED_GOLDEN_APPLE,
+        GOLDEN_APPLE,
+
+        SNOWBALL,
+        EGG,
+        TNT,
+        FLINT_AND_STEEL
+    )
+
+    val filteredItems by items(
+        "Items",
+        defaultItems.toMutableSet()
+    ).onChanged(::reloadRender)
 
     private object BoxMode : Choice("Box") {
 
@@ -92,7 +156,14 @@ object ModuleItemESP : ClientModule("ItemESP", Category.RENDER) {
             get() = modes
     }
 
-    fun shouldRender(it: Entity?) = it is ItemEntity || it is ArrowEntity
+    fun reloadRender(@Suppress("UNUSED_PARAMETER") any: Any) {
+        mc.worldRenderer.reload()
+    }
+
+    fun shouldRender(entity: Entity?): Boolean {
+        if (entity !is ItemEntity) return false
+        return entity.stack.item in filteredItems
+    }
 
     fun getColor() = this.colorMode.activeChoice.getColor(null)
 }

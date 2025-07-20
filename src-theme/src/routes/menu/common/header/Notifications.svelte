@@ -2,46 +2,61 @@
     import {fly} from "svelte/transition";
     import {notification, type TNotification} from "./notification_store";
     import {onMount} from "svelte";
+    import {get} from "svelte/store";
 
-    interface NotificationWithId {
-        notification: TNotification;
-        id: number;
-    }
-
-    let notifications: NotificationWithId[] = [];
+    let currentNotification: TNotification | null = null;
+    let showNotification = false;
+    let timeoutHandle: ReturnType<typeof setTimeout> | null = null;
 
     onMount(() => {
-       notifications = [];
-    });
+        if (get(notification)) notification.set(null);
 
-    notification.subscribe((v) => {
-        if (!v) {
-            return;
-        }
-        const id = Date.now();
-        const n = {
-            notification: v,
-            id
+        const unsubscribe = notification.subscribe((n) => {
+            if (n) {
+
+                if (timeoutHandle) {
+                    clearTimeout(timeoutHandle);
+                    timeoutHandle = null;
+                }
+
+                currentNotification = n;
+                showNotification = true;
+
+                timeoutHandle = setTimeout(() => {
+                    showNotification = false;
+                    timeoutHandle = null;
+                }, (n.delay ?? 3) * 1000);
+            } else {
+                showNotification = false;
+            }
+        });
+
+        return () => {
+            unsubscribe();
+            if (timeoutHandle) clearTimeout(timeoutHandle);
         };
-        notifications = [...notifications, n];
-        setTimeout(() => {
-            notifications = notifications.filter(n => n.id !== id);
-        }, (v?.delay ?? 3) * 1000);
     });
 </script>
 
-<div class="notifications">
-    {#each notifications as n (n.id)}
-        <div class="notification" transition:fly|global={{duration: 500, y: -100}}>
-            <div class="icon" class:error={n.notification.error}>
-                <img src="img/hud/notification/icon-info.svg" alt="info">
-            </div>
-            <div class="title">{n.notification.title}</div>
-            <div class="message">{n.notification.message}</div>
-        </div>
-    {/each}
-</div>
 
+<div class="notifications">
+    {#if showNotification && currentNotification}
+        {#key currentNotification.id || currentNotification.message}
+            <div class="notification"
+                 transition:fly|global={{duration: 500, y: -100}}
+                 on:outroend={() => {
+                        if (!showNotification) currentNotification = null;
+                    }}
+            >
+                <div class="icon" class:error={currentNotification.error}>
+                    <img src="img/hud/notification/icon-info.svg" alt="info">
+                </div>
+                <div class="title">{currentNotification.title}</div>
+                <div class="message">{currentNotification.message}</div>
+            </div>
+        {/key}
+    {/if}
+</div>
 <style lang="scss">
   @use "../../../../colors.scss" as *;
 
@@ -53,7 +68,8 @@
   .notification {
     grid-row-start: 1;
     grid-column-start: 1;
-    background-color: rgba($menu-base-color, 0.68);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
     border-radius: 5px;
     display: grid;
     grid-template-areas:
@@ -65,7 +81,7 @@
     min-width: 350px;
 
     .title {
-      color: $menu-text-color;
+      color: $text;
       font-weight: 600;
       font-size: 18px;
       grid-area: b;
@@ -73,7 +89,7 @@
     }
 
     .message {
-      color: $menu-text-dimmed-color;
+      color: $text-color;
       font-weight: 500;
       grid-area: c;
     }
@@ -82,15 +98,11 @@
       grid-area: a;
       height: 65px;
       width: 65px;
-      background-color: $accent-color;
+      background-color: rgba(255, 255, 255, 0.1);
       display: flex;
       align-items: center;
       justify-content: center;
       margin-right: 10px;
-
-      &.error {
-        background-color: $menu-error-color;
-      }
     }
   }
 </style>

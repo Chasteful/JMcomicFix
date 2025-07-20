@@ -83,17 +83,22 @@ object MinaraiTrainer : ModuleDebugRecorder.DebugRecorderMode<TrainingData>("Min
                 }
                 val distance = player.squaredBoxedDistanceTo(target).toFloat()
 
-                recordPacket(TrainingData(
-                    currentVector = current.directionVector,
-                    previousVector = previous.directionVector,
-                    targetVector = Rotation.lookingAt(point = target.box.center, from = player.eyePos).directionVector,
-                    velocityDelta = current.rotationDeltaTo(next).toVec2f(),
-                    playerDiff = player.pos.subtract(player.prevPos),
-                    targetDiff = target.pos.subtract(target.prevPos),
-                    age = target.age,
-                    hurtTime = target.hurtTime,
-                    distance = distance
-                ))
+                recordPacket(
+                    TrainingData(
+                        currentVector = current.directionVector,
+                        previousVector = previous.directionVector,
+                        targetVector = Rotation.lookingAt(
+                            point = target.box.center,
+                            from = player.eyePos
+                        ).directionVector,
+                        velocityDelta = current.rotationDeltaTo(next).toVec2f(),
+                        playerDiff = player.pos.subtract(player.prevPos),
+                        targetDiff = target.pos.subtract(target.prevPos),
+                        age = target.age,
+                        hurtTime = target.hurtTime,
+                        distance = distance
+                    )
+                )
 
                 false
             }

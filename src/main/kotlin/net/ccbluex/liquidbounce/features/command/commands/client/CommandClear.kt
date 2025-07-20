@@ -27,7 +27,7 @@ import net.ccbluex.liquidbounce.utils.client.mc
 /**
  * Clear Command
  *
- * Allow clears the chat history in the game.
+ * Allow clears the ChatScreen history in the game.
  */
 object CommandClear : CommandFactory {
 

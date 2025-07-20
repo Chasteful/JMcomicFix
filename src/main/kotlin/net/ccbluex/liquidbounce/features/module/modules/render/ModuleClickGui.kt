@@ -34,6 +34,7 @@ import net.ccbluex.liquidbounce.integration.interop.protocol.rest.v1.game.isTypi
 import net.ccbluex.liquidbounce.integration.theme.ThemeManager
 import net.ccbluex.liquidbounce.utils.client.asText
 import net.ccbluex.liquidbounce.utils.client.inGame
+import net.ccbluex.liquidbounce.utils.kotlin.EventPriorityConvention
 import net.ccbluex.liquidbounce.utils.kotlin.EventPriorityConvention.OBJECTION_AGAINST_EVERYTHING
 import net.ccbluex.liquidbounce.utils.kotlin.EventPriorityConvention.READ_FINAL_STATE
 import net.minecraft.client.gui.screen.Screen
@@ -52,7 +53,16 @@ object ModuleClickGui :
 
     @Suppress("UnusedPrivateProperty")
     private val scale by float("Scale", 1f, 0.5f..2f).onChanged {
-        EventManager.callEvent(ClickGuiScaleChangeEvent(it))
+        EventManager.callEvent(ClickGuiValueChangeEvent(this))
+    }
+
+    @Suppress("UnusedPrivateProperty")
+    private val length by float("Length", 66f, 30f..100f, "%").onChanged {
+        EventManager.callEvent(ClickGuiValueChangeEvent(this))
+    }
+
+    @Suppress("UnusedPrivateProperty")
+    private val fontSize by int("FontSize", 14, 10..20, "px").onChanged {
         EventManager.callEvent(ClickGuiValueChangeEvent(this))
     }
 
@@ -93,7 +103,7 @@ object ModuleClickGui :
         }
     }
 
-    private var clickGuiBrowser: Browser? = null
+    private var clickGuiBrowser: Browser?= null
     private const val WORLD_CHANGE_SECONDS_UNTIL_RELOAD = 5
 
     init {
@@ -131,11 +141,17 @@ object ModuleClickGui :
         }
     }
 
+    /**
+     * Closes the ClickGUI view
+     */
     private fun close() {
         clickGuiBrowser?.close()
         clickGuiBrowser = null
     }
 
+    /**
+     * Restarts the ClickGUI view
+     */
     fun reload(restart: Boolean = false) {
         if (restart) {
             close()
@@ -143,14 +159,14 @@ object ModuleClickGui :
             return
         }
 
+
         clickGuiBrowser?.reload()
     }
 
     @Suppress("unused")
     private val gameRenderHandler = handler<GameRenderEvent>(priority = OBJECTION_AGAINST_EVERYTHING) {
         clickGuiBrowser?.visible = mc.currentScreen is ClickScreen
-    }
-
+        }
     @Suppress("unused")
     private val browserReadyHandler = handler<BrowserReadyEvent>(priority = READ_FINAL_STATE) {
         tree(IntegrationListener.browserSettings!!)
@@ -179,7 +195,7 @@ object ModuleClickGui :
     }
 
     /**
-     * An empty screen that acts as a hint when to draw the clickgui
+     * An empty screen that acts as hint when to draw the clickgui
      */
     class ClickScreen : Screen("ClickGUI".asText()) {
 

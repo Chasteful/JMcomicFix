@@ -140,8 +140,10 @@ private open class BestRotationTracker(val comparator: Comparator<Rotation>, val
         }
     }
 
-    open fun getIsRotationBetter(base: RotationWithVector?, newRotation: RotationWithVector,
-                                 visible: Boolean): Boolean {
+    open fun getIsRotationBetter(
+        base: RotationWithVector?, newRotation: RotationWithVector,
+        visible: Boolean
+    ): Boolean {
         return base?.let { currentlyBest ->
             this.comparator.compare(currentlyBest.rotation, newRotation.rotation) > 0
         } != false
@@ -162,8 +164,10 @@ private class PrePlaningTracker(
     private val bestVisibleIntersects = false
     private val bestInvisibleIntersects = false
 
-    override fun getIsRotationBetter(base: RotationWithVector?, newRotation: RotationWithVector,
-                                     visible: Boolean): Boolean {
+    override fun getIsRotationBetter(
+        base: RotationWithVector?, newRotation: RotationWithVector,
+        visible: Boolean
+    ): Boolean {
         val intersects = futureTarget.isHitByLine(eyes, newRotation.vec)
 
         val isBetterWhenVisible = visible && !bestVisibleIntersects
@@ -257,7 +261,7 @@ fun raytraceBlockSide(
 //                nearestSpotOnSide,
 //                bestRotationTracker,
 //            )
-//            chat(side.toString())
+//            ChatScreen(side.toString())
 
 
             range(0.05..0.95 step 0.1, 0.05..0.95 step 0.1) { a, b ->
@@ -567,9 +571,10 @@ fun findClosestPointOnBlockInLineWithCrystal(
 
         val coordinate = it.axis.choose(eyes.x, eyes.y, eyes.z)
         if (notFacingAway && !blockBB.contains(eyes) && when (it) {
-            Direction.NORTH, Direction.WEST, Direction.DOWN -> coordinate > blockBB.getMin(it.axis)
-            Direction.SOUTH, Direction.EAST, Direction.UP -> coordinate < blockBB.getMax(it.axis)
-        }) {
+                Direction.NORTH, Direction.WEST, Direction.DOWN -> coordinate > blockBB.getMin(it.axis)
+                Direction.SOUTH, Direction.EAST, Direction.UP -> coordinate < blockBB.getMax(it.axis)
+            }
+        ) {
             return@forEach
         }
 

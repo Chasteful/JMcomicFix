@@ -50,6 +50,7 @@ data class Proxy(
         } else {
             HttpProxyHandler(address, credentials.username, credentials.password)
         }
+
         Type.SOCKS5 -> if (credentials == null) {
             Socks5ProxyHandler(address)
         } else {

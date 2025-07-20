@@ -33,7 +33,8 @@ object ModuleTargets : ClientModule(
     hide = true,
     aliases = arrayOf("Enemies")
 ) {
-    val combatConfigurable = multiEnumChoice("Combat",
+    val combatConfigurable = multiEnumChoice(
+        "Combat",
         Targets.PLAYERS,
         Targets.HOSTILE,
         Targets.ANGERABLE,
@@ -41,7 +42,8 @@ object ModuleTargets : ClientModule(
         Targets.INVISIBLE,
     )
 
-    val visualConfigurable = multiEnumChoice("Visual",
+    val visualConfigurable = multiEnumChoice(
+        "Visual",
         Targets.PLAYERS,
         Targets.HOSTILE,
         Targets.ANGERABLE,

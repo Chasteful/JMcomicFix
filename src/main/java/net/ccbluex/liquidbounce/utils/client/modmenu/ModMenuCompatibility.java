@@ -25,7 +25,7 @@ public enum ModMenuCompatibility {
     /**
      * SAFETY: The method doesn't check if {@link ModMenu} is present and loaded
      *
-     * @param id modid to associate the mod container
+     * @param id  modid to associate the mod container
      * @param mod mod container in the {@link ModMenu} system to add
      */
     public final void addModUnchecked(@NotNull String id, @NotNull Mod mod) {

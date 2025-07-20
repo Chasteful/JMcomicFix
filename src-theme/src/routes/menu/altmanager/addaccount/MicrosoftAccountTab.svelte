@@ -16,6 +16,6 @@
 </script>
 
 <Tab>
-    <ButtonSetting title="Link Account" on:click={addAccount} {loading}/>
-    <ButtonSetting title="Copy URL" secondary={true} on:click={copyLoginUrl} inset={true}/>
+    <ButtonSetting {loading} on:click={addAccount} title="Link Account"/>
+    <ButtonSetting inset={true} on:click={copyLoginUrl} secondary={true} title="Copy URL"/>
 </Tab>

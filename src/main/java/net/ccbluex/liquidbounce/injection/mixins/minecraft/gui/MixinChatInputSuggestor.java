@@ -44,16 +44,19 @@ public abstract class MixinChatInputSuggestor {
     private CompletableFuture<Suggestions> pendingSuggestions;
     @Shadow
     private ParseResults<CommandSource> parse;
-    @Shadow public abstract void show(boolean narrateFirstSuggestion);
+    @Shadow
+    @Nullable
+    private ChatInputSuggestor.@Nullable SuggestionWindow window;
 
-    @Shadow @Nullable private ChatInputSuggestor.@Nullable SuggestionWindow window;
+    @Shadow
+    public abstract void show(boolean narrateFirstSuggestion);
 
     @Inject(method = "refresh", at = @At(value = "INVOKE", target = "Lcom/mojang/brigadier/StringReader;canRead()Z", remap = false), cancellable = true)
     private void injectAutoCompletionB(CallbackInfo ci) {
         if (this.textField.getText().startsWith(CommandManager.Options.INSTANCE.getPrefix())) {
             this.pendingSuggestions = CommandManager.INSTANCE.autoComplete(this.textField.getText(), this.textField.getCursor());
             this.pendingSuggestions.thenRun(() -> {
-                if(this.pendingSuggestions.isDone() && window == null) {
+                if (this.pendingSuggestions.isDone() && window == null) {
                     this.show(false);
                 }
             });

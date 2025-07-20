@@ -6,13 +6,11 @@
         <div></div>
     </div>
 </div>
-
 <style lang="scss">
   /*
     Taken from https://loading.io/css/
    */
-
-  @use "../../../colors.scss" as *;
+  @import "../../../colors";
 
   .loader-wrapper {
     position: absolute;

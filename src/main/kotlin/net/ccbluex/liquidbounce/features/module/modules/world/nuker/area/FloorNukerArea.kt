@@ -92,7 +92,8 @@ object FloorNukerArea : NukerArea("Floor") {
                         shape.offset(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())
                             .getClosestPointTo(eyesPos)
                             .map { vec3d -> vec3d.squaredDistanceTo(eyesPos) <= rangeSquared }
-                            .getOrDefault(false)) {
+                            .getOrDefault(false)
+                    ) {
                         yield(pos.toImmutable() to state)
                     }
                 }

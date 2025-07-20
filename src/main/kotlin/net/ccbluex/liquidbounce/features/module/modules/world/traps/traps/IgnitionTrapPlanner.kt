@@ -63,7 +63,7 @@ class IgnitionTrapPlanner(parent: EventListener) : TrapPlanner<IgnitionTrapPlann
 
             targetTracker.target = target
             return BlockChangeIntent(
-                BlockChangeInfo.PlaceBlock(placementTarget ),
+                BlockChangeInfo.PlaceBlock(placementTarget),
                 slot,
                 IntentTiming.NEXT_PROPITIOUS_MOMENT,
                 IgnitionIntentData(target, target.getDimensions(EntityPose.STANDING).getBoxAt(targetPos)),

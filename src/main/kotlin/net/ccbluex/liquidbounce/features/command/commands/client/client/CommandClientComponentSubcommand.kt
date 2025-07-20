@@ -76,33 +76,33 @@ object CommandClientComponentSubcommand {
         .hub()
         .subcommand(
             CommandBuilder.begin("text")
-                    .parameter(
-                        ParameterBuilder.begin<String>("text")
-                            .vararg()
-                            .verifiedBy(ParameterBuilder.STRING_VALIDATOR).required()
-                            .build()
-                    ).handler { command, args ->
-                        val arg = (args[-1] as Array<*>).joinToString(" ") { it as String }
-                        customComponents += TextComponent(arg)
-                        ComponentOverlay.fireComponentsUpdate()
+                .parameter(
+                    ParameterBuilder.begin<String>("text")
+                        .vararg()
+                        .verifiedBy(ParameterBuilder.STRING_VALIDATOR).required()
+                        .build()
+                ).handler { command, args ->
+                    val arg = (args[-1] as Array<*>).joinToString(" ") { it as String }
+                    customComponents += TextComponent(arg)
+                    ComponentOverlay.fireComponentsUpdate()
 
                     chat("Successfully added text component.")
-                    }.build()
+                }.build()
         )
         .subcommand(
             CommandBuilder.begin("image")
-                    .parameter(
-                        ParameterBuilder.begin<String>("url")
-                            .vararg()
-                            .verifiedBy(ParameterBuilder.STRING_VALIDATOR).required()
-                            .build()
-                    ).handler { command, args ->
-                        val arg = (args[-1] as Array<*>).joinToString(" ") { it as String }
-                        customComponents += ImageComponent(arg)
-                        ComponentOverlay.fireComponentsUpdate()
+                .parameter(
+                    ParameterBuilder.begin<String>("url")
+                        .vararg()
+                        .verifiedBy(ParameterBuilder.STRING_VALIDATOR).required()
+                        .build()
+                ).handler { command, args ->
+                    val arg = (args[-1] as Array<*>).joinToString(" ") { it as String }
+                    customComponents += ImageComponent(arg)
+                    ComponentOverlay.fireComponentsUpdate()
 
                     chat("Successfully added image component.")
-                    }.build()
+                }.build()
         )
         .build()
 

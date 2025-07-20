@@ -45,6 +45,7 @@ object VelocityHylex : VelocityMode("Hylex") {
                     0.8
                 )
             }
+
             8 -> {
                 player.velocity = player.velocity.multiply(
                     0.11,
@@ -52,11 +53,13 @@ object VelocityHylex : VelocityMode("Hylex") {
                     0.11
                 )
             }
+
             7 -> player.velocity = player.velocity.multiply(
                 0.4,
                 1.0,
                 0.4
             )
+
             4 -> player.velocity = player.velocity.multiply(
                 0.37,
                 1.0,

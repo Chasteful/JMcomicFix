@@ -14,7 +14,8 @@ public class MixinMobSpawnerBlockEntityRenderer {
             method = "render(Lnet/minecraft/block/entity/MobSpawnerBlockEntity;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;II)V",
             at = @At("HEAD"),
             cancellable = true
-    ) private void onRender(CallbackInfo ci) {
+    )
+    private void onRender(CallbackInfo ci) {
         if (!ModuleAntiBlind.canRender(DoRender.MOB_IN_SPAWNER)) {
             ci.cancel();
         }

@@ -78,12 +78,14 @@ object ModuleAnimations : ClientModule("Animations", Category.RENDER, aliases = 
     val blockAnimationChoice = choices(
         "BlockingAnimation", OneSevenAnimation, arrayOf(
             OneSevenAnimation,
-            PushdownAnimation
+            PushdownAnimation,
+            SmoothAnimation
         )
     )
 
     object EquipOffset : ToggleableConfigurable(this, "EquipOffset", true) {
-        private val ignore by multiEnumChoice("Ignore",
+        private val ignore by multiEnumChoice(
+            "Ignore",
             Ignores.BLOCKING,
             Ignores.PLACE
         )
@@ -162,7 +164,24 @@ object ModuleAnimations : ClientModule("Animations", Category.RENDER, aliases = 
         }
 
     }
+    object SmoothAnimation : AnimationChoice("Smooth") {
+        private val swingSmoothness by float("SwingSmoothness", 0.8f, 0.1f..1.5f)
+        private val heightOffset by float("HeightOffset", 0.1f, 0f..0.3f)
 
+        override fun transform(matrices: MatrixStack, arm: Arm, equipProgress: Float, swingProgress: Float) {
+            val armSide = if (arm == Arm.RIGHT) 1 else -1
+            matrices.translate(armSide * 0.08f, heightOffset, 0.0f)
+
+            val swing = MathHelper.sin(swingProgress * swingProgress * Math.PI.toFloat()) * swingSmoothness
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(armSide * (40f + swing * -20f)))
+            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(armSide * swing * -10f))
+            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(swing * -60f))
+
+            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-85f))
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(armSide * 5f))
+            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(armSide * 20f))
+        }
+    }
     /**
      * Based on the [applySwingOffset] but with a different transformation
      * during swing progress to make it look like the [PushdownAnimation] from LiquidBounce Legacy.

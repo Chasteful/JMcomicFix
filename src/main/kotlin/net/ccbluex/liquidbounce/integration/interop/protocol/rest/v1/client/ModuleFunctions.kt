@@ -36,6 +36,7 @@ import net.ccbluex.liquidbounce.utils.client.logger
 import net.ccbluex.netty.http.model.RequestObject
 import net.ccbluex.netty.http.util.httpForbidden
 import net.ccbluex.netty.http.util.httpOk
+import java.io.StringReader
 
 private fun ClientModule.toJsonObject() = JsonObject().apply {
     addProperty("name", name)
@@ -137,7 +138,10 @@ data class ModuleRequest(val name: String) {
     fun acceptPutSettingsRequest(content: String): FullHttpResponse {
         val module = ModuleManager[name] ?: return httpForbidden("$name not found")
 
-        ConfigSystem.deserializeConfigurable(module, content.reader())
+        StringReader(content).use {
+            ConfigSystem.deserializeConfigurable(module, it)
+        }
+
         ConfigSystem.storeConfigurable(modulesConfigurable)
         return httpOk(emptyJsonObject())
     }

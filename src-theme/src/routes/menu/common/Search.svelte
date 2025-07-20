@@ -8,20 +8,20 @@
     }>();
 </script>
 
-<input class="search" type="text" placeholder="Search..." bind:value={value}
-       on:input={() => dispatch("search", {query: value})} spellcheck="false">
+<input bind:value={value} class="search" on:input={() => dispatch("search", {query: value})} placeholder="Search..."
+       spellcheck="false" type="text">
 
 <style lang="scss">
   @use "../../../colors.scss" as *;
 
   .search {
-    background-color: rgba($menu-base-color, .36);
-    border: none;
-    color: $menu-text-color;
-    font-family: "Inter", sans-serif;
+    background-color: rgba($base, 0.5);
+    color: $text;
+    font-family: "Inter", "Genshin", sans-serif;
     font-size: 20px;
-    border-radius: 5px;
-    border-bottom: solid 4px $accent-color;
+    border-radius: 12px;
+    border: none;
+    border-bottom: solid 4px rgba($text, 0.7);
     background-image: url("/img/menu/icon-search.svg");
     background-repeat: no-repeat;
     background-position: 20px center;

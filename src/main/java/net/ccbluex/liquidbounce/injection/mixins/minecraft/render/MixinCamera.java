@@ -121,8 +121,8 @@ public abstract class MixinCamera {
         }
 
         setRotation(
-            MathHelper.lerp(tickDelta, previousRotation.getYaw(), currentRotation.getYaw()),
-            MathHelper.lerp(tickDelta, previousRotation.getPitch(), currentRotation.getPitch())
+                MathHelper.lerp(tickDelta, previousRotation.getYaw(), currentRotation.getYaw()),
+                MathHelper.lerp(tickDelta, previousRotation.getPitch(), currentRotation.getPitch())
         );
     }
 

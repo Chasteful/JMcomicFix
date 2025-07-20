@@ -155,7 +155,7 @@ object ModuleTimer : ClientModule("Timer", Category.WORLD, disableOnQuit = true)
                 boostCapable = (boostCapable + addition).toInt().coerceAtMost(timeBoostTicks)
             } else {
                 val speedUp = boostCapable > 0 ||
-                        (allowNegative && (CombatManager.isInCombat || ModuleScaffold.running))
+                    (allowNegative && (CombatManager.isInCombat || ModuleScaffold.running))
 
                 if (!speedUp) {
                     return@tickHandler

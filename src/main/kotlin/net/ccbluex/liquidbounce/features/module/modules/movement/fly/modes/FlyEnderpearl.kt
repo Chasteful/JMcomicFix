@@ -108,7 +108,8 @@ internal object FlyEnderpearl : Choice("Enderpearl") {
 
     val packetHandler = handler<PacketEvent> { event ->
         if (event.origin == TransferOrigin.OUTGOING && event.packet is TeleportConfirmC2SPacket
-            && isABitAboveGround() && threwPearl) {
+            && isABitAboveGround() && threwPearl
+        ) {
             threwPearl = false
             canFly = true
         }

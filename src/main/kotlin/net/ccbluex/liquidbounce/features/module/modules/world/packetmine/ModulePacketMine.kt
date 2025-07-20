@@ -82,7 +82,8 @@ object ModulePacketMine : ClientModule("PacketMine", Category.WORLD) {
     }
 
     val swingMode by enumChoice("Swing", SwingMode.HIDE_CLIENT)
-    val switchMode = choices("Switch",
+    val switchMode = choices(
+        "Switch",
         OnStopToolMode,
         arrayOf(AlwaysToolMode, PostStartToolMode, OnStopToolMode, NeverToolMode)
     )

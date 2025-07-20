@@ -97,7 +97,8 @@ object ModuleFucker : ClientModule("Fucker", Category.WORLD, aliases = arrayOf("
     // Rotation
     private val rotations = tree(RotationsConfigurable(this))
     private val targetRenderer = tree(
-        PlacementRenderer("TargetRendering", true, this,
+        PlacementRenderer(
+            "TargetRendering", true, this,
             defaultColor = Color4b(255, 0, 0, 90)
         )
     )

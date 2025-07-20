@@ -86,28 +86,35 @@ sealed class MultiChooseListValue<T>(
     }
 
     override fun deserializeFrom(gson: Gson, element: JsonElement) {
-        val active = get()
-        active.clear()
+
+        val newSet = if (choices.isNotEmpty() && choices.first() is Enum<*>) {
+            @Suppress("UNCHECKED_CAST")
+            EnumSet.noneOf(choices.first()?.javaClass as Class<out Enum<*>?>?) as MutableSet<T>
+        } else {
+            mutableSetOf()
+        }
 
         when (element) {
-            is JsonArray -> element.forEach { active.tryToEnable(it.asString) }
-            is JsonPrimitive -> active.tryToEnable(element.asString)
+            is JsonArray -> element.forEach { newSet.tryToEnable(it.asString) }
+            is JsonPrimitive -> newSet.tryToEnable(element.asString)
         }
 
-        if (!canBeNone && active.isEmpty()) {
-            active.addAll(choices)
+        if (!canBeNone && newSet.isEmpty()) {
+            newSet.addAll(choices)
         } else {
-            active.sortIfAutoSortingDisabled()
+            newSet.sortIfAutoSortingDisabled()
         }
 
-        set(active)
+
+        set(newSet)
     }
 
     private fun MutableSet<T>.tryToEnable(name: String) {
-        val choiceWithName = choices.firstOrNull { it.elementName == name }
-
-        if (choiceWithName != null) {
-            add(choiceWithName)
+        choices.firstOrNull { it.elementName == name }?.let {
+            when (this) {
+                is EnumSet<*> -> (this as EnumSet<T>).add(it)
+                else -> add(it)
+            }
         }
     }
 

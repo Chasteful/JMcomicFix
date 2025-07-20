@@ -193,7 +193,7 @@ object ModuleAutoPearl : ClientModule("AutoPearl", Category.COMBAT, aliases = ar
             return false
         }
 
-        return when(mode) {
+        return when (mode) {
             Modes.TRIGGER -> pearl.owner!!.shouldBeAttacked()
             Modes.TARGET -> ModuleKillAura.targetTracker.target?.uuid == pearl.ownerUuid
         }

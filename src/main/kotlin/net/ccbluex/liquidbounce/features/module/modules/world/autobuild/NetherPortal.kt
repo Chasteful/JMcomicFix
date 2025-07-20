@@ -26,8 +26,8 @@ import net.minecraft.entity.decoration.EndCrystalEntity
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 
-class NetherPortal(val origin: BlockPos, val down: Boolean, val direction: Direction, rotated: Direction)
-    : MinecraftShortcuts {
+class NetherPortal(val origin: BlockPos, val down: Boolean, val direction: Direction, rotated: Direction) :
+    MinecraftShortcuts {
 
     val frameBlocks = arrayOf(
         origin.up(4), origin.offset(rotated).up(4),
@@ -87,11 +87,11 @@ class NetherPortal(val origin: BlockPos, val down: Boolean, val direction: Direc
 
         // might not need support blocks
         edgeBlocks.forEach {
-           if (!world.isAir(it)) {
+            if (!world.isAir(it)) {
                 score += 4
-           } else if (it.isBlockedByEntities()) {
-               score -= 1
-           }
+            } else if (it.isBlockedByEntities()) {
+                score -= 1
+            }
         }
 
         // entering doesn't require jumping

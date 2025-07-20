@@ -44,21 +44,31 @@ object ModuleFullBright : ClientModule("FullBright", Category.RENDER) {
 
         override val parent: ChoiceConfigurable<Choice>
             get() = modes
-
+        val removeNightVision by boolean("RemoveNightVision", true)
         val brightness by int("Brightness", 15, 1..15)
 
         var gamma = 0.0
 
         override fun enable() {
             gamma = mc.options.gamma.value
+            if (removeNightVision) {
+                player.removeStatusEffect(StatusEffects.NIGHT_VISION)
+            }
         }
 
         val tickHandler = handler<PlayerPostTickEvent> {
             if (gamma < brightness) {
                 gamma = (gamma + 0.1).coerceAtMost(brightness.toDouble())
             }
+
+            if (removeNightVision && player.hasStatusEffect(StatusEffects.NIGHT_VISION)) {
+                player.removeStatusEffect(StatusEffects.NIGHT_VISION)
+            }
         }
 
+        override fun disable() {
+            mc.options.gamma.value = gamma
+        }
     }
 
     private object FullBrightNightVision : Choice("NightVision") {

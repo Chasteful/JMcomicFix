@@ -30,7 +30,6 @@ import net.ccbluex.liquidbounce.utils.entity.ping
 import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 import net.minecraft.text.TextColor
 import net.minecraft.util.Formatting
@@ -102,7 +101,8 @@ class NametagTextFormatter(private val entity: Entity) {
 
             val coloringBasedOnPing = when {
                 playerPing > 200 -> Formatting.RED
-                playerPing > 100 -> Formatting.YELLOW
+                playerPing > 125 -> Formatting.GOLD
+                playerPing > 50 -> Formatting.YELLOW
                 else -> Formatting.GREEN
             }
 
@@ -124,11 +124,12 @@ class NametagTextFormatter(private val entity: Entity) {
             val healthColor = when {
                 // Perhaps you should modify the values here
                 actualHealth >= 14 -> Formatting.GREEN
-                actualHealth >= 8 -> Formatting.YELLOW
+                actualHealth >= 10 -> Formatting.YELLOW
+                actualHealth >= 6 -> Formatting.GOLD
                 else -> Formatting.RED
             }
 
-            return "$actualHealth HP".asText().formatted(healthColor)
+            return "$actualHealth❤".asText().formatted(healthColor)
 
         }
 }

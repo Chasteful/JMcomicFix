@@ -137,7 +137,8 @@ object ModuleSuperKnockback : ClientModule("SuperKnockback", Category.COMBAT, al
             priority = CRITICAL_MODIFICATION
         ) { event ->
             if (cancelSprint && (event.source == SprintEvent.Source.MOVEMENT_TICK ||
-                    event.source == SprintEvent.Source.INPUT)) {
+                    event.source == SprintEvent.Source.INPUT)
+            ) {
                 event.sprint = false
             }
         }
@@ -153,10 +154,14 @@ object ModuleSuperKnockback : ClientModule("SuperKnockback", Category.COMBAT, al
         override val parent: ChoiceConfigurable<Choice>
             get() = modes
 
-        private val ticksUntilMovementBlock by intRange("UntilMovementBlock", 0..1, 0..10,
-            "ticks")
-        private val ticksUntilAllowedMovement by intRange("UntilAllowedMovement", 0..1, 0..10,
-            "ticks")
+        private val ticksUntilMovementBlock by intRange(
+            "UntilMovementBlock", 0..1, 0..10,
+            "ticks"
+        )
+        private val ticksUntilAllowedMovement by intRange(
+            "UntilAllowedMovement", 0..1, 0..10,
+            "ticks"
+        )
 
         private var inSequence = false
         private var cancelMovement = false

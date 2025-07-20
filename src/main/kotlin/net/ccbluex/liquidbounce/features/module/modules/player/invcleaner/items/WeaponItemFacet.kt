@@ -78,7 +78,7 @@ open class WeaponItemFacet(itemSlot: ItemSlot) : ItemFacet(itemSlot) {
             val speedAdjustedDamage = attackDamage * attackSpeed * probabilityAdjustmentFactor.toFloat()
 
             val damageFromFireAspect = (o1.itemStack.getEnchantment(Enchantments.FIRE_ASPECT) * 4.0f - 1)
-                    .coerceAtLeast(0.0F) * 0.33F
+                .coerceAtLeast(0.0F) * 0.33F
 
             val additionalFactor = DAMAGE_ESTIMATOR.estimateValue(o1.itemStack)
 

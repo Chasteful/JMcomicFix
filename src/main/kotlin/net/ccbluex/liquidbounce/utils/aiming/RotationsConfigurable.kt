@@ -1,10 +1,12 @@
 package net.ccbluex.liquidbounce.utils.aiming
 
+import net.ccbluex.jmcomicfix.utils.aiming.features.processors.anglesmooth.impl.QuaternionAngleSmooth
 import net.ccbluex.liquidbounce.config.types.Configurable
 import net.ccbluex.liquidbounce.event.EventListener
 import net.ccbluex.liquidbounce.utils.aiming.data.Rotation
 import net.ccbluex.liquidbounce.utils.aiming.features.MovementCorrection
 import net.ccbluex.liquidbounce.utils.aiming.features.processors.FailRotationProcessor
+import net.ccbluex.jmcomicfix.utils.aiming.features.processors.NeuralNetworkRotationProcessor
 import net.ccbluex.liquidbounce.utils.aiming.features.processors.ShortStopRotationProcessor
 import net.ccbluex.liquidbounce.utils.aiming.features.processors.anglesmooth.impl.*
 import net.ccbluex.liquidbounce.utils.client.RestrictedSingleUseAction
@@ -22,16 +24,18 @@ open class RotationsConfigurable(
     private val angleSmooth = choices(owner, "AngleSmooth", 0) {
         val linearAngleSmooth = LinearAngleSmooth(it)
         val interpolationAngleSmooth = if (combatSpecific) InterpolationAngleSmooth(it) else null
+        val quaternionAngleSmooth = QuaternionAngleSmooth(it)
 
         listOfNotNull(
             linearAngleSmooth,
-            SigmoidAngleSmooth(it),
+            InterpolationAngleSmooth(it),
             interpolationAngleSmooth,
             AccelerationAngleSmooth(it),
+            quaternionAngleSmooth,
             if (combatSpecific) MinaraiAngleSmooth(it, interpolationAngleSmooth ?: linearAngleSmooth) else null
         ).toTypedArray()
     }
-
+    private var neuralNetwork = NeuralNetworkRotationProcessor(owner).takeIf { combatSpecific }?.also { tree(it) }
     private var shortStop = ShortStopRotationProcessor(owner).takeIf { combatSpecific }?.also { tree(it) }
     private val fail = FailRotationProcessor(owner).takeIf { combatSpecific }?.also { tree(it) }
 
@@ -49,8 +53,9 @@ open class RotationsConfigurable(
         entity,
         listOfNotNull(
             angleSmooth.activeChoice,
-            fail.takeIf { failFocus -> failFocus?.running == true },
-            shortStop.takeIf { shortStop -> shortStop?.running == true }
+            fail.takeIf { it?.running == true },
+            shortStop.takeIf { it?.running == true },
+            neuralNetwork.takeIf { it?.running ==true},
         ),
         ticksUntilReset,
         resetThreshold,

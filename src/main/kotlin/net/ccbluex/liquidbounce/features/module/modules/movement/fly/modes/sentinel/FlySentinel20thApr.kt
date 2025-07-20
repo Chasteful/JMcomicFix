@@ -93,7 +93,7 @@ internal object FlySentinel20thApr : Choice("Sentinel20thApr") {
     }
 
     val moveHandler = handler<PlayerMoveEvent> { event ->
-        if (player.hurtTime > 0  && !hasBeenHurt) {
+        if (player.hurtTime > 0 && !hasBeenHurt) {
             hasBeenHurt = true
             player.velocity = player.velocity.withStrafe(speed = horizontalSpeed.toDouble())
             notification(
@@ -130,14 +130,30 @@ internal object FlySentinel20thApr : Choice("Sentinel20thApr") {
 
     private fun boost() {
         hasBeenHurt = false
-        network.sendPacket(PlayerMoveC2SPacket.PositionAndOnGround(player.x, player.y, player.z, false,
-            player.horizontalCollision))
-        network.sendPacket(PlayerMoveC2SPacket.PositionAndOnGround(player.x, player.y + 3.25, player.z,
-            false, player.horizontalCollision))
-        network.sendPacket(PlayerMoveC2SPacket.PositionAndOnGround(player.x, player.y, player.z, false,
-            player.horizontalCollision))
-        network.sendPacket(PlayerMoveC2SPacket.PositionAndOnGround(player.x, player.y, player.z, true,
-            player.horizontalCollision))
+        network.sendPacket(
+            PlayerMoveC2SPacket.PositionAndOnGround(
+                player.x, player.y, player.z, false,
+                player.horizontalCollision
+            )
+        )
+        network.sendPacket(
+            PlayerMoveC2SPacket.PositionAndOnGround(
+                player.x, player.y + 3.25, player.z,
+                false, player.horizontalCollision
+            )
+        )
+        network.sendPacket(
+            PlayerMoveC2SPacket.PositionAndOnGround(
+                player.x, player.y, player.z, false,
+                player.horizontalCollision
+            )
+        )
+        network.sendPacket(
+            PlayerMoveC2SPacket.PositionAndOnGround(
+                player.x, player.y, player.z, true,
+                player.horizontalCollision
+            )
+        )
     }
 
 }

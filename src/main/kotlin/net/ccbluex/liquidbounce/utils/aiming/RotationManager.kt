@@ -29,6 +29,7 @@ import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.features.module.modules.combat.backtrack.ModuleBacktrack
 import net.ccbluex.liquidbounce.utils.aiming.data.Rotation
 import net.ccbluex.liquidbounce.utils.aiming.features.MovementCorrection
+import net.ccbluex.jmcomicfix.utils.aiming.features.processors.NeuralNetworkRotationProcessor
 import net.ccbluex.liquidbounce.utils.aiming.utils.setRotation
 import net.ccbluex.liquidbounce.utils.aiming.utils.withFixedYaw
 import net.ccbluex.liquidbounce.utils.client.*
@@ -105,9 +106,11 @@ object RotationManager : EventListener {
         provider: ClientModule,
         whenReached: RestrictedSingleUseAction? = null
     ) {
-        setRotationTarget(configurable.toRotationTarget(
-            rotation, considerInventory = considerInventory, whenReached = whenReached
-        ), priority, provider)
+        setRotationTarget(
+            configurable.toRotationTarget(
+                rotation, considerInventory = considerInventory, whenReached = whenReached
+            ), priority, provider
+        )
     }
 
     fun setRotationTarget(plan: RotationTarget, priority: Priority, provider: ClientModule) {
@@ -148,6 +151,10 @@ object RotationManager : EventListener {
     @Suppress("CognitiveComplexMethod", "NestedBlockDepth")
     fun update() {
         val activeRotationTarget = this.activeRotationTarget ?: return
+        if (activeRotationTarget != previousRotationTarget) {
+            (activeRotationTarget.processors.find { it is NeuralNetworkRotationProcessor }
+                as? NeuralNetworkRotationProcessor)?.newState(true)
+        }
         val playerRotation = player.rotation
 
         val rotationTarget = this.rotationTarget
@@ -163,7 +170,8 @@ object RotationManager : EventListener {
 
             if (rotationTarget == null && (activeRotationTarget.movementCorrection == MovementCorrection.CHANGE_LOOK
                     || activeRotationTarget.processors.isEmpty()
-                    || diff <= activeRotationTarget.resetThreshold)) {
+                    || diff <= activeRotationTarget.resetThreshold)
+            ) {
                 currentRotation?.let { currentRotation ->
                     player.yaw = player.withFixedYaw(currentRotation)
                     player.renderYaw = player.yaw
@@ -245,6 +253,7 @@ object RotationManager : EventListener {
                 // We trust that we have sent a normalized rotation, if not, ... why?
                 Rotation(packet.yaw, packet.pitch, isNormalized = true)
             }
+
             is PlayerPositionLookS2CPacket -> Rotation(packet.change.yaw, packet.change.pitch, isNormalized = true)
             is PlayerInteractItemC2SPacket -> Rotation(packet.yaw, packet.pitch, isNormalized = true)
             else -> return@handler

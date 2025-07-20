@@ -21,17 +21,21 @@
 
 package net.ccbluex.liquidbounce.integration.interop.protocol.rest.v1.game
 
+import net.ccbluex.jmcomicfix.features.module.modules.render.ModuleKillEffects
 import net.ccbluex.liquidbounce.config.gson.interopGson
 import net.ccbluex.liquidbounce.features.module.modules.combat.ModuleSwordBlock.hideShieldSlot
 import net.ccbluex.liquidbounce.features.module.modules.combat.ModuleSwordBlock.shouldHideOffhand
 import net.ccbluex.liquidbounce.features.module.modules.misc.nameprotect.ModuleNameProtect
 import net.ccbluex.liquidbounce.features.module.modules.misc.nameprotect.sanitizeForeignInput
+import net.ccbluex.liquidbounce.features.module.modules.player.autobuff.ModuleAutoBuff
+import net.ccbluex.liquidbounce.utils.session.GameWins
 import net.ccbluex.liquidbounce.utils.client.interaction
 import net.ccbluex.liquidbounce.utils.client.mc
 import net.ccbluex.liquidbounce.utils.client.player
 import net.ccbluex.liquidbounce.utils.entity.getActualHealth
 import net.ccbluex.liquidbounce.utils.entity.netherPosition
 import net.ccbluex.liquidbounce.utils.entity.ping
+import net.ccbluex.liquidbounce.utils.session.KilledTarget
 import net.ccbluex.netty.http.model.RequestObject
 import net.ccbluex.netty.http.util.httpOk
 import net.minecraft.entity.effect.StatusEffectInstance
@@ -68,6 +72,8 @@ data class PlayerData(
     val uuid: String,
     val dimension: Identifier,
     val position: Vec3d,
+    val pitch: Float,
+    val yaw: Float,
     val netherPosition: Vec3d,
     val blockPosition: BlockPos,
     val velocity: Vec3d,
@@ -84,12 +90,21 @@ data class PlayerData(
     val experienceLevel: Int,
     val experienceProgress: Float,
     val ping: Int,
+    val serverAddress: String,
     val effects: List<StatusEffectInstance>,
     val mainHandStack: ItemStack,
     val offHandStack: ItemStack,
     val armorItems: List<ItemStack> = emptyList(),
     val scoreboard: ScoreboardData? = null,
-) {
+    val killsCount: Int,
+    val deathCount: Int,
+    val isDead: Boolean,
+    val isEating: Boolean,
+    val eatingStartTime: Long,
+    val eatingMaxDuration: Int,
+    val winsCount: Int,
+    val playTime: Long,
+    ) {
 
     companion object {
 
@@ -98,6 +113,8 @@ data class PlayerData(
             player.uuidAsString,
             player.world.registryKey.value,
             player.pos,
+            player.pitch,
+            player.yaw,
             player.netherPosition,
             player.blockPos,
             player.velocity,
@@ -114,12 +131,36 @@ data class PlayerData(
             player.experienceLevel,
             player.experienceProgress.fixNaN(),
             player.ping,
+            mc.currentServerEntry?.address ?: "jmcomicph.org",
             player.statusEffects.toList(),
             player.mainHandStack,
             if (shouldHideOffhand(player = player) && hideShieldSlot) ItemStack.EMPTY else player.offHandStack,
             player.armorItems.toList(),
-            if (mc.player == player) ScoreboardData.fromScoreboard(player.scoreboard) else null
-        )
+            if (mc.player == player) ScoreboardData.fromScoreboard(player.scoreboard) else null,
+            KilledTarget.killsCount,
+            updateDeathCount(player),
+            player.isDead,
+            ModuleAutoBuff.isEating,
+            ModuleAutoBuff.eatingStartTime,
+            ModuleAutoBuff.eatingMaxDuration,
+            GameWins.localWinsCounter,
+            PlayTimeTracker.getPlayTime(),
+
+            )
+
+        private var wasAliveLastTick = true
+        private var localPlayerDeathCounter = 0
+        private fun updateDeathCount(player: PlayerEntity): Int {
+            if (player != mc.player) return localPlayerDeathCounter
+
+            val isNowDead = player.isRemoved || !player.isAlive
+            if (wasAliveLastTick && isNowDead) {
+                localPlayerDeathCounter++
+            }
+            wasAliveLastTick = !isNowDead
+
+            return localPlayerDeathCounter
+        }
     }
 
 }
@@ -237,12 +278,43 @@ data class ScoreboardData(val header: Text, val entries: Array<SidebarEntry?>) {
         return true
     }
 
+
     override fun hashCode(): Int {
         var result = header.hashCode()
         result = 31 * result + entries.contentHashCode()
         return result
     }
 
+}
+
+object PlayTimeTracker {
+    private val playTimeMap = mutableMapOf<String, Long>()
+    private var lastServer: String? = null
+    private var lastUpdateTime: Long = System.currentTimeMillis()
+    private var leftoverMs: Long = 0
+
+    fun update() {
+        val address = mc.currentServerEntry?.address ?: return
+        val now = System.currentTimeMillis()
+        val deltaMs = now - lastUpdateTime + leftoverMs
+
+        if (deltaMs < 1000) {
+            leftoverMs = deltaMs
+            return
+        }
+
+        val deltaSeconds = deltaMs / 1000
+        leftoverMs = deltaMs % 1000
+
+        playTimeMap[address] = playTimeMap.getOrDefault(address, 0L) + deltaSeconds
+        lastUpdateTime = now
+        lastServer = address
+    }
+
+    fun getPlayTime(): Long {
+        val address = mc.currentServerEntry?.address ?: return 0
+        return playTimeMap[address] ?: 0
+    }
 }
 
 /**

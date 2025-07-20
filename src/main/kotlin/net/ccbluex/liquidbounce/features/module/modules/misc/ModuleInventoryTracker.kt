@@ -80,6 +80,7 @@ object ModuleInventoryTracker : ClientModule("InventoryTracker", Category.WORLD)
                 trackedInventory.update(offHandStack, OFFHAND)
                 trackedInventory.update(mainHandStack, MAINHAND)
             }
+
             HUMANOID_ARMOR -> trackedInventory.update(newItemStack, updatedSlot)
             else -> {}
         }

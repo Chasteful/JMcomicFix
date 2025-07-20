@@ -28,11 +28,8 @@ import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.event.tickHandler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
-import net.ccbluex.liquidbounce.render.drawSolidBox
+import net.ccbluex.liquidbounce.render.*
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
-import net.ccbluex.liquidbounce.render.renderEnvironmentForWorld
-import net.ccbluex.liquidbounce.render.withColor
-import net.ccbluex.liquidbounce.render.withPositionRelativeToCamera
 import net.ccbluex.liquidbounce.utils.client.Chronometer
 import net.ccbluex.liquidbounce.utils.client.PacketSnapshot
 import net.ccbluex.liquidbounce.utils.combat.findEnemy
@@ -51,7 +48,6 @@ import net.minecraft.network.packet.s2c.common.DisconnectS2CPacket
 import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Box
 import net.minecraft.util.math.Vec3d
 
 object ModuleBacktrack : ClientModule("Backtrack", Category.COMBAT) {
@@ -79,7 +75,7 @@ object ModuleBacktrack : ClientModule("Backtrack", Category.COMBAT) {
 
     private val espMode = choices(
         "EspMode", Wireframe, arrayOf(
-            Box, Model, Wireframe, None
+            Model, Wireframe, None
         )
     ).apply {
         doNotIncludeAlways()
@@ -178,30 +174,6 @@ object ModuleBacktrack : ClientModule("Backtrack", Category.COMBAT) {
         }
     }
 
-    object Box : RenderChoice("Box") {
-        override val parent: ChoiceConfigurable<RenderChoice>
-            get() = espMode
-
-        private val color by color("Color", Color4b(36, 32, 147, 87))
-
-        @Suppress("unused")
-        private val renderHandler = handler<WorldRenderEvent> { event ->
-            val (entity, pos) = getEntityPosition() ?: return@handler
-
-            val dimensions = entity.getDimensions(entity.pose)
-            val d = dimensions.width.toDouble() / 2.0
-
-            val box = Box(-d, 0.0, -d, d, dimensions.height.toDouble(), d).expand(0.05)
-
-            renderEnvironmentForWorld(event.matrixStack) {
-                withPositionRelativeToCamera(pos) {
-                    withColor(color) {
-                        drawSolidBox(box)
-                    }
-                }
-            }
-        }
-    }
 
     object Model : RenderChoice("Model") {
         override val parent: ChoiceConfigurable<RenderChoice>
@@ -237,17 +209,30 @@ object ModuleBacktrack : ClientModule("Backtrack", Category.COMBAT) {
         override val parent: ChoiceConfigurable<RenderChoice>
             get() = espMode
 
-        private val color by color("Color", Color4b(36, 32, 147, 87))
-        private val outlineColor by color("OutlineColor", Color4b(36, 32, 147, 255))
+        private val colorMode = choices("ColorMode", 2) {
+            arrayOf(
+                GenericStaticColorMode(it, Color4b(36, 32, 147)),
+                GenericRainbowColorMode(it),
+                GenericSyncColorMode(it)
+            )
+        }
+
+        private val fillAlpha by int("FillAlpha", 70, 0..255)
+        private val outlineAlpha by int("OutlineAlpha", 150, 0..255)
 
         @Suppress("unused")
         private val renderHandler = handler<WorldRenderEvent> {
             val (entity, pos) = getEntityPosition() ?: return@handler
 
+            val baseColor = colorMode.activeChoice.getColor(null)
+            val fillColor = baseColor.withAlpha(fillAlpha)
+            val outlineColor = baseColor.withAlpha(outlineAlpha)
+
             val wireframePlayer = WireframePlayer(pos, entity.yaw, entity.pitch)
-            wireframePlayer.render(it, color, outlineColor)
+            wireframePlayer.render(it, fillColor, outlineColor)
         }
     }
+
 
     object None : RenderChoice("None") {
         override val parent: ChoiceConfigurable<RenderChoice>

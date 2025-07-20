@@ -1,24 +1,50 @@
-/*
- * This file is part of LiquidBounce (https://github.com/CCBlueX/LiquidBounce)
- *
- * Copyright (c) 2015 - 2025 CCBlueX
- *
- * LiquidBounce is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * LiquidBounce is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
- */
 package net.ccbluex.liquidbounce.features.module.modules.render
 
+import net.ccbluex.liquidbounce.features.misc.FriendManager
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
+import net.ccbluex.liquidbounce.render.GenericEntityHealthColorMode
+import net.ccbluex.liquidbounce.render.GenericRainbowColorMode
+import net.ccbluex.liquidbounce.render.GenericStaticColorMode
+import net.ccbluex.liquidbounce.render.GenericSyncColorMode
+import net.ccbluex.liquidbounce.render.engine.type.Color4b
+import net.ccbluex.liquidbounce.utils.combat.EntityTaggingManager
+import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.player.PlayerEntity
 
-object ModuleChams: ClientModule("Chams", Category.RENDER)
+object ModuleChams : ClientModule("Chams", Category.RENDER) {
+
+    private val colorModes = choices("ColorMode", 1) {
+        arrayOf(
+            GenericEntityHealthColorMode(it),
+            GenericStaticColorMode(it, Color4b.WHITE),
+            GenericRainbowColorMode(it),
+            GenericSyncColorMode(it)
+        )
+    }
+    private val friendColor by color("Friends", Color4b.BLUE)
+    private val attackColor by color("Attacked", Color4b.RED)
+
+    private val alpha by int("TextureAlpha", 70, 0..255)
+
+    fun getColor(entity: LivingEntity): Color4b {
+
+        return getBaseColor(entity).withAlpha(alpha)
+    }
+
+    fun getBaseColor(entity: LivingEntity): Color4b {
+        if (entity is PlayerEntity) {
+            if (FriendManager.isFriend(entity) && friendColor.a > 0) {
+                return friendColor
+            }
+
+            if (entity.hurtTime > 0) {
+                return attackColor
+            }
+
+            EntityTaggingManager.getTag(entity).color?.let { return it }
+        }
+
+        return colorModes.activeChoice.getColor(entity)
+    }
+}

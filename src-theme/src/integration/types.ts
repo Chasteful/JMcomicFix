@@ -1,12 +1,12 @@
 export interface Module {
     name: string;
     category: string;
-    keyBind: number;
     enabled: boolean;
     description: string;
     hidden: boolean;
     aliases: string[];
     tag: string | null;
+
 }
 
 export interface GroupedModules {
@@ -14,7 +14,7 @@ export interface GroupedModules {
 }
 
 export type ModuleSetting =
-    BlocksSetting
+    SearchSetting
     | BooleanSetting
     | FloatSetting
     | FloatRangeSetting
@@ -32,7 +32,7 @@ export type ModuleSetting =
     | VectorSetting
     | KeySetting;
 
-export interface BlocksSetting {
+export interface SearchSetting {
     valueType: string;
     name: string;
     value: string[];
@@ -48,12 +48,14 @@ export interface BindSetting {
     valueType: string;
     name: string;
     value: {
+        printableKeyName: string;
         boundKey: string;
         action: string;
     };
     defaultValue: {
         boundKey: string;
-        action: string;
+        action: "Toggle" | "Hold";
+        printableKeyName: string;
     };
 }
 
@@ -189,12 +191,21 @@ export interface Scoreboard {
     }[];
 }
 
+export interface Vec3 {
+    x: number;
+    y: number;
+    z: number;
+}
+
 export interface PlayerData {
     username: string;
     uuid: string;
     position: Vec3;
     blockPosition: Vec3;
     velocity: Vec3;
+    yaw: number;
+    pitch: number;
+    dimension: string;
     selectedSlot: number;
     gameMode: string;
     health: number,
@@ -204,17 +215,28 @@ export interface PlayerData {
     armor: number;
     food: number;
     air: number;
+    ping: number;
     maxAir: number;
     experienceLevel: number;
     experienceProgress: number;
+    killsCount: number;
+    deathCount: number;
+    playTime: number;
     effects: StatusEffect[];
     mainHandStack: ItemStack;
     offHandStack: ItemStack;
     armorItems: ItemStack[];
     scoreboard: Scoreboard;
+    serverAddress: String,
+    isDead: boolean,
+    isEating: boolean;
+    eatingStartTime: number;
+    eatingMaxDuration: number;
+    winsCount:number;
 }
 
 export interface StatusEffect {
+    id: any;
     effect: string;
     localizedName: string;
     duration: number;
@@ -226,11 +248,6 @@ export interface StatusEffect {
     color: number;
 }
 
-export interface Vec3 {
-    x: number;
-    y: number;
-    z: number;
-}
 
 export interface ItemStack {
     identifier: string;
@@ -238,13 +255,19 @@ export interface ItemStack {
     damage: number;
     maxDamage: number;
     displayName: TextComponent | string;
-    /**
-     * @deprecated use {@link enchantments} instead.
-     */
     hasEnchantment: boolean;
     enchantments?: Record<string, number>;
+    hasDyedColor: boolean;
+    dyedColor?: number;
 }
+export function getEffectiveEnchantmentStatus(item: ItemStack): boolean {
+    const specialEnchantedItems = new Set([
+        "minecraft:enchanted_golden_apple",
+        "minecraft:enchanted_book"
+    ]);
 
+    return item.hasEnchantment || specialEnchantedItems.has(item.identifier);
+}
 export interface PrintableKey {
     translationKey: string;
     localized: string;
@@ -272,6 +295,14 @@ export interface Session {
     avatar: string;
     premium: boolean;
     uuid: string;
+}
+
+export interface Verification {
+    isDev: boolean;
+    isOwner: boolean;
+    hwid: string;
+    developer: string;
+    avatar: string;
 }
 
 export interface Server {
@@ -336,7 +367,6 @@ export interface Proxy {
     id: number;
     host: string;
     port: number;
-    type: 'HTTP' | 'SOCKS5';
     forwardAuthentication: boolean;
     favorite: boolean;
     credentials: {
@@ -366,6 +396,7 @@ export interface GameWindow {
 
 export interface Component {
     name: string;
+    mode: string;
     settings: { [name: string]: any };
 }
 

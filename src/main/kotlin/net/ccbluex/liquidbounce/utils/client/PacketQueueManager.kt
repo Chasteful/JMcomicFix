@@ -23,8 +23,8 @@ import net.ccbluex.liquidbounce.event.EventListener
 import net.ccbluex.liquidbounce.event.EventManager
 import net.ccbluex.liquidbounce.event.events.*
 import net.ccbluex.liquidbounce.event.handler
+import net.ccbluex.jmcomicfix.features.module.modules.render.ModulePacketQueue
 import net.ccbluex.liquidbounce.render.drawLineStrip
-import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.ccbluex.liquidbounce.render.engine.type.Vec3
 import net.ccbluex.liquidbounce.render.renderEnvironmentForWorld
 import net.ccbluex.liquidbounce.render.withColor
@@ -170,10 +170,13 @@ object PacketQueueManager : EventListener {
         val matrixStack = event.matrixStack
 
         // Use LiquidBounce accent color
-        val color = Color4b(0x00, 0x80, 0xFF, 0xFF)
+        val baseColor = ModulePacketQueue.colorMode.activeChoice.getColor(null)
+        val lineColor = baseColor.with(a = ModulePacketQueue.lineAlpha)
+        val modelFill = baseColor.with(a = ModulePacketQueue.modelAlpha / 3)
+        val modelOutline = baseColor.with(a = ModulePacketQueue.modelOutlineAlpha)
 
         renderEnvironmentForWorld(matrixStack) {
-            withColor(color) {
+            withColor(lineColor) {
                 drawLineStrip(positions = positions.mapArray { vec3d -> Vec3(relativeToCamera(vec3d)) })
             }
         }
@@ -184,7 +187,7 @@ object PacketQueueManager : EventListener {
             val rotation = RotationManager.actualServerRotation
 
             val wireframePlayer = WireframePlayer(pos, rotation.yaw, rotation.pitch)
-            wireframePlayer.render(event, Color4b(36, 32, 147, 87), Color4b(36, 32, 147, 255))
+            wireframePlayer.render(event, modelFill, modelOutline)
         }
     }
 

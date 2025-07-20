@@ -19,14 +19,20 @@
 package net.ccbluex.liquidbounce.injection.mixins.minecraft.gui;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import net.ccbluex.liquidbounce.event.EventManager;
+import net.ccbluex.liquidbounce.event.events.OverlayChatEvent;
 import net.ccbluex.liquidbounce.features.module.modules.misc.betterchat.ModuleBetterChat;
+import net.ccbluex.liquidbounce.integration.theme.component.ComponentOverlay;
+import net.ccbluex.liquidbounce.integration.theme.component.FeatureTweak;
 import net.ccbluex.liquidbounce.interfaces.ChatHudAddition;
 import net.ccbluex.liquidbounce.interfaces.ChatMessageAddition;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.ChatHudLine;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.OrderedText;
+import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -49,24 +55,21 @@ public abstract class MixinChatHud implements ChatHudAddition {
     @Shadow
     @Final
     public List<ChatHudLine.Visible> visibleMessages;
+    @Shadow
+    private int scrolledLines;
+    @Shadow
+    private boolean hasUnreadNewMessages;
+    @Unique
+    private int chatY = -1;
 
     @Shadow
     public abstract boolean isChatFocused();
-
-    @Shadow
-    private int scrolledLines;
-
-    @Shadow
-    private boolean hasUnreadNewMessages;
 
     @Shadow
     public abstract void scroll(int scroll);
 
     @Shadow
     public abstract int getWidth();
-
-    @Unique
-    private int chatY = -1;
 
     @Inject(method = "<init>", at = @At(value = "TAIL"))
     public void hookNewArrayList2(MinecraftClient client, CallbackInfo ci) {
@@ -99,18 +102,26 @@ public abstract class MixinChatHud implements ChatHudAddition {
         }
     }
 
+
+    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
+    private void hookRenderChat(DrawContext context, int currentTick, int mouseX, int mouseY, boolean focused, CallbackInfo ci) {
+        if (ComponentOverlay.isTweakEnabled(FeatureTweak.DISABLE_CHAT_HUD)) {
+            ci.cancel();
+        }
+    }
+
     /**
      * Modifies {@link ChatHud#addVisibleMessage(ChatHudLine)} so, that the id is
      * forwarded and if {@link ModuleBetterChat} is enabled, older lines won't be removed.
      */
+
     @Inject(method = "addVisibleMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/ChatHud;isChatFocused()Z", shift = At.Shift.BEFORE), cancellable = true)
     public void hookAddVisibleMessage(ChatHudLine message, CallbackInfo ci, @Local List<OrderedText> list) {
         var focused = isChatFocused();
         var removable = ChatMessageAddition.class.cast(message);
-        //noinspection DataFlowIssue
         var id = removable.liquid_bounce$getId();
 
-        for(int j = 0; j < list.size(); ++j) {
+        for (int j = 0; j < list.size(); ++j) {
             OrderedText orderedText = list.get(j);
             if (focused && scrolledLines > 0) {
                 hasUnreadNewMessages = true;
@@ -118,13 +129,31 @@ public abstract class MixinChatHud implements ChatHudAddition {
             }
 
             boolean last = j == list.size() - 1;
-            //noinspection DataFlowIssue
             ChatHudLine.Visible visible = new ChatHudLine.Visible(message.creationTick(), orderedText, message.indicator(), last);
             ChatMessageAddition.class.cast(visible).liquid_bounce$setId(id);
             visibleMessages.addFirst(visible);
         }
 
         var betterChat = ModuleBetterChat.INSTANCE;
+
+
+        MutableText formattedText = Text.empty();
+        for (OrderedText t : list) {
+            t.accept((index, style, codePoint) -> {
+                formattedText.append(Text.literal(String.valueOf((char) codePoint)).setStyle(style));
+                return true;
+            });
+        }
+
+
+        if (message != null) {
+            EventManager.INSTANCE.callEvent(new OverlayChatEvent(
+                    formattedText,
+                    System.currentTimeMillis(),
+                    message.indicator() != null
+            ));
+        }
+
         if (!betterChat.getRunning() || !betterChat.getInfiniteLength()) {
             if (visibleMessages.size() > 100) {
                 visibleMessages.subList(100, visibleMessages.size()).clear();
@@ -133,6 +162,7 @@ public abstract class MixinChatHud implements ChatHudAddition {
 
         ci.cancel();
     }
+
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/ChatHud;getLineHeight()I", ordinal = 0))
     public void hookStoreChatY(DrawContext context, int currentTick, int mouseX, int mouseY, boolean focused, CallbackInfo ci, @Local(ordinal = 7) int m) {
@@ -145,12 +175,12 @@ public abstract class MixinChatHud implements ChatHudAddition {
             @Local(ordinal = 1, argsOnly = true) int mouseX,
             @Local(ordinal = 2, argsOnly = true) int mouseY
     ) {
-        if(!(ModuleBetterChat.INSTANCE.getRunning() && ModuleBetterChat.Copy.INSTANCE.getRunning() && ModuleBetterChat.Copy.INSTANCE.getHighlight())) {
+        if (!(ModuleBetterChat.INSTANCE.getRunning() && ModuleBetterChat.Copy.INSTANCE.getRunning() && ModuleBetterChat.Copy.INSTANCE.getHighlight())) {
             return;
         }
 
-        var hovering = mouseX >= 0 && mouseX <= ((int) args.get(2)) -4 &&
-                mouseY >= ((int)args.get(1)+1) && mouseY <= ((int)args.get(3));
+        var hovering = mouseX >= 0 && mouseX <= ((int) args.get(2)) - 4 &&
+                mouseY >= ((int) args.get(1) + 1) && mouseY <= ((int) args.get(3));
 
         if (hovering) {
             args.set(4, 140 << 24);

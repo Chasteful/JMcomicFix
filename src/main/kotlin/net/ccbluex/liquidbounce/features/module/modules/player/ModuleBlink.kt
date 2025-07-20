@@ -25,8 +25,7 @@ import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.event.tickHandler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
-import net.ccbluex.liquidbounce.features.module.modules.movement.autododge.ModuleAutoDodge
-import net.ccbluex.liquidbounce.features.module.modules.player.ModuleBlink.dummyPlayer
+import net.ccbluex.liquidbounce.features.module.modules.combat.autododge.ModuleAutoDodge
 import net.ccbluex.liquidbounce.utils.client.PacketQueueManager
 import net.ccbluex.liquidbounce.utils.client.PacketQueueManager.Action
 import net.ccbluex.liquidbounce.utils.client.PacketQueueManager.positions
@@ -48,6 +47,7 @@ object ModuleBlink : ClientModule("Blink", Category.PLAYER) {
     private val dummy by boolean("Dummy", false)
     private val ambush by boolean("Ambush", false)
     private val autoDisable by boolean("AutoDisable", true)
+    private val blinkPackets by boolean("Notification", true)
 
     private object AutoResetOption : ToggleableConfigurable(this, "AutoReset", false) {
         val resetAfter by int("ResetAfter", 100, 1..1000)
@@ -56,6 +56,11 @@ object ModuleBlink : ClientModule("Blink", Category.PLAYER) {
 
     private var dummyPlayer: OtherClientPlayerEntity? = null
 
+
+    private var lastNotifyTime = 0L
+    private var lastNotifyCount = -1
+    private var blinkPacketCount = 0
+
     init {
         tree(AutoResetOption)
     }
@@ -63,24 +68,34 @@ object ModuleBlink : ClientModule("Blink", Category.PLAYER) {
     override fun enable() {
         if (dummy) {
             val clone = OtherClientPlayerEntity(world, player.gameProfile)
-
             clone.headYaw = player.headYaw
             clone.copyPositionAndRotation(player)
-            /**
-             * A different UUID has to be set, to avoid [dummyPlayer] from being invisible to [player]
-             * @see net.minecraft.world.entity.EntityIndex.add
-             */
             clone.uuid = UUID.randomUUID()
             world.addEntity(clone)
-
             dummyPlayer = clone
         }
+
+        notification(
+            "Blink",
+            "Currently storing packets for later send.",
+            NotificationEvent.Severity.BLINK
+        )
     }
 
     override fun disable() {
+        notification(
+            "Blink",
+            "Currently storing packets for later send.",
+            NotificationEvent.Severity.BLINKED
+        )
+
         PacketQueueManager.flush { snapshot -> snapshot.origin == TransferOrigin.OUTGOING }
         removeClone()
+
+        blinkPacketCount = 0
+        lastNotifyCount = -1
     }
+
 
     private fun removeClone() {
         val clone = dummyPlayer ?: return
@@ -99,6 +114,22 @@ object ModuleBlink : ClientModule("Blink", Category.PLAYER) {
         if (ambush && packet is PlayerInteractEntityC2SPacket) {
             enabled = false
             return@handler
+        }
+    }
+
+    @Suppress("unused")
+    private val blinkNotifyHandler = tickHandler {
+        if (!blinkPackets || blinkPacketCount <= 0) return@tickHandler
+
+        val now = System.currentTimeMillis()
+        if (blinkPacketCount != lastNotifyCount || now - lastNotifyTime > 1000L) {
+            lastNotifyTime = now
+            lastNotifyCount = blinkPacketCount
+
+            notification(
+                "Blink", "Currently storing $blinkPacketCount packets.",
+                NotificationEvent.Severity.BLINKING
+            )
         }
     }
 
@@ -141,7 +172,7 @@ object ModuleBlink : ClientModule("Blink", Category.PLAYER) {
                     dummyPlayer?.copyPositionAndRotation(player)
                 }
             }
-
+            blinkPacketCount = 0
             notification("Blink", "Auto reset", NotificationEvent.Severity.INFO)
             if (autoDisable) {
                 enabled = false
@@ -149,10 +180,12 @@ object ModuleBlink : ClientModule("Blink", Category.PLAYER) {
         }
     }
 
+
     @Suppress("unused")
     private val fakeLagHandler = handler<QueuePacketEvent> { event ->
         if (event.origin == TransferOrigin.OUTGOING) {
             event.action = Action.QUEUE
+            blinkPacketCount++
         }
     }
 

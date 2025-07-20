@@ -75,7 +75,7 @@ object PostRotationExecutor : EventListener {
         // but if the priority action is not null, the rotation got most likely set because of it
         val preventedByCurrentRot = RotationManager.currentRotation != null && priorityAction == null
         if (preventedByAction || preventedByCurrentRot) {
-           return@handler
+            return@handler
         }
 
         priorityAction?.let { action ->

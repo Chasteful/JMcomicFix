@@ -16,7 +16,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
 
-object PlayerSimulationCache: EventListener {
+object PlayerSimulationCache : EventListener {
     private val otherPlayerCache = ConcurrentHashMap<PlayerEntity, SimulatedPlayerCache>()
     private var localPlayerCache: SimulatedPlayerCache? = null
 
@@ -168,7 +168,7 @@ data class SimulatedPlayerSnapshot(
     val onGround: Boolean,
     val clipLedged: Boolean
 ) {
-    constructor(s: SimulatedPlayer): this(
+    constructor(s: SimulatedPlayer) : this(
         s.pos,
         s.fallDistance,
         s.velocity,
@@ -180,7 +180,7 @@ data class SimulatedPlayerSnapshot(
 /**
  * Yes, this name sucks as [SimulatedPlayerCache] already exists, but I don't know a better name :/
  */
-class CachedPlayerSimulation(val simulatedPlayer: SimulatedPlayerCache): PlayerSimulation {
+class CachedPlayerSimulation(val simulatedPlayer: SimulatedPlayerCache) : PlayerSimulation {
     override val pos: Vec3d
         get() = this.simulatedPlayer.getSnapshotAt(this.ticks).pos
 

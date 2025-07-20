@@ -52,7 +52,8 @@ object ModuleParticles : ClientModule("Particles", category = Category.RENDER) {
     val rotate by boolean("RandomParticleRotation", true)
     val color by color("Color", Color4b.RED)
 
-    private val particleImages by multiEnumChoice("Particle",
+    private val particleImages by multiEnumChoice(
+        "Particle",
         ParticleImage.STAR,
         canBeNone = false
     )
@@ -125,6 +126,7 @@ private enum class ParticleImage(
      * Modified: @sqlerrorthing
      */
     STAR("Star", "particles/star.png".registerAsDynamicImageFromClientResources()),
+    SNOWFLAKE("Snowflake", "particles/snowflake.png".registerAsDynamicImageFromClientResources()),
 
     /**
      * Original: https://www.svgrepo.com/svg/487288/dollar?edit=true
@@ -214,7 +216,7 @@ private fun WorldRenderEnvironment.render(particle: Particle, partialTicks: Floa
         90f
     }
 
-    with (matrixStack) {
+    with(matrixStack) {
         translate(-size / 2.0, -size / 2.0, 0.0)
         multiply(mc.gameRenderer.camera.rotation)
         scale(-1.0f, 1.0f, -1.0f)
@@ -247,5 +249,6 @@ private fun WorldRenderEnvironment.render(particle: Particle, partialTicks: Floa
     }
 }
 
-inline val Vec3d.isBlockAir: Boolean get() =
-    world.getBlockState(this.toBlockPos()).isAir
+inline val Vec3d.isBlockAir: Boolean
+    get() =
+        world.getBlockState(this.toBlockPos()).isAir

@@ -48,6 +48,7 @@ object SubmoduleCrystalPlacer : ToggleableConfigurable(ModuleCrystalAura, "Place
 
     private val swingMode by enumChoice("Swing", SwingMode.DO_NOT_HIDE)
     private val switchMode by enumChoice("Switch", SwitchMode.SILENT)
+    val placeOnAnyBlock by boolean("PlaceOnAnyBlock", true)
     val oldVersion by boolean("1_12_2", false)
     private val delay by int("Delay", 0, 0..1000, "ms")
     val range by float("Range", 4.5f, 1f..6f).onChanged {

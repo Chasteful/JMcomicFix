@@ -116,7 +116,7 @@ object ItemImageAtlas : EventListener {
 private class ItemFramebufferRenderer(
     val items: Array<Item>,
     val scale: Int,
-): MinecraftShortcuts {
+) : MinecraftShortcuts {
     val itemsPerDimension = ceil(sqrt(items.size.toDouble())).toInt()
 
     val framebuffer: Framebuffer = run {

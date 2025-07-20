@@ -19,7 +19,10 @@
 
 package net.ccbluex.liquidbounce.config.gson.adapter
 
+import com.google.gson.*
 import net.minecraft.item.Item
 import net.minecraft.registry.Registries
+import net.minecraft.util.Identifier
+import java.lang.reflect.Type
 
 object ItemAdapter : IdentifierAsStringAdapter<Item>(Registries.ITEM)

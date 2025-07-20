@@ -2,28 +2,45 @@
 @use "../../../colors.scss" as *;
 
 .noUi-handle {
-    background-color: $accent-color;
-    box-shadow: unset;
-    border: none;
-    border-radius: 50%;
-    height: 12px !important;
-    width: 12px !important;
-    transform: translate(-5px, 1px);
+  width: 12px !important;
+  height: 12px !important;
+  top: 50%;
+  transform: translate(-5px, calc(50% - 1px));
+  background-color: #CCCCCC;
+  border: none;
+  border-radius: 50%;
+  box-shadow: unset;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translate(-5px, calc(50% - 1px)) scale(1.2);
+    box-shadow: 0 0 3px rgba(204, 204, 204, 0.9);
+  }
 }
+
 
 .noUi-handle::after,
 .noUi-handle::before {
-    display: none;
+  display: none;
 }
 
 .noUi-target {
-    margin: 10px 0;
-    height: 2px;
-    border: none;
-    background-color: color.adjust($clickgui-text-color, $lightness: -80%);
-    box-shadow: unset;
+  margin: 10px 0;
+  height: 10px;
+  border: none;
+  background-color: rgba($text, 0.2);
+  box-shadow: unset;
 }
 
+
 .noUi-connect {
-    background-color: $accent-color;
+  border: none;
+  background: linear-gradient(
+                  120deg in oklch,
+                  color-mix(in srgb, var(--primary-color) 50%, transparent) 0%,
+                  color-mix(in srgb, var(--secondary-color) 50%, transparent) 100%,
+  );
 }
+
+
+

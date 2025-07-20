@@ -26,6 +26,7 @@ import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.event.sequenceHandler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
+import net.ccbluex.liquidbounce.features.module.modules.combat.velocity.mode.VelocityHuaYuting
 import net.ccbluex.liquidbounce.features.module.modules.combat.velocity.mode.*
 import net.minecraft.network.listener.ClientPlayPacketListener
 import net.minecraft.network.packet.Packet
@@ -52,18 +53,23 @@ object ModuleVelocity : ClientModule("Velocity", Category.COMBAT, aliases = arra
             VelocityReversal,
             VelocityStrafe,
             VelocityJumpReset,
-
+            VelocityAdvancedJumpReset,
             // Server modes
             VelocityHypixel,
             VelocityDexland,
             VelocityHylex,
             VelocityBlocksMC,
-
+            VelocityHuaYuting,
             // Anti cheat modes
             VelocityAAC442,
+            VelocityKarhu,
             VelocityExemptGrim117,
-            VelocityIntave
-        )
+            VelocityGrimAttacked,
+            VelocityIntave,
+            VelocityHeypixel,
+            VelocityTatako,
+
+            )
     ).apply(::tagBy)
 
     private val delay by intRange("Delay", 0..0, 0..40, "ticks")

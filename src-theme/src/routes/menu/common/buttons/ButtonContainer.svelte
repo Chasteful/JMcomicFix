@@ -1,16 +1,17 @@
 <div class="button-container">
-    <slot />
+    <slot/>
 </div>
 
 <style lang="scss">
-    @use "../../../../colors.scss" as *;
+  @use "../../../../colors.scss" as *;
 
-    .button-container {
-      background-color: rgba($menu-base-color, 0.68);
-      padding: 15px 30px;
-      width: max-content;
-      border-radius: 5px;
-      display: flex;
-      column-gap: 20px;
-    }
+  .button-container {
+    background-color: rgba($base, 0.3);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    padding: 10px 24px;
+    width: max-content;
+    border-radius: 16px;
+    display: flex;
+    column-gap: 20px;
+  }
 </style>

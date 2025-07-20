@@ -63,7 +63,7 @@ class RotationTarget(
     val movementCorrection: MovementCorrection,
     /**
      * What should be done if the target rotation has been reached. Can be `null`.
-      */
+     */
     val whenReached: RestrictedSingleUseAction? = null
 ) {
 

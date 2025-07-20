@@ -57,8 +57,8 @@ abstract class BlockPlacerRotationMode(
  * Normal rotations.
  * Only one placement per tick is possible, possible less because rotating takes some time.
  */
-class NormalRotationMode(configurable: ChoiceConfigurable<BlockPlacerRotationMode>, placer: BlockPlacer)
-    : BlockPlacerRotationMode("Normal", configurable, placer) {
+class NormalRotationMode(configurable: ChoiceConfigurable<BlockPlacerRotationMode>, placer: BlockPlacer) :
+    BlockPlacerRotationMode("Normal", configurable, placer) {
 
     val rotations = tree(RotationsConfigurable(this))
 
@@ -101,8 +101,8 @@ class NormalRotationMode(configurable: ChoiceConfigurable<BlockPlacerRotationMod
 /**
  * No rotations, or just a packet containing the rotation target.
  */
-class NoRotationMode(configurable: ChoiceConfigurable<BlockPlacerRotationMode>, placer: BlockPlacer)
-    : BlockPlacerRotationMode("None", configurable, placer) {
+class NoRotationMode(configurable: ChoiceConfigurable<BlockPlacerRotationMode>, placer: BlockPlacer) :
+    BlockPlacerRotationMode("None", configurable, placer) {
 
     val send by boolean("SendRotationPacket", false)
 
@@ -122,8 +122,10 @@ class NoRotationMode(configurable: ChoiceConfigurable<BlockPlacerRotationMode>, 
             if (send) {
                 val rotation = placementTarget.rotation.normalize()
                 network.sendPacket(
-                    PlayerMoveC2SPacket.LookAndOnGround(rotation.yaw, rotation.pitch, player.isOnGround,
-                        player.horizontalCollision)
+                    PlayerMoveC2SPacket.LookAndOnGround(
+                        rotation.yaw, rotation.pitch, player.isOnGround,
+                        player.horizontalCollision
+                    )
                 )
             }
 

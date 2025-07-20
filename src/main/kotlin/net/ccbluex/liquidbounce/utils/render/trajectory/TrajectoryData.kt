@@ -22,6 +22,7 @@ object TrajectoryData {
 
                 TrajectoryInfo.bowWithUsageDuration(useTime)
             }
+
             is CrossbowItem -> TrajectoryInfo.BOW_FULL_PULL
             is FishingRodItem -> TrajectoryInfo.FISHING_ROD
             is ThrowablePotionItem -> TrajectoryInfo.POTION
@@ -65,6 +66,7 @@ object TrajectoryData {
                     null
                 }
             }
+
             is EnderPearlEntity -> TrajectoryInfo.GENERIC
             is SnowballEntity -> TrajectoryInfo.GENERIC
             is ExperienceBottleEntity -> TrajectoryInfo.EXP_BOTTLE

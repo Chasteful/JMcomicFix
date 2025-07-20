@@ -23,6 +23,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.ccbluex.liquidbounce.event.EventManager;
 import net.ccbluex.liquidbounce.event.events.OverlayMessageEvent;
+import net.ccbluex.liquidbounce.event.events.OverlayTitleEvent;
 import net.ccbluex.liquidbounce.event.events.PerspectiveEvent;
 import net.ccbluex.liquidbounce.features.module.modules.combat.ModuleSwordBlock;
 import net.ccbluex.liquidbounce.features.module.modules.render.DoRender;
@@ -67,15 +68,23 @@ public abstract class MixinInGameHud {
     @Final
     @Shadow
     private static Identifier POWDER_SNOW_OUTLINE;
+    @Shadow
+    @Final
+    private MinecraftClient client;
+    @Shadow
+    @Nullable
+    private Text title;
+    @Shadow
+    @Nullable
+    private Text subtitle;
+    @Unique
+    private Text cachedTitle = null;
+    @Unique
+    private Text cachedSubtitle = null;
 
     @Shadow
     @Nullable
     protected abstract PlayerEntity getCameraPlayer();
-
-
-    @Shadow
-    @Final
-    private MinecraftClient client;
 
     @Shadow
     protected abstract void renderHotbarItem(DrawContext context, int x, int y, RenderTickCounter tickCounter, PlayerEntity player, ItemStack stack, int seed);
@@ -152,7 +161,6 @@ public abstract class MixinInGameHud {
         }
     }
 
-
     @Inject(method = "renderScoreboardSidebar*", at = @At("HEAD"), cancellable = true)
     private void renderScoreboardSidebar(CallbackInfo ci) {
         if (ComponentOverlay.isTweakEnabled(FeatureTweak.DISABLE_SCOREBOARD)) {
@@ -217,6 +225,7 @@ public abstract class MixinInGameHud {
     }
 
     @Unique
+
     private void drawHotbar(DrawContext context, RenderTickCounter tickCounter, IntegratedComponent component) {
         var playerEntity = this.getCameraPlayer();
         if (playerEntity == null) {
@@ -231,14 +240,18 @@ public abstract class MixinInGameHud {
         var y = bounds.getYMin() - 12;
 
         int l = 1;
+        boolean disableItemIcons = ComponentOverlay.isTweakEnabled(FeatureTweak.DISABLE_ITEM_ICONS);
+
         for (int m = 0; m < 9; ++m) {
             var x = center - offset + m * itemWidth;
-            this.renderHotbarItem(context, (int) x, (int) y, tickCounter, playerEntity,
-                    playerEntity.getInventory().main.get(m), l++);
+            if (!disableItemIcons) {
+                this.renderHotbarItem(context, (int) x, (int) y, tickCounter, playerEntity,
+                        playerEntity.getInventory().main.get(m), l++);
+            }
         }
 
         var offHandStack = playerEntity.getOffHandStack();
-        if (!hookOffhandItem(offHandStack.isEmpty())) {
+        if (!disableItemIcons && !hookOffhandItem(offHandStack.isEmpty())) {
             this.renderHotbarItem(context, center - offset - 32, (int) y, tickCounter, playerEntity, offHandStack, l++);
         }
     }
@@ -264,11 +277,41 @@ public abstract class MixinInGameHud {
     }
 
     @Inject(method = "renderTitleAndSubtitle", at = @At("HEAD"), cancellable = true)
+
     private void hookRenderTitleAndSubtitle(CallbackInfo ci) {
-        if (!ModuleAntiBlind.canRender(DoRender.TITLE)) {
+
+        if (!ModuleAntiBlind.canRender(DoRender.TITLE)
+                || ComponentOverlay.isTweakEnabled(FeatureTweak.DISABLE_TITLE)) {
             ci.cancel();
         }
     }
+
+    @Inject(method = "setTitle", at = @At("HEAD"))
+    private void onSetTitle(Text title, CallbackInfo ci) {
+        this.cachedTitle = title;
+        tryEmitOverlay();
+    }
+
+    @Inject(method = "setSubtitle", at = @At("HEAD"))
+    private void onSetSubtitle(Text subtitle, CallbackInfo ci) {
+        this.cachedSubtitle = subtitle;
+        tryEmitOverlay();
+    }
+
+    @Unique
+    private void tryEmitOverlay() {
+        if (cachedTitle != null && cachedSubtitle != null) {
+            OverlayTitleEvent event = new OverlayTitleEvent(cachedTitle, cachedSubtitle);
+
+            EventManager.INSTANCE.callEvent(event);
+
+            if (!event.isCancelled()) {
+                cachedTitle = null;
+                cachedSubtitle = null;
+            }
+        }
+    }
+
 
     @Inject(method = "renderNauseaOverlay", at = @At("HEAD"), cancellable = true)
     private void hookNauseaOverlay(DrawContext context, float distortionStrength, CallbackInfo ci) {
@@ -277,4 +320,10 @@ public abstract class MixinInGameHud {
         }
     }
 
+    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
+    private void hookRender(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+        if (ComponentOverlay.isTweakEnabled(FeatureTweak.DISABLE_ALL_GAME_HUD)) {
+            ci.cancel();
+        }
+    }
 }

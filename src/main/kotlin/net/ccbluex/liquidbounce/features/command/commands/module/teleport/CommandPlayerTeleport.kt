@@ -59,10 +59,10 @@ object CommandPlayerTeleport : CommandFactory, MinecraftShortcuts {
                     ?: throw CommandException(command.result("playerNotFound"))
 
                 val y = if (ModuleTeleport.highTp) {
-                        ModuleTeleport.highTpAmount
-                    } else {
-                        player.y
-                    }
+                    ModuleTeleport.highTpAmount
+                } else {
+                    player.y
+                }
 
                 if (args.size > 1 && args[1] == "copy") {
                     val clipboard = ".teleport ${player.x.toInt()} ${y.toInt()} ${player.z.toInt()}"

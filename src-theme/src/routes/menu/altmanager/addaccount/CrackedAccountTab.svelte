@@ -19,9 +19,9 @@
 </script>
 
 <Tab>
-    <IconTextInput icon="user" title="Username" bind:value={username} maxLength={16}>
-        <IconButton icon="random" title="Random" on:click={generateRandomUsername}/>
+    <IconTextInput bind:value={username} icon="user" maxLength={16} title="Username">
+        <IconButton icon="random" on:click={generateRandomUsername} title="Random"/>
     </IconTextInput>
-    <SwitchSetting title="Use online UUID" bind:value={online}/>
-    <ButtonSetting title="Add Account" on:click={addAccount} listenForEnter={true} inset={true}/>
+    <SwitchSetting bind:value={online} title="Use online UUID"/>
+    <ButtonSetting inset={true} listenForEnter={true} on:click={addAccount} title="Add Account"/>
 </Tab>

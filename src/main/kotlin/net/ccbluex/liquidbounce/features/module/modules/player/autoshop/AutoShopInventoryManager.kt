@@ -51,10 +51,10 @@ class AutoShopInventoryManager : EventListener {
             // collects all kinds of colorful blocks together
             // so that there is no dependency on color
             when {
-                stack.item.isWool() ->          newItems.incrementOrSet(WOOL_ID, stack.count)
-                stack.item.isTerracotta() ->    newItems.incrementOrSet(TERRACOTTA_ID, stack.count)
-                stack.item.isStainedGlass() ->  newItems.incrementOrSet(STAINED_GLASS_ID, stack.count)
-                stack.item.isConcrete() ->      newItems.incrementOrSet(CONCRETE_ID, stack.count)
+                stack.item.isWool() -> newItems.incrementOrSet(WOOL_ID, stack.count)
+                stack.item.isTerracotta() -> newItems.incrementOrSet(TERRACOTTA_ID, stack.count)
+                stack.item.isStainedGlass() -> newItems.incrementOrSet(STAINED_GLASS_ID, stack.count)
+                stack.item.isConcrete() -> newItems.incrementOrSet(CONCRETE_ID, stack.count)
             }
 
             // groups potions by their effects
@@ -129,8 +129,7 @@ class AutoShopInventoryManager : EventListener {
                         newPendingAmount <= 0 -> itemsToRemove.add(item)
                         else -> itemsToUpdate[item] = newPendingAmount
                     }
-                }
-                else if (lostNegativeItems) {
+                } else if (lostNegativeItems) {
                     val newPendingAmount = currentPendingAmount + (prevAmount - newAmount)
                     when {
                         newPendingAmount >= 0 -> itemsToRemove.add(item)
@@ -148,7 +147,7 @@ class AutoShopInventoryManager : EventListener {
         }
     }
 
-    fun getInventoryItems() : Map<String, Int> {
+    fun getInventoryItems(): Map<String, Int> {
         synchronized(currentInventoryItems) {
             synchronized(pendingItems) {
                 return currentInventoryItems.toMutableMap().sumValues(pendingItems)

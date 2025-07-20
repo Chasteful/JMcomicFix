@@ -230,6 +230,7 @@ object CustomAntiBotMode : Choice("Custom"), ModuleAntiBot.IAntiBotMode {
                     EntityAnimationS2CPacket.SWING_MAIN_HAND, EntityAnimationS2CPacket.SWING_OFF_HAND -> {
                         swungSet.add(packet.entityId)
                     }
+
                     EntityAnimationS2CPacket.CRIT, EntityAnimationS2CPacket.ENCHANTED_HIT -> {
                         crittedSet.add(packet.entityId)
                     }

@@ -57,8 +57,10 @@ val ipcConfiguration by AsyncLazy {
     }.getOrNull()
 }
 
-object ModuleRichPresence : ClientModule("RichPresence", Category.CLIENT, state = true, hide = true,
-    aliases = arrayOf("DiscordPresence")) {
+object ModuleRichPresence : ClientModule(
+    "RichPresence", Category.CLIENT, state = true, hide = true,
+    aliases = arrayOf("DiscordPresence")
+) {
 
     private val detailsText by text("Details", "Nextgen v%clientVersion% by %clientAuthor%")
     private val stateText by text("State", "%enabledModules% of %totalModules% modules enabled")
@@ -144,7 +146,6 @@ object ModuleRichPresence : ClientModule("RichPresence", Category.CLIENT, state 
             } else {
                 shutdownIpc()
             }
-
             val ipcClient = ipcClient
             // Check ipc client is connected and send rpc
             if (ipcClient == null || ipcClient.status != PipeStatus.CONNECTED) {
@@ -169,17 +170,19 @@ object ModuleRichPresence : ClientModule("RichPresence", Category.CLIENT, state 
                 setDetails(formatText(detailsText))
                 setState(formatText(stateText))
 
-                setButtons(jsonArrayOf(
-                    json {
-                        "label" to "Download"
-                        "url" to "https://liquidbounce.net/"
-                    },
+                setButtons(
+                    jsonArrayOf(
+                        json {
+                            "label" to "Download"
+                            "url" to "https://liquidbounce.net/"
+                        },
 
-                    json {
-                        "label" to "GitHub"
-                        "url" to "https://github.com/CCBlueX/LiquidBounce"
-                    },
-                ))
+                        json {
+                            "label" to "GitHub"
+                            "url" to "https://github.com/CCBlueX/LiquidBounce"
+                        },
+                    )
+                )
             }
         }
     }

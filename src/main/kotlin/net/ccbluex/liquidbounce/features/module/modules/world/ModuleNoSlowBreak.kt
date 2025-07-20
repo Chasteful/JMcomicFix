@@ -29,7 +29,8 @@ import net.ccbluex.liquidbounce.features.module.ClientModule
  */
 object ModuleNoSlowBreak : ClientModule("NoSlowBreak", Category.WORLD) {
     @Suppress("ObjectPropertyNaming")
-    private val `when` by multiEnumChoice("When",
+    private val `when` by multiEnumChoice(
+        "When",
         When.MINING_FATIGUE,
         When.ON_AIR
     )

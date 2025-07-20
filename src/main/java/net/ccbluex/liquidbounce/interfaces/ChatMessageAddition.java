@@ -25,13 +25,13 @@ package net.ccbluex.liquidbounce.interfaces;
 public interface ChatMessageAddition {
 
     /**
-     * Sets the ID for the chat message.
-     * The ID will be used for removing chat messages.
+     * Sets the ID for the ChatScreen message.
+     * The ID will be used for removing ChatScreen messages.
      */
     void liquid_bounce$setId(String id);
 
     /**
-     * Gets the ID of the chat message.
+     * Gets the ID of the ChatScreen message.
      */
     String liquid_bounce$getId();
 

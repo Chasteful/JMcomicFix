@@ -26,10 +26,8 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.ccbluex.liquidbounce.api.models.cosmetics.CosmeticCategory;
 import net.ccbluex.liquidbounce.features.cosmetic.CosmeticService;
-import net.ccbluex.liquidbounce.features.module.modules.render.ModuleFreeCam;
-import net.ccbluex.liquidbounce.features.module.modules.render.ModuleLogoffSpot;
-import net.ccbluex.liquidbounce.features.module.modules.render.ModuleRotations;
-import net.ccbluex.liquidbounce.features.module.modules.render.ModuleTrueSight;
+import net.ccbluex.liquidbounce.features.module.modules.render.*;
+import net.ccbluex.liquidbounce.interfaces.EntityRenderStateAddition;
 import net.ccbluex.liquidbounce.render.engine.type.Color4b;
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager;
 import net.ccbluex.liquidbounce.utils.aiming.data.Rotation;
@@ -55,6 +53,15 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, S extend
 
     @Unique
     private static final int ESP_TRUE_SIGHT_REQUIREMENT_COLOR = new Color4b(255, 255, 255, 255).alpha(100).toARGB();
+
+    @ModifyReturnValue(method = "shouldFlipUpsideDown", at = @At("RETURN"))
+    private static boolean injectShouldFlipUpsideDown(boolean original, LivingEntity entity) {
+        if (!(entity instanceof AbstractClientPlayerEntity)) {
+            return original;
+        }
+
+        return CosmeticService.INSTANCE.hasCosmetic(entity.getUuid(), CosmeticCategory.DINNERBONE);
+    }
 
     @Shadow
     public abstract Identifier getTexture(S state);
@@ -120,22 +127,40 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, S extend
         return original;
     }
 
-    @WrapOperation(method = "render(Lnet/minecraft/client/render/entity/state/LivingEntityRenderState;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/model/EntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;III)V"))
-    private void injectTrueSight(EntityModel instance, MatrixStack matrixStack, VertexConsumer vertexConsumer, int light, int overlay, int color, Operation<Void> original, @Local(argsOnly = true) S livingEntityRenderState) {
-        if (ModuleLogoffSpot.INSTANCE.isLogoffEntity(livingEntityRenderState)) {
+    @WrapOperation(
+            method = "render(Lnet/minecraft/client/render/entity/state/LivingEntityRenderState;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/render/entity/model/EntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;III)V"
+            )
+    )
+    private void injectTrueSightAndChams(EntityModel instance, MatrixStack matrices, VertexConsumer consumer, int light, int overlay, int color, Operation<Void> original, @Local(argsOnly = true) S state) {
+
+        if (ModuleLogoffSpot.INSTANCE.isLogoffEntity(state)) {
             color = ESP_TRUE_SIGHT_REQUIREMENT_COLOR;
         }
 
-        var trueSightModule = ModuleTrueSight.INSTANCE;
-        var trueSight = trueSightModule.getRunning() && trueSightModule.getEntities();
-        if (ModuleTrueSight.canRenderEntities(livingEntityRenderState)) {
-            color = trueSight ? trueSightModule.getEntityColor().toARGB() : ESP_TRUE_SIGHT_REQUIREMENT_COLOR;
+        var trueSight = ModuleTrueSight.INSTANCE;
+        var chams = ModuleChams.INSTANCE;
+
+
+        if (ModuleTrueSight.canRenderEntities(state)) {
+            color = trueSight.getRunning() && trueSight.getEntities()
+                    ? trueSight.getEntityColor().toARGB()
+                    : ESP_TRUE_SIGHT_REQUIREMENT_COLOR;
+        } else if (chams.getRunning()) {
+
+            var entity = ((EntityRenderStateAddition) state).liquid_bounce$getEntity();
+            if (!entity.isInvisible()) {
+                color = chams.getColor((LivingEntity) entity).toARGB();
+            }
         }
-        original.call(instance, matrixStack, vertexConsumer, light, overlay, color);
+
+        original.call(instance, matrices, consumer, light, overlay, color);
     }
 
     @ModifyReturnValue(method = "getRenderLayer", at = @At("RETURN"))
-    private RenderLayer injectTrueSight(RenderLayer original, S state, boolean showBody, boolean translucent, boolean showOutline) {
+    private RenderLayer injectChamsRenderLayer(RenderLayer original, S state, boolean showBody, boolean translucent, boolean showOutline) {
         if (ModuleLogoffSpot.INSTANCE.isLogoffEntity(state)) {
             return RenderLayer.getItemEntityTranslucentCull(this.getTexture(state));
         }
@@ -144,16 +169,16 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, S extend
             state.invisible = false;
             return RenderLayer.getItemEntityTranslucentCull(this.getTexture(state));
         }
-        return original;
-    }
 
-    @ModifyReturnValue(method = "shouldFlipUpsideDown", at = @At("RETURN"))
-    private static boolean injectShouldFlipUpsideDown(boolean original, LivingEntity entity) {
-        if (!(entity instanceof AbstractClientPlayerEntity)) {
-            return original;
+        var chams = ModuleChams.INSTANCE;
+        if (chams.getRunning()) {
+            var entity = ((EntityRenderStateAddition) state).liquid_bounce$getEntity();
+            if (!entity.isInvisible()) {
+                return RenderLayer.getItemEntityTranslucentCull(this.getTexture(state));
+            }
         }
 
-        return CosmeticService.INSTANCE.hasCosmetic(entity.getUuid(), CosmeticCategory.DINNERBONE);
+        return original;
     }
 
 }

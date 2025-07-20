@@ -15,7 +15,8 @@ internal class NoSlowSneakingAAC5(override val parent: ChoiceConfigurable<*>) : 
     private val networkTickHandler = handler<PlayerNetworkMovementTickEvent> { event ->
         if (timingMode == TimingMode.PRE_POST
             || event.state == EventState.PRE && timingMode == TimingMode.PRE_TICK
-            || event.state == EventState.POST && timingMode == TimingMode.POST_TICK) {
+            || event.state == EventState.POST && timingMode == TimingMode.POST_TICK
+        ) {
             network.sendPacket(ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY))
         }
     }

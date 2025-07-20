@@ -92,7 +92,7 @@ object ScriptRotationUtil {
         RotationManager.setRotationTarget(
             rotation,
             configurable = RotationsConfigurable(
-                object : EventListener { },
+                object : EventListener {},
                 movementCorrection = if (fixVelocity) MovementCorrection.SILENT else MovementCorrection.OFF
             ), priority = Priority.NORMAL, provider = ClientModule("ScriptAPI", Category.MISC)
         )

@@ -41,18 +41,26 @@ import net.ccbluex.liquidbounce.utils.kotlin.Priority
 import net.minecraft.client.network.ServerInfo
 import net.minecraft.world.GameMode
 
-@Deprecated(
-    "The `clickGuiScaleChange` event has been deprecated.",
-    ReplaceWith("ClickGuiScaleChangeEvent"),
-    DeprecationLevel.WARNING
-)
-@Nameable("clickGuiScaleChange")
-@WebSocketEvent
-class ClickGuiScaleChangeEvent(val value: Float) : Event()
+
 
 @Nameable("clickGuiValueChange")
 @WebSocketEvent
 class ClickGuiValueChangeEvent(val configurable: Configurable) : Event()
+
+@Nameable("hudValueChange")
+@WebSocketEvent
+class HudValueChangeEvent(val configurable: Configurable) : Event()
+@Nameable("hudLayoutEditorValueChange")
+@WebSocketEvent
+class HudLayoutEditorValueChangeEvent(val configurable: Configurable) : Event()
+
+@Nameable("titleControlValueChange")
+@WebSocketEvent
+class TitleControlChangeEvent(val configurable: Configurable) : Event()
+
+@Nameable("betterTabValueChange")
+@WebSocketEvent
+class BetterTabChangeEvent(val configurable: Configurable) : Event()
 
 @Nameable("spaceSeperatedNamesChange")
 @WebSocketEvent
@@ -88,7 +96,7 @@ object RefreshArrayListEvent : Event()
 @WebSocketEvent
 class NotificationEvent(val title: String, val message: String, val severity: Severity) : Event() {
     enum class Severity {
-        INFO, SUCCESS, ERROR, ENABLED, DISABLED
+        INFO, SUCCESS, ERROR, ENABLED, DISABLED, BLINK, BLINKED, BLINKING
     }
 }
 
@@ -240,7 +248,7 @@ class ScheduleInventoryActionEvent(val schedule: MutableList<InventoryActionChai
 }
 
 @Nameable("selectHotbarSlotSilently")
-class SelectHotbarSlotSilentlyEvent(val requester: Any?, val slot: Int): CancellableEvent()
+class SelectHotbarSlotSilentlyEvent(val requester: Any?, val slot: Int) : CancellableEvent()
 
 @Nameable("browserUrlChange")
 @WebSocketEvent

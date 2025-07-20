@@ -23,6 +23,8 @@ package net.ccbluex.liquidbounce.config.gson
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import net.ccbluex.jmcomicfix.config.gson.serializer.VerificationSerializer
+import net.ccbluex.jmcomicfix.utils.client.verificationUtils.Verifications
 import net.ccbluex.liquidbounce.authlib.account.MinecraftAccount
 import net.ccbluex.liquidbounce.config.gson.adapter.*
 import net.ccbluex.liquidbounce.config.gson.serializer.*
@@ -49,10 +51,10 @@ import net.minecraft.util.math.Vec2f
 import net.minecraft.util.math.Vec3d
 import net.minecraft.util.math.Vec3i
 import net.minecraft.world.GameMode
+import java.util.function.Supplier
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
-import java.util.function.Supplier
 
 /**
  * An enumeration of all GSON instances used in LiquidBounce. Each instance has its own configuration,
@@ -102,12 +104,15 @@ val fileGson: Gson = GsonBuilder()
 /**
  * A GSON instance which is used for JSON that is distributed to other players.
  */
+
+
 val publicGson: Gson = GsonBuilder()
     .setPrettyPrinting()
     .addSerializationExclusionStrategy(ExcludeStrategy)
     .registerCommonTypeAdapters()
     .registerTypeHierarchyAdapter(Configurable::class.javaObjectType, ConfigurableSerializer.PUBLIC_SERIALIZER)
     .create()
+
 
 /**
  * This GSON instance is used for interop communication.
@@ -164,3 +169,4 @@ internal fun GsonBuilder.registerCommonTypeAdapters() =
         .registerTypeAdapter(Identifier::class.javaObjectType, IdentifierSerializer)
         .registerTypeAdapter(StatusEffectInstance::class.javaObjectType, StatusEffectInstanceSerializer)
         .registerTypeHierarchyAdapter(Supplier::class.javaObjectType, SupplierSerializer)
+        .registerTypeAdapter(Verifications::class.java, VerificationSerializer)

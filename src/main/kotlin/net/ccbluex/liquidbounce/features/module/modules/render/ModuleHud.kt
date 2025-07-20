@@ -19,12 +19,10 @@
 package net.ccbluex.liquidbounce.features.module.modules.render
 
 import net.ccbluex.liquidbounce.config.types.Configurable
+import net.ccbluex.liquidbounce.config.types.NamedChoice
 import net.ccbluex.liquidbounce.config.types.Value
 import net.ccbluex.liquidbounce.event.EventManager
-import net.ccbluex.liquidbounce.event.events.BrowserReadyEvent
-import net.ccbluex.liquidbounce.event.events.DisconnectEvent
-import net.ccbluex.liquidbounce.event.events.ScreenEvent
-import net.ccbluex.liquidbounce.event.events.SpaceSeperatedNamesChangeEvent
+import net.ccbluex.liquidbounce.event.events.*
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.misc.HideAppearance.isDestructed
 import net.ccbluex.liquidbounce.features.misc.HideAppearance.isHidingNow
@@ -38,20 +36,20 @@ import net.ccbluex.liquidbounce.integration.theme.ThemeManager
 import net.ccbluex.liquidbounce.integration.theme.component.components
 import net.ccbluex.liquidbounce.integration.theme.component.customComponents
 import net.ccbluex.liquidbounce.integration.theme.component.types.minimap.ChunkRenderer
+import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.ccbluex.liquidbounce.utils.block.ChunkScanner
 import net.ccbluex.liquidbounce.utils.client.chat
 import net.ccbluex.liquidbounce.utils.client.inGame
 import net.ccbluex.liquidbounce.utils.client.markAsError
 import net.ccbluex.liquidbounce.utils.entity.RenderedEntities
 import net.minecraft.client.gui.screen.DisconnectedScreen
-import net.minecraft.client.gui.screen.DownloadingTerrainScreen
+import net.minecraft.client.gui.screen.multiplayer.ConnectScreen
 
 /**
  * Module HUD
  *
  * The client in-game dashboard.
  */
-
 object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = true) {
 
     override val running
@@ -62,9 +60,20 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
 
     override val baseKey: String
         get() = "liquidbounce.module.hud"
+
     private var browserBrowser: Browser? = null
 
     private val blur by boolean("Blur", true)
+
+    @Suppress("unused")
+    private val vignette by boolean("Vignette", false).onChanged {
+        EventManager.callEvent(HudValueChangeEvent(this))
+    }
+    @Suppress("unused")
+    private val refresh by boolean("Refresh", true).onChanged {
+        EventManager.callEvent(HudValueChangeEvent(this))
+    }
+    val centeredCrosshair by boolean("CenteredCrosshair", false)
 
     @Suppress("unused")
     private val spaceSeperatedNames by boolean("SpaceSeperatedNames", true).onChange { state ->
@@ -72,12 +81,53 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
         state
     }
 
-    val centeredCrosshair by boolean("CenteredCrosshair", false)
+    val PrimaryColor by color("Primary", Color4b(40,100,180, 255))
+        .onChanged {
+            EventManager.callEvent(HudValueChangeEvent(this))
+        }
 
+    val SecondaryColor by color("Secondary", Color4b(200,140,255, 255))
+        .onChanged {
+            EventManager.callEvent(HudValueChangeEvent(this))
+        }
+    @Suppress("unused")
+    private val hudZoom by float("ScaleFactor", 1f, 0.5f..2f).onChanged {
+        EventManager.callEvent(HudValueChangeEvent(this))
+    }
+    val clientName by text("ClientName", "")
+        .apply(::tagBy)
+        .onChanged {
+            EventManager.callEvent(HudValueChangeEvent(this))
+        }
+    @Suppress("unused")
+    private val IP by text("ScoreboardIP","")   .onChanged {
+        EventManager.callEvent(HudValueChangeEvent(this))
+    }
     val isBlurEffectActive
         get() = blur && !(mc.options.hudHidden && mc.currentScreen == null)
-
     var browserSettings: BrowserSettings? = null
+
+
+    @Suppress("unused")
+    private val render = multiEnumChoice(
+        "ArraylistPrefixRender",
+        DoPrefix.CHOICE,
+        DoPrefix.CHOOSE,
+    ).onChanged {
+        EventManager.callEvent(HudValueChangeEvent(this))
+    }
+
+    @Suppress("Unused")
+    enum class DoPrefix(override val choiceName: String) : NamedChoice {
+        CHOICE("CHOICE"),
+        CHOOSE("CHOOSE"),
+        MULTI_CHOOSE("MULTI_CHOOSE"),
+        INT_RANGE("INT_RANGE"),
+        FLOAT_RANGE("FLOAT_RANGE"),
+        INT("INT"),
+        FLOAT("FLOAT"),
+        TEXT("TEXT"),
+    }
 
     init {
         tree(Configurable("In-built", value = components as MutableList<Value<*>>))
@@ -85,14 +135,15 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
     }
 
     override fun enable() {
+
+
         if (isHidingNow) {
             chat(markAsError(message("hidingAppearance")))
         }
 
-        // Minimap
+
         RenderedEntities.subscribe(this)
         ChunkScanner.subscribe(ChunkRenderer.MinimapChunkUpdateSubscriber)
-
         if (visible) {
             open()
         }
@@ -102,7 +153,6 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
         // Closes tab entirely
         browserBrowser?.close()
         browserBrowser = null
-
         // Minimap
         RenderedEntities.unsubscribe(this)
         ChunkScanner.unsubscribe(ChunkRenderer.MinimapChunkUpdateSubscriber)
@@ -114,7 +164,6 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
         tree(GlobalBrowserSettings)
         browserSettings = tree(BrowserSettings(60, ::reopen))
     }
-
     @Suppress("unused")
     private val screenHandler = handler<ScreenEvent> { event ->
         // Close the tab when the HUD is not running, is hiding now, or the player is not in-game
@@ -122,16 +171,18 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
             close()
             return@handler
         }
-
         // Otherwise, open the tab and set its visibility
         val browserTab = open()
-        browserTab.visible = event.screen !is DisconnectedScreen && event.screen !is DownloadingTerrainScreen
+        browserTab.visible = event.screen !is DisconnectedScreen && event.screen !is ConnectScreen
     }
 
     @Suppress("unused")
-    private val disconnectHandler = handler<DisconnectEvent> {
-        close()
+    private val virtualScreenHandler = handler<VirtualTypeEvent> { event ->
+        if (event.virtualScreenType == VirtualScreenType.LAYOUT_EDITOR) {
+            close()
+        }
     }
+
 
     private fun open(): Browser {
         if (browserBrowser != null) {
@@ -147,7 +198,9 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
         }
     }
 
+
     private fun close() {
+
         browserBrowser?.close()
         browserBrowser = null
     }

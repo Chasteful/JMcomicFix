@@ -18,6 +18,7 @@
  */
 package net.ccbluex.liquidbounce.config
 
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import net.ccbluex.liquidbounce.LiquidBounce
@@ -46,7 +47,7 @@ import java.util.*
 data class IncludeConfiguration(
     val includeBinds: Boolean = false,
     val includeAction: Boolean = false,
-    val includeHidden: Boolean = false
+    val includeHidden: Boolean = false,
 ) {
     companion object {
         val DEFAULT = IncludeConfiguration()
@@ -67,7 +68,6 @@ object AutoConfig {
         }
 
     var includeConfiguration = IncludeConfiguration.DEFAULT
-
     @Volatile
     var configs: Array<AutoSettings>? = null
         private set
@@ -101,13 +101,17 @@ object AutoConfig {
     /**
      * Deserialize module configurable from a reader
      */
+    var silentMode: Boolean = false
     fun loadAutoConfig(
         reader: Reader,
-        modules: Collection<Configurable> = emptyList()
+        modules: Collection<Configurable> = emptyList(),
+        silent: Boolean = false
     ) {
+        this.silentMode = silent
         JsonParser.parseReader(publicGson.newJsonReader(reader))?.let { jsonElement ->
             loadAutoConfig(jsonElement.asJsonObject, modules)
         }
+        this.silentMode = false
     }
 
     /**
@@ -117,22 +121,21 @@ object AutoConfig {
      * @param jsonObject The JSON object of the configurable
      * @see ConfigSystem.deserializeConfigurable
      */
-    fun loadAutoConfig(
+    private fun loadAutoConfig(
         jsonObject: JsonObject,
         modules: Collection<Configurable> = emptyList()
     ) {
-        chat(metadata = MessageMetadata(prefix = false))
-        chat(regular("Auto Config").formatted(Formatting.LIGHT_PURPLE).bold(true))
+        if (!silentMode) {
+            chat(metadata = MessageMetadata(prefix = false))
+            chat(regular("Config").formatted(Formatting.LIGHT_PURPLE).bold(true))
+        }
 
         val name = jsonObject.string("name") ?: throw IllegalArgumentException("Auto Config has no name")
         when (name) {
             "autoconfig" -> {
-                // Deserialize Module Configurable
                 jsonObject.obj("modules")?.let { moduleObject ->
                     deserializeModuleConfigurable(moduleObject, modules)
                 }
-
-                // Deserialize Spoofer Configurable
                 jsonObject.obj("spoofers")?.let { spooferObject ->
                     deserializeConfigurable(SpooferManager, spooferObject)
                 }
@@ -141,8 +144,9 @@ object AutoConfig {
             else -> error("Unknown auto config type: $name")
         }
 
-        // Auto Config
-        printOutInformation(jsonObject)
+        if (!silentMode) {
+            printOutInformation(jsonObject)
+        }
     }
 
     /**
@@ -167,8 +171,7 @@ object AutoConfig {
         val date = jsonObject.string("date")
         val time = jsonObject.string("time")
         val author = jsonObject.string("author")
-        val lbVersion = jsonObject.string("clientVersion")
-        val lbCommit = jsonObject.string("clientCommit")
+
 
         if (date != null || time != null) {
             chat(
@@ -185,16 +188,8 @@ object AutoConfig {
             )
         }
 
-        if (lbVersion != null) {
-            chat(
-                regular("with LiquidBounce "),
-                variable(lbVersion),
-                regular(" "),
-                variable(lbCommit ?: "")
-            )
-        }
 
-        jsonObject.array("chat")?.let { chatMessages ->
+        jsonObject.array("ChatScreen")?.let { chatMessages ->
             for (messages in chatMessages) {
                 chat(messages.asString)
             }
@@ -251,12 +246,26 @@ object AutoConfig {
         writer: Writer,
         includeConfiguration: IncludeConfiguration = IncludeConfiguration.DEFAULT,
         autoSettingsType: AutoSettingsType = AutoSettingsType.RAGE,
-        statusType: AutoSettingsStatusType = AutoSettingsStatusType.BYPASSING
+        statusType: AutoSettingsStatusType = AutoSettingsStatusType.BYPASSING,
+        modulesToInclude: List<Configurable> = emptyList()
     ) {
         this.includeConfiguration = includeConfiguration
 
-        // Store the config
-        val moduleTree = ConfigSystem.serializeConfigurable(ModuleManager.modulesConfigurable, publicGson)
+        val moduleTree = if (modulesToInclude.isEmpty()) {
+
+            ConfigSystem.serializeConfigurable(ModuleManager.modulesConfigurable, publicGson)
+        } else {
+
+            JsonObject().apply {
+                addProperty("name", "modules")
+                add("value", JsonArray().apply {
+                    modulesToInclude.forEach { module ->
+                        add(ConfigSystem.serializeConfigurable(module, publicGson))
+                    }
+                })
+            }
+        }
+
         val spooferTree = ConfigSystem.serializeConfigurable(SpooferManager, publicGson)
 
         if (!moduleTree.isJsonObject || !spooferTree.isJsonObject) {
@@ -271,11 +280,10 @@ object AutoConfig {
 
         val author = mc.session.username
 
-        val now = Date()
         val dateFormatter = SimpleDateFormat("dd/MM/yyyy")
         val timeFormatter = SimpleDateFormat("HH:mm:ss")
-        val date = dateFormatter.format(now)
-        val time = timeFormatter.format(now)
+        val date = dateFormatter.format(Date())
+        val time = timeFormatter.format(Date())
 
         val (protocolName, protocolVersion) = protocolVersion
 
@@ -283,7 +291,6 @@ object AutoConfig {
         jsonObject.addProperty("date", date)
         jsonObject.addProperty("time", time)
         jsonObject.addProperty("clientVersion", LiquidBounce.clientVersion)
-        jsonObject.addProperty("clientCommit", LiquidBounce.clientCommit)
         mc.currentServerEntry?.let {
             jsonObject.addProperty("serverAddress", it.address.dropPort().rootDomain())
         }

@@ -35,22 +35,23 @@
   @use "../../../../../colors.scss" as *;
 
   .title {
-    font-weight: 600;
+    font-weight: 900;
   }
 
   .option {
     font-weight: 500;
-    color: $menu-text-dimmed-color;
+    color: rgba($text, 0.5);
     font-size: 20px;
     padding: 15px 20px;
     transition: ease color .2s;
 
     &:hover {
-      color: $menu-text-color;
+      color: $text;
     }
 
     &.active {
-      color: $accent-color;
+      color: rgba($text, 0.7);
+      text-shadow: 0 0 4px rgba($text, 0.7);
     }
   }
 </style>

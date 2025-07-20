@@ -27,8 +27,11 @@ import net.ccbluex.liquidbounce.features.module.modules.combat.criticals.ModuleC
 import net.ccbluex.liquidbounce.features.module.modules.combat.criticals.ModuleCriticals.VisualsConfigurable.showCriticals
 import net.ccbluex.liquidbounce.features.module.modules.combat.criticals.ModuleCriticals.canDoCriticalHit
 import net.ccbluex.liquidbounce.features.module.modules.combat.criticals.ModuleCriticals.modes
+import net.ccbluex.liquidbounce.features.module.modules.combat.killaura.ModuleKillAura
+import net.ccbluex.liquidbounce.features.module.modules.movement.step.ModuleStep
 import net.ccbluex.liquidbounce.utils.client.MovePacketType
 import net.minecraft.entity.LivingEntity
+import java.util.concurrent.ThreadLocalRandom
 
 /**
  * Packet criticals mode
@@ -37,7 +40,7 @@ object CriticalsPacket : Choice("Packet") {
 
     private val mode by enumChoice("Mode", Mode.NO_CHEAT_PLUS)
     private val packetType by enumChoice("PacketType", MovePacketType.FULL)
-
+    private val bloxdMode by enumChoice("Bloxd Mode", BloxdMode.LOW_HOP)
     override val parent: ChoiceConfigurable<Choice>
         get() = modes
 
@@ -87,13 +90,7 @@ object CriticalsPacket : Choice("Packet") {
 
             Mode.GRIM -> {
                 if (!player.isOnGround) {
-                    // If player is in air, go down a little bit.
-                    // Vanilla still crits and movement is too small
-                    // for simulation checks.
-
-                    // Requires packet type to be .FULL
                     p(-0.000001)
-
                     showCriticals(event.entity)
                 }
             }
@@ -103,6 +100,38 @@ object CriticalsPacket : Choice("Packet") {
                     p(0.0011, true)
                     p(0.0)
                     showCriticals(event.entity)
+                }
+            }
+
+            Mode.VERUS -> {
+                if (player.isOnGround) {
+                    when (event.entity.hurtTime) {
+                        17, 19 -> {
+                            p(ThreadLocalRandom.current().nextDouble(0.001, 0.0011), onGround = false)
+                        }
+
+                        18, 20 -> {
+                            p(0.03 + ThreadLocalRandom.current().nextDouble(0.001, 0.0011), onGround = false)
+                        }
+                    }
+                    showCriticals(event.entity)
+                }
+            }
+
+            Mode.BLOXD -> {
+                if (player.isOnGround && ModuleKillAura.targetTracker.target != null) {
+                    when (bloxdMode) {
+                        BloxdMode.LOW_HOP -> {
+
+                            p(0.000005)
+                            showCriticals(event.entity)
+                        }
+
+                        BloxdMode.PACKET -> {
+                            p(0.000005, onGround = false)
+                            showCriticals(event.entity)
+                        }
+                    }
                 }
             }
         }
@@ -123,5 +152,12 @@ object CriticalsPacket : Choice("Packet") {
         DOWN("Down"),
         GRIM("Grim"),
         BLOCKSMC("BlocksMC"),
+        VERUS("Verus"),
+        BLOXD("Bloxd")
+    }
+
+    enum class BloxdMode(override val choiceName: String) : NamedChoice {
+        LOW_HOP("LowHop"),
+        PACKET("Packet")
     }
 }

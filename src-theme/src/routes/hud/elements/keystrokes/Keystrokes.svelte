@@ -4,6 +4,8 @@
     import {getMinecraftKeybinds} from "../../../../integration/rest";
     import type {MinecraftKeybind} from "../../../../integration/types";
     import {listen} from "../../../../integration/ws";
+    import {expoInOut} from "svelte/easing";
+    import {fly} from "svelte/transition";
 
     let keyForward: MinecraftKeybind | undefined;
     let keyBack: MinecraftKeybind | undefined;
@@ -26,22 +28,22 @@
     listen("keybindChange", updateKeybinds)
 </script>
 
-<div class="keystrokes">
-    <Key key={keyForward} gridArea="a" />
-    <Key key={keyLeft} gridArea="b" />
-    <Key key={keyBack} gridArea="c" />
-    <Key key={keyRight} gridArea="d" />
-    <Key key={keyJump} gridArea="e" />
+<div class="keystrokes" transition:fly|global={{duration: 500, x: -50, easing: expoInOut}}>
+    <Key gridArea="a" key={keyForward}/>
+    <Key gridArea="b" key={keyLeft}/>
+    <Key gridArea="c" key={keyBack}/>
+    <Key gridArea="d" key={keyRight}/>
+    <Key asBar={true} gridArea="e" key={keyJump}/>
 </div>
 
 <style lang="scss">
-    .keystrokes {
-      display: grid;
-      grid-template-areas:
+  .keystrokes {
+    display: grid;
+    grid-template-areas:
         ". a ."
         "b c d"
         "e e e";
-      grid-template-columns: repeat(3, 50px);
-      gap: 5px;
-    }
+    grid-template-columns: repeat(3, 50px);
+    gap: 5px;
+  }
 </style>

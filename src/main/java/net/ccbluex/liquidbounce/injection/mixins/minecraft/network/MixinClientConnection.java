@@ -44,23 +44,6 @@ public abstract class MixinClientConnection {
     }
 
     /**
-     * Handle sending packets
-     *
-     * @param packet       packet to send
-     * @param callbackInfo callback
-     */
-    @Inject(method = "send(Lnet/minecraft/network/packet/Packet;)V", at = @At("HEAD"), cancellable = true)
-    private void hookSendingPacket(Packet<?> packet, final CallbackInfo callbackInfo) {
-        final PacketEvent event = new PacketEvent(TransferOrigin.OUTGOING, packet, true);
-
-        EventManager.INSTANCE.callEvent(event);
-
-        if (event.isCancelled()) {
-            callbackInfo.cancel();
-        }
-    }
-
-    /**
      * Handle receiving packets
      */
     @Inject(method = "handlePacket", at = @At("HEAD"), cancellable = true, require = 1)
@@ -98,6 +81,23 @@ public abstract class MixinClientConnection {
         if (side == NetworkSide.CLIENTBOUND) {
             final PipelineEvent event = new PipelineEvent(pipeline, local);
             EventManager.INSTANCE.callEvent(event);
+        }
+    }
+
+    /**
+     * Handle sending packets
+     *
+     * @param packet       packet to send
+     * @param callbackInfo callback
+     */
+    @Inject(method = "send(Lnet/minecraft/network/packet/Packet;)V", at = @At("HEAD"), cancellable = true)
+    private void hookSendingPacket(Packet<?> packet, final CallbackInfo callbackInfo) {
+        final PacketEvent event = new PacketEvent(TransferOrigin.OUTGOING, packet, true);
+
+        EventManager.INSTANCE.callEvent(event);
+
+        if (event.isCancelled()) {
+            callbackInfo.cancel();
         }
     }
 

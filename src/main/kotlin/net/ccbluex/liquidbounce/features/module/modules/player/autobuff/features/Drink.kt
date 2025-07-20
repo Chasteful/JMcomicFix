@@ -99,6 +99,7 @@ object Drink : Buff("Drink") {
             StatusEffects.INSTANT_HEALTH -> HealthPotion.enabled && health <= HealthPotion.health
             StatusEffects.REGENERATION -> RegenPotion.enabled && health <= RegenPotion.health
                 && !player.hasStatusEffect(StatusEffects.REGENERATION)
+
             StatusEffects.STRENGTH -> strengthPotion && !player.hasStatusEffect(StatusEffects.STRENGTH)
             StatusEffects.SPEED -> speedPotion && !player.hasStatusEffect(StatusEffects.SPEED)
             else -> false

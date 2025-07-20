@@ -2,15 +2,14 @@ package net.ccbluex.liquidbounce.features.module.modules.combat.velocity.mode
 
 import net.ccbluex.liquidbounce.config.types.Choice
 import net.ccbluex.liquidbounce.config.types.ChoiceConfigurable
-import net.ccbluex.liquidbounce.features.module.modules.combat.velocity.ModuleVelocity.modes
-import net.ccbluex.liquidbounce.features.module.modules.combat.velocity.ModuleVelocity.pause
+import net.ccbluex.liquidbounce.features.module.modules.combat.velocity.ModuleVelocity
 
 abstract class VelocityMode(name: String) : Choice(name) {
 
     override val parent: ChoiceConfigurable<VelocityMode>
-        get() = modes
+        get() = ModuleVelocity.modes
 
     override val running: Boolean
-        get() = super.running && pause == 0
+        get() = super.running && ModuleVelocity.pause == 0
 
 }

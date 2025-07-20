@@ -17,16 +17,6 @@
     let apiSlider: API;
 
     onMount(() => {
-        let step = 0.01;
-
-        if (cSetting.range.to > 100) {
-            step = 0.1;
-        } else if (cSetting.range.to <= 0.1) {
-            step = 0.0001;
-        } else if (cSetting.range.to <= 1.0) {
-            step = 0.001;
-        }
-
         apiSlider = noUiSlider.create(slider, {
             start: cSetting.value,
             connect: "lower",
@@ -34,18 +24,14 @@
                 min: cSetting.range.from,
                 max: cSetting.range.to,
             },
-            step: step,
-            format: {
-                to: (value) => parseFloat(value.toFixed(4)), // Display up to 4 decimal places
-                from: (value) => parseFloat(value), // Convert back to float
-            }
+            step: 0.01,
         });
 
         apiSlider.on("update", (values) => {
             const newValue = parseFloat(values[0].toString());
 
             cSetting.value = newValue;
-            setting = { ...cSetting };
+            setting = {...cSetting};
         });
 
         apiSlider.on("set", () => {
@@ -57,8 +43,8 @@
 <div class="setting" class:has-suffix={cSetting.suffix !== ""}>
     <div class="name">{$spaceSeperatedNames ? convertToSpacedString(cSetting.name) : cSetting.name}</div>
     <div class="value">
-        <ValueInput valueType="float" value={cSetting.value}
-                    on:change={(e) => apiSlider.set(e.detail.value)}/>
+        <ValueInput on:change={(e) => apiSlider.set(e.detail.value)} value={cSetting.value}
+                    valueType="float"/>
     </div>
     {#if cSetting.suffix !== ""}
         <div class="suffix">{cSetting.suffix}</div>
@@ -67,50 +53,50 @@
 </div>
 
 <style lang="scss">
-    @use "../../../colors.scss" as *;
+  @use "../../../colors.scss" as *;
 
-    .setting {
-        padding: 7px 0 2px 0;
-        display: grid;
-        grid-template-areas:
+  .setting {
+    padding: 7px 0 2px 0;
+    display: grid;
+    grid-template-areas:
             "a b"
             "d d";
-        grid-template-columns: 1fr max-content;
-        column-gap: 5px;
+    grid-template-columns: 1fr max-content;
+    column-gap: 5px;
 
-        /* animation fix */
-        min-height: 46px;
-    }
 
-    .setting.has-suffix {
-        grid-template-areas:
+    min-height: 46px;
+  }
+
+  .setting.has-suffix {
+    grid-template-areas:
             "a b c"
             "d d d";
-        grid-template-columns: 1fr max-content max-content;
-    }
+    grid-template-columns: 1fr max-content max-content;
+  }
 
-    .suffix,
-    .setting {
-        color: $clickgui-text-color;
-        font-weight: 500;
-        font-size: 12px;
-    }
+  .suffix,
+  .setting {
+    color: $text;
+    font-weight: 500;
+    font-size: var(--font-size);
+  }
 
-    .name {
-        grid-area: a;
-        font-weight: 500;
-    }
+  .name {
+    grid-area: a;
+    font-weight: 500;
+  }
 
-    .value {
-        grid-area: b;
-    }
+  .value {
+    grid-area: b;
+  }
 
-    .suffix {
-        grid-area: c;
-    }
+  .suffix {
+    grid-area: c;
+  }
 
-    .slider {
-        grid-area: d;
-        padding-right: 10px;
-    }
+  .slider {
+    grid-area: d;
+    padding-right: 10px;
+  }
 </style>

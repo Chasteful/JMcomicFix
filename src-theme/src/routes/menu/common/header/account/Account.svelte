@@ -4,9 +4,10 @@
         getAccounts,
         getSession,
         openScreen,
-        loginToAccount,
         directLoginToCrackedAccount,
-        randomUsername
+        randomUsername,
+        loginToAccount as loginToAccountRest
+
     } from "../../../../../integration/rest";
     import {onMount} from "svelte";
     import {listen} from "../../../../../integration/ws";
@@ -16,18 +17,36 @@
     import type {Account} from "../../../../../integration/types";
     import Avatar from "./Avatar.svelte";
     import {notification} from "../notification_store";
+    import AddAccountModal from "../../../altmanager/addaccount/AddAccountModal.svelte";
+    import type {
+        AccountManagerAdditionEvent,
+        AccountManagerLoginEvent,
+        AccountManagerMessageEvent
+    } from "../../../../../integration/events";
+    import DirectLoginModal from "../../../altmanager/directLogin/DirectLoginModal.svelte";
 
     let username = "";
-    let avatar = "";
-    let premium = true;
-
     let expanded = false;
     let accountElement: HTMLElement;
     let headerElement: HTMLElement;
-
     let searchQuery = "";
     let accounts: Account[] = [];
+    const userData = JSON.parse(
+        localStorage.getItem('userSettings') ||
+        JSON.stringify({
+            username: 'Customer',
+            uid: '0000',
+            isDev: false,
+            isOwner: false,
+            hwid: '',
+            developer: 'Customer',
+            avatar: ''
+        })
+    );
 
+
+    let addAccountModalVisible = false;
+    let directLoginModalVisible = false;
     $: renderedAccounts = accounts.filter(a => a.username.toLowerCase().includes(searchQuery.toLowerCase()) || searchQuery === "");
 
     const inAccountManager = $location === "/altmanager";
@@ -35,18 +54,12 @@
     async function refreshSession() {
         const session = await getSession();
         username = session.username;
-        avatar = session.avatar;
-        premium = session.premium;
     }
 
     async function refreshAccounts() {
         accounts = await getAccounts();
     }
 
-    onMount(async () => {
-        await refreshSession();
-        await refreshAccounts();
-    });
 
     listen("session", async () => {
         await refreshSession();
@@ -59,6 +72,49 @@
     listen("accountManagerAddition", async () => {
         await refreshAccounts();
     });
+    listen("accountManagerAddition", (e: AccountManagerAdditionEvent) => {
+        addAccountModalVisible = false;
+        refreshAccounts();
+        notification.set(null);
+        if (!e.error) {
+            notification.set({
+                title: "AltManager",
+                message: `Successfully added account ${e.username}`,
+                error: false
+            });
+        } else {
+            notification.set({
+                title: "AltManager",
+                message: e.error,
+                error: true
+            });
+        }
+    });
+
+    listen("accountManagerMessage", (e: AccountManagerMessageEvent) => {
+        notification.set({
+            title: "AltManager",
+            message: e.message,
+            error: false
+        });
+    });
+
+    listen("accountManagerLogin", (e: AccountManagerLoginEvent) => {
+        directLoginModalVisible = false;
+        if (!e.error) {
+            notification.set({
+                title: "AltManager",
+                message: `Successfully logged in to account ${e.username}`,
+                error: false
+            });
+        } else {
+            notification.set({
+                title: "AltManager",
+                message: e.error,
+                error: true
+            });
+        }
+    });
 
     function handleWindowClick(e: MouseEvent) {
         if (!accountElement.contains(e.target as Node)) {
@@ -69,7 +125,7 @@
 
     function handleSelectClick(e: MouseEvent) {
         if (!expanded) {
-            // Prevent icon buttons from opening quick switcher
+
             expanded = !(e.target as HTMLElement).classList.contains("icon");
         } else {
             expanded = !headerElement.contains(e.target as Node);
@@ -80,230 +136,422 @@
         }
     }
 
-    async function login(account: Account) {
-        notification.set({
-            title: "AltManager",
-            message: "Logging in...",
-            error: false
-        });
+    async function logging(id: number) {
+        let showNotification = true;
+        const notificationTimeout = setTimeout(() => {
+            if (showNotification) {
+                notification.set({
+                    title: "AltManager",
+                    message: "Logging in...",
+                    error: false
+                });
+            }
+        }, 50);
 
-        await loginToAccount(account.id);
+        try {
+            await loginToAccountRest(id);
+
+            showNotification = false;
+            clearTimeout(notificationTimeout);
+        } catch (error) {
+            showNotification = false;
+            clearTimeout(notificationTimeout);
+            throw error;
+        }
     }
 
     async function loginWithRandomUsername() {
         const username = await randomUsername();
         await directLoginToCrackedAccount(username, false);
     }
+
+    function copyHWID() {
+        navigator.clipboard.writeText(userData.hwid)
+            .then(() => {
+                notification.set({
+                    title: "HWID Copied",
+                    message: "HWID has been copied to clipboard!",
+                    error: false
+                });
+            })
+            .catch(() => {
+                notification.set({
+                    title: "Error",
+                    message: "Failed to copy HWID",
+                    error: true
+                });
+            });
+    }
+
+    onMount(async () => {
+        await refreshSession();
+        await refreshAccounts();
+    });
 </script>
 
-<svelte:window on:click={handleWindowClick}/>
 
+<svelte:window on:click={handleWindowClick}/>
+<AddAccountModal bind:visible={addAccountModalVisible}/>
+<DirectLoginModal bind:visible={directLoginModalVisible}/>
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class="account" class:expanded bind:this={accountElement} on:click={handleSelectClick}>
-    <div class="header" bind:this={headerElement}>
-        <object data={avatar} type="image/png" class="avatar" aria-label="avatar">
-            <img src="img/steve.png" alt=avatar class="avatar">
-        </object>
-        <div class="username">{username}</div>
-        <div class="account-type">
-            {#if premium}
-                <span class="premium">Premium</span>
+<div bind:this={accountElement} class="account-selector" class:expanded on:click={handleSelectClick}>
+    <div bind:this={headerElement} class="selector-header">
+        <div class="avatar-container">
+            <!-- svelte-ignore a11y_missing_attribute -->
+            <img alt="avatar" class="avatar" draggable="false" src={userData.avatar|| 'img/avatars/Customer.png'}/>
+        </div>
+        <div class="account-info">
+            <div class="username" on:dblclick|stopPropagation={copyHWID} style="cursor: pointer">
+                {#if userData.isOwner || userData.isDev}
+                    {userData.developer || 'Developer'}
+                {:else}
+                    {userData.username || 'Customer'}
+                {/if}
+            </div>
+
+            {#if userData.isOwner}
+                <span class="owner-badge">Owner</span>
+            {:else if userData.isDev}
+                <span class="developer-badge">Developer</span>
             {:else}
-                <span class="offline">Offline</span>
+                <span class="customer-badge">Free User</span>
             {/if}
         </div>
-        <div class="buttons">
-            <button class="icon-button" type="button" on:click={loginWithRandomUsername}>
+
+        <div class="action-buttons">
+            <button class="icon-button" on:click={loginWithRandomUsername} type="button">
                 <ToolTip text="Random username"/>
 
-                <img class="icon" src="img/menu/account/icon-random.svg" alt="random username">
+                <img alt="random username" class="icon" draggable="false" src="img/menu/account/icon-random.svg">
             </button>
-            <button class="icon-button" disabled={inAccountManager} type="button"
-                    on:click={() => openScreen("altmanager")}>
+            <button class="icon-button" disabled={inAccountManager} on:click={() => openScreen("altmanager")}
+                    type="button">
                 <ToolTip text="Change account"/>
 
-                <img class="icon" src="img/menu/icon-pen.svg" alt="change account">
+                <img alt="change account" class="icon" draggable="false" src="img/menu/icon-pen.svg">
             </button>
         </div>
     </div>
 
     {#if expanded}
-        <div class="quick-switcher" transition:fade|global={{ duration: 200, easing: quintOut }}>
-            <!-- svelte-ignore a11y_autofocus -->
-            <input type="text" autofocus class="account-search" placeholder="Search..." bind:value={searchQuery}>
+        <div class="account-dropdown" transition:fade|global={{ duration: 150, easing: quintOut }}>
+            <div class="search-container" in:slide|global={{ duration: 150, easing: quintOut }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="search-icon">
+                    <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+                    <path d="M21 21L17 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <!-- svelte-ignore a11y_autofocus -->
+                <input type="text" autofocus class="search-input" placeholder="Search accounts..."
+                       bind:value={searchQuery}>
+            </div>
 
-            {#if accounts.length > 0}
-                {#if renderedAccounts.length > 0}
-                    <div class="account-list">
-                        {#each renderedAccounts as a}
-                            <div on:click={() => login(a)} class="account-item"
-                                 transition:slide|global={{ duration: 200, easing: quintOut }}
-                                 class:active={a.username === username}>
-                                <Avatar url={a.avatar}/>
-                                <div class="username">{a.username}</div>
-                                <div class="type">{a.type}</div>
-                            </div>
-                        {/each}
-                    </div>
+            <div class="account-list-container" in:slide|global={{ duration: 150, easing: quintOut, delay: 50 }}>
+                {#if accounts.length > 0}
+                    {#if renderedAccounts.length > 0}
+                        <div class="account-list">
+                            {#each renderedAccounts as a (a.id)}
+                                <div on:click={() => logging(a.id)} class="account-item"
+                                     transition:slide|global={{ duration: 150, easing: quintOut }}
+                                     class:active={a.username === username}>
+                                    <Avatar url={a.avatar}/>
+                                    <div class="account-details">
+                                        <div class="account-username">{a.username}</div>
+                                        <div class="account-type">{a.type}</div>
+                                    </div>
+                                    {#if a.username === username}
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="check-icon">
+                                            <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2"
+                                                  stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    {/if}
+                                </div>
+                            {/each}
+                        </div>
+                    {:else}
+                        <div class="empty-state" in:fade>
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" class="empty-icon">
+                                <path d="M3 7V17C3 18.1046 3.89543 19 5 19H19C20.1046 19 21 18.1046 21 17V7C21 5.89543 20.1046 5 19 5H5C3.89543 5 3 5.89543 3 7Z"
+                                      stroke="currentColor" stroke-width="2"/>
+                                <path d="M7 10L12 13L17 10" stroke="currentColor" stroke-width="2"
+                                      stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <div class="empty-text">No accounts found</div>
+                        </div>
+                    {/if}
                 {:else}
-                    <div class="placeholder">No results</div>
+                    <div class="empty-state" transition:fade>
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" class="empty-icon">
+                            <path d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z"
+                                  stroke="currentColor" stroke-width="2"/>
+                            <path d="M19 21V19C19 17.3431 17.6569 16 16 16H8C6.34315 16 5 17.3431 5 19V21"
+                                  stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <div class="empty-text">No accounts added yet</div>
+                        <button class="add-account-button" on:click={() => addAccountModalVisible = true}>
+                            Add Account
+                        </button>
+                    </div>
                 {/if}
-            {:else}
-                <div class="placeholder">Account list is empty</div>
-            {/if}
+            </div>
         </div>
     {/if}
 </div>
 
 <style lang="scss">
-  @use "../../../../../colors" as *;
+  @import "../../../../../colors";
 
-  .account {
-    width: 488px;
+  $border-radius: 12px;
+  $transition-speed: 0.2s;
+  $shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+  .account-selector {
+    width: 360px;
     position: relative;
+    user-select: none;
 
     &.expanded {
-      .header {
-        border-radius: 5px 5px 0 0;
+      .selector-header {
+        border-radius: $border-radius $border-radius 0 0;
+        background: linear-gradient(
+                        to bottom,
+                        rgba(255, 255, 255, 0.05) 0%,
+                        rgba(0, 0, 0, 0.2) 100%
+        );
+        box-shadow: $shadow;
       }
     }
   }
 
-  .header {
-    background-color: rgba($hotbar-base-color, 0.68);
-    padding: 15px 18px;
-    border-radius: 5px;
+  .selector-header {
+    display: flex;
     align-items: center;
-    display: grid;
-    grid-template-areas:
-        "a b c"
-        "a d c";
-    grid-template-columns: max-content 1fr max-content;
-    column-gap: 15px;
+    gap: 12px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    border-radius: $border-radius;
+    transition: all $transition-speed ease;
     cursor: pointer;
-    transition: ease border-radius .2s;
 
-    .avatar {
-      height: 68px;
-      width: 68px;
-      border-radius: 50%;
-      grid-area: a;
+    &:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+  }
+
+  .avatar-container {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .avatar {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(white, 0.1);
+    transition: all $transition-speed ease;
+
+
+  }
+
+
+  .account-info {
+    flex-grow: 1;
+    min-width: 0;
+  }
+
+  .username {
+    font-weight: 600;
+    font-size: 20px;
+    color: $text;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .account-type {
+    font-weight: bold;
+    font-size: 20px;
+    margin-top: 2px;
+  }
+
+  .owner-badge {
+    color: $menu-account-owner;
+  }
+
+  .developer-badge {
+    color: $menu-account-developer;
+  }
+
+  .customer-badge {
+    color: $menu-account-customer;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+
+  .icon-button {
+    background-color: transparent;
+    border: none;
+    position: relative;
+    height: max-content;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+
+    .icon {
+      filter: drop-shadow(0 0 4px rgba($base, 0.5));
     }
 
-    .username {
-      font-weight: 600;
-      color: $menu-text-color;
-      font-size: 20px;
-      grid-area: b;
-      align-self: flex-end;
+    &:disabled {
+      pointer-events: none;
+      opacity: .5;
+    }
+  }
+
+
+  .account-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(12px);
+    border-radius: 0 0 $border-radius $border-radius;
+    overflow: hidden;
+    box-shadow: $shadow;
+    z-index: 1000;
+  }
+
+  .search-container {
+    position: relative;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba($text, 0.1);
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 28px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba($text, 0.6);
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 8px 16px 8px 40px;
+    background: rgba($text, 0.05);
+    border: none;
+    border-radius: 6px;
+    color: $text;
+    font-size: 14px;
+    transition: all $transition-speed ease;
+
+    &:focus {
+      outline: none;
+      background: rgba($text, 0.1);
     }
 
-    .account-type {
-      font-weight: 500;
-      font-size: 20px;
-      grid-area: d;
-      align-self: flex-start;
+    &::placeholder {
+      color: rgba($text, 0.5);
+    }
+  }
 
-      .premium {
-        color: $menu-account-premium-color;
-      }
+  .account-list-container {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 8px 0;
+  }
 
-      .offline {
-        color: $menu-text-dimmed-color;
-      }
+  .account-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .account-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: all $transition-speed ease;
+    font-weight: 600;
+
+    &:hover {
+      background: rgba($text, 0.05);
     }
 
-    .buttons {
-      grid-area: c;
-      display: flex;
-      column-gap: 20px;
-      align-items: center;
-    }
+    &.active {
+      background: rgba($text, 0.1);
 
-    .icon-button {
-      background-color: transparent;
-      border: none;
-      position: relative;
-      height: max-content;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-
-      &:disabled {
-        pointer-events: none;
-        opacity: .5;
+      .account-username {
+        color: $text;
       }
     }
   }
 
-  .quick-switcher {
-    position: absolute;
-    z-index: 1000;
-    width: 100%;
-    border-radius: 0 0 5px 5px;
-    background-color: rgba($menu-base-color, 0.9);
+  .account-details {
+    flex-grow: 1;
+    min-width: 0;
+  }
 
-    .placeholder {
-      font-weight: 500;
-      font-size: 20px;
-      color: $menu-text-dimmed-color;
-      padding: 15px 20px;
-    }
+  .account-username {
+    font-size: 14px;
+    color: $text;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-    .account-search {
-      background-color: rgba($menu-base-color, .36);
-      border: none;
-      color: $menu-text-color;
-      font-family: "Inter", sans-serif;
-      padding: 15px 15px 15px 50px;
-      width: 100%;
-      font-size: 18px;
-      border-bottom: solid 4px $accent-color;
-      background-image: url("/img/menu/icon-search.svg");
-      background-repeat: no-repeat;
-      background-position: 18px center;
-      background-size: 18px 18px;
-    }
+  .account-type {
+    font-size: 12px;
+    color: rgba($text, 0.6);
+    margin-top: 2px;
+  }
 
-    .account-list {
-      max-height: 350px;
-      overflow: auto;
-    }
+  .check-icon {
+    flex-shrink: 0;
+    color: $text;
+  }
 
-    .account-item {
-      color: $menu-text-dimmed-color;
-      font-size: 20px;
-      padding: 15px 20px;
-      transition: ease color .2s;
-      cursor: pointer;
-      display: grid;
-      grid-template-areas:
-        "a b"
-        "a c";
-      grid-template-columns: max-content 1fr;
-      column-gap: 15px;
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px;
+    text-align: center;
+    color: rgba($text, 0.7);
+  }
 
-      .username {
-        grid-area: b;
-        font-weight: 600;
-        font-size: 20px;
-        transition: ease color .2s;
-      }
+  .empty-icon {
+    margin-bottom: 12px;
+    color: rgba($text, 0.5);
+  }
 
-      .type {
-        grid-area: c;
-      }
+  .empty-text {
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
 
-      &:hover {
-        color: $menu-text-color;
-      }
+  .add-account-button {
+    background: rgba($text, 0.1);
+    color: $text;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all $transition-speed ease;
 
-      &.active {
-        .username {
-          color: $accent-color;
-        }
-      }
+    &:hover {
+      background: rgba($text, 0.2);
     }
   }
 </style>

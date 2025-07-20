@@ -16,7 +16,7 @@ private val BASIC_CHARS = '\u0000'..'\u0200'
 class FontGlyphPageManager(
     baseFonts: Set<FontManager.FontFace>,
     additionalFonts: Set<FontManager.FontFace> = emptySet()
-): EventListener {
+) : EventListener {
 
     private val staticPage: List<StaticGlyphPage> = StaticGlyphPage.createGlyphPages(baseFonts.flatMap { loadedFont ->
         loadedFont.styles.filterNotNull().flatMap { font -> BASIC_CHARS.map { ch -> FontGlyph(ch, font) } }

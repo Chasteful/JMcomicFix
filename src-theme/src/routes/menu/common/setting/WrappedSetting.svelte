@@ -49,9 +49,9 @@
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="wrapped-setting" class:expanded class:has-nested-settings={value.value.length > 0}
-     onclick={handleWrapperClick} bind:this={wrappedSettingElement}>
-    <div class="header" bind:this={headerElement}>
+<div bind:this={wrappedSettingElement} class="wrapped-setting" class:expanded
+     class:has-nested-settings={value.value.length > 0} onclick={handleWrapperClick}>
+    <div bind:this={headerElement} class="header">
         {#if value.valueType === "TOGGLEABLE"}
             <SwitchSetting title={convertToSpacedString(value.name)} bind:value={enabledSetting.value}/>
         {:else if value.valueType === "CONFIGURABLE"}
@@ -74,21 +74,21 @@
 </div>
 
 <style lang="scss">
-  @use "../../../../colors.scss" as *;
+  @use "../../../../colors" as *;
 
   .configurable-title {
-    color: $menu-text-color;
+    color: $text;
     font-size: 20px;
-    font-weight: 500;
+    font-weight: 900;
   }
 
   .wrapped-setting {
     position: relative;
     min-width: 300px;
 
-    &.expanded {
+    &.expanded.has-nested-settings {
       .header {
-        border-radius: 5px 5px 0 0;
+        border-radius: 12px 12px 0 0;
       }
     }
 
@@ -96,13 +96,14 @@
       cursor: pointer;
 
       .header {
-        background-color: rgba($menu-base-color, .36);
+        background-color: rgba($base, .5);
+        box-shadow: 0 0 8px rgba($base, 0.6);
         padding: 20px;
         display: flex;
         column-gap: 20px;
         align-items: center;
         justify-content: space-between;
-        border-radius: 5px;
+        border-radius: 12px;
         transition: ease border-radius .2s;
       }
     }
@@ -111,11 +112,11 @@
   .nested-settings {
     position: absolute;
     z-index: 1000;
-    border-radius: 0 0 5px 5px;
-    background-color: rgba($menu-base-color, 0.9);
+    border-radius: 0 0 12px 12px;
+    background-color: rgba($base, 0.5);
+    box-shadow: 0 4px 8px rgba($base, 0.6);
     padding: 10px 13px;
-    zoom: 1.5;
+    zoom: 1.2;
     width: 100%;
   }
 </style>
-

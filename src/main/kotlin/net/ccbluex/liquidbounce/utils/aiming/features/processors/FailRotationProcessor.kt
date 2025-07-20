@@ -33,22 +33,28 @@ import kotlin.random.Random
 /**
  * The fail focus acts as fail rate, it will purposely miss the target on a certain rate.
  */
-class FailRotationProcessor(owner: EventListener? = null)
-    : ToggleableConfigurable(owner, "Fail", false), RotationProcessor {
+class FailRotationProcessor(owner: EventListener? = null) : ToggleableConfigurable(owner, "Fail", false),
+    RotationProcessor {
 
     private val failRate by int("Rate", 3, 1..100, "%")
     val failFactor by float("Factor", 0.04f, 0.01f..0.99f)
 
-    private val strengthHorizontal by floatRange("StrengthHorizontal", 5f..10f, 1f..90f,
-        "°")
-    private val strengthVertical by floatRange("StrengthVertical", 0f..2f, 0f..90f,
-        "°")
+    private val strengthHorizontal by floatRange(
+        "StrengthHorizontal", 5f..10f, 1f..90f,
+        "°"
+    )
+    private val strengthVertical by floatRange(
+        "StrengthVertical", 0f..2f, 0f..90f,
+        "°"
+    )
 
     /**
      * The duration it takes to transition from the fail factor to the normal factor.
      */
-    private var transitionInDuration by intRange("TransitionInDuration", 1..4, 0..20,
-        "ticks")
+    private var transitionInDuration by intRange(
+        "TransitionInDuration", 1..4, 0..20,
+        "ticks"
+    )
 
     private var ticksElapsed = 0
     private var currentTransitionInDuration = transitionInDuration.random()

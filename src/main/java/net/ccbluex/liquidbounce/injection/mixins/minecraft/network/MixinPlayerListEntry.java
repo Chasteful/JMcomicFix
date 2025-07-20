@@ -1,31 +1,12 @@
-/*
- * This file is part of LiquidBounce (https://github.com/CCBlueX/LiquidBounce)
- *
- * Copyright (c) 2015 - 2025 CCBlueX
- *
- * LiquidBounce is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * LiquidBounce is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
- */
-
+// MixinPlayerListEntry.java
 package net.ccbluex.liquidbounce.injection.mixins.minecraft.network;
 
+import com.mojang.authlib.GameProfile;
+import net.ccbluex.jmcomicfix.features.module.modules.client.ModuleCapes;
+import net.ccbluex.liquidbounce.features.cosmetic.CapeCosmeticsManager;
+import net.minecraft.client.MinecraftClient;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.mojang.authlib.GameProfile;
-import net.ccbluex.liquidbounce.features.cosmetic.CapeCosmeticsManager;
-import net.ccbluex.liquidbounce.features.misc.HideAppearance;
-import net.ccbluex.liquidbounce.features.module.modules.render.ModuleSkinChanger;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.util.SkinTextures;
 import net.minecraft.util.Identifier;
@@ -34,6 +15,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import net.ccbluex.liquidbounce.features.misc.HideAppearance;
+import net.ccbluex.liquidbounce.features.module.modules.render.ModuleSkinChanger;
+import net.minecraft.client.MinecraftClient;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerListEntry.class)
 public abstract class MixinPlayerListEntry {
@@ -47,8 +33,14 @@ public abstract class MixinPlayerListEntry {
     @Unique
     private Identifier capeTexture = null;
 
+    @ModifyExpressionValue(method = "texturesSupplier", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;uuidEquals(Ljava/util/UUID;)Z"))
+    private static boolean liquid_bounce$allow_custom_skin(boolean original) {
+        return original || ModuleSkinChanger.INSTANCE.getRunning();
+    }
+
     @ModifyReturnValue(method = "getSkinTextures", at = @At("RETURN"))
-    private SkinTextures liquid_bounce$skin(SkinTextures original) {
+    private SkinTextures liquid_bounce$modifySkinTextures(SkinTextures original) {
+
         if (HideAppearance.INSTANCE.isDestructed()) {
             return original;
         }
@@ -60,29 +52,40 @@ public abstract class MixinPlayerListEntry {
                 original = customSkinTextures.get();
             }
         }
+        if (!ModuleCapes.INSTANCE.getRunning()) {
+            return original;
+        }
+
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client.player != null && this.profile.getId().equals(client.player.getGameProfile().getId())) {
+            Identifier currentModeCape = ModuleCapes.INSTANCE.getCapeTextureId();
+            return createTexturesWithCape(original, currentModeCape);
+        }
 
         if (capeTexture != null) {
-            return new SkinTextures(original.texture(), original.textureUrl(), capeTexture,
-                    original.elytraTexture(), original.model(), original.secure());
+            return createTexturesWithCape(original, capeTexture);
         }
 
         liquid_bounce$fetchCapeTexture();
         return original;
     }
 
-    @ModifyExpressionValue(method = "texturesSupplier", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;uuidEquals(Ljava/util/UUID;)Z"))
-    private static boolean liquid_bounce$allow_custom_skin(boolean b) {
-        return b || ModuleSkinChanger.INSTANCE.getRunning();
-    }
-
     @Unique
     private void liquid_bounce$fetchCapeTexture() {
-        if (capeTextureLoading) {
-            return;
-        }
-
+        if (capeTextureLoading) return;
         capeTextureLoading = true;
         CapeCosmeticsManager.INSTANCE.loadPlayerCape(this.profile, id -> capeTexture = id);
     }
 
+    @Unique
+    private SkinTextures createTexturesWithCape(SkinTextures original, Identifier cape) {
+        return new SkinTextures(
+                original.texture(),
+                original.textureUrl(),
+                cape,
+                original.elytraTexture(),
+                original.model(),
+                original.secure()
+        );
+    }
 }

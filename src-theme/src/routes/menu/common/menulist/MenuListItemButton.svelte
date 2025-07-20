@@ -8,9 +8,9 @@
     const dispatch = createEventDispatcher();
 </script>
 
-<button class="button" type="button" on:click={() => dispatch("click")}>
-    <ToolTip text={title} color="black"/>
-    <img class="icon" src="img/menu/icon-{icon}.svg" alt={icon}>
+<button class="button" on:click={() => dispatch("click")} type="button">
+    <ToolTip color="black" text={title}/>
+    <img alt={icon} class="icon" src="img/menu/icon-{icon}.svg">
 </button>
 
 <style lang="scss">

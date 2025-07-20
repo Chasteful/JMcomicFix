@@ -29,9 +29,11 @@ internal object NoSlowBlockingReuse : Choice("Reuse") {
                 TimingMode.PRE_TICK -> {
                     if (event.state == EventState.PRE) {
                         untracked {
-                            network.sendPacket(PlayerActionC2SPacket(
-                                PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, Direction.DOWN
-                            ))
+                            network.sendPacket(
+                                PlayerActionC2SPacket(
+                                    PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, Direction.DOWN
+                                )
+                            )
                             interaction.sendSequencedPacket(world) { sequence ->
                                 PlayerInteractItemC2SPacket(blockingHand, sequence, player.yaw, player.pitch)
                             }
@@ -42,9 +44,11 @@ internal object NoSlowBlockingReuse : Choice("Reuse") {
                 TimingMode.POST_TICK -> {
                     if (event.state == EventState.POST) {
                         untracked {
-                            network.sendPacket(PlayerActionC2SPacket(
-                                PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, Direction.DOWN
-                            ))
+                            network.sendPacket(
+                                PlayerActionC2SPacket(
+                                    PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, Direction.DOWN
+                                )
+                            )
                             interaction.sendSequencedPacket(world) { sequence ->
                                 PlayerInteractItemC2SPacket(blockingHand, sequence, player.yaw, player.pitch)
                             }
@@ -56,9 +60,11 @@ internal object NoSlowBlockingReuse : Choice("Reuse") {
                     when (event.state) {
                         EventState.PRE -> {
                             untracked {
-                                network.sendPacket(PlayerActionC2SPacket(
-                                    PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, Direction.DOWN
-                                ))
+                                network.sendPacket(
+                                    PlayerActionC2SPacket(
+                                        PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, Direction.DOWN
+                                    )
+                                )
                             }
                         }
 

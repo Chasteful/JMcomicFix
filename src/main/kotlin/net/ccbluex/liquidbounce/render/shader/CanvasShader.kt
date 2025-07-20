@@ -33,8 +33,8 @@ import org.lwjgl.opengl.GL30
  * Inspired from the GLSL Panorama Shader Mod
  * https://github.com/magistermaks/mod-glsl
  */
-open class CanvasShader(vertex: String, fragment: String, uniforms: Array<UniformProvider> = emptyArray())
-    : Shader(vertex, fragment, uniforms) {
+open class CanvasShader(vertex: String, fragment: String, uniforms: Array<UniformProvider> = emptyArray()) :
+    Shader(vertex, fragment, uniforms) {
 
     private var canvas = ScalableCanvas()
     private var buffer = VertexBuffer(GlUsage.DYNAMIC_WRITE)

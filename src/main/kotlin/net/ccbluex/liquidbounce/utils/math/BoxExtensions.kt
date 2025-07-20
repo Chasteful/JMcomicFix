@@ -57,7 +57,8 @@ fun Box.isHitByLine(start: Vec3d, p: Vec3d): Boolean {
 
     if (checkSide(Direction.Axis.X, start, d) ||
         checkSide(Direction.Axis.Y, start, d) ||
-        checkSide(Direction.Axis.Z, start, d)) {
+        checkSide(Direction.Axis.Z, start, d)
+    ) {
         return false
     }
 

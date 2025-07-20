@@ -82,7 +82,7 @@ class SupportFeature(val placer: BlockPlacer) : ToggleableConfigurable(placer, "
                 }
 
                 if (
-                    // don't place helping blocks where the structure will be
+                // don't place helping blocks where the structure will be
                     blockedPositions.contains(neighbor) ||
 
                     // exclude blocks where the structure is...
@@ -91,7 +91,7 @@ class SupportFeature(val placer: BlockPlacer) : ToggleableConfigurable(placer, "
                     neighbor.getManhattanDistance(targetPos) > depth ||
                     player.eyePos.squaredDistanceTo(neighbor.toCenterPos()) > rangeSq ||
                     neighbor.isBlockedByEntities()
-                    ) {
+                ) {
                     closedList.add(neighbor)
                     continue
                 }

@@ -101,7 +101,7 @@ class ChatClient {
     }
 
     /**
-     * Connect to chat server via websocket.
+     * Connect to ChatScreen server via websocket.
      * Supports SSL and non-SSL connections.
      * Be aware SSL takes insecure certificates.
      */
@@ -189,12 +189,12 @@ class ChatClient {
     fun requestMojangLogin() = sendPacket(ServerRequestMojangInfoPacket())
 
     /**
-     * Send chat message to server
+     * Send ChatScreen message to server
      */
     fun sendMessage(message: String) = sendPacket(ServerMessagePacket(message))
 
     /**
-     * Send private chat message to server
+     * Send private ChatScreen message to server
      */
     fun sendPrivateMessage(username: String, message: String) =
         sendPacket(ServerPrivateMessagePacket(username, message))
@@ -258,22 +258,35 @@ class ChatClient {
                     if (cause is InvalidCredentialsException) {
                         EventManager.callEvent(ClientChatStateChange(ClientChatStateChange.State.AUTHENTICATION_FAILED))
                     } else {
-                        EventManager.callEvent(ClientChatErrorEvent(
-                            cause.localizedMessage ?: cause.message ?: cause.javaClass.name
-                        ))
+                        EventManager.callEvent(
+                            ClientChatErrorEvent(
+                                cause.localizedMessage ?: cause.message ?: cause.javaClass.name
+                            )
+                        )
                     }
                 }
                 return
             }
 
-            is ClientMessagePacket -> EventManager.callEvent(ClientChatMessageEvent(packet.user, packet.content,
-                ClientChatMessageEvent.ChatGroup.PUBLIC_CHAT))
-            is ClientPrivateMessagePacket -> EventManager.callEvent(ClientChatMessageEvent(packet.user, packet.content,
-                ClientChatMessageEvent.ChatGroup.PRIVATE_CHAT))
+            is ClientMessagePacket -> EventManager.callEvent(
+                ClientChatMessageEvent(
+                    packet.user, packet.content,
+                    ClientChatMessageEvent.ChatGroup.PUBLIC_CHAT
+                )
+            )
+
+            is ClientPrivateMessagePacket -> EventManager.callEvent(
+                ClientChatMessageEvent(
+                    packet.user, packet.content,
+                    ClientChatMessageEvent.ChatGroup.PRIVATE_CHAT
+                )
+            )
+
             is ClientErrorPacket -> {
                 // TODO: Replace with translation
                 EventManager.callEvent(ClientChatErrorEvent(translateErrorMessage(packet)))
             }
+
             is ClientSuccessPacket -> {
                 when (packet.reason) {
                     "Login" -> {
@@ -295,7 +308,7 @@ class ChatClient {
         val message = when (packet.message) {
             "NotSupported" -> "This method is not supported!"
             "LoginFailed" -> "Login Failed!"
-            "NotLoggedIn" -> "You must be logged in to use the chat!"
+            "NotLoggedIn" -> "You must be logged in to use the ChatScreen!"
             "AlreadyLoggedIn" -> "You are already logged in!"
             "MojangRequestMissing" -> "Mojang request missing!"
             "NotPermitted" -> "You are missing the required permissions!"

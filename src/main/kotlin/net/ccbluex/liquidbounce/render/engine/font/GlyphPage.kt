@@ -102,6 +102,7 @@ class GlyphAtlasLocation(val pixelBoundingBox: BoundingBox2f, atlasDimensions: D
         this.atlasHeight = pixelBoundingBox.yMax - pixelBoundingBox.yMin
     }
 }
+
 data class GlyphLayoutInfo(val useHorizontalBaseline: Boolean, val advanceX: Float, val advanceY: Float)
 
 abstract class GlyphPage {

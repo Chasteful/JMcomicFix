@@ -4,6 +4,7 @@ import net.minecraft.text.TextColor;
 
 public interface ClientTextColorAdditions {
     boolean liquid_bounce$doesBypassingNameProtect();
+
     TextColor liquid_bounce$withNameProtectionBypass();
 
     @Deprecated

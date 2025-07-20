@@ -11,7 +11,7 @@
     import TogglableSetting from "../TogglableSetting.svelte";
     import ColorSetting from "../ColorSetting.svelte";
     import TextSetting from "../TextSetting.svelte";
-    import BlocksSetting from "../blocks/BlocksSetting.svelte";
+    import SearchItems from "./SearchItems.svelte";
     import {slide} from "svelte/transition";
     import {onMount} from "svelte";
     import TextArraySetting from "../TextArraySetting.svelte";
@@ -51,7 +51,9 @@
     {:else if setting.valueType === "TEXT"}
         <TextSetting bind:setting={setting} on:change/>
     {:else if setting.valueType === "BLOCKS"}
-        <BlocksSetting {path} bind:setting={setting} on:change/>
+        <SearchItems {path} bind:setting={setting} type="blocks" on:change/>
+    {:else if setting.valueType === "ITEMS"}
+        <SearchItems {path} bind:setting={setting} type="items" on:change/>
     {:else if setting.valueType === "TEXT_ARRAY"}
         <TextArraySetting bind:setting={setting} on:change/>
     {:else if setting.valueType === "BIND"}

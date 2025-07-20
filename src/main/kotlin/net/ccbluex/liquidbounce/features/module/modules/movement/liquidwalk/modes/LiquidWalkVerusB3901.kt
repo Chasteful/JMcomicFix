@@ -67,7 +67,7 @@ internal object LiquidWalkVerusB3901 : Choice("VerusB3901") {
                 !player.isTouchingWater &&
                 standingOnWater() &&
                 !collidesWithAnythingElse()
-                ) {
+            ) {
                 packet.onGround = spoof
                 spoof = !spoof
             } else {

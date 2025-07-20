@@ -41,7 +41,7 @@ internal object VelocityStrafe : VelocityMode("Strafe") {
     private val delay by int("Delay", 2, 0..10, "ticks")
     private val strength by float("Strength", 1f, 0.1f..2f)
 
-    object OnlyFacing: ToggleableConfigurable(this, "OnlyFacing", false) {
+    object OnlyFacing : ToggleableConfigurable(this, "OnlyFacing", false) {
         val range by float("Range", 3.5f, 0.1f..6f)
     }
 

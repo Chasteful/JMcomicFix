@@ -21,14 +21,14 @@
 package net.ccbluex.liquidbounce.features.module.modules.player.cheststealer
 
 import net.ccbluex.liquidbounce.config.types.NamedChoice
-import net.ccbluex.liquidbounce.event.*
 import net.ccbluex.liquidbounce.event.events.ScheduleInventoryActionEvent
+import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.features.module.modules.player.cheststealer.features.FeatureChestAura
+import net.ccbluex.liquidbounce.features.module.modules.player.cheststealer.features.FeatureProgress
 import net.ccbluex.liquidbounce.features.module.modules.player.invcleaner.*
 import net.ccbluex.liquidbounce.utils.inventory.*
-import net.ccbluex.liquidbounce.utils.item.*
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
 import net.minecraft.text.Text
 import kotlin.math.ceil
@@ -41,17 +41,18 @@ import kotlin.math.ceil
 
 object ModuleChestStealer : ClientModule("ChestStealer", Category.PLAYER) {
 
+
     private val inventoryConstrains = tree(InventoryConstraints())
     private val autoClose by boolean("AutoClose", true)
-
     private val selectionMode by enumChoice("SelectionMode", SelectionMode.DISTANCE)
     private val itemMoveMode by enumChoice("MoveMode", ItemMoveMode.QUICK_MOVE)
     private val quickSwaps by boolean("QuickSwaps", true)
 
-    private val checkTitle by boolean("CheckTitle", true)
+    var checkTitle by boolean("CheckTitle", true)
 
     init {
         tree(FeatureChestAura)
+        tree(FeatureProgress)
     }
 
     override fun disable() {
@@ -60,13 +61,26 @@ object ModuleChestStealer : ClientModule("ChestStealer", Category.PLAYER) {
     }
 
     val scheduleInventoryAction = handler<ScheduleInventoryActionEvent> { event ->
-        // Check if we are in a chest screen
-        val screen = getChestScreen() ?: return@handler
+        val screen = getChestScreen()
+        if (screen == null) {
+            FeatureProgress.initialItemCount = 0
+            FeatureProgress.remainingItems = 0
+            return@handler
+        }
 
         val cleanupPlan = createCleanupPlan(screen)
-        val itemsToCollect = cleanupPlan.usefulItems.filterIsInstance<ContainerItemSlot>()
+        val itemsToCollect = cleanupPlan.usefulItems
+            .filterIsInstance<ContainerItemSlot>()
+            .distinctBy { it.slotInContainer }
 
-        // Quick swap items in hotbar (i.e. swords), some servers hate them
+
+        if (itemsToCollect.isNotEmpty() && FeatureProgress.initialItemCount == 0) {
+            FeatureProgress.onStartStealing(itemsToCollect.size)
+        }
+
+
+        FeatureProgress.updateRemainingItems(itemsToCollect.size)
+
         if (quickSwaps && performQuickSwaps(event, cleanupPlan, screen) != null) {
             return@handler
         }
@@ -76,24 +90,20 @@ object ModuleChestStealer : ClientModule("ChestStealer", Category.PLAYER) {
 
         for (slot in sortedItemsToCollect) {
             if (!hasInventorySpace() && stillRequiredSpace > 0) {
-                event.schedule(inventoryConstrains, throwItem(cleanupPlan, screen) ?: break)
+                event.schedule(inventoryConstrains, throwItem(cleanupPlan, screen)!!)
             }
 
             val emptySlot = findEmptyStorageSlotsInInventory().firstOrNull() ?: break
-
             val actions = getActionsForMove(screen, from = slot, to = emptySlot)
 
-            event.schedule(inventoryConstrains, actions,
-                /**
-                 * we prioritize item based on how important it is
-                 * for example we should prioritize armor over apples
-                 */
+            event.schedule(
+                inventoryConstrains, actions,
                 ItemCategorization(listOf()).getItemFacets(slot).maxOf { it.category.type.allocationPriority }
             )
+            break
         }
 
-        // Check if stealing the chest was completed
-        if (autoClose && sortedItemsToCollect.isEmpty()) {
+        if (autoClose && (sortedItemsToCollect.isEmpty() || !hasInventorySpace() && stillRequiredSpace > 0)) {
             event.schedule(inventoryConstrains, CloseContainerAction(screen))
         }
     }
@@ -259,4 +269,29 @@ object ModuleChestStealer : ClientModule("ChestStealer", Category.PLAYER) {
         DRAG_AND_DROP("DragAndDrop"),
     }
 
+    private val render = multiEnumChoice(
+        "DoRender",
+        DoRender.CHEST,
+        DoRender.CHEST_LAGER,
+        DoRender.ENDER_CHEST,
+        DoRender.BARREL,
+        DoRender.SHULKER_BOX
+    ).also { tagBy(it) }
+
+
+    @JvmStatic
+    fun canRender(choice: DoRender): Boolean {
+        return !running || render.contains(choice)
+    }
 }
+
+@Suppress("unused")
+enum class DoRender(override val choiceName: String) : NamedChoice {
+    CHEST("Chest"),
+    CHEST_LAGER("ChestDouble"),
+    ENDER_CHEST("EnderChest"),
+    SHULKER_BOX("ShulkerBox"),
+    BARREL("Barrel")
+
+}
+

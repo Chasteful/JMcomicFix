@@ -94,6 +94,15 @@ public class MixinUtils {
                     .build();
             CURRENT_URL.set(url.toString());
             var response = CLIENT.newCall(request).execute();
+
+            if (!response.isSuccessful()) {
+                throw new IOException("HTTP request failed with code: " + response.code());
+            }
+
+            if (!response.isSuccessful()) {
+                throw new IOException("HTTP request failed with code: " + response.code());
+            }
+
             cir.setReturnValue(response.body().byteStream());
         }
     }

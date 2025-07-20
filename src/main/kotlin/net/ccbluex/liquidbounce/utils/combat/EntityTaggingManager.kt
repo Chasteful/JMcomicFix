@@ -10,7 +10,7 @@ import net.ccbluex.liquidbounce.utils.kotlin.EventPriorityConvention.FIRST_PRIOR
 import net.minecraft.entity.Entity
 import java.util.concurrent.ConcurrentHashMap
 
-object EntityTaggingManager: EventListener {
+object EntityTaggingManager : EventListener {
     private val cache = ConcurrentHashMap<Entity, EntityTag>()
 
     @Suppress("unused")

@@ -25,9 +25,11 @@ import net.ccbluex.liquidbounce.features.module.modules.player.autoqueue.presets
 import net.ccbluex.liquidbounce.features.module.modules.player.autoqueue.presets.AutoQueueHypixelSW
 
 object ModuleAutoQueue : ClientModule("AutoQueue", Category.PLAYER, aliases = arrayOf("AutoPlay")) {
-    val presets = choices("Presets", AutoQueueHypixelSW, arrayOf(
-        AutoQueueHypixelSW,
-        AutoQueueGommeDuels,
-        AutoQueueCustom
-    )).apply(::tagBy)
+    val presets = choices(
+        "Presets", AutoQueueHypixelSW, arrayOf(
+            AutoQueueHypixelSW,
+            AutoQueueGommeDuels,
+            AutoQueueCustom
+        )
+    ).apply(::tagBy)
 }

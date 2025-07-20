@@ -166,7 +166,6 @@ class PlacementRenderHandler(private val placementRenderer: PlacementRenderer, v
     }
 
 
-
     /**
      * Checks whether the position is rendered.
      */

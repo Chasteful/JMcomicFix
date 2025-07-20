@@ -21,6 +21,7 @@ package net.ccbluex.liquidbounce.integration.interop.protocol.rest.v1.client
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.thealtening.api.retriever.DataRetriever.gson
 import io.netty.handler.codec.http.FullHttpResponse
 import net.ccbluex.liquidbounce.config.ConfigSystem
 import net.ccbluex.liquidbounce.config.gson.util.emptyJsonObject
@@ -40,10 +41,31 @@ fun getThemeInfo(requestObject: RequestObject): FullHttpResponse = httpOk(JsonOb
 @Suppress("UNUSED_PARAMETER")
 fun postToggleShader(requestObject: RequestObject): FullHttpResponse {
     ThemeManager.shaderEnabled = !ThemeManager.shaderEnabled
+    ThemeManager.initializeBackground()
     ConfigSystem.storeConfigurable(ThemeManager)
     return httpOk(emptyJsonObject())
 }
 
+@Suppress("UNUSED_PARAMETER")
+fun getShaderEnabled(requestObject: RequestObject): FullHttpResponse {
+    val result = JsonObject().apply {
+        addProperty("enabled", ThemeManager.shaderEnabled)
+    }
+    return httpOk(result)
+}
+
+@Suppress("UNUSED_PARAMETER")
+fun postSetShaderEnabled(requestObject: RequestObject): FullHttpResponse {
+    val json = gson.fromJson(requestObject.body, JsonObject::class.java)
+
+    val enabled = json.get("enabled")?.asBoolean ?: return httpBadRequest("Missing 'enabled' field")
+
+    ThemeManager.shaderEnabled = enabled
+    ThemeManager.initializeBackground()
+    ConfigSystem.storeConfigurable(ThemeManager)
+
+    return httpOk(emptyJsonObject())
+}
 
 // GET /api/v1/client/fonts
 @Suppress("UNUSED_PARAMETER")

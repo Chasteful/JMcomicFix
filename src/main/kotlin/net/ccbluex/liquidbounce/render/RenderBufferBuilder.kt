@@ -21,6 +21,8 @@
 package net.ccbluex.liquidbounce.render
 
 import com.mojang.blaze3d.systems.RenderSystem
+import net.ccbluex.liquidbounce.render.RenderBufferBuilder.Companion.TESSELATOR_A
+import net.ccbluex.liquidbounce.render.RenderBufferBuilder.Companion.TESSELATOR_B
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.ccbluex.liquidbounce.render.engine.type.UV2f
 import net.ccbluex.liquidbounce.render.engine.type.Vec3
@@ -60,7 +62,7 @@ const val EDGE_WEST_UP = ((1 shl 22) or (1 shl (23)))
  * Not sync, not send. Not thread-safe at all.
  */
 class RenderBufferBuilder<I : VertexInputType>(
-    private val drawMode: DrawMode,
+    drawMode: DrawMode,
     private val vertexFormat: I,
     private val tesselator: Tessellator
 ) {
@@ -104,6 +106,75 @@ class RenderBufferBuilder<I : VertexInputType>(
         }
     }
 
+    fun drawGradientBox(
+        env: WorldRenderEnvironment,
+        box: Box,
+        startColor: Color4b,
+        endColor: Color4b,
+        outlineColor: Color4b? = null
+    ) {
+        // Call the actual implementation with the environment
+        val matrix = env.currentMvpMatrix
+        val verts = box.vertexPositions()
+
+        val faceCenters = arrayOf(
+            Vec3((box.minX + box.maxX) / 2.0, box.minY, (box.minZ + box.maxZ) / 2.0), // Down
+            Vec3((box.minX + box.maxX) / 2.0, box.maxY, (box.minZ + box.maxZ) / 2.0), // Up
+            Vec3((box.minX + box.maxX) / 2.0, (box.minY + box.maxY) / 2.0, box.minZ), // North
+            Vec3(box.maxX, (box.minY + box.maxY) / 2.0, (box.minZ + box.maxZ) / 2.0), // East
+            Vec3((box.minX + box.maxX) / 2.0, (box.minY + box.maxY) / 2.0, box.maxZ), // South
+            Vec3(box.minX, (box.minY + box.maxY) / 2.0, (box.minZ + box.maxZ) / 2.0)  // West
+        )
+
+        val faces = arrayOf(
+            arrayOf(0, 1, 2, 3),   // Down
+            arrayOf(4, 5, 6, 7),   // Up
+            arrayOf(8, 9, 10, 11),   // North
+            arrayOf(12, 13, 14, 15),  // East
+            arrayOf(16, 17, 18, 19),  // South
+            arrayOf(20, 21, 22, 23)   // West
+        )
+
+        for (i in faces.indices) {
+            val indices = faces[i]
+            val v0 = verts[indices[0]]
+            val v1 = verts[indices[1]]
+            val v2 = verts[indices[2]]
+            val v3 = verts[indices[3]]
+            val center = faceCenters[i]
+
+            with(buffer) {
+                vertex(matrix, v0.x, v0.y, v0.z).color(startColor.toARGB())
+                vertex(matrix, v1.x, v1.y, v1.z).color(startColor.toARGB())
+                vertex(matrix, center.x, center.y, center.z).color(endColor.toARGB())
+
+                vertex(matrix, v1.x, v1.y, v1.z).color(startColor.toARGB())
+                vertex(matrix, v2.x, v2.y, v2.z).color(startColor.toARGB())
+                vertex(matrix, center.x, center.y, center.z).color(endColor.toARGB())
+
+                vertex(matrix, v2.x, v2.y, v2.z).color(startColor.toARGB())
+                vertex(matrix, v3.x, v3.y, v3.z).color(startColor.toARGB())
+                vertex(matrix, center.x, center.y, center.z).color(endColor.toARGB())
+
+                vertex(matrix, v3.x, v3.y, v3.z).color(startColor.toARGB())
+                vertex(matrix, v0.x, v0.y, v0.z).color(startColor.toARGB())
+                vertex(matrix, center.x, center.y, center.z).color(endColor.toARGB())
+            }
+        }
+
+        draw()
+
+        if (outlineColor != null) {
+            val outlineR = RenderBufferBuilder(
+                DrawMode.DEBUG_LINES,
+                VertexInputType.PosColor,
+                TESSELATOR_B
+            )
+            outlineR.drawBox(env, box, useOutlineVertices = true, color = outlineColor)
+            outlineR.draw()
+        }
+    }
+
     fun draw() {
         val built = buffer.endNullable() ?: return
 
@@ -127,12 +198,12 @@ class BoxRenderer private constructor(private val env: WorldRenderEnvironment) {
     private val faceRenderer = RenderBufferBuilder(
         DrawMode.QUADS,
         VertexInputType.PosColor,
-        RenderBufferBuilder.TESSELATOR_A
+        TESSELATOR_A
     )
     private val outlinesRenderer = RenderBufferBuilder(
         DrawMode.DEBUG_LINES,
         VertexInputType.PosColor,
-        RenderBufferBuilder.TESSELATOR_B
+        TESSELATOR_B
     )
 
     companion object {
@@ -147,6 +218,32 @@ class BoxRenderer private constructor(private val env: WorldRenderEnvironment) {
             } finally {
                 renderer.draw()
             }
+        }
+    }
+
+    fun drawGradientBox(
+        box: Box,
+        startColor: Color4b,
+        endColor: Color4b,
+        outlineColor: Color4b? = null
+    ) {
+        val renderer = RenderBufferBuilder(
+            DrawMode.TRIANGLES,
+            VertexInputType.PosColor,
+            TESSELATOR_A
+        )
+
+        renderer.drawGradientBox(env, box, startColor, endColor)
+        renderer.draw()
+
+        if (outlineColor != null) {
+            val outlineR = RenderBufferBuilder(
+                DrawMode.DEBUG_LINES,
+                VertexInputType.PosColor,
+                TESSELATOR_B
+            )
+            outlineR.drawBox(env, box, useOutlineVertices = true, color = outlineColor)
+            outlineR.draw()
         }
     }
 
@@ -261,15 +358,6 @@ fun Box.outlineVertexPositions(): Array<Vec3> {
         Vec3(minX, maxY, maxZ),
         Vec3(minX, maxY, minZ)
     )
-}
-
-fun RenderEnvironment.drawSolidBox(consumer: VertexConsumer, box: Box, color: Color4b) {
-    val matrix = currentMvpMatrix
-
-    // Draw the vertices of the box
-    box.vertexPositions().forEach { (x, y, z) ->
-        consumer.vertex(matrix, x, y, z).color(color.toARGB())
-    }
 }
 
 fun RenderBufferBuilder<VertexInputType.PosTexColor>.drawQuad(

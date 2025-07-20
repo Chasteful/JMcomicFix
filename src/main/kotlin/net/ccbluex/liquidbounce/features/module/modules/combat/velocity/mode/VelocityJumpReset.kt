@@ -57,8 +57,8 @@ internal object VelocityJumpReset : VelocityMode("JumpReset") {
     private val movementInputHandler = handler<MovementInputEvent> { event ->
         // To be able to alter velocity when receiving knockback, player must be sprinting.
         if (player.hurtTime != 9 || !player.isOnGround || !player.isSprinting ||
-            isFallDamage || !isCooldownOver() || chance != 100f && Random.nextInt(100) > chance)
-        {
+            isFallDamage || !isCooldownOver() || chance != 100f && Random.nextInt(100) > chance
+        ) {
             updateLimit()
             return@handler
         }

@@ -51,6 +51,7 @@ object ScaffoldGodBridgeTechnique : ScaffoldTechnique("GodBridge"), ScaffoldLedg
     private enum class Mode(override val choiceName: String) : NamedChoice {
         JUMP("Jump"),
         SNEAK("Sneak"),
+
         /**
          * Might not be as consistent as the other modes.
          */
@@ -105,6 +106,7 @@ object ScaffoldGodBridgeTechnique : ScaffoldTechnique("GodBridge"), ScaffoldLedg
                 ModuleScaffold.blockCount < forceSneakBelowCount -> {
                     LedgeAction(sneakTime = sneakTime.random())
                 }
+
                 mode == Mode.JUMP -> LedgeAction(jump = true)
                 mode == Mode.SNEAK -> LedgeAction(sneakTime = sneakTime.random())
                 mode == Mode.STOP_INPUT -> LedgeAction(stopInput = true)
@@ -114,6 +116,7 @@ object ScaffoldGodBridgeTechnique : ScaffoldTechnique("GodBridge"), ScaffoldLedg
                 } else {
                     LedgeAction(jump = false, sneakTime = sneakTime.random())
                 }
+
                 else -> LedgeAction.NO_LEDGE
             }
         } else {

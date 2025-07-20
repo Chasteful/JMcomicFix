@@ -157,7 +157,8 @@ private fun findBestTargetPlanForTargetPosition(
 
         // Check if the target face is pointing away from the player
         if (!targetFindingOptions.faceHandlingOptions.considerFacingAwayFaces &&
-            targetPlan.calculateAngleToPlayerEyeCosine(targetFindingOptions.playerLocationOnPlacement.position) < 0) {
+            targetPlan.calculateAngleToPlayerEyeCosine(targetFindingOptions.playerLocationOnPlacement.position) < 0
+        ) {
             return@mapNotNull null
         }
 
@@ -198,6 +199,7 @@ fun getTargetPlanForPositionAndDirection(
 
             return BlockTargetPlan(currPos, direction)
         }
+
         BlockTargetingMode.REPLACE_EXISTING_BLOCK -> {
             return BlockTargetPlan(pos, direction)
         }

@@ -74,5 +74,4 @@ object AutoBowAimbotFeature : ToggleableConfigurable(ModuleAutoBow, "BowAimbot",
             targetRenderer.render(this, target, event.tickDelta)
         }
     }
-
 }

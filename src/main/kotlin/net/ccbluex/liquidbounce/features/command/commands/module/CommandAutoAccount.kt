@@ -23,7 +23,7 @@ object CommandAutoAccount : CommandFactory {
             .subcommand(
                 CommandBuilder
                     .begin("register")
-                    .handler {_, _ ->
+                    .handler { _, _ ->
                         ModuleAutoAccount.register()
                     }
                     .build()
@@ -31,7 +31,7 @@ object CommandAutoAccount : CommandFactory {
             .subcommand(
                 CommandBuilder
                     .begin("login")
-                    .handler {_, _ ->
+                    .handler { _, _ ->
                         ModuleAutoAccount.login()
                     }
                     .build()

@@ -42,6 +42,7 @@ import kotlin.coroutines.suspendCoroutine
 object OAuthClient {
 
     private var serverPort: Int? = null
+
     @Volatile
     private var authCodeContinuation: Continuation<String>? = null
 

@@ -25,13 +25,13 @@ object ConditionCalculator {
     private val stack = mutableListOf<Pair<ConditionNode, Boolean>>()
     private val results = mutableMapOf<ConditionNode, Boolean>()
 
-    fun items(newItems: Map<String, Int>) : ConditionCalculator {
+    fun items(newItems: Map<String, Int>): ConditionCalculator {
         this.items.clear()
         this.items.putAll(newItems)
         return this
     }
 
-    fun process(currentItem: String, root: ConditionNode?) : Boolean {
+    fun process(currentItem: String, root: ConditionNode?): Boolean {
         if (currentItem.isItemWithTiers() && hasBetterTierItem(currentItem, items)) {
             return false
         }
@@ -74,7 +74,7 @@ object ConditionCalculator {
                 val itemAmount = items[it] ?: 0
                 return@any itemAmount <= currentNode.max &&
                     itemAmount >= currentNode.min.coerceAtMost(currentNode.max)
-        }
+            }
         results[currentNode] = result
     }
 

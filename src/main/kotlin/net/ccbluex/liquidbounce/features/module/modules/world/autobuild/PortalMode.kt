@@ -79,7 +79,7 @@ object PortalMode : ModuleAutoBuild.AutoBuildMode("Portal") {
         val pos = BlockPos.ofFloored(player.pos)
         for (direction in Direction.HORIZONTAL) {
             for (yOffset in -1..0) {
-                for (dirOffset in 0 downTo  -1) {
+                for (dirOffset in 0 downTo -1) {
                     val portalOrigin = pos.mutableCopy().move(direction)
                     val rotated = direction.rotateYClockwise()
                     if (dirOffset == -1) {

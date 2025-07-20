@@ -51,31 +51,26 @@ public abstract class MixinHostClassDesc {
             throw new RuntimeException(e);
         }
     });
-
+    /**
+     * Skip synthetic array field/method with singleton check
+     */
+    @Unique
+    private static final Set<String> NOT_MAPPED = Set.of(
+            "com.oracle.truffle.host.HostFieldDesc$SyntheticArrayLengthField",
+            "com.oracle.truffle.host.HostMethodDesc$SingleMethod$SyntheticArrayCloneMethod"
+    );
     @Shadow(remap = false)
     @Final
     Map<String, Object> methods;
-
     @Shadow(remap = false)
     @Final
     Map<String, Object> fields;
-
     @Shadow(remap = false)
     @Final
     Map<String, Object> staticFields;
-
     @Shadow(remap = false)
     @Final
     Map<String, Object> staticMethods;
-
-    @Inject(method = "<init>", at = @At("RETURN"), remap = false)
-    private void remapClassDesc(CallbackInfo ci) {
-        remapFieldEntries(fields, MixinHostClassDesc::getField);
-        remapFieldEntries(staticFields, MixinHostClassDesc::getField);
-
-        remapMethodEntries(methods);
-        remapMethodEntries(staticMethods);
-    }
 
     @Unique
     private static Object[] getOverloadsFromHostMethodDesc(Object value) throws
@@ -160,15 +155,6 @@ public abstract class MixinHostClassDesc {
         map.putAll(remappedEntries);
     }
 
-    /**
-     * Skip synthetic array field/method with singleton check
-     */
-    @Unique
-    private static final Set<String> NOT_MAPPED = Set.of(
-            "com.oracle.truffle.host.HostFieldDesc$SyntheticArrayLengthField",
-            "com.oracle.truffle.host.HostMethodDesc$SingleMethod$SyntheticArrayCloneMethod"
-    );
-
     @Unique
     private static @Nullable Member getField(Object o) throws IllegalAccessException, NoSuchFieldException {
         var clazz = o.getClass();
@@ -205,6 +191,15 @@ public abstract class MixinHostClassDesc {
 
 //        ClientUtilsKt.getLogger().debug("Remapped descriptor: {} in {} to {}", name, member.getDeclaringClass().getName(), remapped);
         return remapped;
+    }
+
+    @Inject(method = "<init>", at = @At("RETURN"), remap = false)
+    private void remapClassDesc(CallbackInfo ci) {
+        remapFieldEntries(fields, MixinHostClassDesc::getField);
+        remapFieldEntries(staticFields, MixinHostClassDesc::getField);
+
+        remapMethodEntries(methods);
+        remapMethodEntries(staticMethods);
     }
 
 }

@@ -8,6 +8,7 @@ internal enum class NametagShowOptions(
     HEALTH("Health"),
     DISTANCE("Distance"),
     PING("Ping"),
+    BACKGROUND("Background"),
     ITEMS("Items"),
     ITEM_INFO("ItemInfo"),
     ENCHANTMENTS("Enchantments"),

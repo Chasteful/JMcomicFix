@@ -104,6 +104,7 @@ fun VoxelShape.shrink(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0): VoxelS
             x, y, z,
             1.0 - x, 1.0 - y, 1.0 - z
         )
+
         else -> {
             var shape = VoxelShapes.empty()
 
@@ -335,7 +336,8 @@ fun BlockView.raycast(
     include: BlockPos?,
     maxBlastResistance: Float?
 ): BlockHitResult {
-    return BlockView.raycast(context.start, context.end, context,
+    return BlockView.raycast(
+        context.start, context.end, context,
         { raycastContext, pos ->
             val excluded = exclude?.let { pos in it } ?: false
 
@@ -483,7 +485,7 @@ enum class SwingMode(
     override val choiceName: String,
     val serverSwing: Boolean,
     val swing: (Hand) -> Unit = { }
-): NamedChoice {
+) : NamedChoice {
 
     DO_NOT_HIDE("DoNotHide", true, { player.swingHand(it) }),
     HIDE_BOTH("HideForBoth", false),
@@ -705,7 +707,7 @@ inline fun BlockPos.getBlockingEntities(include: (Entity) -> Boolean = { true })
  */
 fun BlockPos.isBlockedByEntitiesReturnCrystal(
     box: Box = FULL_BOX,
-    excludeIds : IntArray? = null
+    excludeIds: IntArray? = null
 ): BooleanObjectPair<EndCrystalEntity?> {
     var blocked = false
 

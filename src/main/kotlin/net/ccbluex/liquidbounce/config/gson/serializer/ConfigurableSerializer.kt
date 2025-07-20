@@ -19,11 +19,13 @@
 
 package net.ccbluex.liquidbounce.config.gson.serializer
 
+import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import net.ccbluex.liquidbounce.config.types.Configurable
 import net.ccbluex.liquidbounce.config.types.Value
+import net.ccbluex.liquidbounce.config.types.ValueType
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
 import java.lang.reflect.Type
@@ -64,7 +66,8 @@ class ConfigurableSerializer(
         add(
             "value",
             context.serialize(src.inner.filter { includeNotAnOption || !it.notAnOption }
-                .filter { includePrivate || checkIfInclude(it) }))
+                .filter { includePrivate || checkIfInclude(it) })
+        )
         if (withValueType) {
             add("valueType", context.serialize(src.valueType))
         }
@@ -88,7 +91,8 @@ class ConfigurableSerializer(
              * Do not include modules that are heavily user-personalised
              */
             if (value.category == Category.RENDER || value.category == Category.CLIENT ||
-                value.category == Category.FUN) {
+                value.category == Category.FUN ||value.valueType == ValueType.COLOR
+            ) {
                 return false
             }
         }

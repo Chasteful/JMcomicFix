@@ -56,7 +56,7 @@ internal object Matrix7145FlagLongJump : Choice("Matrix-7.14.5-Flag") {
         // Reset
         waitUntil { player.isOnGround }
         flagTicks = 0
-        if (ModuleLongJump.autoDisable) {
+        if (ModuleLongJump.AutoDisable.onBoosted) {
             ModuleLongJump.enabled = false
         }
     }

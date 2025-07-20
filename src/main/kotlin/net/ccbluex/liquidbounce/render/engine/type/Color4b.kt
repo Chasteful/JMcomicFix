@@ -17,10 +17,12 @@
  * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
  */
 @file:Suppress("TooManyFunctions")
+
 package net.ccbluex.liquidbounce.render.engine.type
 
 import org.lwjgl.opengl.GL20
 import java.awt.Color
+import kotlin.math.abs
 
 @JvmRecord
 data class Color4b(val r: Int, val g: Int, val b: Int, val a: Int = 255) {
@@ -74,6 +76,7 @@ data class Color4b(val r: Int, val g: Int, val b: Int, val a: Int = 255) {
     constructor(color: Color) : this(color.red, color.green, color.blue, color.alpha)
     constructor(hex: Int, hasAlpha: Boolean = false) : this(Color(hex, hasAlpha))
 
+
     fun with(
         r: Int = this.r,
         g: Int = this.g,
@@ -87,7 +90,9 @@ data class Color4b(val r: Int, val g: Int, val b: Int, val a: Int = 255) {
 
     fun toARGB() = (a shl 24) or (r shl 16) or (g shl 8) or b
 
-    fun toABGR() = (a shl 24) or (b shl 16) or (g shl 8) or r
+    fun withAlpha(alpha: Int): Color4b {
+        return Color4b(r, g, b, alpha.coerceIn(0, 255))
+    }
 
     fun fade(fade: Float): Color4b {
         return if (fade >= 1.0f) {
@@ -143,5 +148,4 @@ data class Color4b(val r: Int, val g: Int, val b: Int, val a: Int = 255) {
      *
      * @return The Color object representation
      */
-    fun toAwtColor(): Color = Color(r, g, b, a)
 }

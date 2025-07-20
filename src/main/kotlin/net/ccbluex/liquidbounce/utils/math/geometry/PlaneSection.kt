@@ -41,6 +41,7 @@ class PlaneSection(
 
                 DoubleDoublePair.of(dz, dy)
             }
+
             vec1zero && vec2zero -> DoubleDoublePair.of(1.0, 1.0)
             vec1zero -> DoubleDoublePair.of(1.0, 2.0 / nPoints)
             else -> DoubleDoublePair.of(2.0 / nPoints, 1.0)

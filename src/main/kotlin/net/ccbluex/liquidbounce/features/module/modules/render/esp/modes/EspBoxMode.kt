@@ -38,6 +38,7 @@ object EspBoxMode : EspMode("Box") {
         val matrixStack = event.matrixStack
         val entitiesWithBoxes = RenderedEntities.map { entity ->
             val dimensions = entity.getDimensions(entity.pose)
+
             val d = dimensions.width.toDouble() / 2.0
 
             entity to Box(-d, 0.0, -d, d, dimensions.height.toDouble(), d).expand(expand.toDouble())

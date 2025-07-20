@@ -32,12 +32,12 @@
 <div class="setting">
     <div class="name">{$spaceSeperatedNames ? convertToSpacedString(cSetting.name) : cSetting.name}</div>
     <div class="input-group">
-        <input type="number" class="value" spellcheck="false" placeholder="X" bind:value={cSetting.value.x}
-               on:input={handleChange}/>
-        <input type="number" class="value" spellcheck="false" placeholder="Y" bind:value={cSetting.value.y}
-               on:input={handleChange}/>
-        <input type="number" class="value" spellcheck="false" placeholder="Z" bind:value={cSetting.value.z}
-               on:input={handleChange}/>
+        <input bind:value={cSetting.value.x} class="value" on:input={handleChange} placeholder="X" spellcheck="false"
+               type="number"/>
+        <input bind:value={cSetting.value.y} class="value" on:input={handleChange} placeholder="Y" spellcheck="false"
+               type="number"/>
+        <input bind:value={cSetting.value.z} class="value" on:input={handleChange} placeholder="Z" spellcheck="false"
+               type="number"/>
         <button class="locate-btn" on:click={locate} title="Locate">&#x2299;</button>
     </div>
 </div>
@@ -51,8 +51,8 @@
 
   .name {
     font-weight: 500;
-    color: $clickgui-text-color;
-    font-size: 12px;
+    color: $text;
+    font-size: var(--font-size);
     margin-bottom: 5px;
   }
 
@@ -63,12 +63,12 @@
 
     input.value {
       width: 100%;
-      background-color: rgba($clickgui-base-color, .36);
-      font-family: monospace;
-      font-size: 12px;
-      color: $clickgui-text-color;
+      background-color: rgba($base, .4);
+
+      font-size: var(--font-size);
+      color: $text;
       border: none;
-      border-bottom: solid 2px $accent-color;
+      border-bottom: solid 2px $text;
       padding: 5px;
       border-radius: 3px;
       transition: ease border-color .2s;
@@ -78,7 +78,7 @@
         background-color: transparent;
       }
 
-      /* Hide the number input spinner buttons */
+
       &::-webkit-outer-spin-button,
       &::-webkit-inner-spin-button {
         -webkit-appearance: none;
@@ -91,8 +91,8 @@
       background-color: transparent;
       border: none;
       cursor: pointer;
-      color: $clickgui-text-color;
-      font-size: 12px;
+      color: $text;
+      font-size: var(--font-size);
       text-align: right;
     }
   }

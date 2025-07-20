@@ -20,6 +20,7 @@
  */
 package net.ccbluex.liquidbounce.features.module.modules.movement.longjump
 
+import net.ccbluex.liquidbounce.config.types.ToggleableConfigurable
 import net.ccbluex.liquidbounce.event.events.MovementInputEvent
 import net.ccbluex.liquidbounce.event.events.PlayerJumpEvent
 import net.ccbluex.liquidbounce.event.handler
@@ -27,6 +28,7 @@ import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.features.module.modules.movement.longjump.modes.Matrix7145FlagLongJump
 import net.ccbluex.liquidbounce.features.module.modules.movement.longjump.modes.VulcanLongJump
+import net.ccbluex.liquidbounce.features.module.modules.movement.longjump.modes.bloxd.BloxdBow
 import net.ccbluex.liquidbounce.features.module.modules.movement.longjump.modes.nocheatplus.NoCheatPlusBoost
 import net.ccbluex.liquidbounce.features.module.modules.movement.longjump.modes.nocheatplus.NoCheatPlusBow
 import net.ccbluex.liquidbounce.utils.entity.moving
@@ -42,31 +44,42 @@ object ModuleLongJump : ClientModule("LongJump", Category.MOVEMENT) {
             // NoCheatPlus
             NoCheatPlusBoost,
             NoCheatPlusBow,
+            //Bloxd
+            BloxdBow,
             VulcanLongJump,
             Matrix7145FlagLongJump
         )
     ).apply { tagBy(this) }
     private val autoJump by boolean("AutoJump", false)
-    val autoDisable by boolean("DisableAfterFinished", false)
+
+    object AutoDisable : ToggleableConfigurable(this, "DisableAfterFinished", true) {
+        val onBoosted by boolean("OnBoosted", true)
+        val onGround by boolean("onGround", false)
+    }
+
+    init {
+        tree(AutoDisable)
+    }
 
     var jumped = false
     var canBoost = false
     var boosted = false
-
     val tickHandler = handler<MovementInputEvent> {
         if (jumped) {
-            if (player.isOnGround || player.abilities.flying) {
-                if (autoDisable && boosted) {
-                    enabled = false
-                }
+            val canDisable = AutoDisable.onBoosted ||
+                (AutoDisable.onGround && player.isOnGround) ||
+                (player.abilities.flying)
 
+            if (canDisable && boosted) {
+                enabled = false
                 jumped = false
+                boosted = false
             }
         }
-
         // AutoJump
         if (autoJump && player.isOnGround && player.moving
-            && mode.activeChoice != NoCheatPlusBow) {
+            && mode.activeChoice != NoCheatPlusBow
+        ) {
             player.jump()
             jumped = true
         }

@@ -1,5 +1,5 @@
-import { getPersistentStorageItems, setPersistentStorageItems } from "./rest";
-import type { PersistentStorageItem } from "./types";
+import {getPersistentStorageItems, setPersistentStorageItems} from "./rest";
+import type {PersistentStorageItem} from "./types";
 
 let loadedOnce = false;
 let persistentDataUpdateTimeout: null | number = null;
@@ -7,7 +7,7 @@ let persistentDataUpdateTimeout: null | number = null;
 export async function insertPersistentData() {
     const items = await getPersistentStorageItems();
 
-    for (const { key, value } of items) {
+    for (const {key, value} of items) {
         localStorage.setItem(key, value);
     }
     loadedOnce = true;
@@ -40,6 +40,6 @@ export async function updatePersistentData() {
 }
 
 export async function setItem(name: string, value: string) {
-    localStorage.setItem(name ,value);
+    localStorage.setItem(name, value);
     await updatePersistentData();
 }

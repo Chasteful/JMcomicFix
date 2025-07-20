@@ -135,7 +135,7 @@ object ModuleAutoChatGame : ClientModule("AutoChatGame", Category.MISC) {
         waitUntil {
             // Has the trigger word been said and has the buffer time elapsed?
             triggerWordChronometer.hasElapsed(bufferTime.toLong())
-            // Is the buffer empty? - If it is we already answered the question.
+                // Is the buffer empty? - If it is we already answered the question.
                 && chatBuffer.isNotEmpty()
         }
 

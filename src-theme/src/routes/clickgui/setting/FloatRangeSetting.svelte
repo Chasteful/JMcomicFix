@@ -17,16 +17,6 @@
     let apiSlider: API;
 
     onMount(() => {
-        let step = 0.01;
-
-        if (cSetting.range.to > 100) {
-            step = 0.1;
-        } else if (cSetting.range.to <= 0.1) {
-            step = 0.0001;
-        } else if (cSetting.range.to <= 1.0) {
-            step = 0.001;
-        }
-
         apiSlider = noUiSlider.create(slider, {
             start: [cSetting.value.from, cSetting.value.to],
             connect: true,
@@ -34,11 +24,7 @@
                 min: cSetting.range.from,
                 max: cSetting.range.to,
             },
-            step: step,
-            format: {
-                to: (value) => parseFloat(value.toFixed(4)), // Display up to 4 decimal places
-                from: (value) => parseFloat(value), // Convert back to float
-            }
+            step: 0.01,
         });
 
         apiSlider.on("update", values => {
@@ -60,11 +46,11 @@
 <div class="setting" class:has-suffix={cSetting.suffix !== ""}>
     <div class="name">{$spaceSeperatedNames ? convertToSpacedString(cSetting.name) : cSetting.name}</div>
     <div class="value">
-        <ValueInput valueType="float" value={cSetting.value.from}
-                    on:change={(e) => apiSlider.set([e.detail.value, cSetting.value.to])}/>
+        <ValueInput on:change={(e) => apiSlider.set([e.detail.value, cSetting.value.to])} value={cSetting.value.from}
+                    valueType="float"/>
         -
-        <ValueInput valueType="float" value={cSetting.value.to}
-                    on:change={(e) => apiSlider.set([cSetting.value.from, e.detail.value])}/>
+        <ValueInput on:change={(e) => apiSlider.set([cSetting.value.from, e.detail.value])} value={cSetting.value.to}
+                    valueType="float"/>
     </div>
     {#if cSetting.suffix !== ""}
         <div class="suffix">{cSetting.suffix}</div>
@@ -84,7 +70,7 @@
     grid-template-columns: 1fr max-content;
     column-gap: 5px;
 
-    /* animation fix */
+
     min-height: 46px;
   }
 
@@ -97,9 +83,9 @@
 
   .suffix,
   .setting {
-    color: $clickgui-text-color;
+    color: $text;
     font-weight: 500;
-    font-size: 12px;
+    font-size: var(--font-size);
   }
 
   .name {

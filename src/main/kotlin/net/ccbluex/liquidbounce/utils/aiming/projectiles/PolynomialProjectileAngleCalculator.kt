@@ -16,7 +16,7 @@ import kotlin.math.sqrt
  *
  * Currently only used as backup
  */
-object PolynomialProjectileAngleCalculator: ProjectileAngleCalculator() {
+object PolynomialProjectileAngleCalculator : ProjectileAngleCalculator() {
     override fun calculateAngleFor(
         projectileInfo: TrajectoryInfo,
         sourcePos: Vec3d,

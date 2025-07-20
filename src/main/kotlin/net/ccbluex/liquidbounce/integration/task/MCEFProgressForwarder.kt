@@ -33,13 +33,15 @@ class MCEFProgressForwarder(val task: Task) : MCEFProgressListener {
      * @param progress Progress
      */
     @Suppress("EmptyFunctionBlock")
-    override fun onProgressUpdate(task: String, progress: Float) {}
+    override fun onProgressUpdate(task: String, progress: Float) {
+    }
 
     /**
      * If everything is complete
      */
     @Suppress("EmptyFunctionBlock")
-    override fun onComplete() {}
+    override fun onComplete() {
+    }
 
     /**
      * File download or extraction start

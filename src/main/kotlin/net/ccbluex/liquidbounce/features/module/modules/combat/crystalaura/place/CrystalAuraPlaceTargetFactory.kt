@@ -53,7 +53,7 @@ object CrystalAuraPlaceTargetFactory : MinecraftShortcuts {
         sphere = BlockPos.ORIGIN.getSortedSphere(getMaxRange())
     }
 
-    fun updateTarget(excludeIds : IntArray?) {
+    fun updateTarget(excludeIds: IntArray?) {
         // Reset current target
         previousTarget = placementTarget
         placementTarget = null

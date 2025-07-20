@@ -58,21 +58,22 @@ import static org.lwjgl.opengl.GL11.*;
 public abstract class MixinWorldRenderer {
 
     @Shadow
-    protected abstract boolean canDrawEntityOutlines();
-
-    @Shadow
-    @Final
-    private MinecraftClient client;
-    @Shadow
     @Final
     public DefaultFramebufferSet framebufferSet;
-
-    @Shadow
-    protected abstract void renderEntity(Entity entity, double cameraX, double cameraY, double cameraZ, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers);
-
     @Shadow
     @Nullable
     public Framebuffer entityOutlineFramebuffer;
+    @Shadow
+    @Final
+    private MinecraftClient client;
+    @Unique
+    private boolean isRenderingChams = false;
+
+    @Shadow
+    protected abstract boolean canDrawEntityOutlines();
+
+    @Shadow
+    protected abstract void renderEntity(Entity entity, double cameraX, double cameraY, double cameraZ, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers);
 
     @Shadow
     public abstract @Nullable Framebuffer getEntityOutlinesFramebuffer();
@@ -91,7 +92,7 @@ public abstract class MixinWorldRenderer {
         }
     }
 
-   @Inject(method = "render", at = @At("HEAD"))
+    @Inject(method = "render", at = @At("HEAD"))
     private void onRender(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, Matrix4f positionMatrix, Matrix4f projectionMatrix, CallbackInfo ci) {
         try {
             OutlineShader outlineShader = OutlineShader.INSTANCE;
@@ -164,9 +165,6 @@ public abstract class MixinWorldRenderer {
         }
     }
 
-    @Unique
-    private boolean isRenderingChams = false;
-
     @Inject(method = "renderEntity", at = @At("HEAD"))
     private void injectChamsForEntity(Entity entity, double cameraX, double cameraY, double cameraZ, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
         if (ModuleChams.INSTANCE.getRunning() && CombatExtensionsKt.shouldBeAttacked(entity)) {
@@ -210,11 +208,7 @@ public abstract class MixinWorldRenderer {
             return true;
         } else if (ModuleTNTTimer.INSTANCE.getRunning() && ModuleTNTTimer.INSTANCE.getEsp() && entity instanceof TntEntity) {
             return true;
-        } else if (ModuleStorageESP.Glow.INSTANCE.getRunning() && ModuleStorageESP.categorize(entity) != null) {
-            return true;
-        } else {
-            return false;
-        }
+        } else return ModuleStorageESP.Glow.INSTANCE.getRunning() && ModuleStorageESP.categorize(entity) != null;
     }
 
     /**

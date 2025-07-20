@@ -144,6 +144,7 @@ object ModuleSafeWalk : ClientModule("SafeWalk", Category.MOVEMENT) {
                         event.directionalInput = event.directionalInput.invert()
                         event.jump = false
                     }
+
                     (mode == Mode.CENTER || player.sqrtSpeed > 0.05) -> {
                         val center = center ?: player.blockPos.toBottomCenterPos()
                         val degrees = getDegreesRelativeToView(

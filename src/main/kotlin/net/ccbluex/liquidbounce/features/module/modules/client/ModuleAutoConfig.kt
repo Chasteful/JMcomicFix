@@ -108,7 +108,7 @@ object ModuleAutoConfig : ClientModule("AutoConfig", Category.CLIENT, state = tr
         // "hypixel-csgo", "hypixel-legit", etc.
         val autoConfig = (configs ?: return).filter { config ->
             config.serverAddress?.rootDomain().equals(address, true) ||
-                    config.serverAddress.equals(address, true)
+                config.serverAddress.equals(address, true)
         }.minByOrNull { config -> config.name.length }
 
         if (autoConfig == null) {
@@ -125,12 +125,16 @@ object ModuleAutoConfig : ClientModule("AutoConfig", Category.CLIENT, state = tr
         }.onFailure { error ->
             logger.error("Failed to load config ${autoConfig.name} for $address.", error)
             connectScreen?.setStatus(markAsError(message("failed", address)))
-            notification("Auto Config", "Failed to load config ${autoConfig.name}.",
-                NotificationEvent.Severity.ERROR)
+            notification(
+                "Auto Config", "Failed to load config ${autoConfig.name}.",
+                NotificationEvent.Severity.ERROR
+            )
         }.onSuccess {
             connectScreen?.setStatus(regular(message("loaded", address)))
-            notification("Auto Config", "Successfully loaded config ${autoConfig.name}.",
-                NotificationEvent.Severity.SUCCESS)
+            notification(
+                "Auto Config", "Successfully loaded config ${autoConfig.name}.",
+                NotificationEvent.Severity.SUCCESS
+            )
         }
     }
 

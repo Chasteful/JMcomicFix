@@ -30,13 +30,6 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 @Mixin(value = LightDataAccess.class, remap = false)
 public class MixinSodiumLightDataAccessMixin {
 
-    @Shadow
-    @Final
-    private BlockPos.Mutable pos;
-
-    @Shadow
-    protected BlockRenderView level;
-
     /**
      * Maximum light level for all color channels.
      * <p>
@@ -45,6 +38,11 @@ public class MixinSodiumLightDataAccessMixin {
      */
     @Unique
     private static final int MAX_LIGHT_LEVEL = 15 | 15 << 4 | 15 << 8;
+    @Shadow
+    protected BlockRenderView level;
+    @Shadow
+    @Final
+    private BlockPos.Mutable pos;
 
     @ModifyVariable(method = "compute", at = @At(value = "TAIL"), name = "bl")
     private int modifyLightLevel(int original) {

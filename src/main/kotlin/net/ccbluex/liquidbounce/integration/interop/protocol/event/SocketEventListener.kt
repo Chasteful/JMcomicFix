@@ -43,8 +43,7 @@ class SocketEventListener : EventListener {
     }
 
     fun register(name: String) {
-        val eventClass = events[name] ?:
-            throw IllegalArgumentException("Unknown event: $name")
+        val eventClass = events[name] ?: throw IllegalArgumentException("Unknown event: $name")
 
         if (registeredEvents.containsKey(eventClass)) {
             error("Event $name is already registered")
@@ -57,10 +56,9 @@ class SocketEventListener : EventListener {
     }
 
     fun unregister(name: String) {
-        val eventClass = events[name] ?:
-            throw IllegalArgumentException("Unknown event: $name")
-        val eventHook = registeredEvents[eventClass] ?:
-            throw IllegalArgumentException("No EventHook for event: $eventClass")
+        val eventClass = events[name] ?: throw IllegalArgumentException("Unknown event: $name")
+        val eventHook =
+            registeredEvents[eventClass] ?: throw IllegalArgumentException("No EventHook for event: $eventClass")
 
         EventManager.unregisterEventHook(eventClass.java, eventHook)
     }
@@ -84,7 +82,6 @@ class SocketEventListener : EventListener {
             logger.error("WebSocket event broadcast failed", t)
         }
     }
-
 
 
 }

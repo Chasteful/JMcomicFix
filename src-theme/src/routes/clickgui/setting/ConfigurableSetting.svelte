@@ -1,6 +1,9 @@
 <script lang="ts">
     import {createEventDispatcher} from "svelte";
-    import type {ConfigurableSetting, ModuleSetting,} from "../../../integration/types";
+    import type {
+        ModuleSetting,
+        ConfigurableSetting,
+    } from "../../../integration/types";
     import GenericSetting from "./common/GenericSetting.svelte";
     import ExpandArrow from "./common/ExpandArrow.svelte";
     import {setItem} from "../../../integration/persistent_storage";
@@ -20,11 +23,13 @@
     }
 
     let expanded = localStorage.getItem(thisPath) === "true";
+    let skipAnimationDelay = false;
 
     $: setItem(thisPath, expanded.toString());
 
     function toggleExpanded() {
         expanded = !expanded;
+        skipAnimationDelay = true;
     }
 </script>
 
@@ -32,13 +37,13 @@
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div class="head" class:expanded on:contextmenu|preventDefault={toggleExpanded}>
         <div class="title">{$spaceSeperatedNames ? convertToSpacedString(cSetting.name) : cSetting.name}</div>
-        <ExpandArrow bind:expanded />
+        <ExpandArrow bind:expanded on:click={() => skipAnimationDelay = true}/>
     </div>
 
     {#if expanded}
         <div class="nested-settings">
             {#each cSetting.value as setting (setting.name)}
-                <GenericSetting path={thisPath} bind:setting on:change={handleChange}/>
+                <GenericSetting {skipAnimationDelay} path={thisPath} bind:setting on:change={handleChange}/>
             {/each}
         </div>
     {/if}
@@ -47,13 +52,9 @@
 <style lang="scss">
   @use "../../../colors.scss" as *;
 
-  .setting {
-    padding: 7px 0;
-  }
-
   .title {
-    color: $clickgui-text-color;
-    font-size: 12px;
+    color: $text;
+    font-size: var(--font-size);
     font-weight: 600;
   }
 
@@ -68,7 +69,7 @@
   }
 
   .nested-settings {
-    border-left: solid 2px $accent-color;
-    padding-left: 7px;
+    width: 100%;
+    padding: 0px 4px;
   }
 </style>

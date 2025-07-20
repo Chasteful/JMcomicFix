@@ -32,6 +32,7 @@ import net.minecraft.item.Items
 object ModuleAutoLeave : ClientModule("AutoLeave", Category.COMBAT) {
 
     private val health by float("Health", 8f, 0f..20f, "HP")
+
     /**
      * When conditions are met, we will start counting up until we reach our threshold. If conditions are not met,
      * we reset the counter and start from the beginning.

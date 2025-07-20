@@ -39,11 +39,15 @@ internal object FlyFireball : Choice("Fireball") {
     override val parent: ChoiceConfigurable<*>
         get() = ModuleFly.modes
 
-    val technique = choices("Technique", FlyFireballLegitTechnique,
-        arrayOf(FlyFireballLegitTechnique, FlyFireballCustomTechnique))
+    val technique = choices(
+        "Technique", FlyFireballLegitTechnique,
+        arrayOf(FlyFireballLegitTechnique, FlyFireballCustomTechnique)
+    )
 
-    val trigger = choices("Trigger", FlyFireballInstantTrigger,
-        arrayOf(FlyFireballInstantTrigger, FlyFireballOnEdgeTrigger))
+    val trigger = choices(
+        "Trigger", FlyFireballInstantTrigger,
+        arrayOf(FlyFireballInstantTrigger, FlyFireballOnEdgeTrigger)
+    )
 
     // Silent fireball selection
     object AutoFireball : ToggleableConfigurable(this, "AutoFireball", true) {

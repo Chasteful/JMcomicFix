@@ -148,7 +148,8 @@ class AccelerationAngleSmooth(parent: ChoiceConfigurable<*>) : AngleSmooth("Acce
 
         // Check if we are already on target
         if (MathHelper.approximatelyEquals(diff.deltaYaw, 0f) &&
-            MathHelper.approximatelyEquals(diff.deltaPitch, 0f)) {
+            MathHelper.approximatelyEquals(diff.deltaPitch, 0f)
+        ) {
             return 0
         }
 
@@ -163,7 +164,8 @@ class AccelerationAngleSmooth(parent: ChoiceConfigurable<*>) : AngleSmooth("Acce
         if (MathHelper.approximatelyEquals(newYawDiff, 0f) &&
             MathHelper.approximatelyEquals(newPitchDiff, 0f) ||
             abs(diff.deltaYaw) < abs(newYawDiff) &&
-            abs(diff.deltaPitch) < abs(newPitchDiff)) {
+            abs(diff.deltaPitch) < abs(newPitchDiff)
+        ) {
             return 0
         }
 

@@ -55,7 +55,8 @@ import kotlin.math.max
  */
 object ModuleHoleFiller : ClientModule("HoleFiller", Category.WORLD), HoleManagerSubscriber {
 
-    private val features by multiEnumChoice("Features",
+    private val features by multiEnumChoice(
+        "Features",
         Features.SMART,
         Features.PREVENT_SELF_FILL,
         Features.CHECK_MOVEMENT
@@ -79,13 +80,15 @@ object ModuleHoleFiller : ClientModule("HoleFiller", Category.WORLD), HoleManage
     /**
      * The core of the module, the placer.
      */
-    private val placer = tree(BlockPlacer(
-        "Placing",
-        this,
-        Priority.NORMAL,
-        { filter.getSlot(blocks) },
-        allowSupportPlacements = false
-    ))
+    private val placer = tree(
+        BlockPlacer(
+            "Placing",
+            this,
+            Priority.NORMAL,
+            { filter.getSlot(blocks) },
+            allowSupportPlacements = false
+        )
+    )
 
     private val range: Int get() = ceil(max(placer.range, placer.wallRange)).toInt()
 
@@ -196,7 +199,7 @@ object ModuleHoleFiller : ClientModule("HoleFiller", Category.WORLD), HoleManage
 
         holeContext.holes.forEach { hole ->
             if (hole in checkedHoles) {
-               return@forEach
+                return@forEach
             }
 
             val valid = isValidHole(hole, entity, region, holeContext.selfInHole, holeContext.selfRegion)
@@ -230,16 +233,16 @@ object ModuleHoleFiller : ClientModule("HoleFiller", Category.WORLD), HoleManage
         region: Region,
         selfInHole: Boolean,
         selfRegion: Region
-    ) : BooleanDoubleImmutablePair {
+    ): BooleanDoubleImmutablePair {
         val y = hole.positions.from.y + 1.0
         val movingTowardsHole = isMovingTowardsHole(hole, entity)
         val requirementsMet = movingTowardsHole.firstBoolean() && hole.positions.intersects(region) && y <= entity.y
 
         val noSelfFillViolation =
             Features.PREVENT_SELF_FILL !in features
-            || y > player.y
-            || selfInHole
-            || !hole.positions.intersects(selfRegion)
+                || y > player.y
+                || selfInHole
+                || !hole.positions.intersects(selfRegion)
 
         return BooleanDoubleImmutablePair(requirementsMet && noSelfFillViolation, movingTowardsHole.rightDouble())
     }

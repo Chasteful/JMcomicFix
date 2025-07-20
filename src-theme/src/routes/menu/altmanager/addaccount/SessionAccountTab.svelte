@@ -20,6 +20,6 @@
 </script>
 
 <Tab>
-    <IconTextInput icon="user" title="Session ID" bind:value={token}/>
-    <ButtonSetting title="Add Account" {disabled} on:click={addAccount} listenForEnter={true} inset={true} />
+    <IconTextInput bind:value={token} icon="user" title="Session ID"/>
+    <ButtonSetting {disabled} inset={true} listenForEnter={true} on:click={addAccount} title="Add Account"/>
 </Tab>

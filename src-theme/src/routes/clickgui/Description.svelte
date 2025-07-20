@@ -8,10 +8,10 @@
         data = v;
     });
 
-    let element: HTMLElement | null = null;
-    let left = 0;
-    let anchor: "right" | "left" = "right";
 
+    let element: HTMLElement | null = null;
+    let anchor: "right" | "left" = "right";
+    let left = 0;
     $: {
         if (data?.x !== undefined && element !== null) {
             anchor = data.anchor;
@@ -40,15 +40,15 @@
 
   .description-wrapper {
     position: fixed;
-    z-index: 999999999999;
+    z-index: 2147483647;
     transform: translateY(-50%);
   }
 
   .description {
     position: relative;
     border-radius: 5px;
-    background-color: rgba($clickgui-base-color, .9);
-    filter: drop-shadow(0 0 10px rgba($clickgui-base-color, 0.5));
+    background-color: rgba($base, 0.7);
+    filter: drop-shadow(0 0 10px rgba($base, 0.5));
 
     &::before {
       content: "";
@@ -58,7 +58,7 @@
       height: 0;
       border-top: 8px solid transparent;
       border-bottom: 8px solid transparent;
-      border-right: 8px solid rgba($clickgui-base-color, .9);
+      border-right: 8px solid rgba($base, .7);
       left: -8px;
       top: 50%;
       transform: translateY(-50%);
@@ -74,8 +74,9 @@
   }
 
   .text {
-    font-size: 12px;
+    font-family: 'Alibaba', serif;
+    font-size: calc(var(--font-size) + 2px);
     padding: 10px;
-    color: $clickgui-text-color;
+    color: $text;
   }
 </style>

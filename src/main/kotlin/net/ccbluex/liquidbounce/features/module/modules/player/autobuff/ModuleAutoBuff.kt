@@ -32,6 +32,7 @@ import net.ccbluex.liquidbounce.features.module.modules.player.autobuff.features
 import net.ccbluex.liquidbounce.utils.aiming.RotationsConfigurable
 import net.ccbluex.liquidbounce.utils.client.SilentHotbar
 import net.ccbluex.liquidbounce.utils.combat.CombatManager
+import net.minecraft.item.consume.UseAction
 
 object ModuleAutoBuff : ClientModule(
     name = "AutoBuff",
@@ -82,7 +83,7 @@ object ModuleAutoBuff : ClientModule(
 
     internal class AutoBuffRotationsConfigurable : RotationsConfigurable(this) {
 
-        val rotationTiming by enumChoice("RotationTiming", RotationTimingMode.NORMAL)
+        val rotationTiming by enumChoice("RotationTiming", RotationTimingMode.NORMAL).apply(::tagBy)
 
         enum class RotationTimingMode(override val choiceName: String) : NamedChoice {
             NORMAL("Normal"),
@@ -102,9 +103,44 @@ object ModuleAutoBuff : ClientModule(
 
     private val activeFeatures
         get() = features.filter { it.enabled }
+    var eatingStartTime: Long = 0
+    var isEating: Boolean = false
+    var eatingMaxDuration: Int = 32
+    private var currentEatingFeature: HealthBasedBuff? = null
+
+    fun startEating(feature: HealthBasedBuff, duration: Int) {
+        if (currentEatingFeature != null && currentEatingFeature != feature) return
+
+        isEating = true
+        currentEatingFeature = feature
+        eatingStartTime = System.currentTimeMillis()
+        eatingMaxDuration = duration
+    }
+
+    fun stopEating(feature: HealthBasedBuff) {
+        if (currentEatingFeature == feature) {
+            isEating = false
+            currentEatingFeature = null
+        }
+    }
 
     @Suppress("unused")
     private val tickHandler = tickHandler {
+        val usingItem = player.isUsingItem
+        val useAction = player.activeItem.useAction
+
+        val shouldBeEating = (usingItem && (useAction == UseAction.EAT || useAction == UseAction.DRINK)) ||
+            currentEatingFeature != null
+
+        if (shouldBeEating && !isEating) {
+            isEating = true
+            eatingStartTime = System.currentTimeMillis()
+            eatingMaxDuration =
+                currentEatingFeature?.let { eatingMaxDuration } ?: player.activeItem.getMaxUseTime(player)
+        } else if (!shouldBeEating && isEating) {
+            isEating = false
+            currentEatingFeature = null
+        }
         if (notDuringCombat && CombatManager.isInCombat) {
             return@tickHandler
         }

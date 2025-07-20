@@ -62,7 +62,7 @@ object ModuleMiddleClickAction : ClientModule(
 
         private val slotResetDelay by int("SlotResetDelay", 1, 0..10, "ticks")
 
-        private var wasPressed = false
+        var wasPressed = false
 
         val repeatable = tickHandler {
             if (mc.currentScreen != null) {

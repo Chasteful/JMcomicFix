@@ -15,6 +15,17 @@
     "checkJs": true,
     "isolatedModules": true
   },
-  "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": [
+    "src/**/*.ts",
+    "src",
+    "src/shims-frag.d.ts",
+    "src/**/*.js",
+    "src/**/*.svelte",
+    "src/routes/hud/elements/inventory/InventoryContainer.svelte"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
 }

@@ -25,36 +25,40 @@
     }
 </script>
 
-<svelte:window on:keydown={handleKeyDown} />
+<svelte:window on:keydown={handleKeyDown}/>
 
-<div class="module" class:enabled class:selected bind:this={moduleElement}>
+<div bind:this={moduleElement} class="module" class:enabled class:selected>
     <div class="name">{$spaceSeperatedNames ? convertToSpacedString(name) : name}</div>
 </div>
 
 <style lang="scss">
-    @use "../../../../colors.scss" as *;
+  @use "../../../../colors.scss" as *;
 
-    .module {
-        font-weight: 500;
-        color: $tabgui-text-dimmed-color;
-        font-size: 12px;
-        padding: 6px 15px 6px 10px;
-        transition: ease color 0.2s;
+  .module {
+    font-family: "Alibaba", sans-serif;
+    font-weight: 500;
+    color: rgba(150, 150, 150);
+    font-size: 14px;
 
-        .name {
-            transition: ease transform 0.2s;
-        }
+    padding: 6px 15px 6px 10px;
+    transition: ease color 0.2s;
 
-        &.selected {
-            background-color: rgba($tabgui-base-color, 0.36);
-
-            .name {
-                transform: translateX(5px);
-            }
-        }
-
-        &.enabled {
-            color: $tabgui-text-color;
-        }
+    .name {
+      transition: ease transform 0.2s;
     }
+
+    &.selected {
+      color: $text;
+      border-radius: 6px;
+      background-color: rgba($base, 0.36);
+    }
+
+    &.enabled .name, &.selected.enabled .name {
+      background-clip: text;
+      background: linear-gradient(to right, var(--primary-color) 0%, var(--secondary-color) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 8px color-mix(in srgb, var(--secondary-color) 30%, transparent);
+    }
+  }
 </style>

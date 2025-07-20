@@ -43,6 +43,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Item.class)
 public class MixinItem {
 
+    @ModifyExpressionValue(method = "raycast", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/entity/player/PlayerEntity;getRotationVector(FF)Lnet/minecraft/util/math/Vec3d;"))
+    private static Vec3d hookFixRotation(Vec3d original, World world, PlayerEntity player, RaycastContext.FluidHandling fluidHandling) {
+        var rotation = RotationManager.INSTANCE.getCurrentRotation();
+
+        if (player == MinecraftClient.getInstance().player && rotation != null) {
+            return rotation.getDirectionVector();
+        }
+
+        return original;
+    }
+
     @Inject(method = "use", at = @At("HEAD"), cancellable = true)
     private void hookSwordUse(World world, PlayerEntity user, Hand hand,
                               CallbackInfoReturnable<ActionResult> cir) {
@@ -74,18 +86,6 @@ public class MixinItem {
         // Hooks sword max use time
         if (((Object) this) instanceof SwordItem && ModuleSwordBlock.INSTANCE.getRunning() && !ModuleSwordBlock.INSTANCE.getOnlyVisual()) {
             return 72000;
-        }
-
-        return original;
-    }
-
-    @ModifyExpressionValue(method = "raycast", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/entity/player/PlayerEntity;getRotationVector(FF)Lnet/minecraft/util/math/Vec3d;"))
-    private static Vec3d hookFixRotation(Vec3d original, World world, PlayerEntity player, RaycastContext.FluidHandling fluidHandling) {
-        var rotation = RotationManager.INSTANCE.getCurrentRotation();
-
-        if (player == MinecraftClient.getInstance().player && rotation != null) {
-            return rotation.getDirectionVector();
         }
 
         return original;

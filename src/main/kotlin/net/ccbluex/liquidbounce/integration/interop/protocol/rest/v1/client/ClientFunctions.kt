@@ -31,7 +31,6 @@ import net.ccbluex.netty.http.util.httpForbidden
 import net.ccbluex.netty.http.util.httpOk
 import net.minecraft.util.Util
 import java.net.URI
-import java.text.SimpleDateFormat
 import java.util.*
 
 // GET /api/v1/client/info

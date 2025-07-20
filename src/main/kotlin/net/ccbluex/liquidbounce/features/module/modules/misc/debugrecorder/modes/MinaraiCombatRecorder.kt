@@ -54,13 +54,15 @@ import net.minecraft.util.math.Box
  */
 object MinaraiCombatRecorder : ModuleDebugRecorder.DebugRecorderMode<TrainingData>("MinaraiCombat") {
 
-    private var targetTracker = tree(TargetTracker(
-        // Start tracking target that we look at the closest
-        defaultPriority = TargetPriority.DIRECTION,
+    private var targetTracker = tree(
+        TargetTracker(
+            // Start tracking target that we look at the closest
+            defaultPriority = TargetPriority.DIRECTION,
 
-        // Start tracking when 10 blocks away
-        rangeValue =  FloatValueProvider("Range", 10f, 7f..12f)
-    ))
+            // Start tracking when 10 blocks away
+            rangeValue = FloatValueProvider("Range", 10f, 7f..12f)
+        )
+    )
     private var previous: Rotation = Rotation(0f, 0f)
 
     private val fightMap = Int2ObjectOpenHashMap<Fight>()
@@ -113,17 +115,19 @@ object MinaraiCombatRecorder : ModuleDebugRecorder.DebugRecorderMode<TrainingDat
             val fight = fightMap.getOrPut(target.id, ::Fight)
             val buffer = trainingCollection.getOrPut(target.id, ::ArrayList)
 
-            buffer.add(TrainingData(
-                currentVector = current.directionVector,
-                previousVector = previous.directionVector,
-                targetVector = targetRotation.directionVector,
-                velocityDelta = current.rotationDeltaTo(next).toVec2f(),
-                playerDiff = player.pos.subtract(player.prevPos),
-                targetDiff = target.pos.subtract(target.prevPos),
-                age = fight.ticks,
-                hurtTime = target.hurtTime,
-                distance = player.squaredBoxedDistanceTo(target).toFloat()
-            ))
+            buffer.add(
+                TrainingData(
+                    currentVector = current.directionVector,
+                    previousVector = previous.directionVector,
+                    targetVector = targetRotation.directionVector,
+                    velocityDelta = current.rotationDeltaTo(next).toVec2f(),
+                    playerDiff = player.pos.subtract(player.prevPos),
+                    targetDiff = target.pos.subtract(target.prevPos),
+                    age = fight.ticks,
+                    hurtTime = target.hurtTime,
+                    distance = player.squaredBoxedDistanceTo(target).toFloat()
+                )
+            )
 
             fight.ticks++
         }

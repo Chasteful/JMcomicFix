@@ -21,6 +21,8 @@ package net.ccbluex.liquidbounce.features.module.modules.misc
 import net.ccbluex.liquidbounce.config.types.Configurable
 import net.ccbluex.liquidbounce.config.types.NamedChoice
 import net.ccbluex.liquidbounce.config.types.ToggleableConfigurable
+import net.ccbluex.liquidbounce.event.EventManager
+import net.ccbluex.liquidbounce.event.events.BetterTabChangeEvent
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
@@ -38,10 +40,14 @@ object ModuleBetterTab : ClientModule("BetterTab", Category.RENDER) {
 
     val sorting by enumChoice("Sorting", Sorting.VANILLA)
 
-    private val visibility by multiEnumChoice("Visibility",
+    private val visibility by multiEnumChoice(
+        "Visibility",
         Visibility.HEADER,
         Visibility.FOOTER
-    )
+    ).onChanged {
+        EventManager.callEvent(BetterTabChangeEvent(ModuleBetterTab))
+    }
+
 
     @JvmStatic
     fun isVisible(visibility: Visibility) = visibility in this.visibility
@@ -87,7 +93,7 @@ object ModuleBetterTab : ClientModule("BetterTab", Category.RENDER) {
 
 }
 
-class PlayerFilter: Configurable("Filter") {
+class PlayerFilter : Configurable("Filter") {
     private var filters = setOf<Regex>()
 
     private val filterBy by multiEnumChoice("FilterBy", Filter.entries)

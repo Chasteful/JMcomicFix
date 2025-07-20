@@ -67,7 +67,7 @@ class OpenAiApi(
 
         return try {
             val response: JsonObject = post(
-                "/chat/completions",
+                "/ChatScreen/completions",
                 body = body.toRequestBody()
             ) {
                 add("Authorization", "Bearer $openAiKey")
