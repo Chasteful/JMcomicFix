@@ -132,11 +132,11 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
     private val keyboardKeyHandler = handler<KeyboardKeyEvent> { event ->
         when (event.action) {
             GLFW.GLFW_PRESS -> if (mc.currentScreen == null) {
-                filter { m -> m.bind.matchesKey(event.keyCode, event.scanCode) }
+                    filter { m -> m.bind.matchesKey(event.keyCode, event.scanCode) }
                     .forEach { m ->
                         m.enabled = !m.enabled || m.bind.action == InputBind.BindAction.HOLD
                     }
-            }
+                }
             GLFW.GLFW_RELEASE ->
                 filter { m ->
                     m.bind.matchesKey(event.keyCode, event.scanCode) &&
@@ -360,6 +360,8 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleAutoQueue,
             ModuleSmartEat,
             ModuleReplenish,
+            ModulePotionSpoof,
+
             ModuleAutoClutch,
             // Render
             ModuleAnimations,
@@ -416,6 +418,7 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleZoom,
             ModuleItemChams,
             ModuleCrystalView,
+            ModuleSkinChanger,
 
             // World
             ModuleAutoBuild,
@@ -451,6 +454,7 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleLiquidChat,
             ModuleCapes,
             ModuleTranslation,
+            ModuleLiquidChat
         )
 
         builtin.forEach { module ->
