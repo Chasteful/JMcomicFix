@@ -6,6 +6,12 @@ import net.ccbluex.liquidbounce.event.events.GameTickEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
+import net.ccbluex.liquidbounce.features.module.modules.movement.ModuleAirJump
+import net.ccbluex.liquidbounce.features.module.modules.movement.ModuleFreeze
+import net.ccbluex.liquidbounce.features.module.modules.movement.elytrafly.ModuleElytraFly
+import net.ccbluex.liquidbounce.features.module.modules.movement.fly.ModuleFly
+import net.ccbluex.liquidbounce.features.module.modules.movement.longjump.ModuleLongJump
+import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.ModuleScaffold
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.aiming.RotationsConfigurable
 import net.ccbluex.liquidbounce.utils.aiming.data.Rotation
@@ -42,10 +48,16 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     private val aimThreshold by float("AimThreshold", 0.5f, 0.1f..1f)
     private val aimPitch by floatRange("PitchRange", -90f..90f, -90f..90f)
     private val slotResetDelay by int("SlotResetDelay", 1, 0..10, "ticks")
-    private var cooldownTicks by int("Cooldown", 20, 5..100, "ticks")
+    private var cooldownTicks by int("Cooldown", 1, 1..20, "ticks")
     private var safetyCheckTicks by int("SafetyCheck", 10, 5..20, "ticks")
-
     private val voidThreshold by int("VoidLevel", 0, -256..0)
+    private val moduleChecks by multiEnumChoice("ModuleChecks",
+        ModuleCheck.WHILE_SCAFFOLD,
+        ModuleCheck.WHILE_LONG_JUMP,
+        ModuleCheck.WHILE_FLY,
+        ModuleCheck.WHILE_AIR_JUMP,
+        ModuleCheck.WHILE_ELYTRA_FLY)
+
     private val silenceSlot by boolean("SilenceHotbar", true)
     private val needStuck by boolean("NeedStuck", false)
     private val rotationConfig = tree(RotationsConfigurable(this))
@@ -55,7 +67,6 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     var state = State.IDLE
     private const val SAFE_TICKS_THRESHOLD = 10
     private const val PEARL_LANDING_TIME = 30
-
 
     private var bestEnergy = Double.MAX_VALUE
     private var currentSolution = Rotation(0f, 0f)
@@ -76,6 +87,9 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         if (needStuck && !ModuleAutoStuck.shouldEnableStuck) {
             return@handler
         }
+        if( mc.options.sneakKey.isPressed) {
+            return@handler
+        }
         if (safetyCheckActive) {
             safetyCheckCounter--
             if (safetyCheckCounter <= 0) {
@@ -83,7 +97,6 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
                 if (isPlayerSafe()) {
                     state = State.IDLE
                 } else {
-
                     triggerPosition = player.pos
                     state = State.FINDING_PEARL
                 }
@@ -101,19 +114,86 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
             State.THROWING -> throwPearl()
         }
     }
+    private fun canReachSafeBlock(): Boolean {
+        val world = mc.world ?: return false
+        val player = mc.player ?: return false
 
+
+        var motionX = player.velocity.x
+        var motionY = player.velocity.y
+        var motionZ = player.velocity.z
+
+        var posX = player.pos.x
+        var posY = player.pos.y
+        var posZ = player.pos.z
+
+        for (tick in 0 until 20) {
+
+            motionY -= 0.08
+            motionY *= 0.98
+
+            motionX *= 0.91
+            motionZ *= 0.91
+
+            posX += motionX
+            posY += motionY
+            posZ += motionZ
+
+            val playerBox = player.boundingBox.offset(posX - player.pos.x, posY - player.pos.y, posZ - player.pos.z)
+            val collisions = world.getBlockCollisions(player, playerBox)
+
+            if (collisions.iterator().hasNext()) {
+                val blockPos = BlockPos(posX.toInt(), (posY - 0.5).toInt(), posZ.toInt())
+                val blockState = world.getBlockState(blockPos)
+                return !blockState.isAir && blockState.block != Blocks.WATER && blockState.block != Blocks.LAVA
+            }
+
+            if (posY <= voidThreshold.toDouble()) {
+                return false
+            }
+        }
+
+        return false
+    }
     private fun checkVoidFall() {
-        isLikelyFallingIntoVoid = isPredictingFall()
+        isLikelyFallingIntoVoid = isPredictingFall() && !canReachSafeBlock()
     }
 
     private fun isPredictingFall(): Boolean {
+        val world = mc.world ?: return false
+        val player = mc.player ?: return false
+
+        var motionX = player.velocity.x
+        var motionY = player.velocity.y
+        var motionZ = player.velocity.z
+
+        var posX = player.pos.x
+        var posY = player.pos.y
+        var posZ = player.pos.z
+
         for (tick in 0 until SAFE_TICKS_THRESHOLD) {
-            val futurePos = player.pos.add(0.0, -tick.toDouble(), 0.0)
-            if (isInVoid(futurePos)) {
+            motionY -= 0.08
+            motionY *= 0.98
+            motionX *= 0.91
+            motionZ *= 0.91
+
+            posX += motionX
+            posY += motionY
+            posZ += motionZ
+
+            val playerBox = player.boundingBox.offset(posX - player.pos.x, posY - player.pos.y, posZ - player.pos.z)
+            val collisions = world.getBlockCollisions(player, playerBox)
+
+            if (collisions.iterator().hasNext()) {
+                return false
+            }
+
+            if (posY <= voidThreshold.toDouble()) {
                 return true
             }
         }
-        return false
+
+        return posY <= voidThreshold.toDouble()
     }
 
     private fun isInVoid(pos: Vec3d): Boolean {
@@ -151,18 +231,22 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     }
 
     private fun checkActivationConditions() {
-
         if (System.currentTimeMillis() - lastPearlThrowTime < 1000L) {
             return
         }
 
-        if ((!ModuleAutoStuck.isInAir && !isBlockUnder(
+        // 检查所有选中的模块是否允许运行
+        if (moduleChecks.any { !it.testCondition() }) {
+            return
+        }
+
+        if (isLikelyFallingIntoVoid || (!ModuleAutoStuck.isInAir && !isBlockUnder(
                 x = player.pos.x,
                 y = player.pos.y,
                 z = player.pos.z,
                 height = 30.0,
                 boundingBox = true
-            )) || isLikelyFallingIntoVoid
+            ) && !canReachSafeBlock())
         ) {
             triggerPosition = player.pos
             state = State.FINDING_PEARL
@@ -171,7 +255,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
 
     private fun findPearl() {
         val pearlSlot = Slots.OffhandWithHotbar.findSlot(Items.ENDER_PEARL)?.hotbarSlotForServer
-        if (pearlSlot == null) {
+        if (pearlSlot == null){
             state = State.IDLE
             return
         }
@@ -271,7 +355,6 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
             useHotbarSlotOrOffhand(it, 0, bestSolution?.yaw ?: 0f, bestSolution?.pitch ?: 0f)
             lastPearlThrowTime = currentTime
 
-
             scheduleSafetyCheck()
         }
 
@@ -279,7 +362,6 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     }
 
     private fun isPlayerSafe(): Boolean {
-
         if (!isInVoid(player.pos)) {
             return true
         }
@@ -341,11 +423,9 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
 
         repeat(40) {
             motionY -= 0.03
-
             posX += motionX
             posY += motionY
             posZ += motionZ
-
             motionX *= 0.99
             motionY *= 0.99
             motionZ *= 0.99
@@ -367,7 +447,9 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         if (boundingBox) {
             var offset = 0.0
             while (offset < height) {
-                val playerBox = player.boundingBox.offset(0.0, -offset, 0.0)
+                val motionX = player.velocity.x
+                val motionZ = player.velocity.z
+                val playerBox = player.boundingBox.offset(motionX * offset, -offset, motionZ * offset)
 
                 if (world.getBlockCollisions(player, playerBox).iterator().hasNext()) {
                     return true
@@ -380,7 +462,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
                 val blockPos = BlockPos(x.toInt(), (y - offset).toInt(), z.toInt())
                 val blockState = world.getBlockState(blockPos)
 
-                if (!blockState.isAir && !blockState.fluidState.isEmpty) {
+                if (!blockState.isAir && blockState.fluidState.isEmpty) {
                     return true
                 }
                 offset += 0.5
@@ -391,6 +473,19 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
 
     enum class Algorithm(override val choiceName: String) : NamedChoice {
         SimulatedAnnealing("SimulatedAnnealing")
+    }
+
+    @Suppress("unused")
+    private enum class ModuleCheck(
+        override val choiceName: String,
+        val testCondition: () -> Boolean
+    ) : NamedChoice {
+        WHILE_SCAFFOLD("WhileScaffold", { !ModuleScaffold.running }),
+        WHILE_LONG_JUMP("WhileLongJump", { !ModuleLongJump.running }),
+        WHILE_FLY("WhileFly", { !ModuleFly.running }),
+        WHILE_ELYTRA_FLY("WhileElytraFly", { !ModuleElytraFly.running }),
+        WHILE_AIR_JUMP("WhileAirJump", { !ModuleAirJump.running }),
+        WHILE_FREEZE("WhileFreeze", { !ModuleFreeze.running })
     }
 
     override fun disable() {
