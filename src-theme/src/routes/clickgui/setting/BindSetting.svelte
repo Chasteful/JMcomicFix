@@ -120,7 +120,7 @@
     padding: 4px;
     font-weight: 900;
     color: $text;
-    font-size: var(--font-size);
+    font-size: calc(var(--font-size) - 2px);
     width: 100%;
     display: flex;
     justify-content: center;

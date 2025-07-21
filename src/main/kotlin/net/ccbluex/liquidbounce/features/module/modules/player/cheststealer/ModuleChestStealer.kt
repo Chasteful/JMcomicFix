@@ -95,7 +95,9 @@ object ModuleChestStealer : ClientModule("ChestStealer", Category.PLAYER) {
 
         if (itemsToCollect.isNotEmpty()) {
             if (initialItemCount == 0) {
-                onStartStealing(itemsToCollect.size)
+                stealingStartTime = System.currentTimeMillis()
+                initialItemCount = itemsToCollect.size
+                remainingItems = itemsToCollect.size
             }
             updateRemainingItems(itemsToCollect.size)
         } else if (initialItemCount > 0) {
@@ -130,11 +132,6 @@ object ModuleChestStealer : ClientModule("ChestStealer", Category.PLAYER) {
         if (autoClose && (sortedItemsToCollect.isEmpty() || !hasInventorySpace() && stillRequiredSpace > 0)) {
             event.schedule(inventoryConstrains, CloseContainerAction(screen))
         }
-    }
-    fun onStartStealing(total: Int) {
-        stealingStartTime = System.currentTimeMillis()
-        initialItemCount = total
-        remainingItems = total
     }
 
 
