@@ -1,47 +1,50 @@
-package net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.spartan
+/*
+ * This file is part of LiquidBounce (https://github.com/CCBlueX/LiquidBounce)
+ *
+ * Copyright (c) 2015 - 2025 CCBlueX
+ *
+ * LiquidBounce is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * LiquidBounce is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ */
+package net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.spartan
 
-import net.ccbluex.liquidbounce.config.types.Choice
-import net.ccbluex.liquidbounce.config.types.ChoiceConfigurable
-import net.ccbluex.liquidbounce.config.types.NamedChoice
-import net.ccbluex.liquidbounce.event.events.PacketEvent
+import net.ccbluex.liquidbounce.config.types.nesting.Choice
+import net.ccbluex.liquidbounce.config.types.nesting.ChoiceConfigurable
 import net.ccbluex.liquidbounce.event.events.PlayerMoveEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.ModuleSpeed
+import net.ccbluex.liquidbounce.utils.client.MovePacketType
 import net.ccbluex.liquidbounce.utils.client.Timer
 import net.ccbluex.liquidbounce.utils.entity.airTicks
 import net.ccbluex.liquidbounce.utils.kotlin.Priority
 import net.ccbluex.liquidbounce.utils.movement.stopXZVelocity
 import net.minecraft.item.Items
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket
 
-class SpeedSpartan(override val parent: ChoiceConfigurable<*>) : Choice("Spartan") {
 
-    private val mode by enumChoice("Mode", SpartanMode.SPARTAN_4043)
+/**
+ * @anticheat Spartan
+ * @anticheatVersion v4.0.4.3
+ * @testedOn minecraft.vagdedes.com
+ * @note it will flag randomly, that's just spartan for you
+ */
+class SpeedSpartanV4043(override val parent: ChoiceConfigurable<*>) : Choice("Spartan-4.0.4.3") {
 
     @Suppress("unused")
     private val moveHandler = handler<PlayerMoveEvent> { event ->
-        when (mode) {
-            SpartanMode.SPARTAN_4043 -> handleSpartan4043Move(event)
-            SpartanMode.SPARTAN_4043_FASTFALL -> handleSpartan4043FastFallMove(event)
-        }
-    }
-
-    @Suppress("unused")
-    private val packetHandler = handler<PacketEvent> { event ->
-        if (mode == SpartanMode.SPARTAN_4043_FASTFALL) {
-            handleSpartan4043FastFallPacket(event)
-        }
-    }
-
-    override fun disable() {
-        if (mode == SpartanMode.SPARTAN_4043_FASTFALL) {
-            player.stopXZVelocity()
-        }
-    }
-
-    private fun handleSpartan4043Move(event: PlayerMoveEvent) {
         if (!player.input.playerInput.forward) {
-            return
+            return@handler
         }
 
         val wearingLeatherBoots = player.inventory.getArmorStack(0).item == Items.LEATHER_BOOTS
@@ -57,10 +60,24 @@ class SpeedSpartan(override val parent: ChoiceConfigurable<*>) : Choice("Spartan
             event.movement.y = player.jumpVelocity.toDouble()
         }
     }
+}
 
-    private fun handleSpartan4043FastFallMove(event: PlayerMoveEvent) {
+/**
+ * @anticheat Spartan
+ * @anticheatVersion v4.0.4.3
+ * @testedOn minecraft.vagdedes.com
+ * @note it will flag randomly, that's just spartan for you. Could flag anywhere from 0-20vl if you do 180's with it on
+ */
+class SpeedSpartanV4043FastFall(override val parent: ChoiceConfigurable<*>) : Choice("Spartan-4.0.4.3-FastFall") {
+
+    override fun disable() {
+        player.stopXZVelocity()
+    }
+
+    @Suppress("unused")
+    private val moveHandler = handler<PlayerMoveEvent> { event ->
         if (!player.input.playerInput.forward) {
-            return
+            return@handler
         }
 
         val wearingLeatherBoots = player.inventory.getArmorStack(0).item == Items.LEATHER_BOOTS
@@ -78,18 +95,13 @@ class SpeedSpartan(override val parent: ChoiceConfigurable<*>) : Choice("Spartan
             event.movement.y = 0.42
         } else if (player.airTicks == 1) {
             Timer.requestTimerSpeed(0.5f, Priority.NORMAL, ModuleSpeed, 0)
+
+            network.sendPacket(MovePacketType.FULL.generatePacket().apply { // for some reason full works best
+                onGround = true
+            })
+
             event.movement.y = -0.0784
         }
     }
-
-    private fun handleSpartan4043FastFallPacket(event: PacketEvent) {
-        if (event.packet is PlayerMoveC2SPacket && player.airTicks == 1) {
-            event.packet.onGround = true
-        }
-    }
-
-    enum class SpartanMode(override val choiceName: String) : NamedChoice {
-        SPARTAN_4043("Spartan4043"),
-        SPARTAN_4043_FASTFALL("Spartan4043FastFall")
-    }
 }
+

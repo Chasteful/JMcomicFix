@@ -18,6 +18,7 @@
  */
 package net.ccbluex.liquidbounce.config.types
 
+import net.ccbluex.liquidbounce.config.types.AutoCompletionProvider.CompletionHandler
 import net.ccbluex.liquidbounce.utils.kotlin.mapArray
 
 object AutoCompletionProvider {
@@ -35,9 +36,12 @@ object AutoCompletionProvider {
     }
 
     fun interface CompletionHandler {
+
         /**
          * Gives an array with all possible completions for the [value].
          */
         fun possible(value: Value<*>): Array<String>
+
     }
+
 }

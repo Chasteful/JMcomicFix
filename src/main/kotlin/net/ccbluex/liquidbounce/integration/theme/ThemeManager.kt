@@ -24,6 +24,7 @@ import com.google.gson.annotations.SerializedName
 import com.mojang.blaze3d.systems.RenderSystem
 import net.ccbluex.liquidbounce.config.ConfigSystem
 import net.ccbluex.liquidbounce.config.gson.util.decode
+import net.ccbluex.liquidbounce.config.types.nesting.Configurable
 import net.ccbluex.liquidbounce.config.types.Configurable
 import net.ccbluex.jmcomicfix.features.module.modules.client.ModuleHudEditor
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleClickGui
@@ -87,17 +88,22 @@ object ThemeManager : Configurable("theme") {
 
             // Update components
             ComponentOverlay.insertDefaultComponents()
+
+            // Update integration browser
             IntegrationListener.update()
             ModuleHud.reopen()
             ModuleClickGui.reload(true)
         }
+
     private val takesInputHandler = InputAcceptor { mc.currentScreen != null && mc.currentScreen !is ChatScreen }
+
     init {
         ConfigSystem.root(this)
     }
 
     /**
      * Open [Browser] with the given [VirtualScreenType] and mark as static if [markAsStatic] is true.
+     * This tab will be locked to 60 FPS since it is not input aware.
      */
     fun openImmediate(
         virtualScreenType: VirtualScreenType? = null,
@@ -125,6 +131,7 @@ object ThemeManager : Configurable("theme") {
         priority = priority,
         inputAcceptor = inputAcceptor
     )
+
     fun updateImmediate(
         browser: Browser?,
         virtualScreenType: VirtualScreenType? = null,
@@ -132,7 +139,6 @@ object ThemeManager : Configurable("theme") {
     ) {
         browser?.url = route(virtualScreenType, markAsStatic).url
     }
-
 
     fun route(virtualScreenType: VirtualScreenType? = null, markAsStatic: Boolean = false): Route {
         val theme = if (virtualScreenType == null || activeTheme.doesAccept(virtualScreenType.routeName)) {

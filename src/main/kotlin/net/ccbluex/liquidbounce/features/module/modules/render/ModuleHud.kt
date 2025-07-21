@@ -18,8 +18,7 @@
  */
 package net.ccbluex.liquidbounce.features.module.modules.render
 
-import net.ccbluex.liquidbounce.config.types.Configurable
-import net.ccbluex.liquidbounce.config.types.NamedChoice
+import net.ccbluex.liquidbounce.config.types.nesting.Configurable
 import net.ccbluex.liquidbounce.config.types.Value
 import net.ccbluex.liquidbounce.event.EventManager
 import net.ccbluex.liquidbounce.event.events.*
@@ -105,6 +104,7 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
     }
     val isBlurEffectActive
         get() = blur && !(mc.options.hudHidden && mc.currentScreen == null)
+
     var browserSettings: BrowserSettings? = null
 
 
@@ -141,9 +141,10 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
             chat(markAsError(message("hidingAppearance")))
         }
 
-
+        // Minimap
         RenderedEntities.subscribe(this)
         ChunkScanner.subscribe(ChunkRenderer.MinimapChunkUpdateSubscriber)
+
         if (visible) {
             open()
         }
@@ -153,6 +154,7 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
         // Closes tab entirely
         browserBrowser?.close()
         browserBrowser = null
+
         // Minimap
         RenderedEntities.unsubscribe(this)
         ChunkScanner.unsubscribe(ChunkRenderer.MinimapChunkUpdateSubscriber)
@@ -164,6 +166,7 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
         tree(GlobalBrowserSettings)
         browserSettings = tree(BrowserSettings(60, ::reopen))
     }
+
     @Suppress("unused")
     private val screenHandler = handler<ScreenEvent> { event ->
         // Close the tab when the HUD is not running, is hiding now, or the player is not in-game
@@ -171,6 +174,7 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
             close()
             return@handler
         }
+
         // Otherwise, open the tab and set its visibility
         val browserTab = open()
         browserTab.visible = event.screen !is DisconnectedScreen && event.screen !is ConnectScreen

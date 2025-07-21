@@ -30,7 +30,7 @@ import kotlin.random.Random
 /**
  * Spammer module
  *
- * Spams the ChatScreen with a given message.
+ * Spams the chat with a given message.
  */
 object ModuleSpammer : ClientModule("Spammer", Category.MISC, disableOnQuit = true) {
 
@@ -40,14 +40,12 @@ object ModuleSpammer : ClientModule("Spammer", Category.MISC, disableOnQuit = tr
 
     private val delay by intRange("Delay", 2..4, 0..300, "secs")
     private val mps by intRange("MPS", 1..1, 1..500, "messages")
-    private val message by textArray(
-        "Message", mutableListOf(
-            "LiquidBounce Nextgen | CCBlueX on [youtube] | liquidbounce{.net}",
-            "I'm using LiquidBounce Nextgen and you should too!",
-            "Check out LiquidBounce Nextgen - the best Minecraft client!",
-            "Tired of losing? Try LiquidBounce Nextgen!",
-        )
-    )
+    private val message by textList("Message", mutableListOf(
+        "LiquidBounce Nextgen | CCBlueX on [youtube] | liquidbounce{.net}",
+        "I'm using LiquidBounce Nextgen and you should too!",
+        "Check out LiquidBounce Nextgen - the best Minecraft client!",
+        "Tired of losing? Try LiquidBounce Nextgen!",
+    ))
     private val pattern by enumChoice("Pattern", SpammerPattern.RANDOM)
     private val messageConverterMode by enumChoice("MessageConverter", MessageConverterMode.LEET_CONVERTER)
     private val customFormatter by boolean("CustomFormatter", false)
@@ -63,15 +61,13 @@ object ModuleSpammer : ClientModule("Spammer", Category.MISC, disableOnQuit = tr
 
             val text = if (chosenMessage.startsWith('/')) {
                 format(chosenMessage)
-            } else {
-                messageConverterMode.convert(
-                    if (customFormatter) {
-                        format(chosenMessage)
-                    } else {
-                        "[${RandomStringUtils.randomAlphabetic(1, 5)}] " +
-                            MessageConverterMode.RANDOM_CASE_CONVERTER.convert(chosenMessage)
-                    }
-                )
+            }else {
+                messageConverterMode.convert(if (customFormatter) {
+                    format(chosenMessage)
+                } else {
+                    "[${RandomStringUtils.randomAlphabetic(1, 5)}] " +
+                        MessageConverterMode.RANDOM_CASE_CONVERTER.convert(chosenMessage)
+                })
             }
 
             if (text.length > 256) {
