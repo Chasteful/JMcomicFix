@@ -34,7 +34,7 @@ object AutoBowAimbotFeature : ToggleableConfigurable(ModuleAutoBow, "BowAimbot",
         tree(rotationConfigurable)
     }
 
-    private val targetRenderer = tree(OverlayTargetRenderer(ModuleAutoBow))
+    val targetRenderer = tree(OverlayTargetRenderer(ModuleAutoBow))
 
     @Suppress("unused")
     private val tickRepeatable = tickHandler {

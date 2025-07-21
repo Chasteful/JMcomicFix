@@ -51,6 +51,7 @@ import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.aiming.data.Rotation
 import net.ccbluex.liquidbounce.utils.aiming.data.RotationWithVector
 import net.ccbluex.jmcomicfix.utils.aiming.features.processors.NeuralNetworkRotationProcessor
+import net.ccbluex.liquidbounce.features.module.modules.combat.ModuleAimbot
 import net.ccbluex.liquidbounce.utils.aiming.point.PointTracker
 import net.ccbluex.liquidbounce.utils.aiming.preference.LeastDifferencePreference
 import net.ccbluex.liquidbounce.utils.aiming.utils.facingEnemy
@@ -134,6 +135,7 @@ object ModuleKillAura : ClientModule("KillAura", Category.COMBAT) {
 
     override fun disable() {
         targetTracker.reset()
+        targetRenderer.reset()
         failedHits.clear()
         KillAuraAutoBlock.stopBlocking()
         KillAuraNotifyWhenFail.failedHitsIncrement = 0
@@ -169,6 +171,7 @@ object ModuleKillAura : ClientModule("KillAura", Category.COMBAT) {
         if (isInInventoryScreen && !ignoreOpenInventory || shouldResetTarget) {
             // Reset current target
             targetTracker.reset()
+            targetRenderer.reset()
             return@handler
         }
 
@@ -365,6 +368,7 @@ object ModuleKillAura : ClientModule("KillAura", Category.COMBAT) {
             )
         } else {
             targetTracker.reset()
+            targetRenderer.reset()
         }
     }
 

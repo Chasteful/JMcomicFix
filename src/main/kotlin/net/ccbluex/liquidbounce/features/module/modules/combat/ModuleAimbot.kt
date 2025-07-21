@@ -1,21 +1,3 @@
-/*
- * This file is part of LiquidBounce (https://github.com/CCBlueX/LiquidBounce)
- *
- * Copyright (c) 2015 - 2025 CCBlueX
- *
- * LiquidBounce is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * LiquidBounce is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
- */
 package net.ccbluex.liquidbounce.features.module.modules.combat
 
 import net.ccbluex.liquidbounce.config.types.NamedChoice
@@ -33,7 +15,6 @@ import net.ccbluex.liquidbounce.utils.aiming.data.RotationWithVector
 import net.ccbluex.liquidbounce.utils.aiming.features.MovementCorrection
 import net.ccbluex.liquidbounce.utils.aiming.features.processors.anglesmooth.impl.InterpolationAngleSmooth
 import net.ccbluex.liquidbounce.utils.aiming.features.processors.anglesmooth.impl.LinearAngleSmooth
-import net.ccbluex.liquidbounce.utils.aiming.features.processors.anglesmooth.impl.SigmoidAngleSmooth
 import net.ccbluex.liquidbounce.utils.aiming.point.PointTracker
 import net.ccbluex.liquidbounce.utils.aiming.preference.LeastDifferencePreference
 import net.ccbluex.liquidbounce.utils.aiming.utils.raytraceBox
@@ -57,7 +38,7 @@ import net.minecraft.util.math.MathHelper
 object ModuleAimbot : ClientModule("Aimbot", Category.COMBAT, aliases = arrayOf("AimAssist", "AutoAim")) {
 
     private val range = float("Range", 4.2f, 1f..8f)
-    private val onRotate by boolean("OnlyRotate",true)
+
     val targetTracker = tree(TargetTracker(TargetPriority.DIRECTION, range = range))
     private val targetRenderer = tree(WorldTargetRenderer(this))
     private val pointTracker = tree(PointTracker())
@@ -78,37 +59,39 @@ object ModuleAimbot : ClientModule("Aimbot", Category.COMBAT, aliases = arrayOf(
 
     private var targetRotation: Rotation? = null
     private var playerRotation: Rotation? = null
-    private var mouseDeltaX = 0f
-    private var mouseDeltaY = 0f
+    var mouseDeltaX = 0f
+    var mouseDeltaY = 0f
+
     @Suppress("unused", "ComplexCondition")
     private val tickHandler = handler<RotationUpdateEvent> { _ ->
         playerRotation = player.rotation
 
         if (!requirementsMet) {
             targetTracker.reset()
+            targetRenderer.reset()
             targetRotation = null
             return@handler
         }
 
-        // Only find target rotation if not in OnlyRotate mode or if mouse is moving
-        if (!onRotate || (mouseDeltaX != 0f || mouseDeltaY != 0f)) {
-            targetRotation = findNextTargetRotation()?.let { (target, rotation) ->
-                angleSmooth.activeChoice.process(
-                    RotationTarget(
-                        rotation = rotation.rotation,
-                        entity = target,
-                        processors = listOf(angleSmooth.activeChoice),
-                        ticksUntilReset = 1,
-                        resetThreshold = 1f,
-                        considerInventory = true,
-                        movementCorrection = MovementCorrection.CHANGE_LOOK
-                    ),
-                    player.rotation,
-                    rotation.rotation
-                )
-            }
-        } else {
-            targetRotation = null
+        targetRotation = findNextTargetRotation()?.let { (target, rotation) ->
+            angleSmooth.activeChoice.process(
+                RotationTarget(
+                    rotation = rotation.rotation,
+                    entity = target,
+                    processors = listOf(angleSmooth.activeChoice),
+                    ticksUntilReset = 1,
+                    resetThreshold = 1f,
+                    considerInventory = true,
+                    movementCorrection = MovementCorrection.CHANGE_LOOK
+                ),
+                player.rotation,
+                rotation.rotation
+            )
+        }
+
+        // Reset renderer if no target is found
+        if (targetRotation == null) {
+            targetRenderer.reset()
         }
 
         // Reset mouse delta after checking
@@ -118,9 +101,12 @@ object ModuleAimbot : ClientModule("Aimbot", Category.COMBAT, aliases = arrayOf(
         // Update Auto Weapon
         ModuleAutoWeapon.prepare(targetTracker.target)
     }
+
     override fun disable() {
         targetTracker.reset()
+        targetRenderer.reset() // Ensure renderer is reset when module is disabled
     }
+
 
     @Suppress("unused")
     private val renderHandler = handler<WorldRenderEvent> { event ->
@@ -133,8 +119,7 @@ object ModuleAimbot : ClientModule("Aimbot", Category.COMBAT, aliases = arrayOf(
         }
 
         if (IgnoreOpened.CONTAINER !in ignores && (InventoryManager.isInventoryOpen ||
-                mc.currentScreen is HandledScreen<*>)
-        ) {
+                mc.currentScreen is HandledScreen<*>)) {
             return@handler
         }
 
@@ -155,9 +140,10 @@ object ModuleAimbot : ClientModule("Aimbot", Category.COMBAT, aliases = arrayOf(
         }
     }
 
+
     @Suppress("unused", "MagicNumber")
     private val mouseMovement = handler<MouseRotationEvent> { event ->
-        // Track mouse movement delta for OnlyRotate
+        // Track mouse movement delta
         mouseDeltaX = event.cursorDeltaX.toFloat()
         mouseDeltaY = event.cursorDeltaY.toFloat()
 

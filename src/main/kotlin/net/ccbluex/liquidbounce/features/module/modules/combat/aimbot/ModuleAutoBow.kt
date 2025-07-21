@@ -48,6 +48,7 @@ object ModuleAutoBow : ClientModule("AutoBow", Category.COMBAT, aliases = arrayO
 
     override fun disable() {
         AutoBowAimbotFeature.targetTracker.reset()
+        AutoBowAimbotFeature.targetRenderer.reset()
     }
 
     init {

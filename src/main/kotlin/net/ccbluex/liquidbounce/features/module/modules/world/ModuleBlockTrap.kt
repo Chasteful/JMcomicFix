@@ -87,7 +87,7 @@ object ModuleBlockTrap : ClientModule("BlockTrap", Category.WORLD) {
             if (!placer.isDone()) {
                 placer.clear()
             }
-
+            targetRenderer.reset()
             return@handler
         }
 

@@ -92,6 +92,7 @@ object ModuleCrystalAura : ClientModule(
         SubmoduleCrystalDestroyer.postAttackHandlers.forEach(CrystalPostAttackTracker::onToggle)
         SubmoduleBasePlace.disable()
         CrystalAuraDamageOptions.cacheMap.clear()
+        targetRenderer.reset()
     }
 
     override fun enable() {
@@ -102,10 +103,14 @@ object ModuleCrystalAura : ClientModule(
     private val simulatedTickHandler = handler<RotationUpdateEvent>(1) {
         CrystalAuraDamageOptions.cacheMap.clear()
         if (CombatManager.shouldPauseCombat) {
+            targetRenderer.reset()
             return@handler
         }
 
         targetTracker.selectFirst()
+        if (targetTracker.target == null) {
+            targetRenderer.reset()
+        }
     }
 
     @Suppress("unused")

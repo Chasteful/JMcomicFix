@@ -19,6 +19,7 @@
 package net.ccbluex.liquidbounce.features.module.modules.combat.killaura
 
 import net.ccbluex.liquidbounce.config.types.NamedChoice
+import net.ccbluex.liquidbounce.features.module.modules.combat.ModuleAimbot
 import net.ccbluex.liquidbounce.utils.client.isOlderThanOrEqual1_8
 import net.ccbluex.liquidbounce.utils.client.mc
 import net.ccbluex.liquidbounce.utils.client.player
@@ -45,11 +46,17 @@ enum class KillAuraRequirements(
     }),
     NOT_BREAKING("NotBreaking", {
         mc.interactionManager?.isBreakingBlock == false
+    }),
+    ONLY_ON_ROTATE("OnlyOnRotate", {
+        val mouseDeltaX = ModuleAimbot.mouseDeltaX
+        val mouseDeltaY = ModuleAimbot.mouseDeltaY
+        mouseDeltaX != 0f || mouseDeltaY != 0f
     });
 }
 
 /**
  * Check if the item is a weapon.
  */
+
 private fun Item.isWeapon() = this is SwordItem || !isOlderThanOrEqual1_8 && this is AxeItem
     || this is MaceItem
