@@ -23,7 +23,7 @@ import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.ant
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.martix.SpeedMatrix
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.ncp.SpeedNCP
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.sentinel.SpeedSentinelDamage
-import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.spartan.SpeedSpartan
+import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.spartan.SpeedSpartanV4043
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.verus.SpeedVerus
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.vulcan.SpeedVulcan
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.watchdog.SpeedHypxiel
@@ -70,7 +70,7 @@ object ModuleSpeed : ClientModule("Speed", Category.MOVEMENT) {
         SpeedNCP(configurable),
 
         SpeedSentinelDamage(configurable),
-        SpeedSpartan(configurable),
+        SpeedSpartanV4043(configurable),
 
         SpeedVerus(configurable),
         SpeedVulcan(configurable)

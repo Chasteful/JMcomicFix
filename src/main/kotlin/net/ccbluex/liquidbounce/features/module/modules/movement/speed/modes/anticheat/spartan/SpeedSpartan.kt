@@ -18,7 +18,7 @@
  *
  *
  */
-package net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.spartan
+package net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.anticheat.spartan
 
 import net.ccbluex.liquidbounce.config.types.nesting.Choice
 import net.ccbluex.liquidbounce.config.types.nesting.ChoiceConfigurable

@@ -13,15 +13,10 @@
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<<<<<<<< HEAD:src-theme/src/routes/hud/common/ItemView/ItemView.svelte
-<div class="block" on:click={() => dispatch("toggle", {enabled: !enabled, identifier})}>
-    <img alt={identifier} class="icon" src="{REST_BASE}/api/v1/client/resource/itemTexture?id={identifier}"/>
-========
 <div class="item" class:has-icon={icon !== undefined} on:click={() => dispatch("toggle", {enabled: !enabled, value:value})}>
     {#if icon}
         <img class="icon" src="{icon}" alt={value}/>
     {/if}
->>>>>>>> upstream/nextgen:src-theme/src/routes/clickgui/setting/list/ListItem.svelte
     <div class="name">{name}</div>
     <div class="tick">
         {#if enabled}

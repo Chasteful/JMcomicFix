@@ -6,6 +6,7 @@ import net.ccbluex.liquidbounce.utils.aiming.data.Rotation
 import net.ccbluex.liquidbounce.utils.aiming.features.MovementCorrection
 import net.ccbluex.liquidbounce.utils.aiming.features.processors.FailRotationProcessor
 import net.ccbluex.jmcomicfix.utils.aiming.features.processors.NeuralNetworkRotationProcessor
+import net.ccbluex.jmcomicfix.utils.aiming.features.processors.anglesmooth.impl.QuaternionAngleSmooth
 import net.ccbluex.liquidbounce.utils.aiming.features.processors.ShortStopRotationProcessor
 import net.ccbluex.liquidbounce.utils.aiming.features.processors.anglesmooth.impl.*
 import net.ccbluex.liquidbounce.utils.client.RestrictedSingleUseAction

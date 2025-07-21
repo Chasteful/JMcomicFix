@@ -18,6 +18,7 @@
  */
 package net.ccbluex.liquidbounce.features.module.modules.render
 
+import net.ccbluex.liquidbounce.config.types.NamedChoice
 import net.ccbluex.liquidbounce.config.types.nesting.Configurable
 import net.ccbluex.liquidbounce.config.types.Value
 import net.ccbluex.liquidbounce.event.EventManager
@@ -89,6 +90,10 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
         .onChanged {
             EventManager.callEvent(HudValueChangeEvent(this))
         }
+
+
+
+
     @Suppress("unused")
     private val hudZoom by float("ScaleFactor", 1f, 0.5f..2f).onChanged {
         EventManager.callEvent(HudValueChangeEvent(this))
@@ -102,12 +107,6 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
     private val IP by text("ScoreboardIP","")   .onChanged {
         EventManager.callEvent(HudValueChangeEvent(this))
     }
-    val isBlurEffectActive
-        get() = blur && !(mc.options.hudHidden && mc.currentScreen == null)
-
-    var browserSettings: BrowserSettings? = null
-
-
     @Suppress("unused")
     private val render = multiEnumChoice(
         "ArraylistPrefixRender",
@@ -116,6 +115,9 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
     ).onChanged {
         EventManager.callEvent(HudValueChangeEvent(this))
     }
+    val isBlurEffectActive
+        get() = blur && !(mc.options.hudHidden && mc.currentScreen == null)
+    var browserSettings: BrowserSettings? = null
 
     @Suppress("Unused")
     enum class DoPrefix(override val choiceName: String) : NamedChoice {
@@ -141,10 +143,9 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
             chat(markAsError(message("hidingAppearance")))
         }
 
-        // Minimap
+
         RenderedEntities.subscribe(this)
         ChunkScanner.subscribe(ChunkRenderer.MinimapChunkUpdateSubscriber)
-
         if (visible) {
             open()
         }
@@ -154,7 +155,6 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
         // Closes tab entirely
         browserBrowser?.close()
         browserBrowser = null
-
         // Minimap
         RenderedEntities.unsubscribe(this)
         ChunkScanner.unsubscribe(ChunkRenderer.MinimapChunkUpdateSubscriber)
@@ -166,7 +166,6 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
         tree(GlobalBrowserSettings)
         browserSettings = tree(BrowserSettings(60, ::reopen))
     }
-
     @Suppress("unused")
     private val screenHandler = handler<ScreenEvent> { event ->
         // Close the tab when the HUD is not running, is hiding now, or the player is not in-game
@@ -174,7 +173,6 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
             close()
             return@handler
         }
-
         // Otherwise, open the tab and set its visibility
         val browserTab = open()
         browserTab.visible = event.screen !is DisconnectedScreen && event.screen !is ConnectScreen
