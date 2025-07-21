@@ -133,9 +133,6 @@
                 $maxPanelZIndex = config.zIndex;
             }
 
-            if (config.expanded) {
-                renderedModules = modules;
-            }
 
             return config;
         }
@@ -230,10 +227,8 @@
         pushUndoState();
         panelConfig.expanded = !panelConfig.expanded;
 
-        setTimeout(() => {
-            fixPosition();
-            savePanelConfig();
-        }, 500);
+        fixPosition();
+        savePanelConfig();
     }
 
     function handleModulesScroll() {
@@ -381,7 +376,7 @@
 
             panelConfig.zIndex = ++$maxPanelZIndex;
             panelConfig.expanded = true;
-
+            savePanelConfig();
 
             setTimeout(() => {
                 const targetEl = modulesElement.children[index] as HTMLElement;
@@ -410,15 +405,13 @@
         pushUndoState();
         mod.enabled = e.enabled;
         modules = modules;
-
-        if (panelConfig.expanded) {
-            renderedModules = modules;
-        }
     });
     onMount(() => {
         const last = localStorage.getItem(storageKey);
         if (last) expandedModuleName.set(last);
-
+        if (!modulesElement) {
+            return;
+        }
         expandedModuleName.subscribe(name => {
             if (name) localStorage.setItem(storageKey, name);
             else localStorage.removeItem(storageKey);
@@ -426,7 +419,10 @@
         const options = {passive: true};
         const keydownHandler = (e: KeyboardEvent) => handleKeydown(e);
         const keyupHandler = (e: KeyboardEvent) => handleKeyup(e);
-
+        modulesElement.scrollTo({
+            top: panelConfig.scrollTop,
+            behavior: "smooth"
+        });
         window.addEventListener('mousemove', handleMouseMove);
         window.addEventListener('mousedown', handleMouseDown);
         window.addEventListener('mousemove', debouncedMouseMove, options);
@@ -442,8 +438,8 @@
             window.removeEventListener('mouseup', handleMouseUp);
             window.removeEventListener('wheel', handleWheel);
         };
-    });
 
+    });
 </script>
 
 <!-- Scroll Indicator -->
@@ -462,8 +458,8 @@
         bind:this={panelElement}
         class="panel-wrapper {moving ? 'no-transition' : ''}"
         class:expanded={panelConfig.expanded}
-        in:fly|global={{y: -30, duration: 200, easing: quintOut}}
-        out:fly|global={{y: -30, duration: 200, easing: quintOut}}
+        in:fly|global={{y: -100, duration: 200, easing: quintOut}}
+        out:fly|global={{y: -100, duration: 200, easing: quintOut}}
         style="left: {panelConfig.left}px; top: {panelConfig.top}px; z-index: {panelConfig.zIndex};
         --panel-height: {panelElement?.offsetHeight || 0}px;"
 >
@@ -550,10 +546,10 @@
 
         <!-- Modules List -->
         <div
-                bind:this={modulesElement}
                 class="modules"
                 on:scroll={handleModulesScroll}
-                style="--duration: 0.3s;max-height: {2 / $scaleFactor * $panelLength}vh"
+                bind:this={modulesElement}
+                style="--duration: 0.3s; {panelConfig.expanded ? `max-height: ${2 / $scaleFactor * $panelLength}vh` : ''}"
         >
             {#each renderedModules as {name, enabled, description, aliases} (name)}
                 <div>
@@ -744,6 +740,8 @@
     overflow-y: auto;
     overflow-x: hidden;
     transition: max-height 0.2s ease;
+    scroll-behavior: smooth;
+    max-height: 0;
   }
 
   .modules::-webkit-scrollbar {

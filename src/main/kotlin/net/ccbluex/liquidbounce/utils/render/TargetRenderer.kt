@@ -1,3 +1,5 @@
+@file:Suppress("LongParameterList", "MaxLineLength", "LongMethod")
+
 package net.ccbluex.liquidbounce.utils.render
 
 import com.mojang.blaze3d.platform.GlStateManager
@@ -277,7 +279,11 @@ class WorldTargetRenderer(module: ClientModule) : TargetRenderer<WorldRenderEnvi
                 return delta.coerceAtMost(0.1)
             }
 
-        override fun render(env: WorldRenderEnvironment, entity: Entity, partialTicks: Float, isFadingOut: Boolean, lastChangeTime: Long, slideTime: Int, fadeOutTime: Int) {
+        override fun render(
+            env: WorldRenderEnvironment,
+            entity: Entity, partialTicks: Float,
+            isFadingOut: Boolean, lastChangeTime: Long,
+            slideTime: Int, fadeOutTime: Int) {
             val currentTime = System.currentTimeMillis()
             val timeSinceChange = currentTime - lastChangeTime
 

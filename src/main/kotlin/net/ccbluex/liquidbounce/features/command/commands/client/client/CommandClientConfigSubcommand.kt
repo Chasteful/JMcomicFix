@@ -34,12 +34,6 @@ object CommandClientConfigSubcommand {
             modulesConfigurable
         )
 
-    private val fileTimestamp: String
-        get() {
-            val dateFormat = java.text.SimpleDateFormat("yyyy-MM-dd_HH-mm-ss")
-            return dateFormat.format(System.currentTimeMillis())
-        }
-
     private fun backupSubcommand() = CommandBuilder.begin("backup")
         .parameter(
             Parameters.rootConfigurables()

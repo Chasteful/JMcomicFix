@@ -113,7 +113,8 @@ object KilledTarget : EventListener {
             attackedEntities.entries.forEach { (entity, data) ->
                 if (entity.id == packet.entityId && now - data.lastAttackTime < 1000L) {
                     // Calculate velocity magnitude from packet's X and Z components
-                    val newVelocity = sqrt((packet.velocityX * packet.velocityX + packet.velocityZ * packet.velocityZ).toDouble()) / 8000.0
+                    val newVelocity = sqrt((
+                        packet.velocityX * packet.velocityX + packet.velocityZ * packet.velocityZ).toDouble()) / 8000.0
                     if (abs(newVelocity - data.lastVelocity) > 0.05) { // Detect significant velocity change
                         data.confirmedDamage = true
                         data.lastVelocity = newVelocity
