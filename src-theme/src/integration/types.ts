@@ -52,14 +52,21 @@ export interface BindSetting {
     value: {
         printableKeyName: string;
         boundKey: string;
-        action: string;
+        action: BindAction;
+        modifiers: BindModifier[];
     };
     defaultValue: {
         boundKey: string;
-        action: "Toggle" | "Hold";
+        action: BindAction;
+        modifiers: BindModifier[];
         printableKeyName: string;
     };
 }
+
+export type BindAction = "Toggle" | "Hold";
+
+export type BindModifier = "Shift" | "Control" | "Alt" | "Super";
+export type OS = "linux" | "solaris" | "windows" | "mac" | "unknown";
 
 export interface TextSetting {
     valueType: string;
@@ -407,6 +414,7 @@ export interface Component {
 }
 
 export interface ClientInfo {
+    os: OS;
     gameVersion: string;
     clientVersion: string;
     clientName: string;

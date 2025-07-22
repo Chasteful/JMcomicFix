@@ -91,7 +91,7 @@
              in:slide|global={{ duration: 200, axis: "y" }}
              out:slide|global={{ duration: 200, axis: "y" }}
         >
-            {#each cSetting.choices as choice}
+            {#each cSetting.choices as choice(choice)}
                 <div
                         class="choice"
                         class:active={cSetting.value.includes(choice)}

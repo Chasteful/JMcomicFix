@@ -30,6 +30,7 @@ import net.ccbluex.liquidbounce.event.events.KeyboardKeyEvent
 import net.ccbluex.liquidbounce.event.events.MouseButtonEvent
 import net.ccbluex.liquidbounce.event.events.WorldChangeEvent
 import net.ccbluex.liquidbounce.event.handler
+import net.ccbluex.liquidbounce.features.module.modules.combat.aimbot.ModuleDroneControl
 import net.ccbluex.liquidbounce.features.module.modules.client.ModuleAutoConfig
 import net.ccbluex.jmcomicfix.features.module.modules.client.ModuleHudEditor
 import net.ccbluex.jmcomicfix.features.module.modules.combat.ModuleAutoRod
@@ -76,6 +77,7 @@ import net.ccbluex.liquidbounce.features.module.modules.movement.step.ModuleReve
 import net.ccbluex.liquidbounce.features.module.modules.movement.step.ModuleStep
 import net.ccbluex.liquidbounce.features.module.modules.movement.terrainspeed.ModuleTerrainSpeed
 import net.ccbluex.liquidbounce.features.module.modules.player.*
+import net.ccbluex.liquidbounce.utils.input.toModifierOrNull
 import net.ccbluex.liquidbounce.features.module.modules.player.antivoid.ModuleAntiVoid
 import net.ccbluex.liquidbounce.features.module.modules.player.autobuff.ModuleAutoBuff
 import net.ccbluex.liquidbounce.features.module.modules.player.autoqueue.ModuleAutoQueue
@@ -111,6 +113,7 @@ import net.ccbluex.liquidbounce.utils.kotlin.mapArray
 import net.ccbluex.liquidbounce.utils.kotlin.sortedInsert
 import org.lwjgl.glfw.GLFW
 
+
 /**
  * Should be sorted by Module::name
  */
@@ -132,15 +135,19 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
     private val keyboardKeyHandler = handler<KeyboardKeyEvent> { event ->
         when (event.action) {
             GLFW.GLFW_PRESS -> if (mc.currentScreen == null) {
-                    filter { m -> m.bind.matchesKey(event.keyCode, event.scanCode) }
-                    .forEach { m ->
-                        m.enabled = !m.enabled || m.bind.action == InputBind.BindAction.HOLD
-                    }
+                filter { m ->
+                    m.bind.matchesKey(event.keyCode, event.scanCode) && m.bind.matchesModifiers(event.mods)
+                }.forEach { m ->
+                    m.enabled = !m.enabled || m.bind.action == InputBind.BindAction.HOLD
                 }
+            }
+
             GLFW.GLFW_RELEASE ->
                 filter { m ->
-                    m.bind.matchesKey(event.keyCode, event.scanCode) &&
-                        m.bind.action == InputBind.BindAction.HOLD
+                    m.bind.action == InputBind.BindAction.HOLD && (
+                        m.bind.matchesKey(event.keyCode, event.scanCode)
+                            || event.key.toModifierOrNull().let { it in m.bind.modifiers && !it!!.isAnyPressed }
+                        )
                 }.forEach { m ->
                     m.enabled = false
                 }
@@ -151,14 +158,18 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
     private val mouseButtonHandler = handler<MouseButtonEvent> { event ->
         when (event.action) {
             GLFW.GLFW_PRESS -> if (mc.currentScreen == null) {
-                filter { m -> m.bind.matchesMouse(event.button) }
+                filter { m -> m.bind.matchesMouse(event.button) && m.bind.matchesModifiers(event.mods) }
                     .forEach { m ->
                         m.enabled = !m.running || m.bind.action == InputBind.BindAction.HOLD
                     }
             }
+
             GLFW.GLFW_RELEASE ->
                 filter { m ->
-                    m.bind.matchesMouse(event.button) && m.bind.action == InputBind.BindAction.HOLD
+                    m.bind.action == InputBind.BindAction.HOLD && (
+                        m.bind.matchesMouse(event.button)
+                            || event.key.toModifierOrNull().let { it in m.bind.modifiers && !it!!.isAnyPressed }
+                        )
                 }.forEach { m -> m.enabled = false }
         }
     }

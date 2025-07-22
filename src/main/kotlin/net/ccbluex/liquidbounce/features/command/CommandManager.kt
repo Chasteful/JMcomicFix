@@ -156,7 +156,7 @@ object CommandExecutor : EventListener {
         mc.asCoroutineDispatcher() + SupervisorJob() + coroutineExceptionHandler + CoroutineName("CommandExecutor")
     )
 
-    private fun handleExceptions(e: Throwable) {
+        fun handleExceptions(e: Throwable) {
         when (e) {
             is CommandException -> {
                 mc.inGameHud.chatHud.removeMessage("CommandManager#error")

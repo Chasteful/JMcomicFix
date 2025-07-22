@@ -1,6 +1,6 @@
 <script lang="ts">
     import {onMount, onDestroy} from "svelte";
-    import {getModules, getModuleSettings, setTyping} from "../../integration/rest";
+    import {getClientInfo, getModules, getModuleSettings, setTyping} from "../../integration/rest";
     import {groupByCategory} from "../../integration/util";
     import Panel from "./Panel.svelte";
     import Description from "./Description.svelte";
@@ -10,6 +10,7 @@
     import {ResolutionScaler} from "../../util/ResolutionScaler"
 
     import {
+        os,
         gridSize,
         showGrid,
         snappingEnabled,
@@ -70,6 +71,8 @@
 
 
     onMount(async () => {
+        const info = await getClientInfo();
+        os.set(info.os);
         resolutionScaler.updateScaleFactor();
         scaleFactor.set(minecraftScaleFactor * clickGuiScaleFactor * resolutionScaler.getScaleFactor());
         panelLength.set(panelLengthFactor)

@@ -19,7 +19,9 @@
 package net.ccbluex.liquidbounce.config.gson.adapter
 
 import com.google.gson.*
+import net.ccbluex.liquidbounce.config.types.NamedChoice
 import net.ccbluex.liquidbounce.utils.input.InputBind
+import net.ccbluex.liquidbounce.utils.kotlin.emptyEnumSet
 import net.minecraft.client.util.InputUtil
 import java.lang.reflect.Type
 
@@ -28,7 +30,8 @@ object InputBindAdapter : JsonSerializer<InputBind>, JsonDeserializer<InputBind>
     override fun serialize(src: InputBind, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
         return JsonObject().apply {
             add("boundKey", context.serialize(src.boundKey, InputUtil.Key::class.java))
-            addProperty("action", src.action.choiceName)
+            add("action", context.serialize(src.action, NamedChoice::class.java))
+            add("modifiers", context.serialize(src.modifiers))
         }
     }
 
@@ -51,8 +54,10 @@ object InputBindAdapter : JsonSerializer<InputBind>, JsonDeserializer<InputBind>
         val actionStr = jsonObject.get("action").asString
         val action = InputBind.BindAction.entries.find { it.choiceName == actionStr }
             ?: InputBind.BindAction.TOGGLE
-
-        return InputBind(boundKey, action)
+        val modifierSet = emptyEnumSet<InputBind.Modifier>()
+        jsonObject.get("modifiers")?.asJsonArray?.mapTo(modifierSet) { element ->
+            InputBind.Modifier.entries.find { it.choiceName == element.asString }
+        }
+        return InputBind(boundKey, action, modifierSet)
     }
-
 }

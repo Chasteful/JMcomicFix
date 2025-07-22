@@ -18,11 +18,17 @@
  */
 package net.ccbluex.liquidbounce.utils.input
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap
+import it.unimi.dsi.fastutil.ints.Int2ObjectMaps
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import net.ccbluex.liquidbounce.config.types.NamedChoice
 import net.ccbluex.liquidbounce.event.events.KeyboardKeyEvent
 import net.ccbluex.liquidbounce.utils.client.mc
+import net.ccbluex.liquidbounce.utils.kotlin.emptyEnumSet
 import net.minecraft.client.util.InputUtil
+import net.minecraft.util.Util
 import org.lwjgl.glfw.GLFW
+import java.util.EnumSet
 
 /**
  * Data class representing a key binding.
@@ -33,7 +39,8 @@ import org.lwjgl.glfw.GLFW
  */
 data class InputBind(
     var boundKey: InputUtil.Key,
-    var action: BindAction
+    var action: BindAction = BindAction.TOGGLE,
+    val modifiers: EnumSet<Modifier> = emptyEnumSet(),
 ) {
 
     /**
@@ -50,7 +57,7 @@ data class InputBind(
      *
      * @param name The name of the key, which will be translated to an InputUtil.Key.
      */
-    constructor(name: String) : this(inputByName(name), BindAction.TOGGLE)
+    constructor(name: String) : this(inputByName(name))
 
     /**
      * Retrieves the name of the key in uppercase format, excluding the category prefixes.
@@ -122,6 +129,16 @@ data class InputBind(
     }
 
     /**
+     * Determines if the given modifiers match the required modifiers.
+     *
+     * @param mods The bits of modifiers.
+     * @see org.lwjgl.glfw.GLFW
+     */
+    fun matchesModifiers(mods: Int): Boolean {
+        return this.modifiers.all { it.isActive(mods) }
+    }
+
+    /**
      * Handles the event. Returns the new state, assumes the original state is `false`.
      *
      * @param event The [KeyboardKeyEvent] to handle.
@@ -153,6 +170,60 @@ data class InputBind(
     enum class BindAction(override val choiceName: String) : NamedChoice {
         TOGGLE("Toggle"),
         HOLD("Hold")
+    }
+
+    enum class Modifier(override val choiceName: String, val bitMask: Int, vararg val keyCodes: Int): NamedChoice {
+        SHIFT("Shift", GLFW.GLFW_MOD_SHIFT, InputUtil.GLFW_KEY_LEFT_SHIFT, InputUtil.GLFW_KEY_RIGHT_SHIFT),
+        CONTROL("Control", GLFW.GLFW_MOD_CONTROL, InputUtil.GLFW_KEY_LEFT_CONTROL, InputUtil.GLFW_KEY_RIGHT_CONTROL),
+        ALT("Alt", GLFW.GLFW_MOD_ALT, InputUtil.GLFW_KEY_LEFT_ALT, InputUtil.GLFW_KEY_RIGHT_ALT),
+        SUPER("Super", GLFW.GLFW_MOD_SUPER, InputUtil.GLFW_KEY_LEFT_SUPER, InputUtil.GLFW_KEY_RIGHT_SUPER);
+
+        /**
+         * Check if self is active in [modifiers] value.
+         */
+        fun isActive(modifiers: Int) = modifiers and this.bitMask != 0
+
+        /**
+         * Check if any one modifier key is pressed.
+         */
+        val isAnyPressed: Boolean get() = this.keyCodes.any { InputUtil.isKeyPressed(mc.window.handle, it) }
+
+        /**
+         * Performs the platform (OS) specified render name of a modifier.
+         */
+        val platformRenderName: String get() = when (Util.getOperatingSystem()) {
+            Util.OperatingSystem.OSX -> when (this) {
+                CONTROL -> "Ctrl"
+                SUPER -> "\u229e"
+                else -> choiceName
+            }
+            Util.OperatingSystem.WINDOWS -> when (this) {
+                SHIFT -> "\u21e7"
+                CONTROL -> "^"
+                ALT -> "\u2325"
+                SUPER -> "\u2318"
+                // else -> choiceName
+            }
+            else -> choiceName
+        }
+
+        companion object {
+            @JvmField
+            internal val KEY_CODE_LOOKUP: Int2ObjectMap<Modifier> = run {
+                val map = Int2ObjectOpenHashMap<Modifier>()
+                for (modifier in Modifier.entries) {
+                    for (keyCode in modifier.keyCodes) {
+                        map[keyCode] = modifier
+                    }
+                }
+                Int2ObjectMaps.unmodifiable(map)
+            }
+
+            @JvmStatic
+            fun fromRawValue(modifiers: Int) = entries.filterTo(emptyEnumSet()) {
+                it.isActive(modifiers)
+            }
+        }
     }
 
 }

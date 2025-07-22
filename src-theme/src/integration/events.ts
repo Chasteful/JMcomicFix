@@ -8,20 +8,19 @@ import type {
     Server,
     TextComponent
 } from "./types";
-import {types} from "sass";
-import List = types.List;
-
-export interface ClickGuiValueChangeEvent {
+export interface Event {
+}
+export interface ClickGuiValueChangeEvent extends Event {
     configurable: ConfigurableSetting;
 }
 
-export interface ModuleToggleEvent {
+export interface ModuleToggleEvent extends Event  {
     moduleName: string;
     hidden: boolean;
     enabled: boolean;
 }
 
-export interface KeyboardKeyEvent {
+export interface KeyboardKeyEvent extends Event {
     keyCode: number;
     scanCode: number;
     action: number;
@@ -30,7 +29,7 @@ export interface KeyboardKeyEvent {
     screen: Screen | undefined;
 }
 
-export interface MouseButtonEvent {
+export interface MouseButtonEvent extends Event  {
     key: string;
     button: number;
     action: number;
@@ -38,30 +37,30 @@ export interface MouseButtonEvent {
     screen: Screen | undefined;
 }
 
-export interface ScaleFactorChangeEvent {
+export interface ScaleFactorChangeEvent extends Event  {
     scaleFactor: number;
 }
 
-export interface ComponentsUpdateEvent {
+export interface ComponentsUpdateEvent extends Event  {
     components: Component[];
 }
 
-export interface ClientPlayerDataEvent {
+export interface ClientPlayerDataEvent extends Event  {
     playerData: PlayerData;
 }
 
-export interface OverlayMessageEvent {
+export interface OverlayMessageEvent extends Event  {
     text: TextComponent | string;
     tinted: boolean;
 }
 
-export interface ConnectionDetailsEvent {
+export interface ConnectionDetailsEvent extends Event  {
 
     result: TextComponent | string;
 
 }
 
-export interface OverlayTitleEvent {
+export interface OverlayTitleEvent extends Event  {
     title: TextComponent | string;
     subtitle: TextComponent | string;
 }
@@ -74,14 +73,14 @@ export interface PlayerEntry {
     isStaff: boolean;
 }
 
-export interface OverlayPlayListEvent {
+export interface OverlayPlayListEvent  extends Event {
     header: TextComponent | string;
     footer: TextComponent | string;
     players: PlayerEntry[];
 
 }
 
-export interface OverlayChatEvent {
+export interface OverlayChatEvent  extends Event {
     content: TextComponent | string,
     timestamp: number;
     isSystem: Boolean;
@@ -90,11 +89,11 @@ export interface OverlayChatEvent {
     fadeTimeout?: number;
 }
 
-export interface OverlayDisconnectionEvent {
+export interface OverlayDisconnectionEvent  extends Event  {
     parent: "title" | "menu" | "custom";
     info: TextComponent | string;
 }
-export interface ChatReceiveEvent {
+export interface ChatReceiveEvent  extends Event {
     message: string;
     textData: TextComponent | string;
     type: ChatType;
@@ -110,81 +109,81 @@ export enum ChatType {
 
 
 
-export interface NotificationEvent {
+export interface NotificationEvent  extends Event  {
     title: string;
     message: string;
     severity: "INFO" | "SUCCESS" | "ERROR" | "ENABLED" | "DISABLED" | "BLINK" | "BLINKED" | "BLINKING";
 }
 
-export interface ProgressEvent {
+export interface ProgressEvent  extends Event  {
     title: string;
     progress: number;
     maxProgress: number;
     timeRemaining: number;
 }
 
-export interface KeyEvent {
+export interface KeyEvent  extends Event {
     key: string;
     action: number;
     mods: number;
 
 }
 
-export interface TargetChangeEvent {
+export interface TargetChangeEvent  extends Event {
     target: PlayerData | null;
 }
 
-export interface BlockCountChangeEvent {
+export interface BlockCountChangeEvent  extends Event {
     count?: number;
 }
 
-export interface AccountManagerAdditionEvent {
+export interface AccountManagerAdditionEvent  extends Event {
     username: string | null;
     error: string | null;
 }
 
-export interface AccountManagerMessageEvent {
+export interface AccountManagerMessageEvent extends Event  {
     message: string;
 }
 
-export interface AccountManagerLoginEvent {
+export interface AccountManagerLoginEvent  extends Event {
     username: string | null;
     error: string | null;
 }
 
-export interface ServerPingedEvent {
+export interface ServerPingedEvent extends Event  {
     server: Server;
 }
 
-export interface PlayerInventoryEvent {
+export interface PlayerInventoryEvent  extends Event {
     inventory: PlayerInventory;
 }
 
-export interface PlayerInventory {
+export interface PlayerInventory  extends Event {
     armor: ItemStack[];
     main: ItemStack[];
     crafting: ItemStack[];
 }
 
-export interface ProxyAdditionResultEvent {
+export interface ProxyAdditionResultEvent extends Event  {
     proxy: Proxy | null;
     error: string | null;
 }
 
-export interface ProxyEditResultEvent {
+export interface ProxyEditResultEvent  extends Event {
     proxy: Proxy | null;
     error: string | null;
 }
 
-export interface ProxyCheckResultEvent {
+export interface ProxyCheckResultEvent  extends Event {
     proxy: Proxy;
     error: string | null;
 }
 
-export interface SpaceSeperatedNamesChangeEvent {
+export interface SpaceSeperatedNamesChangeEvent  extends Event {
     value: boolean;
 }
 
-export interface BrowserUrlChangeEvent {
+export interface BrowserUrlChangeEvent  extends Event {
     url: string;
 }

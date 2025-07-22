@@ -2,26 +2,39 @@
     import {createEventDispatcher} from "svelte";
 
     export let expanded: boolean;
+    export let expandable: boolean = true;
+    export let compact = false;
+    export let dimmed = false;
 
     const dispatch = createEventDispatcher();
 
     function handleClick() {
-        expanded = !expanded;
-        dispatch("click");
+        if (expandable) {
+            expanded = !expanded;
+            dispatch("click");
+        }
     }
 </script>
 
 <!-- svelte-ignore a11y_consider_explicit_label -->
-<button class="arrow" class:expanded on:click={handleClick}
+<button class="arrow" class:expanded class:compact class:dimmed on:click={handleClick}
 ></button>
 
 <style lang="scss">
+  @use "../../../../colors" as *;
   .arrow {
     width: 20px;
     position: relative;
     cursor: pointer;
     background-color: transparent;
     border: none;
+
+    &.compact {
+      width: 10px;
+    }
+    &.dimmed {
+      color: $clickgui-text-dimmed-color;
+    }
 
     &::after {
       content: "";
@@ -39,7 +52,9 @@
       transition: ease opacity 0.2s,
       ease transform 0.4s;
     }
-
+    &::after.compact {
+      right: auto;
+    }
     &.expanded::after {
       transform: translateY(-50%) rotate(0);
       opacity: 1;
