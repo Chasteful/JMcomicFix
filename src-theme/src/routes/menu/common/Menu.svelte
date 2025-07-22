@@ -25,9 +25,7 @@
     $: showAccount = !noAccountPaths.includes($location);
     $: showHeader = !noHeaderPaths.includes($location);
     $: showBackground = BackgroundPaths.includes($location);
-    $:if ($locked) {
-        openScreen("lockscreen");
-    }
+
 
 </script>
 

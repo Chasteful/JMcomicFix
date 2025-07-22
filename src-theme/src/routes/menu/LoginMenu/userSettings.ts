@@ -5,13 +5,13 @@ const STORAGE_KEY = 'userSettings';
 
 function createUserSettingsStore() {
     let initialValue = {
-        username: '',
-        uid: '',
+        username: 'Customer',
+        uid: '0000',
         isDev: false,
         isOwner: false,
         hwid: '',
         developer: '',
-        avatar: ''
+        avatar: 'img/avatars/Customer.png'
     };
 
 
