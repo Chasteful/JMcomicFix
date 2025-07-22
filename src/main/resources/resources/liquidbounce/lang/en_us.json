@@ -741,5 +741,6 @@
   "liquidbounce.module.noweb.mode.grim.messages.Protocol": "Please use a protocol version 1.18.2 or later to bypass Grim version weak detection!",
   "liquidbounce.module.autoRod.description": "Automatically use the rod to control the distance, need the crosshair to point at the opponent." ,
   "liquidbounce.module.autoScreenShot.description": "Automatically perform certain actions on victory and take screenshots.",
-  "liquidbounce.module.noBooks.description": "Intercept and close the book interface opened by the server."
+  "liquidbounce.module.noBooks.description": "Intercept and close the book interface opened by the server.",
+  "liquidbounce.module.pointerESP.description": "Display rotating pointer images around targets in screen center."
 }

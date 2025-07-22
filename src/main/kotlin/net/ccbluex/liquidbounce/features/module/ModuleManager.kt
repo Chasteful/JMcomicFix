@@ -419,7 +419,7 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleItemChams,
             ModuleCrystalView,
             ModuleSkinChanger,
-
+            ModulePointerESP,
             // World
             ModuleAutoBuild,
             ModuleAutoDisable,
