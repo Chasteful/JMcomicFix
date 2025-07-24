@@ -283,7 +283,6 @@ public abstract class MixinGameRenderer {
 
         return original;
     }
-
     @ModifyArgs(
             method = "getBasicProjectionMatrix",
             at = @At(value = "INVOKE", target = "Lorg/joml/Matrix4f;perspective(FFFF)Lorg/joml/Matrix4f;")

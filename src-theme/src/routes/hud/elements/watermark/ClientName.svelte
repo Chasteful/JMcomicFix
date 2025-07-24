@@ -13,9 +13,8 @@
     </filter>
 </svg>
 <div class="client client-glow" in:fade>
-    { $clientName || "禁漫修复" } {clientInfo.clientVersion}
+    {$clientName ? $clientName : `禁漫修復 ${clientInfo?.clientVersion ?? ''}`}
 </div>
-
 <style lang="scss">
   @import "../../../../colors";
 

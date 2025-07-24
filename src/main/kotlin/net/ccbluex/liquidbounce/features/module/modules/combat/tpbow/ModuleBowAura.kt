@@ -23,9 +23,7 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.Vec3d
 import net.minecraft.util.math.Vec3i
-import kotlin.math.PI
-import kotlin.math.atan2
-import kotlin.math.sqrt
+import kotlin.math.*
 
 @Suppress("TooManyFunctions")
 object ModuleBowAura : ClientModule("TPBowAura", Category.COMBAT, disableOnQuit = true) {
@@ -86,50 +84,70 @@ object ModuleBowAura : ClientModule("TPBowAura", Category.COMBAT, disableOnQuit 
         C06("C06")
     }
 
+
     @Suppress("unused")
     private val repeatable = tickHandler {
-        val bowSlot = (0..8).firstOrNull { player.inventory.getStack(it)?.item == Items.BOW } ?: return@tickHandler
+        // Check for bow in hand
+        val bowItem = player.inventory.main.firstOrNull { it?.item == Items.BOW } ?: return@tickHandler
+
+        // Check delay
         if (!clickTimer.hasTimePassed(delay.random().toLong())) return@tickHandler
 
+        // Get valid targets
         val targets = targetTracker.targets().take(maxTargets)
         if (targets.isEmpty()) {
             currentPath = emptyList()
             return@tickHandler
         }
 
+        // Process each target
         for (target in targets) {
+            // Calculate projectile trajectory
+            val rotation = calculateBowAngles(target, target.x, target.z)
+
+
             when (mode) {
                 Mode.VELOCITY_1_8 -> handleVelocity18(target)
                 Mode.VELOCITY_1_9 -> handleVelocity19(target)
             }
-            doAttack(target, target.boundingBox.center.x, target.boundingBox.center.z)
         }
+
         clickTimer.reset()
     }
 
     @Suppress("unused")
     private val packetHandler = handler<PacketEvent> { event ->
-        if (antiLag && event.packet is PlayerPositionLookS2CPacket) {
+        val packet = event.packet
+
+        if (antiLag && packet is PlayerPositionLookS2CPacket) {
             event.cancelEvent()
-            val packet = event.packet
-            val playerPosition = Vec3d(packet.change.position.x, packet.change.position.y, packet.change.position.z)
-            val diff = player.distanceTo(player)
+
+
+            val playerPosition = packet.change
+
+            val diffX = player.x - playerPosition.position.x
+            val diffY = player.y - playerPosition.position.y
+            val diffZ = player.z - playerPosition.position.z
+            val distance = sqrt(diffX * diffX + diffY * diffY + diffZ * diffZ)
 
             network.sendPacket(
                 PlayerMoveC2SPacket.Full(
-                    playerPosition.x, playerPosition.y, playerPosition.z,
-                    packet.change.yaw, packet.change.pitch,
-                    player.isOnGround, false
+                    player.x, player.y, player.z,
+                    player.yaw, player.pitch,
+                    player.isOnGround,
+                    false
                 )
             )
 
-            if (antiLagHighVersion && currentPath.isNotEmpty()) {
-                currentPath.forEach { vec ->
+            if (antiLagHighVersion) {
+
+                repeat((distance / 10 + 1).roundToInt()) {
                     network.sendPacket(
                         PlayerMoveC2SPacket.Full(
-                            vec.x, vec.y, vec.z,
+                            player.x, player.y, player.z,
                             player.yaw, player.pitch,
-                            player.isOnGround, false
+                            player.isOnGround,
+                            false
                         )
                     )
                 }
@@ -210,6 +228,46 @@ object ModuleBowAura : ClientModule("TPBowAura", Category.COMBAT, disableOnQuit 
 
         return current // Fallback to current position if no valid path is found
     }
+    private fun handleVelocity18(target: LivingEntity) {
+        currentPath = if (throughWalls) {
+            findPath(player.pos, target.pos, moveDistance.toDouble())
+        } else {
+            findPathWithObstacles(player.pos, target, moveDistance.toDouble())
+        }
+
+        if (currentPath.isEmpty()) return
+
+        // Send movement packets
+        currentPath.forEach { vec ->
+            when (packetMode) {
+                PacketMode.C04 -> network.sendPacket(
+                    PlayerMoveC2SPacket.PositionAndOnGround(vec.x, vec.y, vec.z, true, false)
+                )
+
+                PacketMode.C06 -> network.sendPacket(
+                    PlayerMoveC2SPacket.Full(vec.x, vec.y, vec.z, player.yaw, player.pitch, true, false)
+                )
+            }
+        }
+
+        // Attack at destination
+        doAttack(target, currentPath.last().x, currentPath.last().z)
+
+        // Return path
+        currentPath.reversed().forEach { vec ->
+            when (packetMode) {
+                PacketMode.C04 -> network.sendPacket(
+                    PlayerMoveC2SPacket.PositionAndOnGround(vec.x, vec.y, vec.z, true, false)
+                )
+
+                PacketMode.C06 -> network.sendPacket(
+                    PlayerMoveC2SPacket.Full(vec.x, vec.y, vec.z, player.yaw, player.pitch, true, false)
+                )
+            }
+        }
+    }
+
+
     private fun isPassable(pos: BlockPos): Boolean {
         val state = world.getBlockState(pos)
         val block = state.block
@@ -219,54 +277,18 @@ object ModuleBowAura : ClientModule("TPBowAura", Category.COMBAT, disableOnQuit 
             state.fluidState.isStill
     }
 
-    private fun handleVelocity18(target: LivingEntity) {
-        currentPath = if (throughWalls) {
-            findPath(player.pos, target.boundingBox.center, moveDistance.toDouble())
-        } else {
-            findPathWithObstacles(player.pos, target, moveDistance.toDouble())
-        }
-
-        if (currentPath.isEmpty()) return
-
-        // Send movement packets to target
-        currentPath.forEach { vec ->
-            when (packetMode) {
-                PacketMode.C04 -> network.sendPacket(
-                    PlayerMoveC2SPacket.PositionAndOnGround(vec.x, vec.y, vec.z, true, false)
-                )
-                PacketMode.C06 -> network.sendPacket(
-                    PlayerMoveC2SPacket.Full(vec.x, vec.y, vec.z, player.yaw, player.pitch, true, false)
-                )
-            }
-        }
-
-        // Attack at the target's collision box center
-        doAttack(target, currentPath.last().x, currentPath.last().z)
-
-        // Return path
-        currentPath.reversed().forEach { vec ->
-            when (packetMode) {
-                PacketMode.C04 -> network.sendPacket(
-                    PlayerMoveC2SPacket.PositionAndOnGround(vec.x, vec.y, vec.z, true, false)
-                )
-                PacketMode.C06 -> network.sendPacket(
-                    PlayerMoveC2SPacket.Full(vec.x, vec.y, vec.z, player.yaw, player.pitch, true, false)
-                )
-            }
-        }
-    }
 
     private fun handleVelocity19(target: LivingEntity) {
-        val diff = player.distanceTo(target)
-        val times = (diff / moveDistance).toInt().coerceAtLeast(1)
+        val diff = player.getAttackDistanceScalingFactor(target)
+        val times = (diff / moveDistance).toInt()
 
-        // Travel to target's collision box center
+        // Travel to target
         repeat(times) {
-            sendPositionPacket(target.boundingBox.center.x, target.boundingBox.center.y - player.eyeY, target.boundingBox.center.z)
+            sendPositionPacket(target.x, target.y, target.z)
         }
 
-        currentPath = listOf(target.boundingBox.center)
-        doAttack(target, target.boundingBox.center.x, target.boundingBox.center.z)
+        currentPath = listOf(Vec3d(target.z, target.y, target.z))
+        doAttack(target, target.x, target.z)
 
         // Travel back
         repeat(times) {
@@ -293,71 +315,82 @@ object ModuleBowAura : ClientModule("TPBowAura", Category.COMBAT, disableOnQuit 
     }
 
     private fun doAttack(target: Entity, x: Double, z: Double) {
-        // 1. Switch to bow slot
+        // 1. Switch to bow slot if not already holding it
         val bowSlot = (0..8).firstOrNull { player.inventory.getStack(it).item == Items.BOW } ?: return
         if (player.inventory.selectedSlot != bowSlot) {
             SilentHotbar.selectSlotSilently(this, HotbarItemSlot(bowSlot), 0)
         }
 
-        // 2. Teleport to target's collision box center
-        val targetPos = target.boundingBox.center
+        // 2. Start using the bow (equivalent to C08PacketPlayerBlockPlacement)
         network.sendPacket(
-            PlayerMoveC2SPacket.PositionAndOnGround(
-                targetPos.x, targetPos.y - player.eyeY, targetPos.z,
-                true, false
+            PlayerInteractItemC2SPacket(
+                Hand.MAIN_HAND,
+                0,
+                player.yaw,
+                player.pitch
             )
         )
 
         // 3. Aim at target
         repeat(20) {
-            val (yaw, pitch) = calculateBowAngles(target, targetPos.x, targetPos.z)
+            val (yaw, pitch) = calculateBowAngles(target, x, z)
             network.sendPacket(
                 PlayerMoveC2SPacket.LookAndOnGround(
-                    yaw, pitch, player.isOnGround, false
+                    yaw,
+                    pitch,
+                    player.isOnGround,
+                    false
                 )
             )
         }
 
-        // 4. Start using the bow
-        network.sendPacket(
-            PlayerInteractItemC2SPacket(
-                Hand.MAIN_HAND, 0, player.yaw, player.pitch
-            )
-        )
-
-        // 5. Release the bow
+        // 4. Release the bow (equivalent to C07PacketPlayerDigging.Action.RELEASE_USE_ITEM)
         network.sendPacket(
             PlayerActionC2SPacket(
                 PlayerActionC2SPacket.Action.RELEASE_USE_ITEM,
-                BlockPos.ORIGIN, Direction.DOWN, 0
+                BlockPos.ORIGIN,
+                Direction.DOWN,
+                0
             )
         )
 
-        // 6. Reset position
+        // 5. Reset position packets
         repeat(2) {
             network.sendPacket(
                 PlayerMoveC2SPacket.PositionAndOnGround(
                     player.x, player.y, player.z,
-                    player.isOnGround, false
+                    player.isOnGround,
+                    false
                 )
             )
         }
 
-        // 7. Reset rotation
+        // 6. Reset rotation
         network.sendPacket(
             PlayerMoveC2SPacket.LookAndOnGround(
-                player.yaw, player.pitch, player.isOnGround, false
+                player.yaw,
+                player.pitch,
+                player.isOnGround,
+                false
             )
         )
     }
 
     private fun calculateBowAngles(entity: Entity, x: Double, z: Double): Pair<Float, Float> {
         val posX = entity.x - x
-        val posY = entity.boundingBox.center.y - (player.boundingBox.minY + player.eyeY) // Aim at target's center
+        val posY = entity.boundingBox.minY + entity.eyeY - 0.15 -
+            player.boundingBox.minY - player.eyeY
         val posZ = entity.z - z
+        val posSqrt = sqrt(posX * posX + posZ * posZ)
 
         val yaw = (atan2(posZ, posX) * 180.0 / PI - 90.0).toFloat()
-        val pitch = (-atan2(posY, sqrt(posX * posX + posZ * posZ)) * 180.0 / PI).toFloat()
+        val pitch = (-Math.toDegrees(
+            atan(
+                (1 - sqrt(abs(1 - 0.006f * (0.006f * (posSqrt * posSqrt) + 2 * posY * 1))) /
+                    (0.006f * posSqrt)
+                    )
+            )
+        ).toFloat())
 
         return Pair(yaw, pitch.coerceIn(-90f, 90f))
     }
@@ -385,7 +418,7 @@ object ModuleBowAura : ClientModule("TPBowAura", Category.COMBAT, disableOnQuit 
         travelBack(currentPath.reversed())
     }
 
-    private fun handleVelocity19Movement(target: LivingEntity) {
+    private suspend fun handleVelocity19Movement(target: LivingEntity) {
         val diff = player.distanceTo(target)
         val times = (diff / moveDistance).toInt()
 

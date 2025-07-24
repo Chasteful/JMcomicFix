@@ -55,7 +55,6 @@ const val EDGE_EAST_UP = ((1 shl 18) or (1 shl (19)))
 const val EDGE_SOUTH_UP = ((1 shl 20) or (1 shl (21)))
 const val EDGE_WEST_UP = ((1 shl 22) or (1 shl (23)))
 
-
 /**
  * A utility class for drawing shapes in batches.
  *
@@ -265,7 +264,6 @@ class BoxRenderer private constructor(private val env: WorldRenderEnvironment) {
         faceRenderer.draw()
         outlinesRenderer.draw()
     }
-
 }
 
 fun Box.vertexPositions(): Array<Vec3> {
@@ -370,20 +368,54 @@ fun RenderBufferBuilder<VertexInputType.PosTexColor>.drawQuad(
 ) {
     val matrix = env.currentMvpMatrix
 
-    // Draw the vertices of the box
+    // Draw the vertices of the quad
     with(buffer) {
-        vertex(matrix, pos1.x.toFloat(), pos2.y.toFloat(), pos1.z.toFloat())
-            .texture(uv1.u, uv2.v)
-            .color(color.toARGB())
-        vertex(matrix, pos2.x.toFloat(), pos2.y.toFloat(), pos2.z.toFloat())
-            .texture(uv2.u, uv2.v)
+        vertex(matrix, pos1.x.toFloat(), pos1.y.toFloat(), pos1.z.toFloat())
+            .texture(uv1.u, uv1.v)
             .color(color.toARGB())
         vertex(matrix, pos2.x.toFloat(), pos1.y.toFloat(), pos2.z.toFloat())
             .texture(uv2.u, uv1.v)
             .color(color.toARGB())
+        vertex(matrix, pos2.x.toFloat(), pos2.y.toFloat(), pos2.z.toFloat())
+            .texture(uv2.u, uv2.v)
+            .color(color.toARGB())
+        vertex(matrix, pos1.x.toFloat(), pos2.y.toFloat(), pos1.z.toFloat())
+            .texture(uv1.u, uv2.v)
+            .color(color.toARGB())
+    }
+}
+
+fun RenderBufferBuilder<VertexInputType.PosTexColor>.drawQuad(
+    env: RenderEnvironment,
+    pos1: Vec3d,
+    uv1: UV2f,
+    pos2: Vec3d,
+    uv2: UV2f,
+    pos3: Vec3d,
+    uv3: UV2f,
+    pos4: Vec3d,
+    uv4: UV2f,
+    color1: Color4b,
+    color2: Color4b,
+    color3: Color4b,
+    color4: Color4b
+) {
+    val matrix = env.currentMvpMatrix
+
+    // Draw the vertices of the quad with per-vertex colors
+    with(buffer) {
         vertex(matrix, pos1.x.toFloat(), pos1.y.toFloat(), pos1.z.toFloat())
             .texture(uv1.u, uv1.v)
-            .color(color.toARGB())
+            .color(color1.toARGB())
+        vertex(matrix, pos2.x.toFloat(), pos2.y.toFloat(), pos2.z.toFloat())
+            .texture(uv2.u, uv2.v)
+            .color(color2.toARGB())
+        vertex(matrix, pos3.x.toFloat(), pos3.y.toFloat(), pos3.z.toFloat())
+            .texture(uv3.u, uv3.v)
+            .color(color3.toARGB())
+        vertex(matrix, pos4.x.toFloat(), pos4.y.toFloat(), pos4.z.toFloat())
+            .texture(uv4.u, uv4.v)
+            .color(color4.toARGB())
     }
 }
 
@@ -394,7 +426,7 @@ fun RenderBufferBuilder<VertexInputType.Pos>.drawQuad(
 ) {
     val matrix = env.currentMvpMatrix
 
-    // Draw the vertices of the box
+    // Draw the vertices of the quad
     with(buffer) {
         vertex(matrix, pos1.x, pos2.y, pos1.z)
         vertex(matrix, pos2.x, pos2.y, pos2.z)
@@ -410,7 +442,7 @@ fun RenderBufferBuilder<VertexInputType.Pos>.drawQuadOutlines(
 ) {
     val matrix = env.currentMvpMatrix
 
-    // Draw the vertices of the box
+    // Draw the vertices of the quad outlines
     with(buffer) {
         vertex(matrix, pos1.x, pos1.y, pos1.z)
         vertex(matrix, pos1.x, pos2.y, pos1.z)
@@ -434,7 +466,7 @@ fun RenderBufferBuilder<VertexInputType.PosColor>.drawLine(
 ) {
     val matrix = env.currentMvpMatrix
 
-    // Draw the vertices of the box
+    // Draw the vertices of the line
     with(buffer) {
         vertex(matrix, pos1.x, pos1.y, pos1.z).color(color.toARGB())
         vertex(matrix, pos2.x, pos2.y, pos2.z).color(color.toARGB())
@@ -465,5 +497,4 @@ sealed class VertexInputType {
         override val shaderProgram: ShaderProgramKey
             get() = ShaderProgramKeys.POSITION_TEX_COLOR
     }
-
 }

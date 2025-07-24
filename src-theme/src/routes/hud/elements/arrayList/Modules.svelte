@@ -40,7 +40,8 @@
                 ? convertToSpacedString(m.name)
                 : m.name;
             const prefix = prefixMap.get(m.name) || '';
-            const fullName = `${formattedName}\u00A0${prefix}`;
+            const showPrefix = prefix.trim().length > 0;
+            const fullName = showPrefix ? `${formattedName}\u00A0${prefix}` : formattedName;
 
             const width = getTextWidth(
                 fullName,
@@ -66,7 +67,7 @@
 
         listen('moduleToggle', () => updateEnabledModules());
         listen('refreshArrayList', () => updateEnabledModules());
-        listen('clickGuiValueChange', () => updateEnabledModules());
+        listen('hudValueChange', () => updateEnabledModules());
         spaceSeperatedNames.subscribe(() => updateEnabledModules());
 
         unsubs = subscribeColors();

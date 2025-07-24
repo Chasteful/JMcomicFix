@@ -10,6 +10,8 @@ import net.ccbluex.liquidbounce.config.types.nesting.ToggleableConfigurable
 import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.render.*
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
+import net.ccbluex.liquidbounce.render.engine.type.Color4b.Companion.hslToRgb
+import net.ccbluex.liquidbounce.render.engine.type.Color4b.Companion.rgbToHsl
 import net.ccbluex.liquidbounce.render.engine.type.Vec3
 import net.ccbluex.liquidbounce.utils.client.registerAsDynamicImageFromClientResources
 import net.ccbluex.liquidbounce.utils.entity.box
@@ -350,7 +352,7 @@ class WorldTargetRenderer(module: ClientModule) : TargetRenderer<WorldRenderEnvi
             RenderSystem.setShaderTexture(0, captureTexture)
 
             with(env) {
-                drawParticle(currentSize, (captureAlpha * alphaFactor).toInt())
+                drawGradientParticle(currentSize, (captureAlpha * alphaFactor).toInt())
             }
 
             RenderSystem.depthMask(true)
@@ -360,36 +362,47 @@ class WorldTargetRenderer(module: ClientModule) : TargetRenderer<WorldRenderEnvi
             env.matrixStack.pop()
         }
 
-        private fun WorldRenderEnvironment.drawParticle(currentSize: Float, alpha: Int) {
-            val mainColor = colorMode.activeChoice.getColor(mc.player).withAlpha(alpha)
-            val secondaryColor = colorMode.activeChoice.getColor(mc.player, 90).withAlpha((alpha * 0.8).toInt())
-            val tertiaryColor = colorMode.activeChoice.getColor(mc.player, 180).withAlpha((alpha * 0.6).toInt())
-            val quaternaryColor = colorMode.activeChoice.getColor(mc.player, 270).withAlpha((alpha * 0.8).toInt())
+        private fun WorldRenderEnvironment.drawGradientParticle(currentSize: Float, alpha: Int) {
 
+            val timeFactor = (System.currentTimeMillis() % 4000) / 4000f
+
+
+            val color1 = hslToRgb(timeFactor, 0.95f, 0.65f, alpha)
+            val color2 = hslToRgb(timeFactor + 0.25f, 0.95f, 0.65f, alpha) // 90度色相差
+
+            drawGradientQuad(currentSize, color1, color2)
+        }
+
+
+
+        private fun WorldRenderEnvironment.drawGradientQuad(size: Float, color1: Color4b, color2: Color4b) {
             drawCustomMesh(
                 VertexFormat.DrawMode.QUADS,
                 VertexFormats.POSITION_TEXTURE_COLOR,
                 ShaderProgramKeys.POSITION_TEX_COLOR
             ) { matrix ->
-                vertex(matrix, -currentSize / 2, -currentSize / 2, 0.0f)
+                // Top-left
+                vertex(matrix, -size / 2, -size / 2, 0.0f)
                     .texture(0.0f, 1.0f)
-                    .color(mainColor.toARGB())
+                    .color(color1.toARGB())
 
-                vertex(matrix, -currentSize / 2, currentSize / 2, 0.0f)
+                // Bottom-left
+                vertex(matrix, -size / 2, size / 2, 0.0f)
                     .texture(0.0f, 0.0f)
-                    .color(secondaryColor.toARGB())
+                    .color(color1.toARGB())
 
-                vertex(matrix, currentSize / 2, currentSize / 2, 0.0f)
+                // Bottom-right
+                vertex(matrix, size / 2, size / 2, 0.0f)
                     .texture(1.0f, 0.0f)
-                    .color(tertiaryColor.toARGB())
+                    .color(color2.toARGB())
 
-                vertex(matrix, currentSize / 2, -currentSize / 2, 0.0f)
+                // Top-right
+                vertex(matrix, size / 2, -size / 2, 0.0f)
                     .texture(1.0f, 1.0f)
-                    .color(quaternaryColor.toARGB())
+                    .color(color2.toARGB())
             }
         }
     }
-
     inner class Circle(module: ClientModule) : WorldTargetRenderAppearance("GlowingCircle") {
         override val parent: ChoiceConfigurable<*>
             get() = appearance

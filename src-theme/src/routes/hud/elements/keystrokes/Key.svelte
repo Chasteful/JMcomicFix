@@ -115,7 +115,7 @@
     }
 
     &:active {
-      box-shadow: 0 0 10px rgba($key-color, 0.6) inset;
+      box-shadow: 0 0 10px $key-color;
 
     }
 
@@ -127,7 +127,7 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: rgba(20, 20, 20, 0.2);
+      background: rgba($base, 0.2);
       border-radius: inherit;
       z-index: 0;
     }

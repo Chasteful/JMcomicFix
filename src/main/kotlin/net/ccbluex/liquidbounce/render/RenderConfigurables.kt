@@ -11,13 +11,12 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.util.math.BlockPos
 
 abstract class GenericColorMode<in T>(name: String) : Choice(name) {
-    // 原方法
+
     abstract fun getColors(param: T): Pair<Color4b, Color4b>
     open fun getColor(param: T): Color4b = getColors(param).first
 
-    // 新增带角度参数的方法
     open fun getColor(param: T, angle: Int): Color4b {
-        // 默认实现忽略角度参数
+
         return getColor(param)
     }
 }

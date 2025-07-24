@@ -70,13 +70,86 @@ data class Color4b(val r: Int, val g: Int, val b: Int, val a: Int = 255) {
                 )
             }
         }
+        fun rgbToHsl(color: Color4b): FloatArray {
+            val r = color.r / 255f
+            val g = color.g / 255f
+            val b = color.b / 255f
+
+            val max = maxOf(r, g, b)
+            val min = minOf(r, g, b)
+            var h: Float
+            val s: Float
+            val l = (max + min) / 2f
+
+            if (max == min) {
+                h = 0f
+                s = 0f
+            } else {
+                val d = max - min
+                s = if (l > 0.5f) d / (2f - max - min) else d / (max + min)
+
+                h = when (max) {
+                    r -> (g - b) / d + (if (g < b) 6f else 0f)
+                    g -> (b - r) / d + 2f
+                    else -> (r - g) / d + 4f
+                }
+                h /= 6f
+            }
+
+            return floatArrayOf(h, s, l)
+        }
+
+        fun hslToRgb(h: Float, s: Float, l: Float, alpha: Int = 255): Color4b {
+            // 确保色相在 [0,1] 范围内
+            val normalizedH = ((h % 1f) + 1f) % 1f
+
+            // 其余代码保持不变
+            val r: Float
+            val g: Float
+            val b: Float
+
+            if (s == 0f) {
+                r = l
+                g = l
+                b = l
+            } else {
+                val q = if (l < 0.5f) l * (1 + s) else l + s - l * s
+                val p = 2 * l - q
+
+                r = hueToRgb(p, q, normalizedH + 1f/3f)
+                g = hueToRgb(p, q, normalizedH)
+                b = hueToRgb(p, q, normalizedH - 1f/3f)
+            }
+
+            return Color4b((r * 255).toInt(), (g * 255).toInt(), (b * 255).toInt(), alpha)
+        }
+
+        fun hueToRgb(p: Float, q: Float, t: Float): Float {
+            var t = t
+            if (t < 0f) t += 1f
+            if (t > 1f) t -= 1f
+            return when {
+                t < 1f/6f -> p + (q - p) * 6f * t
+                t < 1f/2f -> q
+                t < 2f/3f -> p + (q - p) * (2f/3f - t) * 6f
+                else -> p
+            }
+        }
 
     }
 
     constructor(color: Color) : this(color.red, color.green, color.blue, color.alpha)
     constructor(hex: Int, hasAlpha: Boolean = false) : this(Color(hex, hasAlpha))
 
-
+    fun blend(other: Color4b, factor: Float): Color4b {
+        val invFactor = 1f - factor
+        return Color4b(
+            (r * invFactor + other.r * factor).toInt(),
+            (g * invFactor + other.g * factor).toInt(),
+            (b * invFactor + other.b * factor).toInt(),
+            (a * invFactor + other.a * factor).toInt()
+        )
+    }
     fun with(
         r: Int = this.r,
         g: Int = this.g,

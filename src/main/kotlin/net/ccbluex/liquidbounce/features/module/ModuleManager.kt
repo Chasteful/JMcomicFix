@@ -33,8 +33,7 @@ import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.modules.client.ModuleAutoConfig
 import net.ccbluex.jmcomicfix.features.module.modules.client.ModuleHudEditor
 import net.ccbluex.jmcomicfix.features.module.modules.combat.ModuleAutoRod
-import net.ccbluex.jmcomicfix.features.module.modules.`fun`.ModuleIQBoost
-import net.ccbluex.jmcomicfix.features.module.modules.`fun`.ModulePendant
+import net.ccbluex.jmcomicfix.features.module.modules.`fun`.*
 import net.ccbluex.liquidbounce.features.module.modules.client.ModuleLiquidChat
 import net.ccbluex.liquidbounce.features.module.modules.client.ModuleRichPresence
 import net.ccbluex.liquidbounce.features.module.modules.client.ModuleTargets
@@ -276,6 +275,7 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleDankBobbing,
             ModuleDerp,
             ModuleIQBoost,
+            ModuleFPSBoost,
             ModuleHandDerp,
             ModulePendant,
             ModuleSkinDerp,
