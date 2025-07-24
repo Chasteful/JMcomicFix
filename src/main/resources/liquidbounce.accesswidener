@@ -1,6 +1,5 @@
 accessWidener	v1	named
-accessible class net/minecraft/client/render/entity/equipment/EquipmentRenderer$LayerTextureKey
-accessible method net/minecraft/client/render/entity/equipment/EquipmentRenderer$LayerTextureKey <init> (Lnet/minecraft/client/render/entity/equipment/EquipmentModel$LayerType;Lnet/minecraft/registry/RegistryKey;)V
+
 accessible field net/minecraft/entity/AreaEffectCloudEntity potionContentsComponent Lnet/minecraft/component/type/PotionContentsComponent;
 
 accessible class net/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier

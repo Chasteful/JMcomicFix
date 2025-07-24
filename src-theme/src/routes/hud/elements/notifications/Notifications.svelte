@@ -30,6 +30,7 @@
         const animationKey = Date.now();
         let id = animationKey;
 
+        // Handle Blink notifications merging
         if (message.startsWith("Currently storing")) {
             const existingIndex = notifications.findIndex(n =>
                 n.severity === "BLINKING" || n.severity === "BLINKED"
@@ -40,87 +41,25 @@
             }
 
             if (existingIndex !== -1) {
-                const existing = notifications[existingIndex];
-                id = existing.id;
-
-                clearInterval(existing.intervalId);
-                clearTimeout(existing.timeoutId);
-
-                let remaining = 3.0;
-                const intervalId = setInterval(() => {
-                    remaining = +(remaining - 0.1).toFixed(1);
-                    notifications = notifications.map(n =>
-                        n.id === id ? {...n, remaining} : n
-                    );
-                }, 100);
-
-                const timeoutId = setTimeout(() => {
-                    clearInterval(intervalId);
-                    notifications = notifications.map(n =>
-                        n.id === id ? {...n, leaving: true} : n
-                    );
-                    setTimeout(() => {
-                        notifications = notifications.filter(n => n.id !== id);
-                    }, 10);
-                }, 3000);
-
-                notifications[existingIndex] = {
-                    ...existing,
-                    message,
-                    severity: severity,
-                    remaining: 3.0,
-                    intervalId,
-                    timeoutId,
-                    leaving: false
-                };
-
-                notifications = notifications;
+                updateExistingNotification(existingIndex, message, severity);
                 return;
             }
         }
+
+        // Handle Enable/Disable notifications merging
         if (severity === "ENABLED" || severity === "DISABLED") {
             const existingIndex = notifications.findIndex(
                 n => n.message === message && (n.severity === "ENABLED" || n.severity === "DISABLED")
             );
 
             if (existingIndex !== -1) {
-                const existing = notifications[existingIndex];
-                id = existing.id;
-
-                clearInterval(existing.intervalId);
-                clearTimeout(existing.timeoutId);
-
-                let remaining = 3.0;
-                const intervalId = setInterval(() => {
-                    remaining = +(remaining - 0.1).toFixed(1);
-                    notifications = notifications.map(n =>
-                        n.id === id ? {...n, remaining} : n
-                    );
-                }, 100);
-
-                const timeoutId = setTimeout(() => {
-                    clearInterval(intervalId);
-                    notifications = notifications.map(n =>
-                        n.id === id ? {...n, leaving: true} : n
-                    );
-                    setTimeout(() => {
-                        notifications = notifications.filter(n => n.id !== id);
-                    }, 10);
-                }, 3000);
-
-                notifications[existingIndex] = {
-                    ...existing,
-                    severity,
-                    remaining: 3.0,
-                    intervalId,
-                    timeoutId,
-                    leaving: false
-                };
-
-                notifications = notifications;
+                updateExistingNotification(existingIndex, message, severity);
                 return;
             }
         }
+
+
+        // Default case - create new notification
         let remaining = 3.0;
         const intervalId = setInterval(() => {
             remaining = +(remaining - 0.1).toFixed(1);
@@ -153,6 +92,44 @@
         ];
     }
 
+    function updateExistingNotification(index: number, message: string, severity: string) {
+        const existing = notifications[index];
+        const id = existing.id;
+
+        clearInterval(existing.intervalId);
+        clearTimeout(existing.timeoutId);
+
+        let remaining = 3.0;
+        const intervalId = setInterval(() => {
+            remaining = +(remaining - 0.1).toFixed(1);
+            notifications = notifications.map(n =>
+                n.id === id ? {...n, remaining} : n
+            );
+        }, 100);
+
+        const timeoutId = setTimeout(() => {
+            clearInterval(intervalId);
+            notifications = notifications.map(n =>
+                n.id === id ? {...n, leaving: true} : n
+            );
+            setTimeout(() => {
+                notifications = notifications.filter(n => n.id !== id);
+            }, 10);
+        }, 3000);
+
+        notifications[index] = {
+            ...existing,
+            message,
+            severity,
+            remaining: 3.0,
+            intervalId,
+            timeoutId,
+            leaving: false
+        };
+
+        notifications = notifications;
+    }
+
     listen("notification", (e: NotificationEvent) => {
         addNotification(e.title, e.message, e.severity);
         switch (e.severity) {
@@ -179,7 +156,6 @@
                 break
         }
     });
-
 </script>
 <div class="notifications" class:draggable={notifications.length === 0}>
     {#each notifications as notification (notification.id)}

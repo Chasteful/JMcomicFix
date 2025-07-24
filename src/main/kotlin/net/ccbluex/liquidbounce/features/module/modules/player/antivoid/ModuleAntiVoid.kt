@@ -32,7 +32,7 @@ object ModuleAntiVoid : ClientModule("AntiVoid", Category.PLAYER) {
     )
 
     // The height at which the void is deemed to begin.
-    private val voidThreshold by int("VoidLevel", 0, -256..0)
+    val voidThreshold by int("VoidLevel", 0, -256..0)
 
     // Flags indicating if an action has been already taken or needs to be taken.
     var isLikelyFalling = false

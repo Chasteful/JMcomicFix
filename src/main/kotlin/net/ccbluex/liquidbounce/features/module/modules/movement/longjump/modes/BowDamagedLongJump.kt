@@ -1,4 +1,4 @@
-package net.ccbluex.liquidbounce.features.module.modules.movement.longjump.modes.bloxd
+package net.ccbluex.liquidbounce.features.module.modules.movement.longjump.modes
 
 import net.ccbluex.liquidbounce.config.types.nesting.Choice
 import net.ccbluex.liquidbounce.config.types.nesting.ChoiceConfigurable
@@ -16,11 +16,11 @@ import net.ccbluex.liquidbounce.utils.client.notification
 import net.ccbluex.liquidbounce.utils.entity.withStrafe
 import net.ccbluex.liquidbounce.utils.kotlin.Priority
 import net.ccbluex.liquidbounce.utils.movement.DirectionalInput
-import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket
 import net.minecraft.item.Items
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket
+import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket
 
-internal object BloxdBow : Choice("BloxdBow") {
+internal object BowDamagedLongJump : Choice("BowSelfDamaged") {
 
     override val parent: ChoiceConfigurable<*>
         get() = ModuleLongJump.mode
@@ -35,7 +35,7 @@ internal object BloxdBow : Choice("BloxdBow") {
     private val chargeTicks by int("ChargeTicks", 5, 3..20)
     private val horizontalSpeed by float("HorizontalSpeed", 2.0f, 0.1f..5f)
     private val verticalSpeed by float("VerticalSpeed", 0.5f, 0.1f..5f)
-    private val maxFlyTime by int("MaxFlyTime", 2000, 500..3000, "ms")
+    private val maxFlyTime by int("MaxFlyTime", 1300, 500..3000, "ms")
     private var flyTimer = 0L
 
     private var stopMovement = false
@@ -63,7 +63,7 @@ internal object BloxdBow : Choice("BloxdBow") {
 
     val movementInputHandler = handler<MovementInputEvent> {
         if (!hasTakenDamage) {
-            it.directionalInput = DirectionalInput.NONE
+            it.directionalInput = DirectionalInput.Companion.NONE
         } else if (isFlying) {
 
             player.velocity = player.velocity.withStrafe(speed = horizontalSpeed.toDouble())
@@ -87,21 +87,24 @@ internal object BloxdBow : Choice("BloxdBow") {
     private val tickHandler = tickHandler {
         ticksSinceEnable++
 
-        if (!hasBowInHotbar() || !hasArrowInHotbar()) {
-            ModuleLongJump.enabled = false
-            return@tickHandler
-        }
-        if (!hasEnoughVerticalSpace()) {
-            ModuleLongJump.enabled = false
-            notification(
-                "LongJump",
-                "There must be a certain amount of space above you!",
-                NotificationEvent.Severity.INFO
-            )
-            return@tickHandler
-        }
+        // Only check for bow/arrow before taking damage
         if (!hasTakenDamage) {
+            if (!hasBowInHotbar() || !hasArrowInHotbar()) {
+                ModuleLongJump.enabled = false
+                return@tickHandler
+            }
 
+            if (!hasEnoughVerticalSpace()) {
+                ModuleLongJump.enabled = false
+                notification(
+                    "LongJump",
+                    "There must be a certain amount of space above you!",
+                    NotificationEvent.Severity.INFO
+                )
+                return@tickHandler
+            }
+
+            // Bow charging logic
             if (!player.isUsingItem && player.inventory.getStack(player.inventory.selectedSlot).item != Items.BOW) {
                 if (!switchToBow()) {
                     ModuleLongJump.enabled = false
@@ -134,23 +137,23 @@ internal object BloxdBow : Choice("BloxdBow") {
                 interaction.stopUsingItem(player)
                 shotArrow = true
             }
-        } else if (!isFlying) {
-
+        } else {
             forceUseKey = false
             if (player.isUsingItem) {
                 interaction.stopUsingItem(player)
             }
-        } else {
-            flyTimer += 50L
 
-            if (flyTimer >= maxFlyTime) {
-                ModuleLongJump.boosted = true
+            if (isFlying) {
+                flyTimer += 50L
 
-                player.inventory.selectedSlot = originalSlot
+                if (flyTimer >= maxFlyTime) {
+                    isFlying = false
+                    ModuleLongJump.boosted = true
+                    player.inventory.selectedSlot = originalSlot
+                }
             }
         }
     }
-
     private fun hasEnoughVerticalSpace(): Boolean {
         val playerPos = player.blockPos
         for (yOffset in 1..5) {
@@ -171,6 +174,9 @@ internal object BloxdBow : Choice("BloxdBow") {
             hasTakenDamage = true
             isFlying = true
             flyTimer = 0L
+            if (player.isUsingItem) {
+                interaction.stopUsingItem(player)
+            }
             player.inventory.selectedSlot = originalSlot
         }
     }

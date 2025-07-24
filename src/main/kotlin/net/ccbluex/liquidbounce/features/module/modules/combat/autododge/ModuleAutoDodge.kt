@@ -1,21 +1,3 @@
-/*
- * This file is part of LiquidBounce (https://github.com/CCBlueX/LiquidBounce)
- *
- * Copyright (c) 2015 - 2025 CCBlueX
- *
- * LiquidBounce is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * LiquidBounce is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
- */
 @file:Suppress("WildcardImport")
 
 package net.ccbluex.liquidbounce.features.module.modules.combat.autododge
@@ -28,6 +10,7 @@ import net.ccbluex.liquidbounce.event.once
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.features.module.modules.player.ModuleBlink
+import net.ccbluex.liquidbounce.features.module.modules.player.antivoid.ModuleAntiVoid
 import net.ccbluex.liquidbounce.features.module.modules.render.murdermystery.ModuleMurderMystery
 import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.ModuleScaffold
 import net.ccbluex.liquidbounce.utils.client.PacketQueueManager
@@ -39,9 +22,12 @@ import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.entity.Entity
 import net.minecraft.entity.projectile.ArrowEntity
+import net.minecraft.entity.projectile.PersistentProjectileEntity
+import net.minecraft.entity.projectile.ProjectileEntity
 import net.minecraft.entity.projectile.SpectralArrowEntity
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.Vec3d
+import net.minecraft.util.shape.VoxelShapes
 
 @Suppress("MagicNumber")
 object ModuleAutoDodge : ClientModule("AutoDodge", Category.COMBAT) {
@@ -54,7 +40,8 @@ object ModuleAutoDodge : ClientModule("AutoDodge", Category.COMBAT) {
     }
 
     private val ignore by multiEnumChoice("Ignore", Ignore.entries)
-
+    private val OnlyArrow by boolean("OnlyArrow", false)
+    private val ignoreOwn by boolean("IgnoreOwn", false)
     init {
         tree(AllowRotationChange)
         tree(AllowTimer)
@@ -101,10 +88,24 @@ object ModuleAutoDodge : ClientModule("AutoDodge", Category.COMBAT) {
             Timer.requestTimerSpeed(AllowTimer.timerSpeed, Priority.IMPORTANT_FOR_PLAYER_LIFE, this@ModuleAutoDodge)
         }
     }
+    fun isOverVoid(pos: Vec3d): Boolean {
+        return ModuleAntiVoid.isSafeForRescue(pos)
+    }
 
     private fun ClientWorld.findFlyingArrows() = entities.filter { entity ->
-        (entity is ArrowEntity || entity is SpectralArrowEntity) && !entity.isInGround
+        val isRelevantProjectile = if (!OnlyArrow) {
+            entity is ProjectileEntity && (entity !is PersistentProjectileEntity || !entity.isOnGround)
+        } else {
+            (entity is ArrowEntity || entity is SpectralArrowEntity) && !entity.isOnGround
+        }
+
+        val isOwn = (entity as? ProjectileEntity)?.owner?.uuid == mc.player?.uuid
+
+        isRelevantProjectile && !(ignoreOwn && isOwn)
     }
+
+
+
 
     private fun <T : PlayerSimulation> getInflictedHits(
         simulatedPlayer: T,

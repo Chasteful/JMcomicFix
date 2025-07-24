@@ -68,7 +68,7 @@ inline fun Vec3d.interpolate(start: Vec3d, multiple: Double) =
 inline fun Double.interpolate(old: Double, scale: Double) = old + (this - old) * scale
 
 inline fun Vec3d.copy(x: Double = this.x, y: Double = this.y, z: Double = this.z) = Vec3d(x, y, z)
-
+inline fun Vec3d.withY(y: Double): Vec3d = Vec3d(this.x, y, this.z)
 inline operator fun Vec3d.component1(): Double = this.x
 inline operator fun Vec3d.component2(): Double = this.y
 inline operator fun Vec3d.component3(): Double = this.z
