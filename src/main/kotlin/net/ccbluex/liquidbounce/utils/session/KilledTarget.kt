@@ -9,6 +9,7 @@ import net.minecraft.client.MinecraftClient
 import net.minecraft.entity.LivingEntity
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket
+import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket
 import net.minecraft.network.packet.s2c.play.ScoreboardObjectiveUpdateS2CPacket
 import net.minecraft.util.hit.HitResult
 import java.util.concurrent.ConcurrentHashMap
@@ -25,6 +26,7 @@ object KilledTarget : EventListener {
         var lastAttackTime: Long,
         var lastVelocity: Double,
         var lastHurtTime: Int,
+        val attackerId: Int,
         var confirmedDamage: Boolean = false
     )
 
@@ -85,7 +87,8 @@ object KilledTarget : EventListener {
         attackedEntities[entity] = AttackData(
             lastAttackTime = System.currentTimeMillis(),
             lastVelocity = currentVelocity,
-            lastHurtTime = entity.hurtTime
+            lastHurtTime = entity.hurtTime,
+            attackerId = mc.player!!.id
         )
     }
 
@@ -107,7 +110,11 @@ object KilledTarget : EventListener {
             attackedEntities.clear()
             return@handler
         }
-
+        //Prevents false positives when unloading chunk.
+        if (packet is PlayerRespawnS2CPacket) {
+            attackedEntities.clear()
+            return@handler
+        }
         // Detect velocity changes (knockback)
         if (packet is EntityVelocityUpdateS2CPacket) {
             attackedEntities.entries.forEach { (entity, data) ->
@@ -145,13 +152,15 @@ object KilledTarget : EventListener {
             val (entity, data) = iterator.next()
 
             if (entity.isRemoved || !entity.isAlive) {
-                // Confirm kill if damage was detected or entity died shortly after attack
-                if (data.confirmedDamage || now - data.lastAttackTime < 1000L) {
+                if ((data.confirmedDamage || now - data.lastAttackTime < 1000L)
+                    && data.attackerId == MinecraftClient.getInstance().player?.id
+                ) {
                     _killsCount++
                     synchronized(killedEntities) {
                         killedEntities.add(entity)
                     }
                 }
+
                 iterator.remove()
             } else if (now - data.lastAttackTime > 5000L) {
                 // Remove stale entries
