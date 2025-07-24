@@ -742,5 +742,6 @@
   "liquidbounce.module.autoRod.description": "Automatically use the rod to control the distance, need the crosshair to point at the opponent." ,
   "liquidbounce.module.autoScreenShot.description": "Automatically perform certain actions on victory and take screenshots.",
   "liquidbounce.module.noBooks.description": "Intercept and close the book interface opened by the server.",
-  "liquidbounce.module.pointerESP.description": "Display rotating pointer images around targets in screen center."
+  "liquidbounce.module.pointerESP.description": "Display rotating pointer images around targets in screen center.",
+  "liquidbounce.module.tPBowAura.description":"「Longbow of the Heavens」"
 }

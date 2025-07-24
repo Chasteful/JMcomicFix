@@ -745,5 +745,6 @@
   "liquidbounce.module.killEffects.description": "在你击杀目标时显示一种效果。",
   "liquidbounce.module.autoScreenShot.description": "自动在胜利时执行某些动作并截图。",
   "liquidbounce.module.noBooks.description": "拦截并关闭服务器打开的书本界面。",
-  "liquidbounce.module.pointerESP.description": "朝向目标的指针组成的环。"
+  "liquidbounce.module.pointerESP.description": "朝向目标的指针组成的环。",
+  "liquidbounce.module.tPBowAura.description":"「天堂陨落长弓」"
 }

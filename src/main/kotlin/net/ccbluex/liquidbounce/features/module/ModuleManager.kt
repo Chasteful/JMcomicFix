@@ -30,7 +30,6 @@ import net.ccbluex.liquidbounce.event.events.KeyboardKeyEvent
 import net.ccbluex.liquidbounce.event.events.MouseButtonEvent
 import net.ccbluex.liquidbounce.event.events.WorldChangeEvent
 import net.ccbluex.liquidbounce.event.handler
-import net.ccbluex.liquidbounce.features.module.modules.combat.aimbot.ModuleDroneControl
 import net.ccbluex.liquidbounce.features.module.modules.client.ModuleAutoConfig
 import net.ccbluex.jmcomicfix.features.module.modules.client.ModuleHudEditor
 import net.ccbluex.jmcomicfix.features.module.modules.combat.ModuleAutoRod
@@ -89,7 +88,7 @@ import net.ccbluex.liquidbounce.features.module.modules.player.offhand.ModuleOff
 import net.ccbluex.liquidbounce.features.module.modules.render.*
 import net.ccbluex.liquidbounce.features.module.modules.render.esp.ModuleESP
 import net.ccbluex.jmcomicfix.features.module.modules.render.jumpeffect.ModuleJumpEffect
-import net.ccbluex.jmcomicfix.features.module.modules.combat.tpbow.ModuleBowAura
+import net.ccbluex.liquidbounce.features.module.modules.combat.tpbow.ModuleBowAura
 import net.ccbluex.jmcomicfix.features.module.modules.misc.ModuleAutoScreenShot
 import net.ccbluex.liquidbounce.features.module.modules.player.ModuleAutoClutch
 import net.ccbluex.liquidbounce.features.module.modules.render.murdermystery.ModuleMurderMystery
