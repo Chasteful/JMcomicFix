@@ -3,6 +3,7 @@ package net.ccbluex.liquidbounce.features.module.modules.render
 import net.ccbluex.liquidbounce.features.misc.FriendManager
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
+import net.ccbluex.liquidbounce.render.GenericCustomColorMode
 import net.ccbluex.liquidbounce.render.GenericEntityHealthColorMode
 import net.ccbluex.liquidbounce.render.GenericRainbowColorMode
 import net.ccbluex.liquidbounce.render.GenericStaticColorMode
@@ -17,6 +18,7 @@ object ModuleChams : ClientModule("Chams", Category.RENDER) {
     private val colorModes = choices("ColorMode", 1) {
         arrayOf(
             GenericEntityHealthColorMode(it),
+            GenericCustomColorMode(it, Color4b.WHITE,Color4b.WHITE),
             GenericStaticColorMode(it, Color4b.WHITE),
             GenericRainbowColorMode(it),
             GenericSyncColorMode(it)
@@ -25,7 +27,7 @@ object ModuleChams : ClientModule("Chams", Category.RENDER) {
     private val friendColor by color("Friends", Color4b.BLUE)
     private val attackColor by color("Attacked", Color4b.RED)
 
-    private val alpha by int("TextureAlpha", 70, 0..255)
+    var alpha by int("TextureAlpha", 70, 0..255)
 
     fun getColor(entity: LivingEntity): Color4b {
 

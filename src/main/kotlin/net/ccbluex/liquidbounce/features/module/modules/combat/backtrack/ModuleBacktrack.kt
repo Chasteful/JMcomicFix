@@ -41,6 +41,7 @@ import net.ccbluex.liquidbounce.utils.render.WireframePlayer
 import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.TrackedPosition
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.network.packet.Packet
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket
 import net.minecraft.network.packet.c2s.play.CommandExecutionC2SPacket
@@ -223,7 +224,7 @@ object ModuleBacktrack : ClientModule("Backtrack", Category.COMBAT) {
         @Suppress("unused")
         private val renderHandler = handler<WorldRenderEvent> {
             val (entity, pos) = getEntityPosition() ?: return@handler
-
+            if (entity !is PlayerEntity) return@handler
             val baseColor = colorMode.activeChoice.getColor(null)
             val fillColor = baseColor.withAlpha(fillAlpha)
             val outlineColor = baseColor.withAlpha(outlineAlpha)

@@ -190,23 +190,6 @@ public abstract class MixinMinecraftClient {
         }
 
         // For debugging purposes, will be removed until we have a stable release
-        if (Util.getOperatingSystem() == Util.OperatingSystem.WINDOWS) {
-            if (BrowserBackendManager.INSTANCE.getBrowserBackend().isInitialized() &&
-                    BrowserBackendManager.INSTANCE.getBrowserBackend().isAccelerationSupported()) {
-                var accelerated = GlobalBrowserSettings.INSTANCE.getAccelerated();
-
-                if (accelerated != null && accelerated.get()) {
-                    titleBuilder.append(" | Enabled GPU Acceleration");
-                } else {
-                    titleBuilder.append(" | Disabled GPU Acceleration");
-                }
-
-                // Hotkey only works when not in-game
-                if (this.world == null && this.player == null) {
-                    titleBuilder.append(" (F12)");
-                }
-            }
-        }
 
         callback.setReturnValue(titleBuilder.toString());
     }

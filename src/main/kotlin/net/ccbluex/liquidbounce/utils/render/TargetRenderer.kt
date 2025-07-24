@@ -264,7 +264,7 @@ class WorldTargetRenderer(module: ClientModule) : TargetRenderer<WorldRenderEnvi
         private val heightOffset by float("HeightOffset", 1f, 0.25f..1.75f)
         private val captureAlpha by int("Alpha", 233, 0..255)
         private val size by float("Size", 1.0f, 0.5f..1.5f)
-        private val rotationSpeed by float("RotationSpeed", 20.0f, 0f..180.0f)
+        private val rotationSpeed by float("RotationSpeed", 180.0f, 180f..360.0f)
         private val floatRange by float("FloatRange", 0.1f, 0.05f..0.3f)
         private val floatSpeed by float("FloatSpeed", 2f, 0.5f..5f)
         private val pulseSpeed by float("PulseSpeed", 1f, 0.1f..5f)

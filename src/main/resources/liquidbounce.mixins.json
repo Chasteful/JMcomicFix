@@ -37,6 +37,7 @@
     "minecraft.client.network.message.MixinMessageHandler",
     "minecraft.client.option.MixinServerListAccessor",
     "minecraft.crash.CrashReportMixin",
+    "minecraft.entity.EquipmentRendererMixin",
     "minecraft.entity.MixinAbstractClientPlayerEntity",
     "minecraft.entity.MixinAbstractHorseEntity",
     "minecraft.entity.MixinArmorFeatureRenderer",
