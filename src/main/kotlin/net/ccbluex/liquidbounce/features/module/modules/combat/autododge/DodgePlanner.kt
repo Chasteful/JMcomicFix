@@ -221,8 +221,12 @@ fun findOptimalDodgePosition(baseLine: Line): Vec3d {
         else -> {
             val distToPrimary = nearestPointsToDangerZoneBorders[0].distanceTo(playerPos2d)
             val distToSecondary = nearestPointsToDangerZoneBorders[1].distanceTo(playerPos2d)
-            if (distToPrimary < distToSecondary) nearestPointsToDangerZoneBorders[0]
-            else nearestPointsToDangerZoneBorders[1]
+            if (distToPrimary < distToSecondary){
+                nearestPointsToDangerZoneBorders[0]
+            }
+            else{
+                nearestPointsToDangerZoneBorders[1]
+            }
         }
     }
 }

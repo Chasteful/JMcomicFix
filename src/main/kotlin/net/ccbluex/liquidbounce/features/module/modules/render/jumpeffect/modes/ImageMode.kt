@@ -111,10 +111,14 @@ object ImageMode : JumpEffectMode("Image") {
                     val animationProgress = (currentTime % animationDuration.toLong()) / animationDuration
 
                     val alpha = (1f - progress) * circleAlpha
-                    val colorTopLeft = color1Base.blend(color2Base, animationProgress).withAlpha(alpha.toInt())
-                    val colorTopRight = color1Base.blend(color2Base, (animationProgress + 0.25f) % 1f).withAlpha(alpha.toInt())
-                    val colorBottomRight = color1Base.blend(color2Base, (animationProgress + 0.5f) % 1f).withAlpha(alpha.toInt())
-                    val colorBottomLeft = color1Base.blend(color2Base, (animationProgress + 0.75f) % 1f).withAlpha(alpha.toInt())
+                    val colorTopLeft = color1Base.blend(color2Base,
+                        animationProgress).withAlpha(alpha.toInt())
+                    val colorTopRight = color1Base.blend(color2Base,
+                        (animationProgress + 0.25f) % 1f).withAlpha(alpha.toInt())
+                    val colorBottomRight = color1Base.blend(color2Base,
+                        (animationProgress + 0.5f) % 1f).withAlpha(alpha.toInt())
+                    val colorBottomLeft = color1Base.blend(color2Base,
+                        (animationProgress + 0.75f) % 1f).withAlpha(alpha.toInt())
 
                     builder.drawQuad(
                         this,

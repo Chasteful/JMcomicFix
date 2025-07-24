@@ -179,7 +179,9 @@ object ModuleBowAura : ClientModule("TPBowAura", Category.COMBAT, disableOnQuit 
         // Convert start Vec3d to BlockPos by truncating to integers
         val startPos = BlockPos(start.x.toInt(), start.y.toInt(), start.z.toInt())
         // Convert target's bounding box center (Vec3d) to BlockPos
-        val targetPos = BlockPos(target.boundingBox.center.x.toInt(), target.boundingBox.center.y.toInt(), target.boundingBox.center.z.toInt())
+        val targetPos = BlockPos(
+            target.boundingBox.center.x.toInt(),
+            target.boundingBox.center.y.toInt(), target.boundingBox.center.z.toInt())
         val path = mutableListOf<Vec3d>()
         var currentPos = startPos
         val maxSteps = 1000 // Prevent infinite loops
