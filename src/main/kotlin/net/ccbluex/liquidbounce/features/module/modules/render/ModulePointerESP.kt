@@ -35,7 +35,7 @@ object ModulePointerESP : ClientModule("PointerESP", Category.RENDER) {
         )
     }
 
-    private object ImageOffset : ToggleableConfigurable(this, "Offset", true) {
+    private object ImageOffset : ToggleableConfigurable(this, "Offset", false) {
         val offsetX by float("OffsetX", 0f, -1f..1f)
         val offsetY by float("OffsetY", 0.3f, -1f..1f)
         val offsetZ by float("OffsetZ", 0f, -1f..1f)
@@ -64,19 +64,19 @@ object ModulePointerESP : ClientModule("PointerESP", Category.RENDER) {
     init {
         tree(ImageOffset)
     }
-    private val renderRadius by int("RenderRadius", 100, 50..500)
+    private val renderRadius by int("RenderRadius", 80, 50..500)
     private val pointerSize by float("PointerSize", 15f, 1f..20f)
     private val pointerAlpha by float("PointerAlpha", 1f, 0f..1f)
     private val pitchLimit by floatRange("PitchLimit", 30f..90f, 0f..90f).onChanged {
         negativePitchLimit = -it.endInclusive..-it.start
     }
+    private val smoothingFactor by float("SmoothingFactor", 0.3f, 0.1f..0.5f)
 
     private var negativePitchLimit: ClosedFloatingPointRange<Float> = -pitchLimit.endInclusive..-pitchLimit.start
-    private var prevRotateX = 0f
+    private val pointerData = mutableMapOf<LivingEntity, Pair<Float, Float>>()
 
     private val pointerTexture: Identifier = "image/hud/triangle.png".registerAsDynamicImageFromClientResources()
     val pointerShader: ShaderProgram by lazy {
-
         mc.shaderLoader.getOrCreateProgram(ShaderProgramKeys.POSITION_TEX_COLOR)!!
     }
 
@@ -87,28 +87,39 @@ object ModulePointerESP : ClientModule("PointerESP", Category.RENDER) {
         val rotateZ: Float
     )
 
+
     @Suppress("unused")
     private val renderHandler = handler<OverlayRenderEvent> { event ->
         val matrices = event.context.matrices
         val pointers = findRenderedEntities().mapArray {
             val diff = it.interpolateCurrentPosition(event.tickDelta) - player.pos
             val rawAngle = atan2(diff.z, diff.x).toFloat().toDegrees()
-            val angle = (player.yaw - 90f - rawAngle).let { theta ->
+            val targetAngle = (player.yaw - 90f - rawAngle).let { theta ->
                 if (mc.options.perspective.isFrontView) -theta else theta
             }
-            val rotateX = player.pitch.let { p ->
+
+            val targetRotateX = player.pitch.let { p ->
                 when {
-                    p in -pitchLimit.start..pitchLimit.start -> prevRotateX
                     p < 0 -> 90f + p.coerceIn(negativePitchLimit)
                     else -> 90f + p.coerceIn(pitchLimit)
                 }
             }
 
+            val (prevRotateX, prevRotateZ) = pointerData.getOrPut(it) {
+                Pair(targetRotateX, targetAngle)
+            }
+
+            val smoothedRotateX = lerp(prevRotateX, targetRotateX, smoothingFactor)
+            val smoothedRotateZ = lerp(prevRotateZ, targetAngle, smoothingFactor)
+
+
+            pointerData[it] = Pair(smoothedRotateX, smoothedRotateZ)
+
             Pointer(
                 renderRadius,
                 modes.activeChoice.getColor(it),
-                rotateX,
-                angle
+                smoothedRotateX,
+                smoothedRotateZ
             )
         }
 
@@ -136,7 +147,6 @@ object ModulePointerESP : ClientModule("PointerESP", Category.RENDER) {
                     (cy + offsetY).toDouble(),
                     offsetZ.toDouble()
                 )
-
 
                 matrices.multiply(Quaternionf().rotateX(Math.toRadians(p.rotateX.toDouble()).toFloat()))
                 matrices.multiply(Quaternionf().rotateZ(Math.toRadians(p.rotateZ.toDouble()).toFloat()))
@@ -166,7 +176,12 @@ object ModulePointerESP : ClientModule("PointerESP", Category.RENDER) {
             RenderSystem.depthMask(true)
         }
 
-        prevRotateX = pointers.firstOrNull()?.rotateX ?: prevRotateX
+
+        pointerData.keys.retainAll(findRenderedEntities().toSet())
+    }
+
+    private fun lerp(start: Float, end: Float, alpha: Float): Float {
+        return start + alpha * (end - start)
     }
 
     private fun findRenderedEntities() = world.entities
@@ -174,7 +189,12 @@ object ModulePointerESP : ClientModule("PointerESP", Category.RENDER) {
         .filter { it.shouldBeShown() }
 
     override fun disable() {
-        prevRotateX = 0f
+        pointerData.clear()
         super.disable()
+    }
+
+    override fun enable() {
+        pointerData.clear()
+        super.enable()
     }
 }
