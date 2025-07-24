@@ -39,7 +39,7 @@ import net.ccbluex.jmcomicfix.features.module.modules.`fun`.ModulePendant
 import net.ccbluex.liquidbounce.features.module.modules.client.ModuleLiquidChat
 import net.ccbluex.liquidbounce.features.module.modules.client.ModuleRichPresence
 import net.ccbluex.liquidbounce.features.module.modules.client.ModuleTargets
-import net.ccbluex.jmcomicfix.features.module.modules.render.ModulePacketQueue
+import net.ccbluex.jmcomicfix.features.module.modules.render.*
 import net.ccbluex.liquidbounce.features.module.modules.combat.*
 import net.ccbluex.liquidbounce.features.module.modules.combat.aimbot.ModuleAutoBow
 import net.ccbluex.liquidbounce.features.module.modules.combat.autoarmor.ModuleAutoArmor
@@ -431,6 +431,8 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleCrystalView,
             ModuleSkinChanger,
             ModulePointerESP,
+            ModuleParticleCosmetics,
+
             // World
             ModuleAutoBuild,
             ModuleAutoDisable,
