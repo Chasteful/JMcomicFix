@@ -86,7 +86,7 @@ import net.ccbluex.liquidbounce.features.module.modules.player.nofall.ModuleNoFa
 import net.ccbluex.liquidbounce.features.module.modules.player.offhand.ModuleOffhand
 import net.ccbluex.liquidbounce.features.module.modules.render.*
 import net.ccbluex.liquidbounce.features.module.modules.render.esp.ModuleESP
-import net.ccbluex.jmcomicfix.features.module.modules.render.jumpeffect.ModuleJumpEffect
+import net.ccbluex.liquidbounce.features.module.modules.render.jumpeffect.ModuleJumpEffect
 import net.ccbluex.liquidbounce.features.module.modules.combat.tpbow.ModuleBowAura
 import net.ccbluex.jmcomicfix.features.module.modules.misc.ModuleAutoScreenShot
 import net.ccbluex.liquidbounce.features.module.modules.player.ModuleAutoClutch
