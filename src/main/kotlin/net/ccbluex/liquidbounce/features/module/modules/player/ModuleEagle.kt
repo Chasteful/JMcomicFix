@@ -57,7 +57,7 @@ object ModuleEagle : ClientModule(
         val pitch by floatRange("Pitch", -90f..90f, -90f..90f)
 
         fun shouldSneak(event: MovementInputEvent) =
-            enabled && player.pitch in pitch && conditions.all { it.meetsCondition(event) }
+            !enabled || player.pitch in pitch && conditions.all { it.meetsCondition(event) }
 
         @Suppress("unused")
         private enum class Conditions(
