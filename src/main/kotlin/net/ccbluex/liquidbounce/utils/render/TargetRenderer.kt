@@ -11,7 +11,6 @@ import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.render.*
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.ccbluex.liquidbounce.render.engine.type.Color4b.Companion.hslToRgb
-import net.ccbluex.liquidbounce.render.engine.type.Color4b.Companion.rgbToHsl
 import net.ccbluex.liquidbounce.render.engine.type.Vec3
 import net.ccbluex.liquidbounce.utils.client.registerAsDynamicImageFromClientResources
 import net.ccbluex.liquidbounce.utils.entity.box
@@ -22,6 +21,7 @@ import net.ccbluex.liquidbounce.utils.math.interpolate
 import net.ccbluex.liquidbounce.utils.math.plus
 import net.ccbluex.liquidbounce.utils.render.WorldToScreen.calculateScreenPos
 import net.minecraft.client.gl.ShaderProgramKeys
+import net.minecraft.client.render.BufferRenderer
 import net.minecraft.client.render.VertexFormat
 import net.minecraft.client.render.VertexFormats
 import net.minecraft.client.util.math.MatrixStack
@@ -83,14 +83,30 @@ sealed class TargetRenderer<T : RenderEnvironment>(
         }
 
         if (currentEntity != null) {
-            appearance.activeChoice.render(env, currentEntity!!, partialTicks, false, lastChangeTime, slideTime, fadeTime)
+            appearance.activeChoice.render(
+                env,
+                currentEntity!!,
+                partialTicks,
+                false,
+                lastChangeTime,
+                slideTime,
+                fadeTime
+            )
         }
 
         if (previousEntity != null) {
             val timeSinceChange = System.currentTimeMillis() - lastChangeTime
             if (timeSinceChange < slideTime + fadeTime) {
 
-                appearance.activeChoice.render(env, previousEntity!!, partialTicks, true, lastChangeTime, slideTime, fadeTime)
+                appearance.activeChoice.render(
+                    env,
+                    previousEntity!!,
+                    partialTicks,
+                    true,
+                    lastChangeTime,
+                    slideTime,
+                    fadeTime
+                )
             } else {
                 previousEntity = null
             }
@@ -122,7 +138,15 @@ class WorldTargetRenderer(module: ClientModule) : TargetRenderer<WorldRenderEnvi
         private var length by int("Length", 25, 15..40)
         private val ghostAlpha by int("Alpha", 255, 0..255)
 
-        override fun render(env: WorldRenderEnvironment, entity: Entity, partialTicks: Float, isFadingOut: Boolean, lastChangeTime: Long, slideTime: Int, fadeOutTime: Int) {
+        override fun render(
+            env: WorldRenderEnvironment,
+            entity: Entity,
+            partialTicks: Float,
+            isFadingOut: Boolean,
+            lastChangeTime: Long,
+            slideTime: Int,
+            fadeOutTime: Int
+        ) {
             val currentTime = System.currentTimeMillis()
 
 
@@ -215,7 +239,8 @@ class WorldTargetRenderer(module: ClientModule) : TargetRenderer<WorldRenderEnvi
                     translate(size / 2.0, size / 2.0, 0.0)
                 }
 
-                val alpha = MathHelper.clamp((ghostAlpha * alphaFactor).toInt() - (i * alphaFactorPerParticle), 0, ghostAlpha)
+                val alpha =
+                    MathHelper.clamp((ghostAlpha * alphaFactor).toInt() - (i * alphaFactorPerParticle), 0, ghostAlpha)
                 val renderColor = colorMode.activeChoice.getColor(mc.player).withAlpha(alpha)
                 drawCustomMesh(
                     VertexFormat.DrawMode.QUADS,
@@ -285,7 +310,8 @@ class WorldTargetRenderer(module: ClientModule) : TargetRenderer<WorldRenderEnvi
             env: WorldRenderEnvironment,
             entity: Entity, partialTicks: Float,
             isFadingOut: Boolean, lastChangeTime: Long,
-            slideTime: Int, fadeOutTime: Int) {
+            slideTime: Int, fadeOutTime: Int
+        ) {
             val currentTime = System.currentTimeMillis()
             val timeSinceChange = currentTime - lastChangeTime
 
@@ -325,7 +351,8 @@ class WorldTargetRenderer(module: ClientModule) : TargetRenderer<WorldRenderEnvi
                 targetPos
             } else {
                 val previousPos = previousEntity!!.pos.interpolate(
-                    previousEntity!!.lastRenderPos(), partialTicks.toDouble())
+                    previousEntity!!.lastRenderPos(), partialTicks.toDouble()
+                )
                     .add(0.0, heightOffset.toDouble(), 0.0)
 
                 val factor = slideEasing.getFactor(lastChangeTime, currentTime, slideTime.toFloat()).toDouble()
@@ -337,7 +364,8 @@ class WorldTargetRenderer(module: ClientModule) : TargetRenderer<WorldRenderEnvi
             }
 
             val pulseFactor = (sin(
-                System.currentTimeMillis() * 0.001 * pulseSpeed) * pulseRange + 1.0).toFloat()
+                System.currentTimeMillis() * 0.001 * pulseSpeed
+            ) * pulseRange + 1.0).toFloat()
             val currentSize = size * pulseFactor * alphaFactor
 
             with(renderPos) {
@@ -363,17 +391,22 @@ class WorldTargetRenderer(module: ClientModule) : TargetRenderer<WorldRenderEnvi
         }
 
         private fun WorldRenderEnvironment.drawGradientParticle(currentSize: Float, alpha: Int) {
+            when (colorMode.activeChoice) {
+                is GenericRainbowColorMode -> {
+                    val timeFactor = (System.currentTimeMillis() % 4000) / 4000f
+                    val color1 = hslToRgb(timeFactor, 0.95f, 0.65f, alpha)
+                    val color2 = hslToRgb(timeFactor + 0.25f, 0.95f, 0.65f, alpha)
+                    drawGradientQuad(currentSize, color1, color2)
+                }
 
-            val timeFactor = (System.currentTimeMillis() % 4000) / 4000f
-
-
-            val color1 = hslToRgb(timeFactor, 0.95f, 0.65f, alpha)
-            val color2 = hslToRgb(timeFactor + 0.25f, 0.95f, 0.65f, alpha) // 90度色相差
-
-            drawGradientQuad(currentSize, color1, color2)
+                else -> {
+                    val (color1, color2) = colorMode.activeChoice.getColors(mc.player)
+                    val adjustedColor1 = color1.withAlpha(alpha)
+                    val adjustedColor2 = color2.withAlpha(alpha)
+                    drawGradientQuad(currentSize, adjustedColor1, adjustedColor2)
+                }
+            }
         }
-
-
 
         private fun WorldRenderEnvironment.drawGradientQuad(size: Float, color1: Color4b, color2: Color4b) {
             drawCustomMesh(
@@ -403,23 +436,33 @@ class WorldTargetRenderer(module: ClientModule) : TargetRenderer<WorldRenderEnvi
             }
         }
     }
+
     inner class Circle(module: ClientModule) : WorldTargetRenderAppearance("GlowingCircle") {
         override val parent: ChoiceConfigurable<*>
             get() = appearance
 
         private val radius by float("Radius", 0.85f, 0.1f..2f)
+        private val thickness by float("Thickness", 0.01f, 0.0f..0.5f)
+        private val rotationSpeed by float("RotationSpeed", 270f, -360f..360f)
 
         private val heightMode = choices(module, "HeightMode") {
             arrayOf(FeetHeight(it), TopHeight(it), RelativeHeight(it), HealthHeight(it), AnimatedHeight(it))
         }
-        private val outerAlpha by int("OuterAlpha", 80, 0..255)
+        private val alpha by int("Alpha", 180, 0..255)
         private val glowAlpha by int("GlowAlpha", 0, 0..255)
 
         private val glowHeightSetting by float("GlowHeight", 0.3f, -1f..1f)
 
-        override fun render(env: WorldRenderEnvironment, entity: Entity, partialTicks: Float, isFadingOut: Boolean, lastChangeTime: Long, slideTime: Int, fadeOutTime: Int) {
+        override fun render(
+            env: WorldRenderEnvironment,
+            entity: Entity,
+            partialTicks: Float,
+            isFadingOut: Boolean,
+            lastChangeTime: Long,
+            slideTime: Int,
+            fadeOutTime: Int
+        ) {
             val currentTime = System.currentTimeMillis()
-
 
             val alphaFactor = if (isFadingOut) {
                 val fadeFactor = fadeOutEasing.getFactor(lastChangeTime + slideTime, currentTime, fadeOutTime.toFloat())
@@ -441,29 +484,96 @@ class WorldTargetRenderer(module: ClientModule) : TargetRenderer<WorldRenderEnvi
                 glowHeightSetting.toDouble()
             }
 
-            val (color, glowColor) = colorMode.activeChoice.getColors(mc.player).let {
-                it.first.withAlpha((outerAlpha * alphaFactor).toInt()) to it.second.withAlpha((glowAlpha * alphaFactor).toInt())
-            }
-
             with(env) {
                 withPosition(this.relativeToCamera(pos)) {
                     withDisabledCull {
-                        drawGradientCircle(
-                            radius,
-                            radius,
-                            color,
-                            glowColor,
-                            Vec3(0.0, glowHeight, 0.0)
-                        )
+                        when (colorMode.activeChoice) {
+                            is GenericRainbowColorMode -> {
+                                // HSL rotation gradient for rainbow mode
+                                val time = (System.currentTimeMillis() % 4000) / 4000f
+                                drawRainbowCircle(
+                                    radius,
+                                    thickness,
+                                    time,
+                                    rotationSpeed,
+                                    (alpha * alphaFactor).toInt(),
+                                    (glowAlpha * alphaFactor).toInt(),
+                                    Vec3(0.0, glowHeight, 0.0)
+                                )
+                            }
 
-                        drawGradientCircle(
-                            radius,
-                            0f,
-                            color,
-                            color
-                        )
+                            else -> {
+                                // Standard two-color gradient for other modes
+                                val (color, glowColor) = colorMode.activeChoice.getColors(mc.player).let {
+                                    it.first.withAlpha((alpha * alphaFactor).toInt()) to
+                                        it.second.withAlpha((glowAlpha * alphaFactor).toInt())
+                                }
+                                drawGradientCircle(
+                                    radius,
+                                    radius - thickness,
+                                    color,
+                                    glowColor,
+                                    Vec3(0.0, glowHeight, 0.0)
+                                )
+                            }
+                        }
                     }
                 }
+            }
+        }
+        private fun RenderEnvironment.drawRainbowCircle(
+            outerRadius: Float,
+            thickness: Float,
+            timeOffset: Float,
+            rotationSpeed: Float,
+            alpha: Int,
+            glowAlpha: Int,
+            innerOffset: Vec3 = Vec3(0f, 0f, 0f)
+        ) {
+            val innerRadius = outerRadius - thickness
+            val matrix = matrixStack.peek().positionMatrix
+            val tessellator = RenderSystem.renderThreadTesselator()
+
+            val buffer = tessellator.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR)
+            RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR)
+
+
+            var firstOuterX = 0f; var firstOuterZ = 0f; var firstOuterColor = 0
+            var firstInnerX = 0f; var firstInnerY = 0f; var firstInnerZ = 0f; var firstInnerColor = 0
+
+            val segments = 64
+            val fullCircle = Math.PI.toFloat() * 2
+
+            with(buffer) {
+                for (i in 0..segments) {
+
+                    val angle = if (i == segments) 0f else i.toFloat() / segments * fullCircle
+                    val hue = ((angle / fullCircle) + (System.currentTimeMillis() * 0.001f * rotationSpeed) % 1f + timeOffset) % 1f
+
+                    val outerColorARGB = hslToRgb(hue, 0.95f, 0.65f, alpha).toARGB()
+                    val innerColorARGB = hslToRgb(hue - 0.1f, 0.95f, 0.65f, glowAlpha).toARGB()
+
+                    val outerX = cos(angle) * outerRadius
+                    val outerZ = sin(angle) * outerRadius
+                    val innerX = cos(angle) * innerRadius + innerOffset.x
+                    val innerZ = sin(angle) * innerRadius + innerOffset.z
+
+                    if (i == 0) {
+                        firstOuterX = outerX; firstOuterZ = outerZ; firstOuterColor = outerColorARGB
+                        firstInnerX = innerX; firstInnerY = innerOffset.y; firstInnerZ = innerZ; firstInnerColor = innerColorARGB
+                    }
+
+
+                    vertex(matrix, outerX, 0f, outerZ).color(outerColorARGB)
+
+                    vertex(matrix, innerX, innerOffset.y, innerZ).color(innerColorARGB)
+                }
+
+
+                vertex(matrix, firstOuterX, 0f, firstOuterZ).color(firstOuterColor)
+                vertex(matrix, firstInnerX, firstInnerY, firstInnerZ).color(firstInnerColor)
+
+                BufferRenderer.drawWithGlobalProgram(buffer.endNullable() ?: return)
             }
         }
     }
@@ -547,7 +657,15 @@ class OverlayTargetRenderer(module: ClientModule) : TargetRenderer<GUIRenderEnvi
         private val color by color("Color", Color4b.RED)
         private val size by float("Size", 1.5f, 0.5f..20f)
 
-        override fun render(env: GUIRenderEnvironment, entity: Entity, partialTicks: Float, isFadingOut: Boolean, lastChangeTime: Long, slideTime: Int, fadeOutTime: Int) {
+        override fun render(
+            env: GUIRenderEnvironment,
+            entity: Entity,
+            partialTicks: Float,
+            isFadingOut: Boolean,
+            lastChangeTime: Long,
+            slideTime: Int,
+            fadeOutTime: Int
+        ) {
             val currentTime = System.currentTimeMillis()
 
 
@@ -586,7 +704,16 @@ class OverlayTargetRenderer(module: ClientModule) : TargetRenderer<GUIRenderEnvi
 sealed class TargetRenderAppearance<T : RenderEnvironment>(name: String) : Choice(name) {
     protected val fadeOutEasing by curve("FadeOutEasing", Easing.QUAD_OUT)
 
-    open fun render(env: T, entity: Entity, partialTicks: Float, isFadingOut: Boolean = false, lastChangeTime: Long = 0L, slideTime: Int = 150, fadeOutTime: Int = 500) {}
+    open fun render(
+        env: T,
+        entity: Entity,
+        partialTicks: Float,
+        isFadingOut: Boolean = false,
+        lastChangeTime: Long = 0L,
+        slideTime: Int = 150,
+        fadeOutTime: Int = 500
+    ) {
+    }
 }
 
 sealed class WorldTargetRenderAppearance(name: String) : TargetRenderAppearance<WorldRenderEnvironment>(name)

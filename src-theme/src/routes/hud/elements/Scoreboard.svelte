@@ -1,11 +1,11 @@
 <script lang="ts">
-    import {listen} from "../../../integration/ws";
-    import {fly} from "svelte/transition";
-    import {expoInOut} from "svelte/easing";
+    import { listen } from "../../../integration/ws";
+    import { fly } from "svelte/transition";
+    import { expoInOut } from "svelte/easing";
     import TextComponent from "../../menu/common/TextComponent.svelte";
-    import type {PlayerData, Scoreboard} from "../../../integration/types";
-    import type {ClientPlayerDataEvent} from "../../../integration/events";
-    import {scoreboardIP} from "../../../util/Theme/ThemeManager";
+    import type { PlayerData, Scoreboard } from "../../../integration/types";
+    import type { ClientPlayerDataEvent } from "../../../integration/events";
+    import { scoreboardIP } from "../../../util/Theme/ThemeManager";
     import Modules from "./arrayList/Modules.svelte";
     import GradientAnimatedText from "../common/GradientAnimatedText.svelte";
 
@@ -14,37 +14,33 @@
         const playerData: PlayerData = e.playerData;
         scoreboard = playerData.scoreboard;
     });
-
 </script>
 
 <div class="combined-container">
     <div class="arraylist-section" id="arraylist"
          transition:fly|global={{duration: 500, y: -50, easing: expoInOut}}>
-        <Modules/>
+        <Modules />
     </div>
 
     {#if scoreboard}
         <div class="scoreboard-section" transition:fly|global={{duration: 500, x: 50, easing: expoInOut}}>
             {#if scoreboard.header}
                 <div class="header">
-                    <TextComponent fontSize={18} allowPreformatting={true} textComponent={scoreboard.header}/>
+                    <TextComponent fontSize={18} allowPreformatting={true} textComponent={scoreboard.header} />
                 </div>
             {/if}
             <div class="entries">
-                {#each scoreboard.entries as {name,score}, i}
+                {#each scoreboard.entries as {name, score}, i}
                     <div class="row">
                         {#if i === scoreboard.entries.length - 1 && $scoreboardIP}
                             <div class="ip-address">
-                                <GradientAnimatedText
-                                        text={$scoreboardIP}
-                                >
-                                </GradientAnimatedText>
+                                <GradientAnimatedText text={$scoreboardIP} />
                             </div>
                         {:else}
-                            <TextComponent fontSize={16} allowPreformatting={true} textComponent={name}/>
+                            <TextComponent fontSize={16} allowPreformatting={true} textComponent={name} />
                         {/if}
                         <div class="invisible-score">
-                        <TextComponent  fontSize={16} allowPreformatting={true} textComponent={score}/>
+                            <TextComponent fontSize={16} allowPreformatting={true} textComponent={score} />
                         </div>
                     </div>
                 {/each}
@@ -75,7 +71,6 @@
     border-radius: 0;
     overflow: visible;
     margin-bottom: 5px;
-    margin-left: auto;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -89,10 +84,11 @@
                     transparent 0%,
                     rgba($scoreboard-base-color, 0.3) 100%);
     display: inline-block;
+    width: max-content;
+    max-width: 240px;
     right: 0;
     transition: width 0.2s ease;
     transform: translateX(0);
-    margin-left: auto;
     font-family: 'Alibaba', sans-serif;
 
     &::after {

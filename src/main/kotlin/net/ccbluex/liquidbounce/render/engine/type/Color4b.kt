@@ -135,6 +135,14 @@ data class Color4b(val r: Int, val g: Int, val b: Int, val a: Int = 255) {
                 else -> p
             }
         }
+        fun lerp(from: Color4b, to: Color4b, t: Float): Color4b {
+            return Color4b(
+                (from.r + (to.r - from.r) * t).toInt(),
+                (from.g + (to.g - from.g) * t).toInt(),
+                (from.b + (to.b - from.b) * t).toInt(),
+                (from.a + (to.a - from.a) * t).toInt()
+            )
+        }
 
     }
 
