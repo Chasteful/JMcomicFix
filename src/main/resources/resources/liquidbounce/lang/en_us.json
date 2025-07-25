@@ -743,5 +743,7 @@
   "liquidbounce.module.autoScreenShot.description": "Automatically perform certain actions on victory and take screenshots.",
   "liquidbounce.module.noBooks.description": "Intercept and close the book interface opened by the server.",
   "liquidbounce.module.pointerESP.description": "Display rotating pointer images around targets in screen center.",
-  "liquidbounce.module.tPBowAura.description":"「Longbow of the Heavens」"
+  "liquidbounce.module.tPBowAura.description":"「Longbow of the Heavens」",
+  "liquidbounce.module.fPSBoost.description":"Displays a false FPS value.",
+  "liquidbounce.module.particleCosmetics.description":"Form a fashion of particles around you."
 }
