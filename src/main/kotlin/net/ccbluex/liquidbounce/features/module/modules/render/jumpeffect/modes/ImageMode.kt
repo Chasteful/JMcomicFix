@@ -120,7 +120,7 @@ object ImageMode : JumpEffectMode("Image") {
                     val colorBottomLeft = color1Base.blend(color2Base,
                         (animationProgress + 0.75f) % 1f).withAlpha(alpha.toInt())
 
-                    builder.drawQuad(
+                    builder.drawGradientQuad(
                         this,
                         pos1 = Vec3d(minX.toDouble(), minY.toDouble(), 0.0),
                         uv1 = UV2f(0f, 1f),

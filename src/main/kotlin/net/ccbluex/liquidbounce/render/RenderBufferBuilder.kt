@@ -55,6 +55,7 @@ const val EDGE_EAST_UP = ((1 shl 18) or (1 shl (19)))
 const val EDGE_SOUTH_UP = ((1 shl 20) or (1 shl (21)))
 const val EDGE_WEST_UP = ((1 shl 22) or (1 shl (23)))
 
+
 /**
  * A utility class for drawing shapes in batches.
  *
@@ -264,6 +265,7 @@ class BoxRenderer private constructor(private val env: WorldRenderEnvironment) {
         faceRenderer.draw()
         outlinesRenderer.draw()
     }
+
 }
 
 fun Box.vertexPositions(): Array<Vec3> {
@@ -368,6 +370,48 @@ fun RenderBufferBuilder<VertexInputType.PosTexColor>.drawQuad(
 ) {
     val matrix = env.currentMvpMatrix
 
+    // Draw the vertices of the box
+    with(buffer) {
+        vertex(matrix, pos1.x.toFloat(), pos2.y.toFloat(), pos1.z.toFloat())
+            .texture(uv1.u, uv2.v)
+            .color(color.toARGB())
+        vertex(matrix, pos2.x.toFloat(), pos2.y.toFloat(), pos2.z.toFloat())
+            .texture(uv2.u, uv2.v)
+            .color(color.toARGB())
+        vertex(matrix, pos2.x.toFloat(), pos1.y.toFloat(), pos2.z.toFloat())
+            .texture(uv2.u, uv1.v)
+            .color(color.toARGB())
+        vertex(matrix, pos1.x.toFloat(), pos1.y.toFloat(), pos1.z.toFloat())
+            .texture(uv1.u, uv1.v)
+            .color(color.toARGB())
+    }
+}
+
+fun RenderBufferBuilder<VertexInputType.Pos>.drawQuad(
+    env: RenderEnvironment,
+    pos1: Vec3,
+    pos2: Vec3,
+) {
+    val matrix = env.currentMvpMatrix
+
+    // Draw the vertices of the box
+    with(buffer) {
+        vertex(matrix, pos1.x, pos2.y, pos1.z)
+        vertex(matrix, pos2.x, pos2.y, pos2.z)
+        vertex(matrix, pos2.x, pos1.y, pos2.z)
+        vertex(matrix, pos1.x, pos1.y, pos1.z)
+    }
+}
+fun RenderBufferBuilder<VertexInputType.PosTexColor>.drawGradientQuad(
+    env: RenderEnvironment,
+    pos1: Vec3d,
+    uv1: UV2f,
+    pos2: Vec3d,
+    uv2: UV2f,
+    color: Color4b
+) {
+    val matrix = env.currentMvpMatrix
+
     // Draw the vertices of the quad
     with(buffer) {
         vertex(matrix, pos1.x.toFloat(), pos1.y.toFloat(), pos1.z.toFloat())
@@ -385,7 +429,7 @@ fun RenderBufferBuilder<VertexInputType.PosTexColor>.drawQuad(
     }
 }
 
-fun RenderBufferBuilder<VertexInputType.PosTexColor>.drawQuad(
+fun RenderBufferBuilder<VertexInputType.PosTexColor>.drawGradientQuad(
     env: RenderEnvironment,
     pos1: Vec3d,
     uv1: UV2f,
@@ -418,23 +462,6 @@ fun RenderBufferBuilder<VertexInputType.PosTexColor>.drawQuad(
             .color(color4.toARGB())
     }
 }
-
-fun RenderBufferBuilder<VertexInputType.Pos>.drawQuad(
-    env: RenderEnvironment,
-    pos1: Vec3,
-    pos2: Vec3,
-) {
-    val matrix = env.currentMvpMatrix
-
-    // Draw the vertices of the quad
-    with(buffer) {
-        vertex(matrix, pos1.x, pos2.y, pos1.z)
-        vertex(matrix, pos2.x, pos2.y, pos2.z)
-        vertex(matrix, pos2.x, pos1.y, pos2.z)
-        vertex(matrix, pos1.x, pos1.y, pos1.z)
-    }
-}
-
 fun RenderBufferBuilder<VertexInputType.Pos>.drawQuadOutlines(
     env: RenderEnvironment,
     pos1: Vec3,
@@ -442,7 +469,7 @@ fun RenderBufferBuilder<VertexInputType.Pos>.drawQuadOutlines(
 ) {
     val matrix = env.currentMvpMatrix
 
-    // Draw the vertices of the quad outlines
+    // Draw the vertices of the box
     with(buffer) {
         vertex(matrix, pos1.x, pos1.y, pos1.z)
         vertex(matrix, pos1.x, pos2.y, pos1.z)
@@ -466,7 +493,7 @@ fun RenderBufferBuilder<VertexInputType.PosColor>.drawLine(
 ) {
     val matrix = env.currentMvpMatrix
 
-    // Draw the vertices of the line
+    // Draw the vertices of the box
     with(buffer) {
         vertex(matrix, pos1.x, pos1.y, pos1.z).color(color.toARGB())
         vertex(matrix, pos2.x, pos2.y, pos2.z).color(color.toARGB())
@@ -497,4 +524,5 @@ sealed class VertexInputType {
         override val shaderProgram: ShaderProgramKey
             get() = ShaderProgramKeys.POSITION_TEX_COLOR
     }
+
 }
