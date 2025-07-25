@@ -3,10 +3,16 @@
     import {notification, type TNotification} from "./notification_store";
     import {onMount} from "svelte";
     import {get} from "svelte/store";
+    import { tweened } from 'svelte/motion';
+    import { cubicOut } from 'svelte/easing';
+
+    let progress = tweened(1, { duration: 0, easing: cubicOut });
 
     let currentNotification: TNotification | null = null;
     let showNotification = false;
     let timeoutHandle: ReturnType<typeof setTimeout> | null = null;
+    progress.set(1, { duration: 0 });
+
 
     onMount(() => {
         if (get(notification)) notification.set(null);
@@ -21,11 +27,16 @@
 
                 currentNotification = n;
                 showNotification = true;
-
+                progress.set(1, { duration: 0 });
                 timeoutHandle = setTimeout(() => {
                     showNotification = false;
                     timeoutHandle = null;
                 }, (n.delay ?? 3) * 1000);
+
+                progress.set(0, {
+                    duration: (n.delay ?? 3) * 1000,
+                    easing: cubicOut
+                });
             } else {
                 showNotification = false;
             }
@@ -36,6 +47,7 @@
             if (timeoutHandle) clearTimeout(timeoutHandle);
         };
     });
+
 </script>
 
 
@@ -44,11 +56,12 @@
         {#key currentNotification.id || currentNotification.message}
             <div class="notification"
                  transition:fly|global={{duration: 500, y: -100}}
+                 style="--progress: {$progress}"
                  on:outroend={() => {
-                        if (!showNotification) currentNotification = null;
-                    }}
-            >
-                <div class="icon" class:error={currentNotification.error}>
+        if (!showNotification) currentNotification = null;
+     }}>
+
+            <div class="icon" class:error={currentNotification.error}>
                     <img src="img/hud/notification/icon-info.svg" alt="info">
                 </div>
                 <div class="title">{currentNotification.title}</div>
@@ -66,6 +79,7 @@
   }
 
   .notification {
+    position: relative;
     grid-row-start: 1;
     grid-column-start: 1;
     background: rgba(255, 255, 255, 0.05);
@@ -79,7 +93,23 @@
     overflow: hidden;
     padding-right: 10px;
     min-width: 350px;
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+      width: calc(100% * var(--progress));
+      background: linear-gradient(to left, rgba(100, 150, 255, 0.2), rgba(100, 150, 255, 0));
+      pointer-events: none;
+      transition: width 0.1s linear;
+      z-index: 0;
+    }
 
+    > * {
+      position: relative;
+      z-index: 1;
+    }
     .title {
       color: $text;
       font-weight: 600;
