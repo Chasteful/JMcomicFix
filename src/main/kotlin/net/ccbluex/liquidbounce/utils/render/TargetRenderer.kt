@@ -126,9 +126,7 @@ class WorldTargetRenderer(module: ClientModule) : TargetRenderer<WorldRenderEnvi
     }
 
     inner class Ghost : WorldTargetRenderAppearance("Ghost") {
-
         private val glow = "particles/glow.png".registerAsDynamicImageFromClientResources()
-
         private var lastTime = System.currentTimeMillis()
 
         override val parent: ChoiceConfigurable<*>
@@ -148,7 +146,6 @@ class WorldTargetRenderer(module: ClientModule) : TargetRenderer<WorldRenderEnvi
             fadeOutTime: Int
         ) {
             val currentTime = System.currentTimeMillis()
-
 
             val alphaFactor = if (isFadingOut) {
                 val fadeFactor = fadeOutEasing.getFactor(lastChangeTime + slideTime, currentTime, fadeOutTime.toFloat())
@@ -223,6 +220,8 @@ class WorldTargetRenderer(module: ClientModule) : TargetRenderer<WorldRenderEnvi
             val distance = 10.0 + (length * 0.2)
             val alphaFactorPerParticle = 15
 
+            val time = (System.currentTimeMillis() % 4000) / 4000f
+
             for (i in 0..<length) {
                 val angle: Double = 0.15f * (System.currentTimeMillis() - lastTime - (i * distance)) / (30)
                 val sin = sin(angle) * radius
@@ -241,7 +240,18 @@ class WorldTargetRenderer(module: ClientModule) : TargetRenderer<WorldRenderEnvi
 
                 val alpha =
                     MathHelper.clamp((ghostAlpha * alphaFactor).toInt() - (i * alphaFactorPerParticle), 0, ghostAlpha)
-                val renderColor = colorMode.activeChoice.getColor(mc.player).withAlpha(alpha)
+
+                val renderColor = when (colorMode.activeChoice) {
+                    is GenericRainbowColorMode -> {
+                        val hue = (time + i / length.toFloat()) % 1f
+                        hslToRgb(hue, 0.95f, 0.65f, alpha)
+                    }
+                    else -> {
+                        val (color1, _) = colorMode.activeChoice.getColors(mc.player)
+                        color1.withAlpha(alpha)
+                    }
+                }
+
                 drawCustomMesh(
                     VertexFormat.DrawMode.QUADS,
                     VertexFormats.POSITION_TEXTURE_COLOR,
@@ -277,7 +287,6 @@ class WorldTargetRenderer(module: ClientModule) : TargetRenderer<WorldRenderEnvi
             }
         }
     }
-
     inner class Capture(override val parent: ChoiceConfigurable<*>) : WorldTargetRenderAppearance("Capture") {
         private val captureTexture by lazy {
             "particles/capture.png".registerAsDynamicImageFromClientResources()
