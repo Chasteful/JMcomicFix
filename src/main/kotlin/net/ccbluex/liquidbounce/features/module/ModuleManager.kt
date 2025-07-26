@@ -371,8 +371,9 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleSmartEat,
             ModuleReplenish,
             ModulePotionSpoof,
-
+            ModuleTreasureManager,
             ModuleAutoClutch,
+
             // Render
             ModuleAnimations,
             ModuleAntiBlind,
@@ -431,6 +432,7 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleSkinChanger,
             ModulePointerESP,
             ModuleParticleCosmetics,
+            ModulePenisESP,
 
             // World
             ModuleAutoBuild,

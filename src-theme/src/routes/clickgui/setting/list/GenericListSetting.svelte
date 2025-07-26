@@ -75,6 +75,11 @@
     &.expanded {
       margin-bottom: 10px;
     }
+    .name {
+      color: $text;
+      font-size: var(--font-size);
+      font-weight: 600;
+    }
   }
   .results {
     height: 200px;
