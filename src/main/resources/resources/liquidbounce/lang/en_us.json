@@ -745,5 +745,7 @@
   "liquidbounce.module.pointerESP.description": "Display rotating pointer images around targets in screen center.",
   "liquidbounce.module.tPBowAura.description":"「Longbow of the Heavens」",
   "liquidbounce.module.fPSBoost.description":"Displays a false FPS value.",
-  "liquidbounce.module.particleCosmetics.description":"Form a fashion of particles around you."
+  "liquidbounce.module.particleCosmetics.description":"Form a fashion of particles around you.",
+  "liquidbounce.module.treasureManager.description":"Automatically store valuable items in boxes.",
+  "liquidbounce.module.instakillAxeFucker.description":"In KKCraft SkyWars,No probability of automatically selecting a instakillAxe"
 }
