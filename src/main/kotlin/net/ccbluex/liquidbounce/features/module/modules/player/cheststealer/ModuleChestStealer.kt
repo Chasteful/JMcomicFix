@@ -28,7 +28,6 @@ import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.features.module.modules.player.cheststealer.features.FeatureChestAura
-import net.ccbluex.liquidbounce.features.module.modules.player.cheststealer.features.FeatureProgress
 import net.ccbluex.liquidbounce.features.module.modules.player.invcleaner.*
 import net.ccbluex.liquidbounce.utils.inventory.*
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
@@ -105,7 +104,6 @@ object ModuleChestStealer : ClientModule("ChestStealer", Category.PLAYER) {
         }
         updateRemainingItems(itemsToCollect.size)
 
-        FeatureProgress.updateRemainingItems(itemsToCollect.size)
 
         if (quickSwaps && performQuickSwaps(event, cleanupPlan, screen) != null) {
             return@handler
