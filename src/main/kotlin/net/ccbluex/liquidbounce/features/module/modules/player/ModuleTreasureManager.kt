@@ -22,6 +22,7 @@ import net.minecraft.text.Text
  *
  * Automatically stores valuable items from inventory into a chest for BedWars.
  */
+@Suppress("TooManyFunctions")
 object ModuleTreasureManager : ClientModule("TreasureManager", Category.PLAYER) {
 
     private val inventoryConstrains = tree(InventoryConstraints())

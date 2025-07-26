@@ -373,6 +373,7 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModulePotionSpoof,
             ModuleTreasureManager,
             ModuleAutoClutch,
+            ModuleInstakillAxeFucker,
 
             // Render
             ModuleAnimations,
