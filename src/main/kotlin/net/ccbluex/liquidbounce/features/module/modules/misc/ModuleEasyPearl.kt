@@ -25,7 +25,7 @@ import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.event.tickHandler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
-import net.ccbluex.jmcomicfix.features.module.modules.world.stuck.ModuleAutoStuck.shouldEnableStuck
+import net.ccbluex.liquidbounce.features.module.modules.player.ModuleAutoStuck.shouldEnableStuck
 import net.ccbluex.liquidbounce.render.*
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager

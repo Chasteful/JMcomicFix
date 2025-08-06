@@ -109,7 +109,7 @@ import net.ccbluex.jmcomicfix.features.module.modules.combat.ModuleAutoRod
 import net.ccbluex.jmcomicfix.features.module.modules.`fun`.*
 import net.ccbluex.jmcomicfix.features.module.modules.render.*
 import net.ccbluex.jmcomicfix.features.module.modules.misc.ModuleAutoScreenShot
-import net.ccbluex.jmcomicfix.features.module.modules.world.stuck.ModuleAutoStuck
+import net.ccbluex.liquidbounce.features.module.modules.player.ModuleAutoStuck
 import org.lwjgl.glfw.GLFW
 
 

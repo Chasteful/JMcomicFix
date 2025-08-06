@@ -1,8 +1,9 @@
+@file:Suppress("detekt:all")
 package net.ccbluex.liquidbounce.features.module.modules.player.autoclutch
 
 import com.mojang.blaze3d.systems.RenderSystem
 import com.viaversion.viaversion.api.minecraft.Vector3f
-import net.ccbluex.jmcomicfix.features.module.modules.world.stuck.ModuleAutoStuck
+import net.ccbluex.liquidbounce.features.module.modules.player.ModuleAutoStuck
 import net.ccbluex.liquidbounce.config.types.NamedChoice
 import net.ccbluex.liquidbounce.event.events.*
 import net.ccbluex.liquidbounce.event.handler
@@ -65,13 +66,14 @@ import kotlin.math.exp
 import kotlin.math.sin
 import kotlin.random.Random
 
-@Suppress("all")
+
 object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
 
     enum class State { IDLE, FINDING_PEARL, CALCULATING, ROTATING, THROWING, PAUSED }
     enum class Algorithm(override val choiceName: String) : NamedChoice {
         SimulatedAnnealing("SimulatedAnnealing")
     }
+    @Suppress("unused")
     private val algorithm by enumChoice("Algorithm", Algorithm.SimulatedAnnealing)
 
     private val voidEvasionFrequency by int("VoidEvasionFrequency", 14, 5..20)
@@ -151,6 +153,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
             !ModuleFly.running
     }
 
+    @Suppress("unused")
     private val tickHandler = handler<GameTickEvent> {
         if (!shouldCalculateTrajectory()) {
             clearTrajectoryAndCache()
@@ -168,6 +171,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         checkVoidFall()
     }
 
+    @Suppress("unused")
     private val interactedItemHandler = handler<PlayerInteractedItemEvent> { event ->
         if (event.actionResult != ActionResult.PASS &&
             event.player == mc.player &&
@@ -180,6 +184,17 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
             scheduleSafetyCheck()
         }
     }
+
+    @Suppress("unused")
+    private val worldRenderHandler = handler<WorldRenderEvent> { event ->
+        if (!shouldCalculateTrajectory() && !playerTrajectory ) {
+            clearTrajectoryAndCache()
+            return@handler
+        }
+        drawPlayerTrajectory(event.matrixStack)
+    }
+
+    @Suppress("unused")
     private val packetEventHandler = handler<PacketEvent> { event ->
         if (!isPearlInFlight) return@handler
         if (event.packet is PlayerPositionLookS2CPacket) {
@@ -211,7 +226,9 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
             if (safetyCheckCounter <= 0) {
                 safetyCheckActive = false
                 manualPearlThrown = false
-                state = if (isPlayerSafe()) State.IDLE else {
+                state = if (isPlayerSafe()){
+                    State.IDLE }
+                else {
                     triggerPosition = player.pos
                     State.FINDING_PEARL
                 }
@@ -225,7 +242,9 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
             safetyCheckCounter--
             if (safetyCheckCounter <= 0) {
                 safetyCheckActive = false
-                state = if (isPlayerSafe()) State.IDLE else {
+                state = if (isPlayerSafe()){
+                    State.IDLE
+                } else {
                     triggerPosition = player.pos
                     State.FINDING_PEARL
                 }
@@ -298,13 +317,6 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         lastPlayerPosition = currentPos
     }
 
-    private val worldRenderHandler = handler<WorldRenderEvent> { event ->
-        if (!shouldCalculateTrajectory() && !playerTrajectory ) {
-            clearTrajectoryAndCache()
-            return@handler
-        }
-        drawPlayerTrajectory(event.matrixStack)
-    }
 
     private fun drawPlayerTrajectory(matrixStack: MatrixStack) {
         if (!playerTrajectory) {
@@ -418,8 +430,11 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
                 )
 
                 val color = if (isSafe1 == isSafe2) {
-                    if (isSafe1) Color4b(0x20, 0xC2, 0x06, 200)
-                    else Color4b(0xD7, 0x09, 0x09, 200)
+                    if (isSafe1){
+                        Color4b(0x20, 0xC2, 0x06, 200)
+                    } else {
+                        Color4b(0xD7, 0x09, 0x09, 200)
+                    }
                 } else {
                     val colorT = t
                     val r = ((if (isSafe1) 0x20 else 0xD7) + ((if (isSafe2) 0x20 else 0xD7) - (if (isSafe1) 0x20 else 0xD7)) * colorT).toInt()
@@ -538,9 +553,6 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     }
 
     private fun findPearl() {
-        if (allowClutchWithStuck){
-            ModuleAutoStuck.shouldEnableStuck = true
-        }
         val startTime = System.currentTimeMillis()
         val pearlSlot = Slots.OffhandWithHotbar.findSlot(Items.ENDER_PEARL)?.hotbarSlotForServer
         if (pearlSlot == null) {
@@ -709,9 +721,6 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     }
 
     private fun calculateSolution() {
-        if (allowClutchWithStuck){
-            ModuleAutoStuck.shouldEnableStuck = true
-        }
         val scaledTemperature = temperature * 100
         repeat((maxIterations * iterationSpeed).toInt()) {
             if (iterations >= maxIterations || temperature < minTemperature) {
@@ -817,7 +826,6 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
                 }
             }
 
-
             val nearestSafeDistance = findNearestSafeBlock(pos)?.let { distanceSq2D(pos, it) } ?: 10000.0
 
             val xFrac = pos.x - pos.x.toInt()
@@ -876,7 +884,6 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
             return
         }
 
-
         if (!mc.options.pickItemKey.isPressed) {
             bestSolution?.let { sol ->
 
@@ -889,8 +896,8 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
                             mc.player?.horizontalCollision ?: false
                         )
                     )
-                }else{
-                    RotationManager.setRotationTarget(
+                }
+                else { RotationManager.setRotationTarget(
                         rotationConfig.toRotationTarget(sol),
                         priority = Priority.IMPORTANT_FOR_USAGE_1,
                         provider = this
