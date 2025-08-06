@@ -21,7 +21,6 @@
 
 package net.ccbluex.liquidbounce.integration.interop.protocol.rest.v1.game
 
-import net.ccbluex.jmcomicfix.features.module.modules.render.ModuleKillEffects
 import net.ccbluex.liquidbounce.config.gson.interopGson
 import net.ccbluex.liquidbounce.features.module.modules.combat.ModuleSwordBlock.hideShieldSlot
 import net.ccbluex.liquidbounce.features.module.modules.combat.ModuleSwordBlock.shouldHideOffhand
@@ -31,13 +30,13 @@ import net.ccbluex.liquidbounce.features.module.modules.player.autobuff.ModuleAu
 import net.ccbluex.liquidbounce.utils.session.GameWins
 import net.ccbluex.liquidbounce.utils.client.interaction
 import net.ccbluex.liquidbounce.utils.client.mc
-import net.ccbluex.liquidbounce.utils.client.player
 import net.ccbluex.liquidbounce.utils.entity.getActualHealth
 import net.ccbluex.liquidbounce.utils.entity.netherPosition
 import net.ccbluex.liquidbounce.utils.entity.ping
 import net.ccbluex.liquidbounce.utils.session.KilledTarget
 import net.ccbluex.netty.http.model.RequestObject
 import net.ccbluex.netty.http.util.httpOk
+import net.ccbluex.netty.http.util.httpNoContent
 import net.minecraft.entity.effect.StatusEffectInstance
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
@@ -54,18 +53,18 @@ import net.minecraft.util.math.Vec3d
 import net.minecraft.world.GameMode
 import kotlin.math.min
 
+private fun nullableResponse(item: Any?) = item?.let { httpOk(interopGson.toJsonTree(it)) } ?: httpNoContent()
+
 // GET /api/v1/client/player
 @Suppress("UNUSED_PARAMETER")
-fun getPlayerData(requestObject: RequestObject) = httpOk(interopGson.toJsonTree(PlayerData.fromPlayer(player)))
-
+fun getPlayerData(requestObject: RequestObject) =
+    nullableResponse(mc.player?.let(PlayerData::fromPlayer))
 // GET /api/v1/client/player/inventory
 @Suppress("UNUSED_PARAMETER")
-fun getPlayerInventory(requestObject: RequestObject) =
-    httpOk(interopGson.toJsonTree(PlayerInventoryData.fromPlayer(player)))
-
+fun getPlayerInventory(requestObject: RequestObject) = nullableResponse(mc.player?.let(PlayerInventoryData::fromPlayer))
 // GET /api/v1/client/crosshair
 @Suppress("UNUSED_PARAMETER")
-fun getCrosshairData(requestObject: RequestObject) = httpOk(interopGson.toJsonTree(mc.crosshairTarget))
+fun getCrosshairData(requestObject: RequestObject) = nullableResponse(mc.crosshairTarget)
 
 data class PlayerData(
     val username: String,
@@ -108,6 +107,7 @@ data class PlayerData(
 
     companion object {
 
+        @JvmStatic
         fun fromPlayer(player: PlayerEntity) = PlayerData(
             ModuleNameProtect.replace(player.nameForScoreboard),
             player.uuidAsString,
@@ -119,7 +119,7 @@ data class PlayerData(
             player.blockPos,
             player.velocity,
             player.inventory.selectedSlot,
-            if (mc.player == player) interaction.currentGameMode else GameMode.DEFAULT,
+            if (mc.player === player) interaction.currentGameMode else GameMode.DEFAULT,
             player.health.fixNaN(),
             player.getActualHealth().fixNaN(),
             player.maxHealth.fixNaN(),
@@ -131,7 +131,7 @@ data class PlayerData(
             player.experienceLevel,
             player.experienceProgress.fixNaN(),
             player.ping,
-            mc.currentServerEntry?.address ?: "jmcomicph.org",
+            mc.currentServerEntry?.address ?: "SingleWorld",
             player.statusEffects.toList(),
             player.mainHandStack,
             if (shouldHideOffhand(player = player) && hideShieldSlot) ItemStack.EMPTY else player.offHandStack,
@@ -172,6 +172,7 @@ data class PlayerInventoryData(
 ) {
 
     companion object {
+        @JvmStatic
         fun fromPlayer(player: PlayerEntity) = PlayerInventoryData(
             armor = player.inventory.armor.map(ItemStack::copy),
             main = player.inventory.main.map(ItemStack::copy),
@@ -230,8 +231,10 @@ data class ScoreboardData(val header: Text, val entries: Array<SidebarEntry?>) {
          *
          * Taken from the Minecraft source code
          */
+        @JvmStatic
         fun fromScoreboard(scoreboard: Scoreboard?): ScoreboardData? {
-            if (scoreboard == null) return null
+            scoreboard ?: return null
+            val player = mc.player ?: return null
 
             val team = scoreboard.getScoreHolderTeam(player.nameForScoreboard)
 

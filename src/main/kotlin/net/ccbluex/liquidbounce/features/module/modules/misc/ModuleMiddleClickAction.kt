@@ -20,7 +20,9 @@ package net.ccbluex.liquidbounce.features.module.modules.misc
 
 import net.ccbluex.liquidbounce.config.types.nesting.Choice
 import net.ccbluex.liquidbounce.config.types.nesting.ChoiceConfigurable
+import net.ccbluex.liquidbounce.event.EventManager
 import net.ccbluex.liquidbounce.event.events.NotificationEvent
+import net.ccbluex.liquidbounce.event.events.PlayerInteractedItemEvent
 import net.ccbluex.liquidbounce.event.events.WorldChangeEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.event.tickHandler
@@ -36,6 +38,8 @@ import net.ccbluex.liquidbounce.utils.inventory.Slots
 import net.ccbluex.liquidbounce.utils.inventory.useHotbarSlotOrOffhand
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.Items
+import net.minecraft.util.ActionResult
+import net.minecraft.util.Hand
 
 /**
  * MiddleClickAction module
@@ -81,7 +85,13 @@ object ModuleMiddleClickAction : ClientModule(
                 Slots.Hotbar.findSlot(Items.ENDER_PEARL)?.let {
                     useHotbarSlotOrOffhand(it, slotResetDelay)
                 }
-
+                EventManager.callEvent(
+                    PlayerInteractedItemEvent(
+                        player = mc.player!!,
+                        hand = Hand.MAIN_HAND,
+                        actionResult = ActionResult.SUCCESS,
+                    )
+                )
                 wasPressed = false
             }
         }

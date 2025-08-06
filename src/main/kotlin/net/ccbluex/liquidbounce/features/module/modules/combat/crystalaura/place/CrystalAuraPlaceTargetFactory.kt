@@ -18,7 +18,6 @@
  */
 package net.ccbluex.liquidbounce.features.module.modules.combat.crystalaura.place
 
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet
 import net.ccbluex.liquidbounce.features.module.MinecraftShortcuts
 import net.ccbluex.liquidbounce.features.module.modules.combat.crystalaura.ModuleCrystalAura
 import net.ccbluex.liquidbounce.features.module.modules.combat.crystalaura.SubmoduleBasePlace
@@ -53,7 +52,7 @@ object CrystalAuraPlaceTargetFactory : MinecraftShortcuts {
         sphere = BlockPos.ORIGIN.getSortedSphere(getMaxRange())
     }
 
-    fun updateTarget(excludeIds: IntArray?) {
+    fun updateTarget(excludeIds : IntArray?) {
         // Reset current target
         previousTarget = placementTarget
         placementTarget = null
@@ -97,7 +96,7 @@ object CrystalAuraPlaceTargetFactory : MinecraftShortcuts {
     ): Boolean {
         val target = ModuleCrystalAura.targetTracker.target ?: return true
         val expectedCrystal = if (oldVersion) FULL_BOX.withMaxX(2.0) else FULL_BOX
-        val basePlaceLayers = if (basePlace) SubmoduleBasePlace.getBasePlaceLayers(target.y) else IntOpenHashSet()
+        val basePlaceLayers = if (basePlace) SubmoduleBasePlace.getBasePlaceLayers(target.y) else IntRange.EMPTY
 
         // create the context
         val context = PlacementContext(basePlace, basePlaceLayers, expectedCrystal, target)

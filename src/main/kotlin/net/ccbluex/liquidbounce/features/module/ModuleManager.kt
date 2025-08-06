@@ -18,11 +18,7 @@
  */
 package net.ccbluex.liquidbounce.features.module
 
-import net.ccbluex.jmcomicfix.features.module.modules.render.ModuleHalo
-import net.ccbluex.jmcomicfix.features.module.modules.client.ModuleCapes
-import net.ccbluex.jmcomicfix.features.module.modules.misc.ModuleAutoGG
-import net.ccbluex.jmcomicfix.features.module.modules.misc.ModuleTitleControl
-import net.ccbluex.jmcomicfix.features.module.modules.render.ModuleKillEffects
+
 import net.ccbluex.liquidbounce.config.ConfigSystem
 import net.ccbluex.liquidbounce.event.EventListener
 import net.ccbluex.liquidbounce.event.events.DisconnectEvent
@@ -31,13 +27,9 @@ import net.ccbluex.liquidbounce.event.events.MouseButtonEvent
 import net.ccbluex.liquidbounce.event.events.WorldChangeEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.modules.client.ModuleAutoConfig
-import net.ccbluex.jmcomicfix.features.module.modules.client.ModuleHudEditor
-import net.ccbluex.jmcomicfix.features.module.modules.combat.ModuleAutoRod
-import net.ccbluex.jmcomicfix.features.module.modules.`fun`.*
 import net.ccbluex.liquidbounce.features.module.modules.client.ModuleLiquidChat
 import net.ccbluex.liquidbounce.features.module.modules.client.ModuleRichPresence
 import net.ccbluex.liquidbounce.features.module.modules.client.ModuleTargets
-import net.ccbluex.jmcomicfix.features.module.modules.render.*
 import net.ccbluex.liquidbounce.features.module.modules.combat.*
 import net.ccbluex.liquidbounce.features.module.modules.combat.aimbot.ModuleAutoBow
 import net.ccbluex.liquidbounce.features.module.modules.combat.autoarmor.ModuleAutoArmor
@@ -88,8 +80,7 @@ import net.ccbluex.liquidbounce.features.module.modules.render.*
 import net.ccbluex.liquidbounce.features.module.modules.render.esp.ModuleESP
 import net.ccbluex.liquidbounce.features.module.modules.render.jumpeffect.ModuleJumpEffect
 import net.ccbluex.liquidbounce.features.module.modules.combat.tpbow.ModuleBowAura
-import net.ccbluex.jmcomicfix.features.module.modules.misc.ModuleAutoScreenShot
-import net.ccbluex.liquidbounce.features.module.modules.player.ModuleAutoClutch
+import net.ccbluex.liquidbounce.features.module.modules.player.autoclutch.ModuleAutoClutch
 import net.ccbluex.liquidbounce.features.module.modules.render.murdermystery.ModuleMurderMystery
 import net.ccbluex.liquidbounce.features.module.modules.render.nametags.ModuleNametags
 import net.ccbluex.liquidbounce.features.module.modules.render.trajectories.ModuleTrajectories
@@ -100,8 +91,8 @@ import net.ccbluex.liquidbounce.features.module.modules.world.fucker.ModuleFucke
 import net.ccbluex.liquidbounce.features.module.modules.world.nuker.ModuleNuker
 import net.ccbluex.liquidbounce.features.module.modules.world.packetmine.ModulePacketMine
 import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.ModuleScaffold
-import net.ccbluex.jmcomicfix.features.module.modules.world.stuck.ModuleAutoStuck
 import net.ccbluex.liquidbounce.features.module.modules.client.ModuleTranslation
+import net.ccbluex.liquidbounce.features.module.modules.misc.ModuleBetterTitle
 import net.ccbluex.liquidbounce.features.module.modules.world.traps.ModuleAutoTrap
 import net.ccbluex.liquidbounce.script.ScriptApiRequired
 import net.ccbluex.liquidbounce.utils.client.logger
@@ -109,6 +100,16 @@ import net.ccbluex.liquidbounce.utils.client.mc
 import net.ccbluex.liquidbounce.utils.input.InputBind
 import net.ccbluex.liquidbounce.utils.kotlin.mapArray
 import net.ccbluex.liquidbounce.utils.kotlin.sortedInsert
+import net.ccbluex.jmcomicfix.features.module.modules.render.ModuleHalo
+import net.ccbluex.jmcomicfix.features.module.modules.client.ModuleCapes
+import net.ccbluex.jmcomicfix.features.module.modules.misc.ModuleAutoGG
+import net.ccbluex.jmcomicfix.features.module.modules.render.ModuleKillEffects
+import net.ccbluex.jmcomicfix.features.module.modules.client.ModuleHudEditor
+import net.ccbluex.jmcomicfix.features.module.modules.combat.ModuleAutoRod
+import net.ccbluex.jmcomicfix.features.module.modules.`fun`.*
+import net.ccbluex.jmcomicfix.features.module.modules.render.*
+import net.ccbluex.jmcomicfix.features.module.modules.misc.ModuleAutoScreenShot
+import net.ccbluex.jmcomicfix.features.module.modules.world.stuck.ModuleAutoStuck
 import org.lwjgl.glfw.GLFW
 
 
@@ -301,7 +302,6 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleAutoChatGame,
             ModuleTargetLock,
             ModuleAutoPearl,
-            ModuleTitleControl,
             ModuleAntiStaff,
             ModuleFlagCheck,
             ModulePacketLogger,

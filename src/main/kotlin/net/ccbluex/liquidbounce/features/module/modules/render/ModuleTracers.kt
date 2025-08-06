@@ -29,10 +29,9 @@ import net.ccbluex.liquidbounce.render.GenericSyncColorMode
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.ccbluex.liquidbounce.render.engine.type.Vec3
 import net.ccbluex.liquidbounce.utils.combat.EntityTaggingManager
-import net.ccbluex.liquidbounce.utils.combat.shouldBeShown
+import net.ccbluex.liquidbounce.utils.entity.RenderedEntities
 import net.ccbluex.liquidbounce.utils.entity.interpolateCurrentPosition
 import net.ccbluex.liquidbounce.utils.math.toVec3
-import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.util.math.MathHelper
@@ -67,8 +66,19 @@ object ModuleTracers : ClientModule("Tracers", Category.RENDER) {
             return Color4b(255, 0, 0, 255) to Color4b(0, 255, 0, 255)
         }
     }
+    override fun enable() {
+        RenderedEntities.subscribe(this)
+    }
+
+    override fun disable() {
+        RenderedEntities.unsubscribe(this)
+    }
 
     val renderHandler = handler<WorldRenderEvent> { event ->
+        if (RenderedEntities.isEmpty()) {
+            return@handler
+        }
+
         val matrixStack = event.matrixStack
         val useDistanceColor = DistanceColor.isSelected
 
@@ -78,10 +88,9 @@ object ModuleTracers : ClientModule("Tracers", Category.RENDER) {
             } else {
                 DistanceColor.customViewDistance
             })
-        val entities = world.entities.filter(this::shouldRenderTrace)
+
         val camera = mc.gameRenderer.camera
 
-        if (entities.isEmpty()) return@handler
 
         renderEnvironmentForWorld(matrixStack) {
             val eyeVec = Vec3(0.0, 0.0, 1.0)
@@ -89,11 +98,9 @@ object ModuleTracers : ClientModule("Tracers", Category.RENDER) {
                 .rotateYaw((-Math.toRadians(camera.yaw.toDouble())).toFloat())
 
             longLines {
-                for (entity in entities) {
-                    if (entity !is LivingEntity) continue
-
-                    val dist = player.distanceTo(entity) * 2.0F
+                for (entity in RenderedEntities) {
                     val tagColor = EntityTaggingManager.getTag(entity).color
+                    val dist = player.distanceTo(entity) * 2.0F
                     val friendColor = if (entity is PlayerEntity &&
                         FriendManager.isFriend(entity.gameProfile.name)
                     ) {
@@ -155,7 +162,4 @@ object ModuleTracers : ClientModule("Tracers", Category.RENDER) {
             }
         }
     }
-
-    @JvmStatic
-    fun shouldRenderTrace(entity: Entity) = entity.shouldBeShown()
 }

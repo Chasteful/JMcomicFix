@@ -877,7 +877,7 @@ class SimulatedPlayer(
 
     class SimulatedPlayerInput(
         val directionalInput: DirectionalInput,
-        jumping: Boolean,
+        var jumping: Boolean,
         var sprinting: Boolean,
         sneaking: Boolean
     ) : Input() {

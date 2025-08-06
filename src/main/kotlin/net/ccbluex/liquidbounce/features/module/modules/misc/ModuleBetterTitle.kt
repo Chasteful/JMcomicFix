@@ -26,8 +26,8 @@ import net.ccbluex.liquidbounce.event.suspendHandler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.features.module.modules.client.ModuleTranslation
+import net.ccbluex.liquidbounce.features.module.modules.misc.bettertitle.TitleFilter
 import net.ccbluex.liquidbounce.utils.client.*
-import net.minecraft.client.gui.hud.InGameHud
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 
@@ -36,6 +36,7 @@ object ModuleBetterTitle : ClientModule(
 ) {
     init {
         tree(AutoTranslate)
+        tree(TitleFilter)
     }
 }
 
@@ -94,7 +95,7 @@ private enum class ShowIn(
 }
 
 
-private enum class TitleType(
+enum class TitleType(
     override val choiceName: String,
     /**
      * Doesn't use [InGameHud.setTitle] and [InGameHud.setSubtitle] because

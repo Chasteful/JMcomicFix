@@ -47,6 +47,7 @@ import net.ccbluex.liquidbounce.utils.inventory.InventoryManager
 import net.ccbluex.liquidbounce.utils.inventory.OffHandSlot
 import net.ccbluex.liquidbounce.utils.inventory.Slots
 import net.ccbluex.liquidbounce.utils.inventory.findClosestSlot
+import net.ccbluex.liquidbounce.utils.item.isConsumable
 import net.ccbluex.liquidbounce.utils.item.isNothing
 import net.ccbluex.liquidbounce.utils.kotlin.Priority
 import net.ccbluex.liquidbounce.utils.render.WorldTargetRenderer
@@ -139,13 +140,18 @@ object ModuleAutoShoot : ClientModule("AutoShoot", Category.COMBAT) {
             player.canSee(it)
         } ?: return@handler
 
+        if (player.isUsingItem && player.activeItem.isConsumable) {
+            return@handler
+        }
         if (notDuringCombat && CombatManager.isInCombat) {
             return@handler
         }
 
-        if (requiresKillAura && !ModuleKillAura.running) {
+        if (requiresKillAura && (!ModuleKillAura.running || !ModuleKillAura.enabled)) {
             return@handler
         }
+
+
 
         // Check if we have a throwable, if not we can't shoot.
         val slot = getThrowable() ?: return@handler
@@ -174,10 +180,12 @@ object ModuleAutoShoot : ClientModule("AutoShoot", Category.COMBAT) {
     private val handleAutoShoot = tickHandler {
         val target = targetTracker.target ?: return@tickHandler
 
+        if (requiresKillAura && (!ModuleKillAura.running || !ModuleKillAura.enabled)) {
+            return@tickHandler
+        }
         if (notDuringCombat && CombatManager.isInCombat) {
             return@tickHandler
         }
-
         // Check if we have a throwable, if not we can't shoot.
         val slot = getThrowable() ?: return@tickHandler
 

@@ -90,8 +90,15 @@ object ModulePacketLogger : ClientModule("PacketLogger", Category.MISC) {
 
         text.append(" ")
 
+        val packetClassName = classNames.computeIfAbsent(packet.javaClass, EnvironmentRemapper::remapClass)
+            .substringAfterLast('.')
+        text.append(highlight(packetClassName).copyable(copyContent = packetClassName))
+
         val packetName = packetId.toName()
-        text.append(highlight(packetName).copyable(copyContent = packetName))
+
+        text.append(regular(" (ID: "))
+        text.append(variable(packetName).copyable(copyContent = packetName))
+        text.append(regular(")"))
 
         if (clazz.isRecord) {
             text.append(" (Record)".asText().formatted(Formatting.DARK_GRAY))
@@ -174,22 +181,18 @@ object ModulePacketLogger : ClientModule("PacketLogger", Category.MISC) {
                     val args = actualTypeArguments
                     args.joinToString(", ", prefix = "$rawType<", postfix = ">") { it.parse() }
                 }
-
                 is WildcardType -> {
                     when {
                         lowerBounds.isNotEmpty() -> "? super ${lowerBounds.first().parse()}"
                         upperBounds.isNotEmpty() && upperBounds.first() !== Object::class.java ->
                             upperBounds.joinToString(" & ", prefix = "? extends ") { it.parse() }
-
                         else -> "?"
                     }
                 }
-
                 is TypeVariable<*> -> when {
                     bounds.size == 1 && bounds[0] === Object::class.java -> name
                     else -> bounds.joinToString(" & ", prefix = "$name extends ") { it.parse() }
                 }
-
                 is GenericArrayType -> "${genericComponentType.parse()}[]"
                 else -> this.toString()
             }

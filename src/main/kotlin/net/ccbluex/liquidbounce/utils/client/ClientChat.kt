@@ -241,6 +241,13 @@ fun progress(title: Text, progress: Float, maxProgress: Float = 1f, timeRemainin
 /**
  * Joins a list of [Text] into a single [Text] with the given [separator].
  */
+private val messageCounts = mutableMapOf<String, Int>()
+
+ fun getNextCount(id: String): Int {
+    val current = messageCounts.getOrDefault(id, 0) + 1
+    messageCounts[id] = current
+    return current
+}
 fun List<Text>.joinToText(separator: Text): MutableText {
     val result = Text.empty()
     if (isEmpty()) {

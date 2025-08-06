@@ -46,6 +46,7 @@ object ModuleNoFall : ClientModule("NoFall", Category.PLAYER) {
             NoFallVulcan,
             NoFallVulcanTP,
             NoFallGrim2365,
+            NoFallGrim2371,
             NoFallVerus,
             NoFallAACv4,
             NoFallAACv5,
