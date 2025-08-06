@@ -57,6 +57,7 @@ object ModuleAimbot : ClientModule("Aimbot", Category.COMBAT, aliases = arrayOf(
 
     private val ignores by multiEnumChoice<IgnoreOpened>("Ignore")
 
+    private var lastTargetEntity: Entity? = null
     private var targetRotation: Rotation? = null
     private var playerRotation: Rotation? = null
     var mouseDeltaX = 0f
@@ -70,10 +71,14 @@ object ModuleAimbot : ClientModule("Aimbot", Category.COMBAT, aliases = arrayOf(
             targetTracker.reset()
             targetRenderer.reset()
             targetRotation = null
+
+            if (!KillAuraRequirements.CLICK.meets()) {
+                lastTargetEntity = null
+            }
             return@handler
         }
-
         targetRotation = findNextTargetRotation()?.let { (target, rotation) ->
+            lastTargetEntity = target
             angleSmooth.activeChoice.process(
                 RotationTarget(
                     rotation = rotation.rotation,
@@ -91,6 +96,9 @@ object ModuleAimbot : ClientModule("Aimbot", Category.COMBAT, aliases = arrayOf(
 
         // Reset renderer if no target is found
         if (targetRotation == null) {
+            if (KillAuraRequirements.ONLY_ON_ROTATE in requires && (mouseDeltaX != 0f || mouseDeltaY != 0f)) {
+                lastTargetEntity = null
+            }
             targetRenderer.reset()
         }
 
@@ -107,12 +115,11 @@ object ModuleAimbot : ClientModule("Aimbot", Category.COMBAT, aliases = arrayOf(
         targetRenderer.reset() // Ensure renderer is reset when module is disabled
     }
 
-
     @Suppress("unused")
     private val renderHandler = handler<WorldRenderEvent> { event ->
         val matrixStack = event.matrixStack
         val partialTicks = event.partialTicks
-        val target = targetTracker.target ?: return@handler
+        val target = targetTracker.target ?: lastTargetEntity ?: return@handler
 
         if (IgnoreOpened.SCREEN !in ignores && mc.currentScreen != null) {
             return@handler

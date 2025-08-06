@@ -66,7 +66,6 @@ object ModuleHalo : ClientModule("Halo", Category.RENDER) {
     }
 
     init {
-
         tree(DynamicOffset)
         tree(TrackCamera)
     }

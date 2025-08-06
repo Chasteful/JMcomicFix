@@ -111,8 +111,7 @@
     display: flex;
     align-items: center;
     height: 48px;
-    padding: 0 8px;
-    gap: 8px;
+    padding: 0 10px;
     border-radius: 12px;
     overflow: hidden;
     color: #fff;
@@ -135,6 +134,7 @@
   .count {
     color: #CCCCCC;
     text-shadow: 0 0 3px rgba(204, 204, 204, 0.9);
+    padding: 0 8px 0 0;
 
     .count-number {
       font-weight: bold;
