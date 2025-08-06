@@ -100,7 +100,7 @@ import net.ccbluex.liquidbounce.utils.client.mc
 import net.ccbluex.liquidbounce.utils.input.InputBind
 import net.ccbluex.liquidbounce.utils.kotlin.mapArray
 import net.ccbluex.liquidbounce.utils.kotlin.sortedInsert
-import net.ccbluex.jmcomicfix.features.module.modules.render.ModuleHalo
+import net.ccbluex.liquidbounce.features.module.modules.render.ModuleHalo
 import net.ccbluex.jmcomicfix.features.module.modules.client.ModuleCapes
 import net.ccbluex.jmcomicfix.features.module.modules.misc.ModuleAutoGG
 import net.ccbluex.jmcomicfix.features.module.modules.render.ModuleKillEffects
