@@ -1,3 +1,22 @@
+/*
+ * This file is part of LiquidBounce (https://github.com/CCBlueX/LiquidBounce)
+ *
+ * Copyright (c) 2015 - 2025 CCBlueX
+ *
+ * LiquidBounce is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * LiquidBounce is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package net.ccbluex.liquidbounce.features.module.modules.render
 
 import com.mojang.blaze3d.platform.GlStateManager
@@ -33,12 +52,11 @@ object ModuleHalo : ClientModule("Halo", Category.RENDER) {
     private val onlySelf by boolean("OnlySelf", true)
     private val firstPerson by boolean("InTheFirstPerson", false)
 
-    private object Flip : ToggleableConfigurable(this, "Flip", true) {
-        val offsetX by float("OffsetX", 0f, -180f..180f)
-        val offsetY by float("OffsetY", 5f, -180f..180f)
-    }
+    private val offsetX by float("OffsetX", 90f, -180f..180f)
+    private val offsetY by float("OffsetY", 5f, -180f..180f)
+
     private object DynamicOffset : ToggleableConfigurable(this, "DynamicFloat", true) {
-        val range by float("FloatRange", 0.05f, 0.01f..0.2f)
+        val range by float("FloatRange", 0.05f, 0.01f..0.1f)
         val speed by float("FloatSpeed", 0.1f, 0.1f..2f)
     }
     private object TrackCamera : ToggleableConfigurable(this, "TrackCamera", true) {
@@ -48,7 +66,7 @@ object ModuleHalo : ClientModule("Halo", Category.RENDER) {
     }
 
     init {
-        tree(Flip)
+
         tree(DynamicOffset)
         tree(TrackCamera)
     }
@@ -114,9 +132,9 @@ object ModuleHalo : ClientModule("Halo", Category.RENDER) {
                         val yaw = player.yaw
                         ms.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-yaw)) // Only rotate with yaw
                     }
-                    if (Flip.enabled) {
-                        ms.multiply(RotationAxis.POSITIVE_X.rotationDegrees(Flip.offsetX))
-                        ms.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(Flip.offsetY))
+                    if (enabled) {
+                        ms.multiply(RotationAxis.POSITIVE_X.rotationDegrees(offsetX))
+                        ms.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(offsetY))
                     }
 
                     val builder = RenderBufferBuilder(
