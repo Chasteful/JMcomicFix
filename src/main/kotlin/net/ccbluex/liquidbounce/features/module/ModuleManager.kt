@@ -110,6 +110,7 @@ import net.ccbluex.jmcomicfix.features.module.modules.`fun`.*
 import net.ccbluex.jmcomicfix.features.module.modules.render.*
 import net.ccbluex.jmcomicfix.features.module.modules.misc.ModuleAutoScreenShot
 import net.ccbluex.liquidbounce.features.module.modules.player.ModuleAutoStuck
+import net.ccbluex.liquidbounce.features.module.modules.render.targetinfo.ModuleTargetInfo
 import org.lwjgl.glfw.GLFW
 
 
@@ -434,8 +435,8 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModulePointerESP,
             ModuleParticleCosmetics,
             ModulePenisESP,
-
-            // World
+            ModuleTargetInfo,
+                // World
             ModuleAutoBuild,
             ModuleAutoDisable,
             ModuleAutoFarm,

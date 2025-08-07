@@ -95,7 +95,7 @@
     &:hover {
       background: rgba(204, 204, 204, 0.2);
       border-color: #ccc;
-      min-width: 200px;
+      min-width: 150px;
     }
 
     &.draggable {

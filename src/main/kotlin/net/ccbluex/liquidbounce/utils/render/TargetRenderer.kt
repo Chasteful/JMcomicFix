@@ -42,7 +42,7 @@ sealed class TargetRenderer<T : RenderEnvironment>(
     private val slideTime by int("SlideTime", 150, 1..1000, "ms")
     private val fadeTime by int("FadeTime", 500, 1..1000, "ms")
 
-    val colorMode = choices(this, "ColorMode", 2) {
+    val colorMode = choices(this, "ColorMode", 1) {
         arrayOf(
             GenericStaticColorMode(it, Color4b(0, 128, 255, 255)),
             GenericRainbowColorMode(it),

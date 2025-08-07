@@ -1,12 +1,16 @@
 package net.ccbluex.liquidbounce.utils.render.trajectory
 
+import net.ccbluex.liquidbounce.features.module.modules.render.trajectories.ModuleTrajectories
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.ccbluex.liquidbounce.utils.client.player
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.projectile.AbstractFireballEntity
 import net.minecraft.entity.projectile.ArrowEntity
+import net.minecraft.entity.projectile.FireballEntity
+import net.minecraft.entity.projectile.FishingBobberEntity
 import net.minecraft.entity.projectile.TridentEntity
+import net.minecraft.entity.projectile.WindChargeEntity
 import net.minecraft.entity.projectile.thrown.*
 import net.minecraft.item.*
 
@@ -37,10 +41,19 @@ object TrajectoryData {
         }
     }
 
+
     fun getColorForEntity(it: Entity): Color4b {
         return when (it) {
-            is ArrowEntity -> Color4b(255, 0, 0, 200)
-            is EnderPearlEntity -> Color4b(128, 0, 128, 200)
+            is ArrowEntity -> ModuleTrajectories.arrowColor
+            is EnderPearlEntity -> ModuleTrajectories.enderPearlColor
+            is FishingBobberEntity -> ModuleTrajectories.fishingBobberColor
+            is PotionEntity -> ModuleTrajectories.potionColor
+            is TridentEntity -> ModuleTrajectories.tridentColor
+            is SnowballEntity -> ModuleTrajectories.snowballColor
+            is EggEntity -> ModuleTrajectories.eggColor
+            is ExperienceBottleEntity -> ModuleTrajectories.expBottleColor
+            is FireballEntity -> ModuleTrajectories.fireballColor
+            is WindChargeEntity -> ModuleTrajectories.windChargeColor
             else -> Color4b(200, 200, 200, 200)
         }
     }
@@ -50,7 +63,7 @@ object TrajectoryData {
         activeArrows: Boolean,
         activeOthers: Boolean,
     ): TrajectoryInfo? {
-        if (activeArrows && entity is ArrowEntity && !entity.isInGround()) {
+        if (activeArrows && entity is ArrowEntity && !entity.isInGround) {
             return TrajectoryInfo(0.05, 0.3)
         }
         if (!activeOthers) {
@@ -59,19 +72,14 @@ object TrajectoryData {
 
         return when (entity) {
             is PotionEntity -> TrajectoryInfo.POTION
-            is TridentEntity -> {
-                if (!entity.isInGround()) {
-                    TrajectoryInfo.TRIDENT
-                } else {
-                    null
-                }
-            }
-
+            is TridentEntity -> if (!entity.isInGround) TrajectoryInfo.TRIDENT else null
             is EnderPearlEntity -> TrajectoryInfo.GENERIC
             is SnowballEntity -> TrajectoryInfo.GENERIC
             is ExperienceBottleEntity -> TrajectoryInfo.EXP_BOTTLE
             is EggEntity -> TrajectoryInfo.GENERIC
             is AbstractFireballEntity -> TrajectoryInfo.FIREBALL
+            is FishingBobberEntity -> TrajectoryInfo.FISHING_ROD
+            is WindChargeEntity -> TrajectoryInfo.WIND_CHARGE
             else -> null
         }
     }

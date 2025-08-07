@@ -36,19 +36,19 @@
           "value": [
             {
               "name": "Horizontal",
-              "value": "Left"
+              "value": "Center"
             },
             {
               "name": "HorizontalOffset",
-              "value": 250
+              "value": -500
             },
             {
               "name": "Vertical",
-              "value": "CenterTranslated"
+              "value": "Bottom"
             },
             {
               "name": "VerticalOffset",
-              "value": 4
+              "value": 5
             }
           ]
         }
@@ -100,7 +100,7 @@
             },
             {
               "name": "HorizontalOffset",
-              "value": -50
+              "value": -100
             },
             {
               "name": "Vertical",
@@ -108,7 +108,7 @@
             },
             {
               "name": "VerticalOffset",
-              "value": 300
+              "value": 0
             }
           ]
         }
@@ -156,19 +156,19 @@
           "value": [
             {
               "name": "Horizontal",
-              "value": "Right"
+              "value": "Left"
             },
             {
               "name": "HorizontalOffset",
-              "value": 200
+              "value": 0
             },
             {
               "name": "Vertical",
-              "value": "Bottom"
+              "value": "Center"
             },
             {
               "name": "VerticalOffset",
-              "value": 0
+              "value": 270
             }
           ]
         }
@@ -246,19 +246,19 @@
           "value": [
             {
               "name": "Horizontal",
-              "value": "Left"
+              "value": "Center"
             },
             {
               "name": "HorizontalOffset",
-              "value": 250
+              "value": 270
             },
             {
               "name": "Vertical",
-              "value": "CenterTranslated"
+              "value": "Bottom"
             },
             {
               "name": "VerticalOffset",
-              "value": -142
+              "value": 5
             }
           ]
         }

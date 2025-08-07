@@ -31,11 +31,11 @@ import java.util.*
 object EspImageMode : EspMode("Image", requiresTrueSight = true) {
 
     private val image by enumChoice("Image", FaceImage.XINXIN)
-    private val imageSize by float("ImageSize", 0.5f, 0.1f..2f)
+    private val imageSize by float("ImageSize", 0.6f, 0.1f..2f)
 
     private object ImageOffset : ToggleableConfigurable(this, "ImageOffset", true) {
         val offsetX by float("OffsetX", 0f, -1f..1f)
-        val offsetY by float("OffsetY", 0.1f, -1f..1f)
+        val offsetY by float("OffsetY", 0.8f, -1f..1f)
         val offsetZ by float("OffsetZ", 0f, -1f..1f)
     }
 

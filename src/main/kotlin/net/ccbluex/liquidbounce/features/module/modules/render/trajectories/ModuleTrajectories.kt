@@ -32,6 +32,7 @@ import net.ccbluex.liquidbounce.utils.render.trajectory.TrajectoryInfoRenderer
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.util.hit.EntityHitResult
 import net.minecraft.util.math.Vec3d
+import java.awt.Color
 
 /**
  * Trajectories module
@@ -46,6 +47,16 @@ object ModuleTrajectories : ClientModule("Trajectories", Category.RENDER) {
         Show.OTHER_PLAYERS,
         Show.ACTIVE_TRAJECTORY_ARROW
     )
+    val arrowColor by color("Arrow", Color4b(Color.RED).withAlpha(100))
+    val potionColor by color("Potion", Color4b(Color.PINK).withAlpha(100))
+    val enderPearlColor by color("EnderPearl", Color4b(Color.MAGENTA).withAlpha(100))
+    val fishingBobberColor by color("FishBobber", Color4b(Color.DARK_GRAY).withAlpha(100))
+    val tridentColor by color("Trident", Color4b(Color.CYAN).withAlpha(100))
+    val snowballColor by color("Snowball", Color4b(Color.WHITE).withAlpha(100))
+    val eggColor by color("Egg", Color4b(Color.WHITE).withAlpha(100))
+    val expBottleColor by color("ExpBottle", Color4b(Color.GREEN).withAlpha(100))
+    val fireballColor by color("Fireball", Color4b(Color.ORANGE).withAlpha(100))
+    val windChargeColor by color("WindCharge", Color4b(Color.LIGHT_GRAY).withAlpha(100))
 
     private val alwaysShowBow get() = Show.ALWAYS_SHOW_BOW in show
     private val otherPlayers get() = Show.OTHER_PLAYERS in show
