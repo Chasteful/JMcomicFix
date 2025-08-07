@@ -1,98 +1,176 @@
 package net.ccbluex.liquidbounce.features.module.modules.combat.velocity.mode
 
-import net.ccbluex.liquidbounce.event.events.AttackEntityEvent
+import com.google.common.collect.Queues
 import net.ccbluex.liquidbounce.event.events.PacketEvent
+import net.ccbluex.liquidbounce.event.events.PlayerTickEvent
+import net.ccbluex.liquidbounce.event.events.TransferOrigin
 import net.ccbluex.liquidbounce.event.handler
-import net.ccbluex.liquidbounce.event.tickHandler
-import net.ccbluex.liquidbounce.utils.client.isOlderThanOrEqual1_8
-import net.ccbluex.liquidbounce.utils.client.protocolVersion
-import net.ccbluex.liquidbounce.utils.client.sendPacketSilently
-import net.ccbluex.liquidbounce.utils.math.Vec2i
-import net.minecraft.item.consume.UseAction
-import net.minecraft.network.packet.c2s.play.PlayerInputC2SPacket
+import net.ccbluex.liquidbounce.event.sequenceHandler
+import net.ccbluex.liquidbounce.utils.aiming.RotationManager
+import net.ccbluex.liquidbounce.utils.aiming.data.Rotation
+import net.ccbluex.liquidbounce.utils.aiming.utils.raycast
+import net.ccbluex.liquidbounce.utils.client.PacketSnapshot
+import net.ccbluex.liquidbounce.utils.client.handlePacket
+import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket
+import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket
+import net.minecraft.network.packet.c2s.common.CommonPongC2SPacket
+import net.minecraft.network.packet.s2c.play.EntityDamageS2CPacket
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket
 import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket
-import net.minecraft.util.PlayerInput
+import net.minecraft.util.ActionResult
+import net.minecraft.util.Hand
+import net.minecraft.util.hit.BlockHitResult
 
-internal object VelocityGrimAC : VelocityMode("Heypixel") {
+internal object VelocityGrimAC : VelocityMode("GrimAC") {
+    private var canCancelVelocity = false
+    private var isDelayingPackets = false
+    private var requiresClickAction = false
+    private var awaitingBlockUpdate = false
+    private var awaitingPingResponse = false
+    private var skipNextInteraction = false
+    private var targetBlockHit: BlockHitResult? = null
+    private val queuedPackets = Queues.newConcurrentLinkedQueue<PacketSnapshot>()
+    private var freezeTickCounter = 0
 
-    private val xzMultiple by float("XZMultiple", 0.5f, 0f..1f)
-    private val attackTimes by int("AttackTimes", 5, 0..20, "times")
-
-    private var velocityInput = false
-
-    @Suppress("unused")
-    private val tickHandler = tickHandler {
-        if (protocolVersion.version > 47) {
-            if (player.hurtTime == 0) {
-                velocityInput = false
-            }
-        } else {
-            if (player.hurtTime > 0 && player.isOnGround) {
-                player.addVelocity(-1.3E-10, -1.3E-10, -1.3E-10)
-                player.isSprinting = false
-            }
-        }
+    override fun enable() {
+        canCancelVelocity = false
+        isDelayingPackets = false
+        requiresClickAction = false
+        awaitingBlockUpdate = false
+        awaitingPingResponse = false
+        skipNextInteraction = false
+        targetBlockHit = null
+        queuedPackets.clear()
     }
 
-    @Suppress("unused","ComplexCondition")
-    private val attackEntityEventHandler = handler<AttackEntityEvent> { event ->
-        if (velocityInput
-            && event.entity.isPlayer
-            && player.isAlive
-            && !player.isSpectator
-            && !player.isInFluid
-            && !player.isHoldingOntoLadder
-            && !player.isOnFire
-            && player.fallDistance <= 1.5
-            && player.activeItem.useAction != UseAction.EAT
-            && player.activeItem.useAction != UseAction.DRINK
-        ) {
-            val isSprinting = player.isSprinting
+    override fun disable() {
+        queuedPackets.forEach { handlePacket(it.packet) }
+        queuedPackets.clear()
+    }
 
-            if (!isSprinting) {
-                sendPacketSilently(PlayerInputC2SPacket(PlayerInput(false, false, false, false, false, false, true)))
+    @Suppress("unused")
+    private val packetInterceptor = sequenceHandler<PacketEvent> { event ->
+        val packet = event.packet
+
+        when (packet) {
+            is PlayerInteractEntityC2SPacket, is PlayerInteractBlockC2SPacket -> {
+                skipNextInteraction = true
             }
 
-            repeat(attackTimes) {
-                if (isOlderThanOrEqual1_8) {
-                    player.swingHand(player.activeHand)
-                    sendPacketSilently(PlayerInteractEntityC2SPacket.attack(event.entity, player.isSneaking))
-                } else {
-                    sendPacketSilently(PlayerInteractEntityC2SPacket.attack(event.entity, player.isSneaking))
-                    player.swingHand(player.activeHand)
+            is PlayerMoveC2SPacket -> {
+                if (packet.changesPosition() && awaitingBlockUpdate) {
+                    event.cancelEvent()
                 }
             }
 
-            if (!isSprinting) {
-                sendPacketSilently(PlayerInputC2SPacket(PlayerInput(false, false, false, false, false, false, true)))
+            is CommonPongC2SPacket -> {
+                if (awaitingPingResponse) {
+                    waitTicks(1)
+                    awaitingBlockUpdate = false
+                    awaitingPingResponse = false
+                }
+                return@sequenceHandler
             }
 
-            player.movement.x *= xzMultiple
-            player.movement.z *= xzMultiple
+            is BlockUpdateS2CPacket -> {
+                if (packet.pos == player.blockPos && awaitingBlockUpdate) {
+                    waitTicks(1)
+                    awaitingPingResponse = true
+                    requiresClickAction = false
+                    return@sequenceHandler
+                }
+            }
+
+            is EntityDamageS2CPacket -> {
+                if (packet.entityId == player.id) {
+                    canCancelVelocity = true
+                }
+            }
+
+            is EntityVelocityUpdateS2CPacket -> {
+                if (packet.entityId == player.id && canCancelVelocity) {
+                    event.cancelEvent()
+                    isDelayingPackets = true
+                    canCancelVelocity = false
+                    requiresClickAction = true
+                }
+            }
+
+            is ExplosionS2CPacket -> {
+                if (canCancelVelocity) {
+                    event.cancelEvent()
+                    isDelayingPackets = true
+                    canCancelVelocity = false
+                    requiresClickAction = true
+                }
+            }
+        }
+
+        if (event.isCancelled || event.origin == TransferOrigin.OUTGOING) return@sequenceHandler
+
+        if (awaitingBlockUpdate) return@sequenceHandler
+
+        if (isDelayingPackets) {
+            queuedPackets.add(PacketSnapshot(packet, event.origin, System.currentTimeMillis()))
+            event.cancelEvent()
         }
     }
 
     @Suppress("unused")
-    private val packetEventHandler = handler<PacketEvent> { event ->
-        val packet = event.packet
-
-        if (packet is EntityVelocityUpdateS2CPacket
-            && packet.entityId == player.id
-            && Vec2i(packet.velocityX, packet.velocityZ).length() > 1000
-        ) {
-            velocityInput = true
-            event.cancelEvent()
-            player.movement.y = packet.velocityY.toDouble() / 8000.0
+    private val tickListener = handler<PlayerTickEvent> { event ->
+        if (requiresClickAction) {
+            targetBlockHit = raycast(rotation = Rotation(player.yaw, 90f))
+            val placePos = targetBlockHit?.blockPos?.offset(targetBlockHit!!.side)
+            if (placePos != player.blockPos || skipNextInteraction || player.isUsingItem) {
+                targetBlockHit = null
+            }
         }
 
-        if (packet is ExplosionS2CPacket && protocolVersion.version >= 755) {
-            event.cancelEvent()
-        }
-    }
+        targetBlockHit?.let { hitResult ->
+            isDelayingPackets = false
+            queuedPackets.forEach { handlePacket(it.packet) }
+            queuedPackets.clear()
 
-    override fun enable() {
-        velocityInput = false
+            if (interaction.interactBlock(player, Hand.MAIN_HAND, hitResult) == ActionResult.SUCCESS) {
+                player.swingHand(Hand.MAIN_HAND)
+            }
+
+            if (RotationManager.serverRotation.pitch != 90f) {
+                network.sendPacket(
+                    PlayerMoveC2SPacket.LookAndOnGround(
+                        player.yaw,
+                        90f,
+                        player.isOnGround,
+                        player.horizontalCollision
+                    )
+                )
+            } else {
+                network.sendPacket(
+                    PlayerMoveC2SPacket.OnGroundOnly(
+                        player.isOnGround,
+                        player.horizontalCollision
+                    )
+                )
+            }
+
+            freezeTickCounter = 0
+            awaitingBlockUpdate = true
+            targetBlockHit = null
+            requiresClickAction = false
+        }
+
+        if (awaitingBlockUpdate) {
+            event.cancelEvent()
+            freezeTickCounter++
+            if (freezeTickCounter > 20) {
+                awaitingBlockUpdate = false
+                awaitingPingResponse = false
+                requiresClickAction = false
+            }
+        }
+
+        skipNextInteraction = false
     }
 }
