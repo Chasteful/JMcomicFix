@@ -8,7 +8,7 @@
     import {expoInOut} from "svelte/easing";
     import {fly} from "svelte/transition";
     import {emptySlotCount} from "../island/Island";
-    import Line from "../../common/Line.svelte";
+    import Line from "../../common/Trims/Line.svelte";
 
     let stacks: ItemStack[] = [];
 

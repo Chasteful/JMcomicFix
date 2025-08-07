@@ -5,7 +5,7 @@
     import { listen } from "../../../integration/ws";
     import { expoInOut } from "svelte/easing";
     import { fly } from "svelte/transition";
-    import Line from "../common/Line.svelte";
+    import Line from "../common/Trims/Line.svelte";
 
     type BindModifier = "Shift" | "Control" | "Alt" | "Super";
 

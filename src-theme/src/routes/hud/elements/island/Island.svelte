@@ -27,6 +27,7 @@
     import {get} from 'svelte/store';
     import {calcArmorValue} from "../../../../util/Client/calcArmorValue";
     import {clientName} from "../../../../util/Theme/ThemeManager";
+    import {randomCode,codeGenerator} from "../../common/Font/TS/Garbled";
     import {TimeoutManager} from "../../../../util/Theme/TimeoutManager";
 
     const ALERT_DISPLAY_DURATION_MS = 2500;
@@ -36,6 +37,10 @@
     const ANIMATION_DURATION_MS = 300;
     const DURABILITY_COOLDOWN_MS = 1000;
     const TOTEM_WARNING_COOLDOWN_MS = 5000;
+    const userData = JSON.parse(
+        localStorage.getItem('userSettings') ||
+        JSON.stringify({ username: 'Customer' })
+    );
 
     type AlertType =
         'health' | 'air' | 'blocks' | 'hunger' | 'uniform' | 'totem' |
@@ -77,7 +82,7 @@
     let currentContent: ContentType = 'greeting';
     let nextContent: ContentType | null = null;
     let nextContentWidth = 0;
-    let randomCode = "";
+
     let animationPhase: 'idle' | 'contract' | 'expand' = 'idle';
     let wrapper: HTMLDivElement | null = null;
     let clientInfo: ClientInfo | null = null;
@@ -118,35 +123,6 @@
         time = formatTime(hours, minutes);
     };
 
-    const codeGenerator = {
-        generate: (length = 6): string => {
-            const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ()[]{},;.:/?!§$%*+-АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ";
-            const baseText = userData.username || "Customer";
-            const tick = Date.now();
-            let newText = "";
-
-            for (let i = 0; i < baseText.length; i++) {
-                const char = baseText[i];
-                let pos = 0;
-                for (let k = 0; k < alphabet.length; k++) {
-                    if (alphabet[k] === char) {
-                        pos = (k + i + Math.floor(tick / 40)) % alphabet.length;
-                        break;
-                    }
-                }
-                newText += alphabet[pos];
-            }
-
-            return newText.padEnd(length, alphabet[0]);
-        },
-        start: (intervalMs = 40) => {
-            randomCode = codeGenerator.generate();
-            timeoutManager.set("randomUsername", () => {
-                randomCode = codeGenerator.generate();
-            }, intervalMs);
-        },
-        stop: () => timeoutManager.clear("randomUsername")
-    };
 
     const checkUsernameVisibility = async (): Promise<void> => {
         const modules = await getModules();
@@ -495,19 +471,6 @@
     }
 
 
-    const userData = JSON.parse(
-        localStorage.getItem('userSettings') ||
-        JSON.stringify({
-            username: 'Customer',
-            uid: '',
-            isDev: false,
-            isOwner: false,
-            hwid: '',
-            developer: 'Customer',
-            avatar: ''
-        })
-    );
-
     onMount(() => {
         isMounted = true;
         (async () => {
@@ -612,7 +575,7 @@
                             {#if showUsername}
                                 {userData.username}
                             {:else}
-                                {randomCode}
+                                {$randomCode}
                             {/if}
                         </span>
                         {/if}

@@ -9,7 +9,7 @@
     import {armorDurabilityStore, totemCount} from '../island/Island';
     import {get} from 'svelte/store';
     import ArmorItem from "../../common/ItemView/ArmorItem.svelte";
-    import Line from "../../common/Line.svelte";
+    import Line from "../../common/Trims/Line.svelte";
 
     function createEmptySlot(): ItemStack {
         return {

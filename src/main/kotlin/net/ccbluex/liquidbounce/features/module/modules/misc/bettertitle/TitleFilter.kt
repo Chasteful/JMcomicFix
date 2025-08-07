@@ -1,31 +1,42 @@
+/*
+ * This file is part of LiquidBounce (https://github.com/CCBlueX/LiquidBounce)
+ *
+ * Copyright (c) 2015 - 2025 CCBlueX
+ *
+ * LiquidBounce is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * LiquidBounce is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package net.ccbluex.liquidbounce.features.module.modules.misc.bettertitle
 
 import net.ccbluex.liquidbounce.config.types.nesting.ToggleableConfigurable
 import net.ccbluex.liquidbounce.event.events.TitleEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.modules.misc.ModuleBetterTitle
-import net.ccbluex.liquidbounce.features.module.modules.misc.TitleType
-import net.ccbluex.liquidbounce.utils.client.MessageMetadata
-import net.ccbluex.liquidbounce.utils.client.chat
-import net.ccbluex.liquidbounce.utils.client.getNextCount
 import net.ccbluex.liquidbounce.utils.client.stripMinecraftColorCodes
-import net.minecraft.text.Text
-import net.minecraft.util.Formatting
 
 object TitleFilter : ToggleableConfigurable(ModuleBetterTitle, "TitleFilter", true) {
 
     private var regexFilters = emptySet<Regex>()
-    private val stack by boolean("StackTitles", false)
     private val filters by textList("Filters", mutableListOf()).onChanged {
         compileFilters()
     }
 
     private fun compileFilters() {
-        regexFilters = filters.mapTo(HashSet(filters.size, 1.0f), ::Regex)
+        regexFilters = filters.mapTo(HashSet(filters.size, 1.0f)) { Regex(".*${Regex.escape(it)}.*") }
     }
 
     private inline fun <reified E : TitleEvent.TextContent> filterHandler(
-        type: TitleType
     ) = handler<E> { event ->
         val string = event.text
             ?.string
@@ -33,39 +44,14 @@ object TitleFilter : ToggleableConfigurable(ModuleBetterTitle, "TitleFilter", tr
             ?.takeUnless(String::isBlank)
             ?: return@handler
 
-        if (regexFilters.isNotEmpty() && regexFilters.any { it.matches(string) }) {
+        if (regexFilters.any { it.matches(string) }) {
             event.cancelEvent()
-            return@handler
-        }
-
-        if (stack) {
-            event.cancelEvent()
-
-            val id = "$string-external"
-            val literalText = Text.literal(string)
-
-            val newCount = getNextCount(id)
-            if (newCount > 1) {
-                literalText.append(" ").append(Text.literal("[$newCount]").formatted(Formatting.GRAY))
-            }
-
-            val data = MessageMetadata(prefix = false, id = id, remove = true, count = newCount)
-            chat(
-                texts = arrayOf(
-                    Text.literal(type.choiceName).formatted(Formatting.AQUA),
-                    Text.literal(": ").formatted(Formatting.RESET),
-                    literalText
-                ),
-                metadata = data
-            )
-
-            type.setText(literalText)
         }
     }
 
     @Suppress("unused")
-    val titleFilterHandler = filterHandler<TitleEvent.Title>(TitleType.TITLE)
+    val titleFilterHandler = filterHandler<TitleEvent.Title>()
 
     @Suppress("unused")
-    val subtitleFilterHandler = filterHandler<TitleEvent.Subtitle>(TitleType.SUBTITLE)
+    val subtitleFilterHandler = filterHandler<TitleEvent.Subtitle>()
 }

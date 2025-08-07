@@ -20,10 +20,7 @@ import net.minecraft.util.Hand
 internal object VelocityGrimAttacked : VelocityMode("GrimAttacked") {
 
     private object Settings : ToggleableConfigurable(ModuleVelocity, "Settings", true) {
-        val onlySprint by boolean("OnlySprint", true)
-        val onlyOnGround by boolean("OnlyOnGround", true)
         val attackCounts by int("AttackCounts", 5, 1..16)
-        val keepSprint by boolean("KeepSprint", false)
     }
 
     private var velocityInput = false
@@ -78,8 +75,8 @@ internal object VelocityGrimAttacked : VelocityMode("GrimAttacked") {
                 targetEntity?.let { entity ->
                     attackEntity(
                         entity = entity,
-                        true,
-                         Settings.keepSprint
+                        swing = true,
+                        keepSprint = false
                     )
                 }
 
@@ -95,13 +92,9 @@ internal object VelocityGrimAttacked : VelocityMode("GrimAttacked") {
     }
 
     private fun checkConditions(): Boolean {
-
         if (player.isRemoved) return false
-
-
-        if (Settings.onlySprint && !player.isSprinting) return false
-        if (Settings.onlyOnGround && !player.isOnGround) return false
-
+        if (!player.isSprinting) return false
+        if (!player.isOnGround) return false
 
         val entity = targetEntity ?: return false
         return !(!entity.isAlive || entity.isRemoved)
