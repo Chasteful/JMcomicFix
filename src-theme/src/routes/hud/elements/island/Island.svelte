@@ -120,16 +120,29 @@
 
     const codeGenerator = {
         generate: (length = 6): string => {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?/~`§';
-            return Array.from({length}, () =>
-                chars.charAt(Math.floor(Math.random() * chars.length))
-            ).join('');
+            const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ()[]{},;.:/?!§$%*+-АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ";
+            const baseText = userData.username || "Customer";
+            const tick = Date.now();
+            let newText = "";
+
+            for (let i = 0; i < baseText.length; i++) {
+                const char = baseText[i];
+                let pos = 0;
+                for (let k = 0; k < alphabet.length; k++) {
+                    if (alphabet[k] === char) {
+                        pos = (k + i + Math.floor(tick / 40)) % alphabet.length;
+                        break;
+                    }
+                }
+                newText += alphabet[pos];
+            }
+
+            return newText.padEnd(length, alphabet[0]);
         },
-        start: (intervalMs = 200) => {
+        start: (intervalMs = 40) => {
             randomCode = codeGenerator.generate();
             timeoutManager.set("randomUsername", () => {
                 randomCode = codeGenerator.generate();
-                codeGenerator.start(intervalMs);
             }, intervalMs);
         },
         stop: () => timeoutManager.clear("randomUsername")
