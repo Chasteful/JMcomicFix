@@ -174,14 +174,12 @@ class ItemCategorization(
      * - (SANDSTONE_BLOCK, 64) => `[Block(SANDSTONE_BLOCK, 64)]`
      * - (DIAMOND_AXE, 1) => `[Axe(DIAMOND_AXE, 1), Tool(DIAMOND_AXE, 1)]`
      */
-    @Suppress("CyclomaticComplexMethod", "LongMethod")
+    @Suppress("CyclomaticComplexMethod","CognitiveComplexMethod", "LongMethod")
     fun getItemFacets(slot: ItemSlot): Array<ItemFacet> {
         if (slot.itemStack.isNothing()) {
             return emptyArray()
         }
-        if (slot.itemStack.item is AxeItem && slot.itemStack.sharpnessLevel > 10) {
-            return arrayOf(InstakillAxeFacet(slot))
-        }
+
         val specificItemFacets: Array<ItemFacet> = when (val item = slot.itemStack.item) {
             // Treat animal armor as a normal item
             is AnimalArmorItem -> arrayOf(ItemFacet(slot))
@@ -190,9 +188,18 @@ class ItemCategorization(
             is BowItem -> arrayOf(BowItemFacet(slot))
             is CrossbowItem -> arrayOf(CrossbowItemFacet(slot))
             is ArrowItem -> arrayOf(ArrowItemFacet(slot))
+            is AxeItem -> {
+                if (slot.itemStack.sharpnessLevel > 10) {
+                    arrayOf(InstakillAxeFacet(slot))
+                } else {
+                    arrayOf(MiningToolItemFacet(slot))
+                }
+            }
             is MiningToolItem -> arrayOf(MiningToolItemFacet(slot))
             is FishingRodItem -> arrayOf(RodItemFacet(slot))
             is ShieldItem -> arrayOf(ShieldItemFacet(slot))
+
+
             is BlockItem -> {
                 if (ScaffoldBlockItemSelection.isValidBlock(slot.itemStack)
                     && !ScaffoldBlockItemSelection.isBlockUnfavourable(slot.itemStack)
