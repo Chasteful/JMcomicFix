@@ -38,6 +38,7 @@ import net.minecraft.enchantment.Enchantments
 import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
 import net.minecraft.item.AxeItem
+import net.minecraft.item.Items
 import net.minecraft.item.MaceItem
 import net.minecraft.item.SwordItem
 import net.minecraft.util.Hand
@@ -165,6 +166,14 @@ object ModuleAutoWeapon : ClientModule("AutoWeapon", Category.COMBAT) {
     }
 
     private fun determineWeaponSlot(target: LivingEntity?, enforceShield: Boolean = false): HotbarItemSlot? {
+        val instakillAxe = Slots.Hotbar
+            .firstOrNull {
+                it.itemStack.item == Items.GOLDEN_AXE &&
+                    it.itemStack.getEnchantment(Enchantments.SHARPNESS) > 10
+            }
+        if (instakillAxe is HotbarItemSlot) {
+            return instakillAxe
+        }
         val itemCategorization = ItemCategorization(Slots.Hotbar)
         val blockedByShield = enforceShield || !isOlderThanOrEqual1_8 &&
             target?.blockedByShield(world.damageSources.playerAttack(player)) == true

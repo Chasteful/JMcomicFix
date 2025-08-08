@@ -179,7 +179,9 @@ class ItemCategorization(
         if (slot.itemStack.isNothing()) {
             return emptyArray()
         }
-
+        if (slot.itemStack.item is AxeItem && slot.itemStack.sharpnessLevel > 10) {
+            return arrayOf(InstakillAxeFacet(slot))
+        }
         val specificItemFacets: Array<ItemFacet> = when (val item = slot.itemStack.item) {
             // Treat animal armor as a normal item
             is AnimalArmorItem -> arrayOf(ItemFacet(slot))
