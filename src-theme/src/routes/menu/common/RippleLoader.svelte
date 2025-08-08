@@ -12,7 +12,7 @@
   @use "../../../colors.scss" as *;
 
   .lds-ripple {
-    color: var(--primary-color);
+    color:$text;
   }
 
   .lds-ripple,

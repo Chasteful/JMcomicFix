@@ -63,8 +63,11 @@ object NovolineMode : TargetInfoMode("Novoline") {
 
         val nameWidth = mc.textRenderer.getWidth(entity.name.string) * 0.3f
         val width = 36f + 6f + nameWidth + 64f
-        val x = ModuleTargetInfo.xOffset
-        val y = ModuleTargetInfo.yOffset
+        val scaledWidth = mc.window.scaledWidth
+        val scaledHeight = mc.window.scaledHeight
+
+        val x = scaledWidth * ModuleTargetInfo.xOffsetRatio
+        val y = scaledHeight * ModuleTargetInfo.yOffsetRatio
 
         val bgColor = ModuleTargetInfo.backgroundColor.withAlpha(
             (ModuleTargetInfo.backgroundColor.a * alpha / 255f).toInt())
@@ -73,8 +76,13 @@ object NovolineMode : TargetInfoMode("Novoline") {
         val txtColor = ModuleTargetInfo.textColor.withAlpha((
             ModuleTargetInfo.textColor.a * alpha / 255f).toInt())
 
-        ctx.fill((x - 1).toInt(), (y - 1).toInt(), (x + width + 1).toInt(), (y + 37).toInt(), bdColor.toARGB())
         ctx.fill(x.toInt(), y.toInt(), (x + width).toInt(), (y + 36).toInt(), bgColor.toARGB())
+
+
+        ctx.fill((x - 1).toInt(), (y - 1).toInt(), (x + width + 1).toInt(), y.toInt(), bdColor.toARGB()) // 上
+        ctx.fill((x - 1).toInt(), (y + 36).toInt(), (x + width + 1).toInt(), (y + 37).toInt(), bdColor.toARGB()) // 下
+        ctx.fill((x - 1).toInt(), y.toInt(), x.toInt(), (y + 36).toInt(), bdColor.toARGB()) // 左
+        ctx.fill((x + width).toInt(), y.toInt(), (x + width + 1).toInt(), (y + 36).toInt(), bdColor.toARGB()) // 右
 
         drawHealthBar(ctx, entity, width, x, y)
         drawPlayerHead(ctx, x, y)

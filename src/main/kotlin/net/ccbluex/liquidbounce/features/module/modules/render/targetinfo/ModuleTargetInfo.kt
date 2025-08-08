@@ -19,8 +19,8 @@ object ModuleTargetInfo : ClientModule("TargetInfo", Category.RENDER, aliases = 
             GenericSyncColorMode(it)
         )
     }
-    val xOffset by float("X-Offset", 450f, -1000f..1000f)
-    val yOffset by float("Y-Offset", 250f, -1000f..1000f)
+    val xOffsetRatio by float("X-Offset", 0.55f, 0f..1f)
+    val yOffsetRatio by float("Y-Offset", 0.6f, 0f..1f)
 
 
     val backgroundColor by color("Background", Color4b.DARK_GRAY.withAlpha(125))
