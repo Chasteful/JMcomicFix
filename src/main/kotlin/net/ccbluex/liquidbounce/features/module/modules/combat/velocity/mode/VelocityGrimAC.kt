@@ -1,6 +1,7 @@
 package net.ccbluex.liquidbounce.features.module.modules.combat.velocity.mode
 
 import com.google.common.collect.Queues
+import com.oracle.truffle.api.utilities.MathUtils
 import net.ccbluex.liquidbounce.event.events.PacketEvent
 import net.ccbluex.liquidbounce.event.events.PlayerTickEvent
 import net.ccbluex.liquidbounce.event.events.TransferOrigin
@@ -10,12 +11,16 @@ import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.aiming.data.Rotation
 import net.ccbluex.liquidbounce.utils.aiming.utils.raycast
 import net.ccbluex.liquidbounce.utils.client.PacketSnapshot
+import net.ccbluex.liquidbounce.utils.client.SilentHotbar
 import net.ccbluex.liquidbounce.utils.client.handlePacket
+import net.ccbluex.liquidbounce.utils.inventory.Slots
+import net.minecraft.item.Items
+import net.minecraft.item.SwordItem
+import net.minecraft.network.packet.c2s.common.CommonPongC2SPacket
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket
-import net.minecraft.network.packet.c2s.common.CommonPongC2SPacket
 import net.minecraft.network.packet.s2c.play.EntityDamageS2CPacket
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket
 import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket
@@ -118,9 +123,23 @@ internal object VelocityGrimAC : VelocityMode("GrimAC") {
         }
     }
 
+    private fun switchToEmptyOrWeapon() {
+        val currentItem = player.inventory.mainHandStack.item
+        if (currentItem == Items.FIRE_CHARGE || currentItem == Items.FLINT_AND_STEEL) {
+            val targetSlot = Slots.Hotbar.find { slot ->
+                val stack = slot.itemStack
+                stack.isEmpty || stack.item is SwordItem
+            }
+            targetSlot?.let { SilentHotbar.selectSlotSilently(this, it, 20) }
+        }
+    }
+
     @Suppress("unused")
     private val tickListener = handler<PlayerTickEvent> { event ->
         if (requiresClickAction) {
+            // Switch to empty hand or weapon before block interaction
+            switchToEmptyOrWeapon()
+
             targetBlockHit = raycast(rotation = Rotation(player.yaw, 90f))
             val placePos = targetBlockHit?.blockPos?.offset(targetBlockHit!!.side)
             if (placePos != player.blockPos || skipNextInteraction || player.isUsingItem) {
@@ -133,15 +152,17 @@ internal object VelocityGrimAC : VelocityMode("GrimAC") {
             queuedPackets.forEach { handlePacket(it.packet) }
             queuedPackets.clear()
 
-            if (interaction.interactBlock(player, Hand.MAIN_HAND, hitResult) == ActionResult.SUCCESS) {
-                player.swingHand(Hand.MAIN_HAND)
+            interaction?.interactBlock(player, Hand.MAIN_HAND, hitResult)?.let {
+                if (it == ActionResult.SUCCESS) {
+                    player.swingHand(Hand.MAIN_HAND)
+                }
             }
 
             if (RotationManager.serverRotation.pitch != 90f) {
                 network.sendPacket(
                     PlayerMoveC2SPacket.LookAndOnGround(
-                        player.yaw,
-                        90f,
+                        player.yaw - (Math.random() * (0.004 - 0.002)).toFloat(),
+                        89.1f + (Math.random() * (90.0 - 89.1)).toFloat() - (Math.random() * (1.0 - 0.002)).toFloat(),
                         player.isOnGround,
                         player.horizontalCollision
                     )

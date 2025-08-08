@@ -136,7 +136,7 @@ data class PlayerData(
             player.mainHandStack,
             if (shouldHideOffhand(player = player) && hideShieldSlot) ItemStack.EMPTY else player.offHandStack,
             player.armorItems.toList(),
-            if (mc.player == player) ScoreboardData.fromScoreboard(player.scoreboard) else null,
+            if (mc.player === player) ScoreboardData.fromScoreboard(player.scoreboard) else null,
             KilledTarget.killsCount,
             updateDeathCount(player),
             player.isDead,
@@ -168,7 +168,9 @@ data class PlayerData(
 data class PlayerInventoryData(
     val armor: List<ItemStack>,
     val main: List<ItemStack>,
-    val crafting: List<ItemStack>
+    val crafting: List<ItemStack>,
+    val enderChest: List<ItemStack>,
+    val openChest: List<ItemStack>,
 ) {
 
     companion object {
@@ -176,14 +178,26 @@ data class PlayerInventoryData(
         fun fromPlayer(player: PlayerEntity) = PlayerInventoryData(
             armor = player.inventory.armor.map(ItemStack::copy),
             main = player.inventory.main.map(ItemStack::copy),
-            crafting = player.playerScreenHandler.craftingInput.heldStacks.map(ItemStack::copy)
+            crafting = player.playerScreenHandler.craftingInput.heldStacks.map(ItemStack::copy),
+            enderChest = player.enderChestInventory.heldStacks.map(ItemStack::copy),
+            openChest = player.currentScreenHandler.let { handler ->
+                if (handler !== player.playerScreenHandler) {
+                    val containerSize = handler.slots.size - 36
+                    handler.slots.subList(0, containerSize).map { it.stack.copy() }
+                } else emptyList()
+            }
+
         )
+
     }
+    private infix fun List<ItemStack>.eq(other: List<ItemStack>) =
+        this.size == other.size && this.indices.all { ItemStack.areEqual(this[it], other[it]) }
 
     override fun hashCode(): Int {
         var result = armor.hashCode()
         result = 31 * result + main.hashCode()
         result = 31 * result + crafting.hashCode()
+        result = 31 * result + enderChest.hashCode()
         return result
     }
 
@@ -193,29 +207,8 @@ data class PlayerInventoryData(
 
         other as PlayerInventoryData
 
-        if (armor.size != other.armor.size) return false
-        if (main.size != other.main.size) return false
-        if (crafting.size != other.crafting.size) return false
-
-        for (i in armor.indices) {
-            if (!ItemStack.areEqual(armor[i], other.armor[i])) {
-                return false
-            }
-        }
-
-        for (i in main.indices) {
-            if (!ItemStack.areEqual(main[i], other.main[i])) {
-                return false
-            }
-        }
-
-        for (i in crafting.indices) {
-            if (!ItemStack.areEqual(crafting[i], other.crafting[i])) {
-                return false
-            }
-        }
-
-        return true
+        return armor eq other.armor && main eq other.main &&
+            crafting eq other.crafting && enderChest eq other.enderChest
     }
 
 }

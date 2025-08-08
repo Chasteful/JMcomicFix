@@ -163,6 +163,8 @@ export interface PlayerInventory  extends Event {
     armor: ItemStack[];
     main: ItemStack[];
     crafting: ItemStack[];
+    enderChest: ItemStack[];
+    openChest: ItemStack[];
 }
 
 export interface ProxyAdditionResultEvent extends Event  {

@@ -12,6 +12,7 @@ import net.ccbluex.liquidbounce.utils.block.getBlock
 import net.ccbluex.liquidbounce.utils.block.getState
 import net.ccbluex.liquidbounce.utils.client.sendPacketSilently
 import net.ccbluex.liquidbounce.utils.combat.CombatManager
+import net.ccbluex.liquidbounce.utils.movement.DirectionalInput
 import net.minecraft.item.Items
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket
@@ -56,6 +57,12 @@ object ModuleAutoStuck : ClientModule("AutoStuck", Category.WORLD) {
             player.movement.x = 0.0
             player.movement.y = 0.0
             player.movement.z = 0.0
+            it.directionalInput = DirectionalInput(
+                forwards = false,
+                backwards = false,
+                left = false,
+                right = false
+            )
         }
     }
 

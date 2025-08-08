@@ -2,33 +2,34 @@
     import {onDestroy, onMount, tick} from "svelte";
     import {fade} from "svelte/transition";
     import {
-        getSession,
+        getClientInfo,
         getModules,
         getPlayerData,
-        getClientInfo
+        getPlayerInventory,
+        getSession
     } from "../../../../integration/rest";
-    import type {ClientInfo} from "../../../../integration/types";
-    import type {ClientPlayerDataEvent} from "../../../../integration/events";
+    import type {ClientInfo, ItemStack, PlayerData, Session} from "../../../../integration/types";
+    import type {ClientPlayerDataEvent, PlayerInventoryEvent,} from "../../../../integration/events";
     import {listen} from "../../../../integration/ws";
-    import type {Session, PlayerData} from "../../../../integration/types";
     import {tweened} from "svelte/motion";
     import {cubicOut} from "svelte/easing";
     import {
-        blockCount,
-        armorValue,
-        armorThreshold,
-        DURABILITY_RECOVERY,
-        totemCount,
         armorDurabilityStore,
-        emptySlotCount,
+        armorThreshold,
+        armorValue,
+        blockCount,
+        DURABILITY_RECOVERY,
         DURABILITY_THRESHOLD,
-        targetId
+        emptySlotCount,
+        targetId,
+        totemCount
     } from './Island';
     import {get} from 'svelte/store';
     import {calcArmorValue} from "../../../../util/Client/calcArmorValue";
     import {clientName} from "../../../../util/Theme/ThemeManager";
-    import {randomCode,codeGenerator} from "../../common/Font/TS/Garbled";
+    import {codeGenerator, randomCode} from "../../common/Font/TS/Garbled";
     import {TimeoutManager} from "../../../../util/Theme/TimeoutManager";
+    import ItemStackView from "../../common/ItemView/ItemStackView.svelte";
 
     const ALERT_DISPLAY_DURATION_MS = 2500;
     const INVENTORY_FULL_COOLDOWN_MS = 30000;
@@ -39,7 +40,7 @@
     const TOTEM_WARNING_COOLDOWN_MS = 5000;
     const userData = JSON.parse(
         localStorage.getItem('userSettings') ||
-        JSON.stringify({ username: 'Customer' })
+        JSON.stringify({username: 'Customer'})
     );
 
     type AlertType =
@@ -82,7 +83,7 @@
     let currentContent: ContentType = 'greeting';
     let nextContent: ContentType | null = null;
     let nextContentWidth = 0;
-
+    let openChest: ItemStack[] = [];
     let animationPhase: 'idle' | 'contract' | 'expand' = 'idle';
     let wrapper: HTMLDivElement | null = null;
     let clientInfo: ClientInfo | null = null;
@@ -417,10 +418,13 @@
     const updateAllData = async (): Promise<void> => {
         const newData = await getPlayerData();
         if (!newData) return;
+        const inventory = await getPlayerInventory();
+        openChest = inventory.openChest ?? [];
         session = await getSession();
         await checkUsernameVisibility();
         updateTime();
         timeLoaded = true;
+
         await updateClientInfo();
         await updatePlayerData();
     };
@@ -514,6 +518,9 @@
 
         playerData = newData;
     });
+    listen("clientPlayerInventory", (data: PlayerInventoryEvent) => {
+        openChest = data.inventory.openChest ?? [];
+    });
 </script>
 {#if loaded}
     <div class="dynamic-island-container">
@@ -560,6 +567,14 @@
 
 
                     </div>
+                 <!-- 有时间再写
+                {:else if openChest.length > 0}
+                    <div class="chest-stealing">
+                        {#each openChest as stack (stack)}
+                            <ItemStackView {stack}/>
+                        {/each}
+                    </div>
+                    -->
                 {:else}
                     <div class="status-content"
                          in:fade={{ duration: 150 }}
