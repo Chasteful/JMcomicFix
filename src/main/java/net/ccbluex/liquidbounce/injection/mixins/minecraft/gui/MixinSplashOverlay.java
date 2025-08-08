@@ -3,9 +3,8 @@ package net.ccbluex.liquidbounce.injection.mixins.minecraft.gui;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
-import net.ccbluex.liquidbounce.common.ClientLogoTexture;
+import net.ccbluex.liquidbounce.common.BackgroundTexture;
 import net.ccbluex.liquidbounce.common.RenderLayerExtensions;
-import net.ccbluex.liquidbounce.common.SoundLoader;
 import net.ccbluex.liquidbounce.event.EventManager;
 import net.ccbluex.liquidbounce.event.events.ScreenRenderEvent;
 import net.ccbluex.liquidbounce.features.misc.HideAppearance;
@@ -36,7 +35,7 @@ public class MixinSplashOverlay {
 
     @Inject(method = "init", at = @At("RETURN"))
     private static void initializeTexture(TextureManager textureManager, CallbackInfo ci) {
-        textureManager.registerTexture(ClientLogoTexture.CLIENT_LOGO, new ClientLogoTexture());
+        textureManager.registerTexture(BackgroundTexture.CLIENT_LOGO, new BackgroundTexture());
     }
 
     @Inject(method = "render", at = @At("RETURN"))
@@ -65,12 +64,12 @@ public class MixinSplashOverlay {
 
         int screenWidth = context.getScaledWindowWidth();
         int screenHeight = context.getScaledWindowHeight();
-        int textureWidth = ClientLogoTexture.WIDTH;
-        int textureHeight = ClientLogoTexture.HEIGHT;
+        int textureWidth = BackgroundTexture.WIDTH;
+        int textureHeight = BackgroundTexture.HEIGHT;
 
         context.drawTexture(
                 RenderLayerExtensions::getSmoothTextureLayer,
-                ClientLogoTexture.CLIENT_LOGO,
+                BackgroundTexture.CLIENT_LOGO,
                 0, 0, 0.0F, 0.0F,
                 screenWidth, screenHeight,
                 textureWidth, textureHeight,
@@ -88,20 +87,6 @@ public class MixinSplashOverlay {
     )
     private void redirectProgressBarFill(DrawContext instance, int x1, int y1, int x2, int y2, int color) {
 
-        int alpha = (color >> 24) & 0xFF;
-        int blackColor = (alpha << 24);
-        instance.fill(x1, y1, x2, y2, blackColor);
-    }
-    @Inject(
-            method = "render",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/resource/ResourceReload;throwException()V",
-                    shift = At.Shift.BEFORE
-            )
-    )
-    private void onReloadComplete(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        SoundLoader.tryPlay();
     }
 
     @ModifyExpressionValue(method = "render", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screen/SplashOverlay;BRAND_ARGB:Ljava/util/function/IntSupplier;"))

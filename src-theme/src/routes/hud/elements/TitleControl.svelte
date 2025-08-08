@@ -1,70 +1,19 @@
 <script lang="ts">
     import {fade} from "svelte/transition";
     import {listen} from "../../../integration/ws";
-    import type {ClickGuiValueChangeEvent, OverlayTitleEvent} from "../../../integration/events";
+    import type { OverlayTitleEvent} from "../../../integration/events";
     import TextComponent from "../../menu/common/TextComponent.svelte";
     import {TimeoutManager} from "../../../util/Theme/TimeoutManager";
-    import type {
-        ConfigurableSetting,
-        TextArraySetting,
-        TextComponent as TTextComponent
-    } from "../../../integration/types";
-    import {getModules, getModuleSettings} from "../../../integration/rest";
-    import {onMount} from "svelte";
 
     let OverlayTitle: OverlayTitleEvent | null = null;
     const timeouts = new TimeoutManager();
     const OVERLAY_TIMEOUT = 3000;
-    let shouldFilter = false;
-    let filterKeywords: string[] = [];
-
-    async function checkShouldFilter(): Promise<void> {
-        const modules = await getModules();
-        shouldFilter = modules.some(module =>
-            module.name === "TitleControl" && module.enabled
-        );
-    }
-
-    function isTextArraySetting(configurable: ConfigurableSetting) {
-        const keywordsSetting = configurable.value.find(v => v.name === "Keywords") as TextArraySetting;
-        filterKeywords = keywordsSetting?.value ?? [];
-    }
-
-    function FilterText(component: TTextComponent | string | undefined): boolean {
-        if (!component || !shouldFilter) return false;
-
-        const extractText = (c: TTextComponent | string): string => {
-            if (typeof c === "string") return c;
-            let result = c.text ?? "";
-            if (Array.isArray(c.extra)) {
-                for (const child of c.extra) {
-                    result += extractText(child);
-                }
-            }
-            return result;
-        };
-
-        const flatText = extractText(component).toLowerCase();
-        return filterKeywords.some(keyword =>
-            flatText.includes(keyword.toLowerCase())
-        );
-    }
 
     listen("overlayTitle", (event: OverlayTitleEvent) => {
-        if (FilterText(event.title) || FilterText(event.subtitle)) return;
-
         OverlayTitle = event;
         timeouts.set("overlay", () => OverlayTitle = null, OVERLAY_TIMEOUT);
     });
 
-    onMount(async () => {
-        await checkShouldFilter();
-        const TitleControlSettings = await getModuleSettings("TitleControl");
-        isTextArraySetting(TitleControlSettings);
-    });
-    listen("titleControlValueChange", (e: ClickGuiValueChangeEvent) => {
-        isTextArraySetting(e.configurable);
-    });
 </script>
 <div class="overlay-container">
     {#if OverlayTitle}

@@ -12,7 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 public class SoundLoader {
-    private static final Logger LOGGER = LoggerFactory.getLogger("Crash Pipe");
+    private static final Logger LOGGER = LoggerFactory.getLogger("Crash Sound");
     private static final Path SOUND = FabricLoader.getInstance().getConfigDir().resolve("resources/liquidbounce/sound/crash.wav");
     private static Clip clip;
 

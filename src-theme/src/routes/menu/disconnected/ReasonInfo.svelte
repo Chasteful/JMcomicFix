@@ -12,6 +12,7 @@
 
     let showMessage = true;
 
+
     function getLines(input: TTextComponent | string): (TTextComponent | string)[] {
         if (typeof input === "string") {
             return input.split("\n");
@@ -30,7 +31,32 @@
         const evtClone = {...event, info: event.info};
         overlayDisconnection.set(evtClone);
         showMessage = true;
+
+        function extractText(component: TTextComponent): string {
+            let result = component.text ?? "";
+            if (Array.isArray(component.extra)) {
+                for (const child of component.extra) {
+                    if (typeof child !== "string") {
+                        result += extractText(child);
+                    }
+                }
+            }
+            return result;
+        }
+
+        const text = typeof event.info === "string" ? event.info : extractText(event.info);
+        if (/banned|封禁/i.test(text)) {
+            const banned = new Howl({
+                src: ['audio/banned.ogg'],
+                preload: true,
+                onload: () => {
+                    banned.play();
+                },
+            });
+        }
     });
+
+
 </script>
 
 {#if $overlayDisconnection && showMessage}

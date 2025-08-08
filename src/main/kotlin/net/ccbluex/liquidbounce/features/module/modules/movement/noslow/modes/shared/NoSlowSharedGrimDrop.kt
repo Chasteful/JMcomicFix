@@ -8,7 +8,7 @@ import net.ccbluex.liquidbounce.utils.entity.moving
 import net.minecraft.util.Hand
 import net.minecraft.item.consume.UseAction
 
-internal class NoSlowSharedGrimDrop (override val parent: ChoiceConfigurable<*>) : Choice("Heypixel") {
+internal class NoSlowSharedGrimDrop (override val parent: ChoiceConfigurable<*>) : Choice("GrimDrop") {
 
     private var dropped = false
 
