@@ -184,7 +184,9 @@ data class PlayerInventoryData(
                 if (handler !== player.playerScreenHandler) {
                     val containerSize = handler.slots.size - 36
                     handler.slots.subList(0, containerSize).map { it.stack.copy() }
-                } else emptyList()
+                } else {
+                    emptyList()
+                }
             }
 
         )

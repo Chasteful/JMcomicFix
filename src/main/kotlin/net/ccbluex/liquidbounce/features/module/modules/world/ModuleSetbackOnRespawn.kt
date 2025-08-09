@@ -11,7 +11,7 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket
 import java.security.SecureRandom
 import java.util.concurrent.ThreadLocalRandom
 
-object SetbackOnRespawn : ClientModule("SetbackOnRespawn", Category.WORLD) {
+object ModuleSetbackOnRespawn : ClientModule("SetbackOnRespawn", Category.WORLD) {
 
     val modes = choices(
         "Mode", Intave1308, arrayOf(
