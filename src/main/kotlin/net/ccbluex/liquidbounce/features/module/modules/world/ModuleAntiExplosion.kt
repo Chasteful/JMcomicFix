@@ -1,3 +1,5 @@
+@file:Suppress("TooManyFunction","NestedBlockDepth")
+
 package net.ccbluex.liquidbounce.features.module.modules.world
 
 import net.ccbluex.liquidbounce.event.events.NotificationEvent
@@ -81,7 +83,9 @@ object ModuleAntiExplosion : ClientModule("AntiExplosion", Category.WORLD) {
         val placementTarget = findBestBlockPlacementTarget(
             targetPos,
             BlockPlacementTargetFindingOptions(
-                BlockOffsetOptions(listOf(Vec3i.ZERO), BlockPlacementTargetFindingOptions.PRIORITIZE_LEAST_BLOCK_DISTANCE),
+                BlockOffsetOptions(
+                    listOf(Vec3i.ZERO),
+                    BlockPlacementTargetFindingOptions.PRIORITIZE_LEAST_BLOCK_DISTANCE),
                 FaceHandlingOptions(CenterTargetPositionFactory),
                 stackToPlaceWith = blockSlot.itemStack,
                 PlayerLocationOnPlacement(position = player.pos)

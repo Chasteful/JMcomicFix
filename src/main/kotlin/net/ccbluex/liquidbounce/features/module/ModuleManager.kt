@@ -310,6 +310,7 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleAntiCheatDetect,
             ModuleEasyPearl,
             ModuleNoBooks,
+            ModuleAutoReport,
             ModuleBetterTitle,
 
 
@@ -464,6 +465,7 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleHoleFiller,
             ModuleSetbackOnRespawn,
             ModuleAntiExplosion,
+
             // Client
             ModuleAutoConfig,
             ModuleRichPresence,
