@@ -312,6 +312,7 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleNoBooks,
             ModuleBetterTitle,
 
+
            // Movement
             ModuleAirJump,
             ModuleAntiBounce,
@@ -436,7 +437,8 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleParticleCosmetics,
             ModulePenisESP,
             ModuleTargetInfo,
-                // World
+
+            // World
             ModuleAutoBuild,
             ModuleAutoDisable,
             ModuleAutoFarm,
@@ -461,7 +463,7 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModulePacketMine,
             ModuleHoleFiller,
             ModuleSetbackOnRespawn,
-
+            ModuleAntiExplosion,
             // Client
             ModuleAutoConfig,
             ModuleRichPresence,
