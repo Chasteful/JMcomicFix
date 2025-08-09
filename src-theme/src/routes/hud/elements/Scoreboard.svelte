@@ -7,7 +7,7 @@
     import type { ClientPlayerDataEvent } from "../../../integration/events";
     import { scoreboardIP } from "../../../util/Theme/ThemeManager";
     import Modules from "./arrayList/Modules.svelte";
-    import GradientAnimatedText from "../common/Font/GradientAnimatedText.svelte";
+    import GradientAnimatedText from "../common/FontRenderer/GradientAnimatedText.svelte";
 
     let scoreboard: Scoreboard | null = null;
     listen("clientPlayerData", (e: ClientPlayerDataEvent) => {

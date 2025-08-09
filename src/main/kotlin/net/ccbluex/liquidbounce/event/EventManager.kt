@@ -155,6 +155,7 @@ val ALL_EVENT_CLASSES: Array<KClass<out Event>> = arrayOf(
     TitleEvent.Fade::class,
     TitleEvent.Clear::class,
     ProgressEvent::class,
+    NameProtectEvent::class,
 )
 
 /**

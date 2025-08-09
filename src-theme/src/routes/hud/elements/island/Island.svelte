@@ -3,13 +3,13 @@
     import {fade} from "svelte/transition";
     import {
         getClientInfo,
-        getModules,
+        getModuleSettings,
         getPlayerData,
         getPlayerInventory,
         getSession
     } from "../../../../integration/rest";
     import type {ClientInfo, ItemStack, PlayerData, Session} from "../../../../integration/types";
-    import type {ClientPlayerDataEvent, PlayerInventoryEvent,} from "../../../../integration/events";
+    import type {ClientPlayerDataEvent, PlayerInventoryEvent, ProgressEvent,} from "../../../../integration/events";
     import {listen} from "../../../../integration/ws";
     import {tweened} from "svelte/motion";
     import {cubicOut} from "svelte/easing";
@@ -27,7 +27,14 @@
     import {get} from 'svelte/store';
     import {calcArmorValue} from "../../../../util/Client/calcArmorValue";
     import {clientName} from "../../../../util/Theme/ThemeManager";
-    import {codeGenerator, randomCode} from "../../common/Font/TS/Garbled";
+    import {
+        checkUsernameVisibility,
+        nameProtect,
+        NameProtectSetting,
+        randomCode,
+        showUsername,
+        useGarbled
+    } from "../../../../util/Theme/NameProtectManager";
     import {TimeoutManager} from "../../../../util/Theme/TimeoutManager";
     import ItemStackView from "../../common/ItemView/ItemStackView.svelte";
 
@@ -57,10 +64,13 @@
 
     let lastTotemCount = 0;
     let totemWarningCooldown = false;
+
     let alertState: AlertState = 'hidden';
     let session: Session | null = null;
+
+    let progressEvent: ProgressEvent | null = null;
     let playerData: PlayerData | null = null;
-    let showUsername = false;
+
     let currentAlert: Alert | null = null;
     let alertHideTimeoutId: ReturnType<typeof setTimeout> | null = null;
     let lastInventoryFullAlertTime = 0;
@@ -124,15 +134,6 @@
         time = formatTime(hours, minutes);
     };
 
-    const checkUsernameVisibility = async (): Promise<void> => {
-        const modules = await getModules();
-        showUsername = modules.some(module =>
-            module.name === "NameProtect" && !module.enabled
-        );
-
-        if (!showUsername) codeGenerator.start();
-        else codeGenerator.stop();
-    };
 
     const clearAlertState = (): void => {
         if (alertHideTimeoutId) {
@@ -417,12 +418,15 @@
         const inventory = await getPlayerInventory();
         openChest = inventory.openChest ?? [];
         session = await getSession();
-        await checkUsernameVisibility();
+
         updateTime();
         timeLoaded = true;
 
         await updateClientInfo();
         await updatePlayerData();
+        await checkUsernameVisibility();
+        const settings = await getModuleSettings("NameProtect");
+        NameProtectSetting(settings);
     };
 
     const handleInitialAnimationEnd = async () => {
@@ -477,7 +481,7 @@
         chestMeasured = true;
     }
 
-    $: if (openChest.length > 0 && currentContent !== 'alert' && !initialAnimation) {
+    $: if (openChest.length > 0 && currentContent !== 'alert' && !initialAnimation && progressEvent?.title === "ChestStealer") {
         switchContent('chest');
     } else if (openChest.length === 0 && currentContent === 'chest' && !initialAnimation) {
         switchContent('status');
@@ -507,7 +511,15 @@
         timeoutManager.clearAll();
         if (eatingAnimationFrame) cancelAnimationFrame(eatingAnimationFrame);
     });
+    listen("progress", (e: ProgressEvent) => {
+        progressEvent = e;
 
+        if (e.progress >= e.maxProgress) {
+            setTimeout(() => {
+                progressEvent = null;
+            }, 100);
+        }
+    });
     listen("playerData", async (event: ClientPlayerDataEvent) => {
         const newData = event.playerData;
         if (newData.armorItems) newData.armor = calcArmorValue(newData.armorItems);
@@ -528,6 +540,10 @@
     });
     listen("clientPlayerInventory", (data: PlayerInventoryEvent) => {
         openChest = data.inventory.openChest ?? [];
+    });
+    listen("nameProtect", async () => {
+        const settings = await getModuleSettings("NameProtect");
+        NameProtectSetting(settings);
     });
 </script>
 {#if loaded}
@@ -594,11 +610,13 @@
                             <span class="fps">{clientInfo.fps}fps</span>
                             <div class="separator"></div>
                             <span class="username">
-                                {#if showUsername}
-                                    {userData.username}
-                                {:else}
-                                    {$randomCode}
-                                {/if}
+                              {#if $showUsername && session}
+                                  {session.username}
+                              {:else if $useGarbled}
+                                  {$randomCode}
+                              {:else}
+                                  {$nameProtect}
+                              {/if}
                             </span>
                         {/if}
                     </div>
@@ -607,6 +625,7 @@
         </div>
     </div>
 {/if}
+
 <style lang="scss">
   @import "../../../../colors";
 

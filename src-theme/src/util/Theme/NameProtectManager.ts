@@ -1,25 +1,9 @@
-/*
- * This file is part of LiquidBounce (https://github.com/CCBlueX/LiquidBounce)
- *
- * Copyright (c) 2015 - 2025 CCBlueX
- *
- * LiquidBounce is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * LiquidBounce is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
- */
-
-import { writable } from "svelte/store";
-import {TimeoutManager} from "../../../../../util/Theme/TimeoutManager";
-
+import {TimeoutManager} from "./TimeoutManager";
+import type {ConfigurableSetting, TextSetting, TogglableSetting} from "../../integration/types";
+import {getModules, getModuleSettings} from "../../integration/rest";
+import { writable, get} from "svelte/store";
+import {onMount} from "svelte";
+import {listen} from "../../integration/ws";
 
 const timeoutManager = new TimeoutManager();
 const userData = JSON.parse(
@@ -28,6 +12,9 @@ const userData = JSON.parse(
         username: 'Customer',
     })
 );
+export const showUsername= writable<boolean>(false);
+export const nameProtect = writable<string>("");
+export const useGarbled = writable<boolean>(false);
 export const randomCode = writable<string>("");
 
 export const codeGenerator = {
@@ -58,4 +45,18 @@ export const codeGenerator = {
         }, intervalMs);
     },
     stop: () => timeoutManager.clear("randomUsername")
+};
+export function NameProtectSetting(configurable: ConfigurableSetting) {
+    const Replacement = configurable.value.find(v => v.name === "Replacement") as TextSetting;
+    nameProtect.set(Replacement?.value ?? "Customer");
+    useGarbled.set(configurable?.value.find(v => v.name === "Garbled")?.value as boolean ?? false);
+}
+export const checkUsernameVisibility = async (): Promise<void> => {
+    const modules = await getModules();
+    showUsername.set(modules.some(module =>
+        module.name === "NameProtect" && !module.enabled
+    ));
+
+    if (!get(showUsername)) codeGenerator.start();
+    else codeGenerator.stop();
 };

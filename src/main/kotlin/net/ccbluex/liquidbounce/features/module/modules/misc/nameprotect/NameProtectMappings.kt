@@ -61,15 +61,19 @@ class NameProtectMappings {
         val currentMapping = HashMap<String, MappingData>(otherPlayers.size + friendMappings.size)
 
         otherPlayers.subList(0, 200.coerceAtMost(otherPlayers.size)).forEach { playerName ->
-            // Prevent DoS attacks
-            if (playerName.length !in 3..20) {
-                return@forEach
-            }
+            if (playerName.length !in 3..20) return@forEach
 
             val rng = getEntropySourceFrom(playerName)
 
-            currentMapping[playerName] = MappingData(randomUsername(16, rng), coloringInfo.otherPlayers)
+            val newName = if (ModuleNameProtect.ReplaceOthers.othersApplyGarbled) {
+                ModuleNameProtect.getGarbledName(playerName)
+            } else {
+                randomUsername(16, rng)
+            }
+
+            currentMapping[playerName] = MappingData(newName, coloringInfo.otherPlayers)
         }
+
 
         friendMappings.forEach { (name, replacement) ->
             currentMapping[name] = MappingData(replacement, coloringInfo.friends)

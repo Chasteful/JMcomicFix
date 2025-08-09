@@ -108,7 +108,6 @@ function updateCssVariables(colors: ThemeColors): void {
 }
 
 function updateColorsFromSettings(settings: ConfigurableSetting): void {
-
     const Replacement1 = settings.value.find((v) => v.name === 'ClientName') as TextSetting
         clientName.set(Replacement1?.value ?? "");
     const Replacement2 = settings.value.find((v) => v.name === 'ScoreboardIP') as TextSetting
@@ -139,5 +138,6 @@ function updateColorsFromSettings(settings: ConfigurableSetting): void {
 listen("hudValueChange", (e: ClickGuiValueChangeEvent) => {
     updateColorsFromSettings(e.configurable);
 });
+
 loadInitialColors().catch(console.error);
 

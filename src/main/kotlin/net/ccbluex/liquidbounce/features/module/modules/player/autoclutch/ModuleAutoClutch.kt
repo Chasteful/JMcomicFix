@@ -3,7 +3,6 @@ package net.ccbluex.liquidbounce.features.module.modules.player.autoclutch
 
 import com.mojang.blaze3d.systems.RenderSystem
 import com.viaversion.viaversion.api.minecraft.Vector3f
-import net.ccbluex.liquidbounce.features.module.modules.player.ModuleAutoStuck
 import net.ccbluex.liquidbounce.config.types.NamedChoice
 import net.ccbluex.liquidbounce.event.events.*
 import net.ccbluex.liquidbounce.event.handler
@@ -12,6 +11,7 @@ import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.features.module.modules.movement.ModuleAirJump
 import net.ccbluex.liquidbounce.features.module.modules.movement.ModuleFreeze
 import net.ccbluex.liquidbounce.features.module.modules.movement.fly.ModuleFly
+import net.ccbluex.liquidbounce.features.module.modules.player.ModuleAutoStuck
 import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.ModuleScaffold
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.ccbluex.liquidbounce.render.renderEnvironmentForWorld
@@ -19,6 +19,7 @@ import net.ccbluex.liquidbounce.render.withDisabledCull
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.aiming.RotationsConfigurable
 import net.ccbluex.liquidbounce.utils.aiming.data.Rotation
+import net.ccbluex.liquidbounce.utils.client.SilentHotbar
 import net.ccbluex.liquidbounce.utils.client.notification
 import net.ccbluex.liquidbounce.utils.client.sendPacketSilently
 import net.ccbluex.liquidbounce.utils.combat.CombatManager
@@ -94,6 +95,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     private val allowClutchWithStuck by boolean("AllowClutchWithStuck", true)
     private val checkHeadSpace by boolean("EnsureHeadSpace", true)
     private val playerTrajectory by boolean("PlayerTrajectory", true)
+    private val advanceSwitch by boolean("AdvanceSwitch", true)
     private val onlyDuringCombat by boolean("OnlyDuringCombat", false)
 
     private val defaultUnsafeBlocks = setOf(
@@ -554,8 +556,11 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
 
     private fun findPearl() {
         val startTime = System.currentTimeMillis()
-        val pearlSlot = Slots.OffhandWithHotbar.findSlot(Items.ENDER_PEARL)?.hotbarSlotForServer
-        if (pearlSlot == null) {
+        val pearlSlot = Slots.Hotbar
+            .firstOrNull {
+                it.itemStack.item == Items.ENDER_PEARL
+            }
+        if (pearlSlot !is HotbarItemSlot) {
             state = State.IDLE
             return
         }
@@ -901,6 +906,10 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
                 }
 
                 if (RotationManager.serverRotation.angleTo(sol) <= aimPrecision) {
+                    if (advanceSwitch) {
+                        val pearlSlot = Slots.OffhandWithHotbar.findSlot(Items.ENDER_PEARL)?.hotbarSlotForServer
+                        pearlSlot?.let { SilentHotbar.selectSlotSilently(this, it, 5) }
+                    }
                     state = State.THROWING
                 }
             } ?: run {

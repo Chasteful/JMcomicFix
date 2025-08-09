@@ -1,4 +1,4 @@
-@file:Suppress("TooManyFunction","NestedBlockDepth")
+@file:Suppress("TooManyFunctions","NestedBlockDepth")
 
 package net.ccbluex.liquidbounce.features.module.modules.world
 

@@ -1,7 +1,6 @@
 package net.ccbluex.liquidbounce.features.module.modules.combat.velocity.mode
 
 import com.google.common.collect.Queues
-import com.oracle.truffle.api.utilities.MathUtils
 import net.ccbluex.liquidbounce.event.events.PacketEvent
 import net.ccbluex.liquidbounce.event.events.PlayerTickEvent
 import net.ccbluex.liquidbounce.event.events.TransferOrigin
@@ -13,9 +12,12 @@ import net.ccbluex.liquidbounce.utils.aiming.utils.raycast
 import net.ccbluex.liquidbounce.utils.client.PacketSnapshot
 import net.ccbluex.liquidbounce.utils.client.SilentHotbar
 import net.ccbluex.liquidbounce.utils.client.handlePacket
+import net.ccbluex.liquidbounce.utils.inventory.InventoryManager
 import net.ccbluex.liquidbounce.utils.inventory.Slots
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
 import net.minecraft.item.Items
 import net.minecraft.item.SwordItem
+import net.minecraft.item.consume.UseAction
 import net.minecraft.network.packet.c2s.common.CommonPongC2SPacket
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket
@@ -28,6 +30,7 @@ import net.minecraft.util.ActionResult
 import net.minecraft.util.Hand
 import net.minecraft.util.hit.BlockHitResult
 
+@Suppress("all")
 internal object VelocityGrimAC : VelocityMode("GrimAC") {
     private var canCancelVelocity = false
     private var isDelayingPackets = false
@@ -104,7 +107,12 @@ internal object VelocityGrimAC : VelocityMode("GrimAC") {
             }
 
             is ExplosionS2CPacket -> {
-                if (canCancelVelocity) {
+                if (canCancelVelocity
+                    && player.activeItem.useAction != UseAction.EAT
+                    && player.activeItem.useAction != UseAction.DRINK
+                    && !InventoryManager.isInventoryOpen
+                    && mc.currentScreen !is GenericContainerScreen
+                ) {
                     event.cancelEvent()
                     isDelayingPackets = true
                     canCancelVelocity = false

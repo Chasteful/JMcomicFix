@@ -19,7 +19,9 @@
 package net.ccbluex.liquidbounce.features.module.modules.misc.nameprotect
 
 import net.ccbluex.liquidbounce.config.types.nesting.ToggleableConfigurable
+import net.ccbluex.liquidbounce.event.EventManager
 import net.ccbluex.liquidbounce.event.events.GameTickEvent
+import net.ccbluex.liquidbounce.event.events.NameProtectEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.misc.FriendManager
 import net.ccbluex.liquidbounce.features.module.Category
@@ -37,6 +39,7 @@ import net.minecraft.text.CharacterVisitor
 import net.minecraft.text.OrderedText
 import net.minecraft.text.Style
 import net.minecraft.text.Text
+import kotlin.random.Random
 
 /**
  * NameProtect module
@@ -60,7 +63,12 @@ object ModuleNameProtect : ClientModule("NameProtect", Category.MISC) {
 
     }
 
-    private object ReplaceFriendNames : ToggleableConfigurable(this, "ObfuscateFriends", true) {
+    val applyGarbled by boolean("Garbled", false).onChanged {
+        EventManager.callEvent(NameProtectEvent(ModuleNameProtect))
+    }
+
+    object ReplaceFriendNames : ToggleableConfigurable(this, "ObfuscateFriends", true) {
+        val friendsApplyGarbled by boolean("FriendsApplyGarbled", false)
         val colorMode = choices<GenericColorMode<Unit>>(
             ReplaceFriendNames,
             "ColorMode",
@@ -74,7 +82,8 @@ object ModuleNameProtect : ClientModule("NameProtect", Category.MISC) {
         }
     }
 
-    private object ReplaceOthers : ToggleableConfigurable(this, "ObfuscateOthers", false) {
+     object ReplaceOthers : ToggleableConfigurable(this, "ObfuscateOthers", false) {
+        val othersApplyGarbled by boolean("OthersApplyGarbled", true)
         val colorMode = choices<GenericColorMode<Unit>>(
             ReplaceOthers,
             "ColorMode",
@@ -91,7 +100,6 @@ object ModuleNameProtect : ClientModule("NameProtect", Category.MISC) {
     init {
         tree(ReplaceFriendNames)
         tree(ReplaceOthers)
-
         // Entirely keep out from public config
         doNotIncludeAlways()
     }
@@ -103,18 +111,42 @@ object ModuleNameProtect : ClientModule("NameProtect", Category.MISC) {
         friends = { ReplaceFriendNames.colorMode.activeChoice.getColor(Unit) },
         otherPlayers = { ReplaceOthers.colorMode.activeChoice.getColor(Unit) },
     )
+    private const val ALPHABET = "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ"
 
+    fun getGarbledName(baseName: String): String {
+        val nowTick = (System.currentTimeMillis() / 10).toInt()
+        val seed = baseName.hashCode() xor nowTick
+        val rng = Random(seed)
+        val sb = StringBuilder(baseName.length)
+        for (i in baseName.indices) {
+            sb.append(ALPHABET[rng.nextInt(ALPHABET.length)])
+        }
+        return sb.toString()
+    }
     @Suppress("unused")
     private val renderHandler = handler<GameTickEvent> {
+
         val friendMappings = if (ReplaceFriendNames.enabled) {
             FriendManager.friends.filter { it.name.isNotBlank() }.mapIndexed { id, friend ->
-                friend.name to (friend.alias ?: friend.getDefaultName(id))
+                val targetName = if (ReplaceFriendNames.friendsApplyGarbled) {
+                   getGarbledName(friend.name)
+                } else {
+                    friend.alias ?: friend.getDefaultName(id)
+                }
+                friend.name to targetName
             }
         } else {
             emptyList()
         }
 
+
         val playerName = player.gameProfile?.name
+        val selfPair = mc.session.username to if (applyGarbled) {
+           getGarbledName(replacement)
+        } else {
+            replacement
+        }
+
 
         val otherPlayers = if (ReplaceOthers.enabled) {
             network.playerList?.mapNotNull { playerListEntry ->
@@ -126,8 +158,8 @@ object ModuleNameProtect : ClientModule("NameProtect", Category.MISC) {
             null
         } ?: emptyList()
 
-        this.replacementMappings.update(
-            mc.session.username to this.replacement,
+        replacementMappings.update(
+            selfPair,
             friendMappings,
             otherPlayers,
             coloringInfo
