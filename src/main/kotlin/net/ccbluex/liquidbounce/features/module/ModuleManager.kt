@@ -109,6 +109,7 @@ import net.ccbluex.jmcomicfix.features.module.modules.combat.ModuleAutoRod
 import net.ccbluex.jmcomicfix.features.module.modules.`fun`.*
 import net.ccbluex.jmcomicfix.features.module.modules.render.*
 import net.ccbluex.jmcomicfix.features.module.modules.misc.ModuleAutoScreenShot
+import net.ccbluex.liquidbounce.features.module.modules.misc.anticheat.ModuleAntiCheat
 import net.ccbluex.liquidbounce.features.module.modules.player.ModuleAutoStuck
 import net.ccbluex.liquidbounce.features.module.modules.render.targetinfo.ModuleTargetInfo
 import org.lwjgl.glfw.GLFW
@@ -272,6 +273,7 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleTimeShift,
             ModuleTeleport,
             ModulePhase,
+            ModuleGodMode,
 
             // Fun
             ModuleDankBobbing,
@@ -312,7 +314,7 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleNoBooks,
             ModuleAutoReport,
             ModuleBetterTitle,
-
+            ModuleAntiCheat,
 
            // Movement
             ModuleAirJump,

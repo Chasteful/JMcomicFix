@@ -8,7 +8,7 @@ import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket
 
-internal object VelocityTatako : VelocityMode("Tatako20250518Flag") {
+internal object VelocityFlag : VelocityMode("Flag") {
 
     private var shouldCancelMovement = false
     private var wasSneaking = false

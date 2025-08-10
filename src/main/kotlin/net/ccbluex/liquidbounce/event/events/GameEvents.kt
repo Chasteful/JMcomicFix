@@ -20,7 +20,6 @@
 
 package net.ccbluex.liquidbounce.event.events
 
-import com.sun.jna.platform.unix.LibCAPI
 import net.ccbluex.liquidbounce.config.types.NamedChoice
 import net.ccbluex.liquidbounce.event.CancellableEvent
 import net.ccbluex.liquidbounce.event.Event

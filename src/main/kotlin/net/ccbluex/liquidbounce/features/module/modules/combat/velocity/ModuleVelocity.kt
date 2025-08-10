@@ -51,8 +51,10 @@ object ModuleVelocity : ClientModule("Velocity", Category.COMBAT, aliases = arra
             VelocityModify,
             VelocityReversal,
             VelocityStrafe,
+            VelocityFlag,
             VelocityJumpReset,
             VelocityAdvancedJumpReset,
+
             // Server modes
             VelocityHypixel,
             VelocityDexland,
@@ -66,7 +68,8 @@ object ModuleVelocity : ClientModule("Velocity", Category.COMBAT, aliases = arra
             VelocityGrimAC,
             VelocityGrimAttacked,
             VelocityIntave,
-            VelocityTatako,
+            VelocityPolar,
+            VelocityTatakoExempt
 
             )
     ).apply(::tagBy)
