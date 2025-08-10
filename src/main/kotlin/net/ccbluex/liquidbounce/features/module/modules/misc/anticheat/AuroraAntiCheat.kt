@@ -1,6 +1,7 @@
 package net.ccbluex.liquidbounce.features.module.modules.misc.anticheat
 
 import net.ccbluex.jmcomicfix.utils.technology.CheaterDetectorUtil
+import net.ccbluex.jmcomicfix.utils.technology.CheaterDetectorUtil.isNotValidToCheck
 import net.ccbluex.jmcomicfix.utils.technology.ComplexMath
 import net.ccbluex.liquidbounce.config.types.nesting.ToggleableConfigurable
 import net.ccbluex.liquidbounce.event.EventState
@@ -9,6 +10,7 @@ import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.lang.translation
+import net.ccbluex.liquidbounce.render.engine.type.Vec3
 import net.ccbluex.liquidbounce.utils.client.chat
 import net.ccbluex.liquidbounce.utils.client.warning
 import net.ccbluex.liquidbounce.utils.entity.prevPos
@@ -24,9 +26,10 @@ import net.minecraft.util.math.MathHelper
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.abs
 
+
 object ModuleAntiCheat : ClientModule("AuroraAntiCheat", Category.MISC) {
 
-    private object CheckSettings : ToggleableConfigurable(this, "Checks", true) {
+    private object CheckSettings : ToggleableConfigurable(this, "AllowCheck", true) {
         val celerity by boolean("Celerity", true)
         val noSlowDown by boolean("NoSlowDown", true)
         val flight by boolean("Flight", true)
@@ -48,14 +51,15 @@ object ModuleAntiCheat : ClientModule("AuroraAntiCheat", Category.MISC) {
     private val minTickBalance by int("MinTickBalance", 45, 5..100, "ticks")
     private val sprintRange by float("SprintRange", 3.7f, 1f..7f, "blocks")
     private val normalRange by float("NormalRange", 3.3f, 1f..7f, "blocks")
-    private val maxJumpMotion by float("MaxJumpMotion", 0.42f, 0f..8f, "blocks/tick")
     private val airSpeedFactor by float("AirSpeedFactor", 1.25f, 0f..8f, "x")
     private val groundSpeedFactor by float("GroundSpeedFactor", 1.15f, 0f..8f, "x")
     private val jumpExtraSpeed by float("JumpExtraSpeed", 0.2f, 0f..8f, "blocks/tick")
     private val webFactor by float("WebSpeedFactor", 0.5f, 0f..8f, "x")
     private val slowDownFactor by float("SlowSpeedFactor", 0.5f, 0f..8f, "x")
-    private val selfCheck by boolean("CheckSelf", true)
-    private val doNotCheckBot by boolean("DontCheckBots", false)
+
+    private val checkSelf by boolean("CheckSelf", true)
+    private val checkOtherPlayers by boolean("CheckOtherPlayers", false)
+    private val checkServerBot by boolean("CheckServerBot", false)
 
     init {
         tree(CheckSettings)
@@ -66,11 +70,11 @@ object ModuleAntiCheat : ClientModule("AuroraAntiCheat", Category.MISC) {
     override fun enable() {
         chat(warning(translation("liquidbounce.module.disabler.messages.auroraAntiCheat")))
     }
+
     override fun disable() {
         hackData.clear()
     }
 
-    @Suppress("unused")
     private val packetHandler = handler<PacketEvent> { event ->
         if (mc.world == null || mc.player == null) return@handler
 
@@ -95,7 +99,7 @@ object ModuleAntiCheat : ClientModule("AuroraAntiCheat", Category.MISC) {
             is EntityVelocityUpdateS2CPacket -> {
                 hackData[packet.entityId]?.let { hacker ->
                     hacker.bypassTime = System.currentTimeMillis()
-                    hacker.velocityVector = doubleArrayOf(
+                    hacker.velocityVector = Vec3(
                         packet.velocityX.toDouble(),
                         packet.velocityY.toDouble(),
                         packet.velocityZ.toDouble()
@@ -104,13 +108,17 @@ object ModuleAntiCheat : ClientModule("AuroraAntiCheat", Category.MISC) {
             }
             is ExplosionS2CPacket -> {
                 hackData.values.forEach { hacker ->
-                    val velocity = packet.playerKnockback.get()
-                    if (hacker.player.squaredDistanceTo(velocity.x, velocity.y, velocity.z) < 8.0) {
-                        hacker.velocityVector = doubleArrayOf(31200.0, 31200.0, 31200.0)
-                        hacker.bypassTime = System.currentTimeMillis()
+                    val velocityOpt = packet.playerKnockback
+                    if (velocityOpt.isPresent) {
+                        val velocity = velocityOpt.get()
+                        if (hacker.player.squaredDistanceTo(velocity.x, velocity.y, velocity.z) < 8.0) {
+                            hacker.velocityVector = Vec3(31200.0, 31200.0, 31200.0)
+                            hacker.bypassTime = System.currentTimeMillis()
+                        }
                     }
                 }
             }
+
             is PlayerInteractEntityC2SPacket -> {
                 hackData[mc.player?.id]?.let { hacker ->
                     if (System.currentTimeMillis() - hacker.lastCT > 5000) hacker.samples.clear()
@@ -125,13 +133,11 @@ object ModuleAntiCheat : ClientModule("AuroraAntiCheat", Category.MISC) {
         }
     }
 
-    @Suppress("unused")
     private val worldChangeHandler = handler<WorldChangeEvent> {
         hackData.clear()
     }
 
-    @Suppress("unused")
-    private val motionHandler = handler<PlayerMoveEvent> { event ->
+    private val motionHandler = handler<PlayerNetworkMovementTickEvent> { event ->
         if (event.state == EventState.POST) {
             val playerId = mc.player?.id ?: return@handler
             hackData.computeIfAbsent(playerId) { HackerLivingBase(mc.player!!) }
@@ -141,6 +147,7 @@ object ModuleAntiCheat : ClientModule("AuroraAntiCheat", Category.MISC) {
             }
         }
     }
+
     fun getFovToTarget(attacker: Entity, target: Entity): Float {
         val x = target.x - attacker.x
         val y = target.y + target.eyeY - 0.15 - attacker.y
@@ -152,6 +159,7 @@ object ModuleAntiCheat : ClientModule("AuroraAntiCheat", Category.MISC) {
         val diffPitch = MathHelper.wrapDegrees(calcPitch - attacker.pitch)
         return ComplexMath.hypot(diffYaw.toDouble(), diffPitch.toDouble()).toFloat()
     }
+
     private fun checkCombatHurt(entity: Entity?) {
         if (entity == null) return
         val attacker = mc.world?.entities?.filterIsInstance<PlayerEntity>()
@@ -161,7 +169,7 @@ object ModuleAntiCheat : ClientModule("AuroraAntiCheat", Category.MISC) {
 
         hackData.computeIfAbsent(attacker.id) { HackerLivingBase(attacker) }
         val hacker = hackData[attacker.id] ?: return
-        if (hacker.player == entity || CheaterDetectorUtil.isNotValidToCheck(hacker.player, selfCheck, doNotCheckBot)) return
+        if (isNotValidToCheck(hacker.player, checkSelf, !checkServerBot, checkOtherPlayers)) return
 
         if (CheckSettings.aura) {
             val result = CheaterDetectorUtil.checkKillAura(hacker, entity as LivingEntity)
@@ -173,8 +181,8 @@ object ModuleAntiCheat : ClientModule("AuroraAntiCheat", Category.MISC) {
             hacker.updateDRot()
             val fixedYaw = (hacker.player.yaw % 360 + 540) % 360 - 180
             val fixedPrevYaw = (hacker.player.prevYaw % 360 + 540) % 360 - 180
-            val deltaYaw = abs(fixedPrevYaw - fixedYaw).toFloat()
-            val deltaPitch = abs(hacker.player.pitch - hacker.player.prevPitch).toFloat()
+            val deltaYaw = abs(fixedPrevYaw - fixedYaw)
+            val deltaPitch = abs(hacker.player.pitch - hacker.player.prevPitch)
             hacker.updateAccel(deltaYaw, deltaPitch)
         }
         if (CheckSettings.autoBlock) {
@@ -188,7 +196,7 @@ object ModuleAntiCheat : ClientModule("AuroraAntiCheat", Category.MISC) {
     }
 
     private fun checkMovement(hacker: HackerLivingBase) {
-        if (CheaterDetectorUtil.isNotValidToCheck(hacker.player, selfCheck, doNotCheckBot)) return
+        if (isNotValidToCheck(hacker.player, checkSelf, !checkServerBot, checkOtherPlayers)) return
         hacker.balance.add((System.currentTimeMillis() - hacker.balanceTime).toInt())
         hacker.balanceTime = System.currentTimeMillis()
         if (hacker.player.age % 160 == 0 && hacker.vl > 0) hacker.vl--
@@ -232,7 +240,7 @@ object ModuleAntiCheat : ClientModule("AuroraAntiCheat", Category.MISC) {
             if (result != "LEGIT") CheaterDetectorUtil.flagEntity(hacker, result, "Celerity")
         }
         if (CheckSettings.jump && System.currentTimeMillis() - hacker.bypassTime > 170) {
-            val result = CheaterDetectorUtil.checkJump(hacker, maxJumpMotion.toDouble())
+            val result = CheaterDetectorUtil.checkJump(hacker)
             if (result != "LEGIT") CheaterDetectorUtil.flagEntity(hacker, result, "Jump")
         }
         if (CheckSettings.spoofGround) {
@@ -242,7 +250,7 @@ object ModuleAntiCheat : ClientModule("AuroraAntiCheat", Category.MISC) {
     }
 
     private fun checkAutoClick(hacker: HackerLivingBase) {
-        if (!CheckSettings.autoClick || CheaterDetectorUtil.isNotValidToCheck(hacker.player, selfCheck, doNotCheckBot)) return
+        if (!CheckSettings.autoClick || isNotValidToCheck(hacker.player, checkSelf, !checkServerBot, checkOtherPlayers)) return
         val result = CheaterDetectorUtil.checkAutoClick(hacker.samples, maxClickSpeed)
         if (result != "LEGIT") CheaterDetectorUtil.flagEntity(hacker, result, "AutoClick")
     }
@@ -251,7 +259,7 @@ object ModuleAntiCheat : ClientModule("AuroraAntiCheat", Category.MISC) {
         var lastTickPlayer: PlayerEntity = player
         var bypassTime: Long = System.currentTimeMillis()
         var balanceTime: Long = System.currentTimeMillis()
-        var velocityVector: DoubleArray = doubleArrayOf(0.0, 0.0, 0.0)
+        var velocityVector: Vec3 = Vec3(0.0, 0.0, 0.0)
         var lastMotionY: Double = player.pos.y - player.prevPos.y
         var samples: ArrayList<Int> = ArrayList()
         var balance: ArrayList<Int> = ArrayList()

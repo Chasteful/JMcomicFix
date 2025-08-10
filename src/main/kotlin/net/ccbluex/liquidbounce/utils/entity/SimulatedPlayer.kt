@@ -75,7 +75,7 @@ class SimulatedPlayer(
 
     var fallDistance: Float,
     private var jumpingCooldown: Int,
-    private var isJumping: Boolean,
+    var isJumping: Boolean,
     private var isFallFlying: Boolean,
     var onGround: Boolean,
     var horizontalCollision: Boolean,
@@ -544,7 +544,7 @@ class SimulatedPlayer(
         return Vec3d(d, g, e)
     }
 
-    private fun isClimbing(): Boolean {
+    fun isClimbing(): Boolean {
         val blockPos = pos.toBlockPos()
         val blockState = blockPos.getState()!!
         return if (blockState.isIn(BlockTags.CLIMBABLE)) {
@@ -643,7 +643,7 @@ class SimulatedPlayer(
         )
     }
 
-    private fun isSprinting(): Boolean = this.sprinting
+    fun isSprinting(): Boolean = this.sprinting
 
     private fun getJumpVelocity(): Float =
         0.42f * this.getJumpVelocityMultiplier() +
@@ -682,8 +682,8 @@ class SimulatedPlayer(
         return if (player.standingEyeHeight.toDouble() < 0.4) 0.0 else 0.4
     }
 
-    private fun isTouchingWater(): Boolean = touchingWater
-    private fun isInLava(): Boolean {
+    fun isTouchingWater(): Boolean = touchingWater
+    fun isInLava(): Boolean {
         return this.fluidHeight.getDouble(FluidTags.LAVA) > 0.0
     }
 
