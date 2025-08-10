@@ -1,3 +1,4 @@
+@file:Suppress("detekt:all")
 package net.ccbluex.liquidbounce.features.module.modules.misc.anticheat
 
 import net.ccbluex.jmcomicfix.utils.technology.CheaterDetectorUtil
@@ -46,6 +47,7 @@ object ModuleAntiCheat : ClientModule("AuroraAntiCheat", Category.MISC) {
         val autoClick by boolean("AutoClick", true)
     }
 
+    val tolerant by float("tolerant",0.05f,0.05f..0.1f)
     private val maxAimSpeed by float("MaxAimSpeed", 120f, 1f..180f, "°/s")
     private val maxClickSpeed by int("MaxClickSpeed", 20, 1..100, "cps")
     private val minTickBalance by int("MinTickBalance", 45, 5..100, "ticks")
@@ -74,7 +76,7 @@ object ModuleAntiCheat : ClientModule("AuroraAntiCheat", Category.MISC) {
     override fun disable() {
         hackData.clear()
     }
-
+    @Suppress("UNUSED")
     private val packetHandler = handler<PacketEvent> { event ->
         if (mc.world == null || mc.player == null) return@handler
 
@@ -132,11 +134,11 @@ object ModuleAntiCheat : ClientModule("AuroraAntiCheat", Category.MISC) {
             }
         }
     }
-
+    @Suppress("UNUSED")
     private val worldChangeHandler = handler<WorldChangeEvent> {
         hackData.clear()
     }
-
+    @Suppress("UNUSED")
     private val motionHandler = handler<PlayerNetworkMovementTickEvent> { event ->
         if (event.state == EventState.POST) {
             val playerId = mc.player?.id ?: return@handler
