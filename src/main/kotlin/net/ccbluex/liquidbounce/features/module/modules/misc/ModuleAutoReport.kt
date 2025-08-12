@@ -168,7 +168,7 @@ object ModuleAutoReport : ClientModule("AutoReport", Category.MISC) {
         killerName = null
     }
 
-    override fun enable() {
+    override fun onEnabled() {
         resetState()
     }
 }

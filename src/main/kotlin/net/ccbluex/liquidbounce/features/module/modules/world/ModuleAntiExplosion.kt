@@ -397,7 +397,7 @@ object ModuleAntiExplosion : ClientModule("AntiExplosion", Category.WORLD) {
         }
     }
 
-    override fun disable() {
+    override fun onDisabled() {
         stopBuildingWall()
     }
 }

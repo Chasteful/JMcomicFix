@@ -93,11 +93,11 @@ object ModuleTreasureManager : ClientModule("TreasureManager", Category.PLAYER) 
         }
     }
 
-    override fun disable() {
+    override fun onDisabled() {
         initialItemCount = 0
         remainingItems = 0
         isInBedWars = false
-        super.disable()
+        super.Disabled()
     }
 
 

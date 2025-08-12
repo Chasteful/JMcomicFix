@@ -59,8 +59,8 @@ sealed class TargetRenderer<T : RenderEnvironment>(
     var previousEntity: Entity? = null
     private var lastChangeTime = 0L
 
-    override fun disable() {
-        super.disable()
+    override fun onDisabled() {
+        super.Disabled()
         reset()
     }
 

@@ -89,7 +89,7 @@ object ModuleBlink : ClientModule("Blink", Category.PLAYER) {
     }
 
     override fun onDisabled() {
-    override fun disable() {
+    override fun onDisabled() {
         notification(
             "Blink",
             "Currently storing packets for later send.",

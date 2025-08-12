@@ -975,12 +975,12 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         return (Random.nextFloat() * (max - min) + min)
     }
 
-    override fun enable() {
-        super.enable()
+    override fun onEnabled() {
+        super.onEnabled()
         resetAllVariables()
     }
 
-    override fun disable() {
+    override fun onDisabled() {
         resetAllVariables()
         lastPlayerPosition = null
         manualPearlThrown = false

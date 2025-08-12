@@ -188,13 +188,13 @@ object ModulePointerESP : ClientModule("PointerESP", Category.RENDER) {
         .filterIsInstance<LivingEntity>()
         .filter { it.shouldBeShown() }
 
-    override fun disable() {
+    override fun onDisabled() {
         pointerData.clear()
-        super.disable()
+        super.Disabled()
     }
 
-    override fun enable() {
+    override fun onEnabled() {
         pointerData.clear()
-        super.enable()
+        super.onEnabled()
     }
 }

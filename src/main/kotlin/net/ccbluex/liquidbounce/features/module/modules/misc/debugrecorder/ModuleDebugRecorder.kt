@@ -49,7 +49,7 @@ object ModuleDebugRecorder : ClientModule("DebugRecorder", Category.MISC, disabl
             packets.add(packet)
         }
 
-        override fun enable() {
+        override fun onEnabled() {
             this.packets.clear()
             chat(regular("Recording "), variable(name), regular("..."))
         }

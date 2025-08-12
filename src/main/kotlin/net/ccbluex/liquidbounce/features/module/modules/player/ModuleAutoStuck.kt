@@ -188,13 +188,13 @@ object ModuleAutoStuck : ClientModule("AutoStuck", Category.WORLD) {
         }
     }
 
-    override fun enable() {
+    override fun onEnabled() {
         stuckTicks = 0
         isInAir = false
         lastGroundY = LOWEST_Y
     }
 
-    override fun disable() {
+    override fun onDisabled() {
         shouldEnableStuck = false
     }
 }

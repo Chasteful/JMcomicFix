@@ -31,11 +31,11 @@ object ModuleJumpEffect : ClientModule("JumpEffect", Category.RENDER) {
         )
     }
 
-    override fun enable() {
+    override fun onEnabled() {
         modes.activeChoice.enable()
     }
 
-    override fun disable() {
+    override fun onDisabled() {
         modes.activeChoice.disable()
     }
 }

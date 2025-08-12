@@ -27,11 +27,11 @@ object ModuleTargetInfo : ClientModule("TargetInfo", Category.RENDER, aliases = 
     val borderColor by color("Border", Color4b.TRANSPARENT)
     val textColor by color("Name", Color4b.WHITE)
 
-    override fun enable() {
+    override fun onEnabled() {
         modes.activeChoice.enable()
     }
 
-    override fun disable() {
+    override fun onDisabled() {
         modes.activeChoice.disable()
     }
 

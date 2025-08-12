@@ -43,7 +43,7 @@ internal object NoSlowSlowness : ToggleableConfigurable(ModuleNoSlow, "Slowness"
         )
     }
 
-    override fun onDisabled() {
+    override fun disable() {
         setSlownessMultiplier(0.15f)
     }
 }

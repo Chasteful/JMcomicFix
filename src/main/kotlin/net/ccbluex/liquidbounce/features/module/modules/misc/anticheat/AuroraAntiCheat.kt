@@ -71,7 +71,7 @@ object ModuleAntiCheat : ClientModule("AuroraAntiCheat", Category.MISC) {
         chat(warning(translation("liquidbounce.module.disabler.messages.auroraAntiCheat")))
     }
 
-    override fun disable() {
+    override fun onDisabled() {
         hackData.clear()
     }
     @Suppress("UNUSED")

@@ -75,7 +75,6 @@ object ModuleFly : ClientModule("Fly", Category.MOVEMENT, aliases = arrayOf("Gli
             FlyVulcan286MC18,
             FlyVulcan286Teleport,
             FlyGrim2859V,
-            FlyGrimFireball,
             FlySpartan524,
 
             // Server specific fly modes
