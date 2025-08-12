@@ -75,7 +75,7 @@ class SimulatedPlayer(
 
     var fallDistance: Float,
     private var jumpingCooldown: Int,
-    var isJumping: Boolean,
+    private var isJumping: Boolean,
     private var isFallFlying: Boolean,
     var onGround: Boolean,
     var horizontalCollision: Boolean,
@@ -85,7 +85,8 @@ class SimulatedPlayer(
     private var isSwimming: Boolean,
     private var submergedInWater: Boolean,
     private var fluidHeight: Object2DoubleMap<TagKey<Fluid>>,
-    private var submergedFluidTag: HashSet<TagKey<Fluid>>
+    private var submergedFluidTag: HashSet<TagKey<Fluid>>,
+
 ) : PlayerSimulation {
     private val world: World
         get() = player.world!!
@@ -115,7 +116,7 @@ class SimulatedPlayer(
                 player.isSwimming,
                 player.isSubmergedInWater,
                 Object2DoubleArrayMap(player.fluidHeight),
-                HashSet(player.submergedFluidTag)
+                HashSet(player.submergedFluidTag),
             )
         }
 
@@ -143,7 +144,8 @@ class SimulatedPlayer(
                 player.isSwimming,
                 player.isSubmergedInWater,
                 Object2DoubleArrayMap(player.fluidHeight),
-                HashSet(player.submergedFluidTag)
+                HashSet(player.submergedFluidTag),
+
             )
         }
     }
@@ -337,7 +339,8 @@ class SimulatedPlayer(
             var q = vec3d6.y
             if (hasStatusEffect(StatusEffects.LEVITATION)) {
                 q += (0.05 * (getStatusEffect(StatusEffects.LEVITATION)!!.amplifier + 1).toDouble() - vec3d6.y) * 0.2
-            } else if (this.player.world.isClient && !this.player.world.isChunkLoaded(blockPos)) {
+            } else if (this.player.world.isClient &&
+                !this.player.world.isChunkLoaded(blockPos.x shr 4, blockPos.z shr 4)) {
                 q = if (this.pos.y > this.player.world.bottomY.toDouble()) {
                     -0.1
                 } else {
@@ -364,7 +367,9 @@ class SimulatedPlayer(
     private fun applyMovementInput(movementInput: Vec3d?, slipperiness: Float): Vec3d {
         this.updateVelocity(this.getMovementSpeed(slipperiness), movementInput)
         this.velocity = applyClimbingSpeed(this.velocity)
+        this.velocity = applyWebSpeed(this.velocity)
         this.move(this.velocity)
+
 
         var vec3d = this.velocity
         if ((horizontalCollision || this.isJumping) && (
@@ -427,7 +432,6 @@ class SimulatedPlayer(
         if (!isTouchingWater()) {
             checkWaterState()
         }
-
         if (onGround) {
             onLanding()
         } else if (movement.y < 0) {
@@ -543,6 +547,18 @@ class SimulatedPlayer(
 
         return Vec3d(d, g, e)
     }
+    private fun applyWebSpeed(motion: Vec3d): Vec3d {
+        val blockState = world.getBlockState(pos.toBlockPos())
+        if (blockState.block != Blocks.COBWEB) {
+            return motion
+        }
+        val multiplier = if (hasStatusEffect(StatusEffects.WEAVING)) {
+            Vec3d(0.5, 0.25, 0.5)
+        } else {
+            Vec3d(0.25, 0.05, 0.25)
+        }
+        return motion.multiply(multiplier.x, multiplier.y, multiplier.z)
+    }
 
     fun isClimbing(): Boolean {
         val blockPos = pos.toBlockPos()
@@ -572,7 +588,6 @@ class SimulatedPlayer(
         if (!isFlying && movement.y <= 0.0 && isSelfMovement && this.method_30263()) {
             var d = movement.x
             var e = movement.z
-            val f = 0.05
             while (d != 0.0 && world.isSpaceEmpty(
                     player,
                     boundingBox.offset(d, -STEP_HEIGHT, 0.0)
@@ -643,7 +658,7 @@ class SimulatedPlayer(
         )
     }
 
-    fun isSprinting(): Boolean = this.sprinting
+    private fun isSprinting(): Boolean = this.sprinting
 
     private fun getJumpVelocity(): Float =
         0.42f * this.getJumpVelocityMultiplier() +
@@ -671,9 +686,14 @@ class SimulatedPlayer(
         return this.player.world.isSpaceEmpty(this.player, box) && !this.player.world.containsFluid(box)
     }
 
-    private fun swimUpward(water: TagKey<Fluid>?) {
-        velocity += Vec3d(0.0, 0.03999999910593033, 0.0)
+    private fun swimUpward(fluid: TagKey<Fluid>) {
+        velocity += Vec3d(
+            0.0,
+            if (fluid === FluidTags.WATER) 0.03999999910593033 else 0.005999999865889549,
+            0.0
+        )
     }
+
 
     private fun getVelocityAffectingPos() =
         BlockPos.ofFloored(this.pos.x, this.boundingBox.minY - 0.5000001, this.pos.z)
@@ -682,15 +702,16 @@ class SimulatedPlayer(
         return if (player.standingEyeHeight.toDouble() < 0.4) 0.0 else 0.4
     }
 
-    fun isTouchingWater(): Boolean = touchingWater
-    fun isInLava(): Boolean {
+    private fun isTouchingWater(): Boolean = touchingWater
+
+    private fun isInLava(): Boolean {
         return this.fluidHeight.getDouble(FluidTags.LAVA) > 0.0
     }
 
     private fun checkWaterState() {
         val var2 = player.vehicle
         if (var2 is BoatEntity) {
-            if (!var2.isSubmergedInWater()) {
+            if (!var2.isSubmergedInWater) {
                 this.touchingWater = false
                 return
             }
@@ -721,7 +742,7 @@ class SimulatedPlayer(
         val d: Double = this.getEyeY() - 0.1111111119389534
         val entity = this.player.vehicle
         if (entity is BoatEntity) {
-            if (!entity.isSubmergedInWater() && entity.getBoundingBox().maxY >= d && entity.getBoundingBox().minY <= d) {
+            if (!entity.isSubmergedInWater && entity.boundingBox.maxY >= d && entity.boundingBox.minY <= d) {
                 return
             }
         }
@@ -796,7 +817,6 @@ class SimulatedPlayer(
 //            }
             val vec3d3: Vec3d = velocity
             vec3d = vec3d.multiply(speed * 1.0)
-            val f = 0.003
             if (abs(vec3d3.x) < 0.003 && abs(vec3d3.z) < 0.003 && vec3d.length() < 0.0045000000000000005) {
                 vec3d = vec3d.normalize().multiply(0.0045000000000000005)
             }
@@ -808,13 +828,19 @@ class SimulatedPlayer(
     }
 
     private fun isRegionUnloaded(): Boolean {
-        val box = this.boundingBox.expand(1.0)
-        val i = MathHelper.floor(box.minX)
-        val j = MathHelper.ceil(box.maxX)
-        val k = MathHelper.floor(box.minZ)
-        val l = MathHelper.ceil(box.maxZ)
-        return !this.player.world.isRegionLoaded(i, k, j, l)
+        val box = boundingBox.expand(1.0)
+        val minChunkX = MathHelper.floor(box.minX) shr 4
+        val maxChunkX = MathHelper.ceil(box.maxX) shr 4
+        val minChunkZ = MathHelper.floor(box.minZ) shr 4
+        val maxChunkZ = MathHelper.ceil(box.maxZ) shr 4
+        for (cx in minChunkX..maxChunkX) {
+            for (cz in minChunkZ..maxChunkZ) {
+                if (!player.world.isChunkLoaded(cx, cz)) return true
+            }
+        }
+        return false
     }
+
 
     private fun getRotationVector() = getRotationVector(this.pitch, this.yaw)
 
@@ -871,13 +897,13 @@ class SimulatedPlayer(
             isSwimming,
             submergedInWater,
             Object2DoubleArrayMap(fluidHeight),
-            HashSet(submergedFluidTag)
+            HashSet(submergedFluidTag),
         )
     }
 
     class SimulatedPlayerInput(
         val directionalInput: DirectionalInput,
-        var jumping: Boolean,
+        jumping: Boolean,
         var sprinting: Boolean,
         sneaking: Boolean
     ) : Input() {

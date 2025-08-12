@@ -79,22 +79,9 @@ class FallingPlayer(
 
         var vec3d5 = Vec3d(this.motionX, this.motionY, this.motionZ).add(0.0, d * (-1.0 + n.toDouble() * 0.75), 0.0)
 
-        var q: Double
-        if (vec3d5.y < 0.0 && k > 0.0) {
-            q = vec3d5.y * -0.1 * n.toDouble()
-            vec3d5 = vec3d5.add(rotationVec.x * q / k, q, rotationVec.z * q / k)
-        }
+        vec3d5 = applyElytraPhysics(vec3d5, rotationVec, j, l, k, d)
 
-        if (j < 0.0f && k > 0.0) {
-            q = l * (-MathHelper.sin(j)).toDouble() * 0.04
-            vec3d5 = vec3d5.add(-rotationVec.x * q / k, q * 3.2, -rotationVec.z * q / k)
-        }
-
-        if (k > 0.0) {
-            vec3d5 = vec3d5.add((rotationVec.x / k * l - vec3d5.x) * 0.1, 0.0, (rotationVec.z / k * l - vec3d5.z) * 0.1)
-        }
-
-        vec3d5.add(
+        vec3d5 = vec3d5.add(
             Entity.movementInputToVelocity(
                 Vec3d(
                     this.player.input.movementSideways.toDouble() * 0.98,
@@ -117,6 +104,29 @@ class FallingPlayer(
         this.z += this.motionZ
 
         this.simulatedTicks++
+    }
+    private fun applyElytraPhysics(velocity: Vec3d, rotationVec: Vec3d, pitch: Float, horizontalSpeed: Double, rotationHorizontal: Double, gravity: Double): Vec3d {
+        var result = velocity.add(0.0, gravity * (-1.0 + MathHelper.cos(pitch) * 0.75), 0.0)
+
+        if (result.y < 0.0 && rotationHorizontal > 0.0) {
+            val q = result.y * -0.1 * MathHelper.cos(pitch)
+            result = result.add(rotationVec.x * q / rotationHorizontal, q, rotationVec.z * q / rotationHorizontal)
+        }
+
+        if (pitch < 0.0f && rotationHorizontal > 0.0) {
+            val q = horizontalSpeed * (-MathHelper.sin(pitch)) * 0.04
+            result = result.add(-rotationVec.x * q / rotationHorizontal, q * 3.2, -rotationVec.z * q / rotationHorizontal)
+        }
+
+        if (rotationHorizontal > 0.0) {
+            result = result.add(
+                (rotationVec.x / rotationHorizontal * horizontalSpeed - result.x) * 0.1,
+                0.0,
+                (rotationVec.z / rotationHorizontal * horizontalSpeed - result.z) * 0.1
+            )
+        }
+
+        return result
     }
 
     private fun hasStatusEffect(effect: RegistryEntry<StatusEffect>): Boolean {

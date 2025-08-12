@@ -14,7 +14,6 @@ import net.ccbluex.liquidbounce.lang.translation
 import net.ccbluex.liquidbounce.render.engine.type.Vec3
 import net.ccbluex.liquidbounce.utils.client.chat
 import net.ccbluex.liquidbounce.utils.client.warning
-import net.ccbluex.liquidbounce.utils.entity.prevPos
 import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
@@ -47,7 +46,6 @@ object ModuleAntiCheat : ClientModule("AuroraAntiCheat", Category.MISC) {
         val autoClick by boolean("AutoClick", true)
     }
 
-    val tolerant by float("tolerant",0.05f,0.05f..0.1f)
     private val maxAimSpeed by float("MaxAimSpeed", 120f, 1f..180f, "°/s")
     private val maxClickSpeed by int("MaxClickSpeed", 20, 1..100, "cps")
     private val minTickBalance by int("MinTickBalance", 45, 5..100, "ticks")
@@ -262,7 +260,7 @@ object ModuleAntiCheat : ClientModule("AuroraAntiCheat", Category.MISC) {
         var bypassTime: Long = System.currentTimeMillis()
         var balanceTime: Long = System.currentTimeMillis()
         var velocityVector: Vec3 = Vec3(0.0, 0.0, 0.0)
-        var lastMotionY: Double = player.pos.y - player.prevPos.y
+        var lastMotionY: Double = player.pos.y - player.prevY
         var samples: ArrayList<Int> = ArrayList()
         var balance: ArrayList<Int> = ArrayList()
         var vl: Int = 0
@@ -278,7 +276,7 @@ object ModuleAntiCheat : ClientModule("AuroraAntiCheat", Category.MISC) {
         }
 
         fun onPost() {
-            lastMotionY = player.pos.y - player.prevPos.y
+            lastMotionY = player.pos.y - player.prevY
             lastTickPlayer = player
         }
 

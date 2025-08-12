@@ -23,8 +23,7 @@ import net.ccbluex.liquidbounce.utils.client.SilentHotbar
 import net.ccbluex.liquidbounce.utils.client.notification
 import net.ccbluex.liquidbounce.utils.client.sendPacketSilently
 import net.ccbluex.liquidbounce.utils.combat.CombatManager
-import net.ccbluex.liquidbounce.utils.entity.SimulatedPlayer
-import net.ccbluex.liquidbounce.utils.entity.SimulatedPlayerCache
+import net.ccbluex.liquidbounce.utils.entity.PlayerSimulationCache
 import net.ccbluex.liquidbounce.utils.inventory.HotbarItemSlot
 import net.ccbluex.liquidbounce.utils.inventory.Slots
 import net.ccbluex.liquidbounce.utils.inventory.useHotbarSlotOrOffhand
@@ -339,17 +338,10 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
             lastTrajectoryUpdate = currentTime
             lastPlayerState = playerState
 
-            val simulatedPlayer = SimulatedPlayer.fromClientPlayer(
-                SimulatedPlayer.SimulatedPlayerInput.fromClientPlayer(playerState.third).apply {
-                    this.sprinting = true
-                    this.jumping = true
-                }
-            )
-            val cache = SimulatedPlayerCache(simulatedPlayer)
+            val cache = PlayerSimulationCache.getSimulationForLocalPlayer()
             val trajectoryPoints = mutableListOf<Pair<Vec3d, Boolean>>()
 
             for (tick in 0 until simulateTime) {
-                simulatedPlayer.tick()
                 val snapshot = cache.getSnapshotAt(tick)
                 val currentPos = snapshot.pos
                 val isSafe = canReachSafeBlockFrom() && !isInVoid(currentPos)
@@ -456,16 +448,9 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     }
 
     private fun canReachSafeBlockFrom(): Boolean {
-        val simulatedPlayer = SimulatedPlayer.fromClientPlayer(
-            SimulatedPlayer.SimulatedPlayerInput.fromClientPlayer(DirectionalInput(player.input)).apply {
-                this.sprinting = true
-                this.jumping = true
-            }
-        )
-        val cache = SimulatedPlayerCache(simulatedPlayer)
+        val cache = PlayerSimulationCache.getSimulationForLocalPlayer()
 
         for (tick in 0 until voidEvasionFrequency) {
-            simulatedPlayer.tick()
             val snapshot = cache.getSnapshotAt(tick)
             val currentPos = snapshot.pos
             val blockPos = BlockPos(currentPos.x.toInt(), currentPos.y.toInt(), currentPos.z.toInt())
@@ -965,16 +950,9 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     }
 
     private fun simulatePlayerTrajectory(checkCondition: (Vec3d, Box, BlockPos) -> Boolean): Boolean {
-        val simulatedPlayer = SimulatedPlayer.fromClientPlayer(
-            SimulatedPlayer.SimulatedPlayerInput.fromClientPlayer(DirectionalInput(player.input)).apply {
-                this.sprinting = true
-                this.jumping = true
-            }
-        )
-        val cache = SimulatedPlayerCache(simulatedPlayer)
+        val cache = PlayerSimulationCache.getSimulationForLocalPlayer()
 
         for (tick in 0 until simulateTime) {
-            simulatedPlayer.tick()
             val snapshot = cache.getSnapshotAt(tick)
             val pos = snapshot.pos
             val playerBox = player.boundingBox.offset(pos.subtract(player.pos))
