@@ -23,7 +23,7 @@ object RenderMode : JumpEffectMode("Render") {
     private val lifetime by int("Lifetime", 30, 1..30)
     private val circles = ArrayDeque<ObjectLongMutablePair<Vec3d>>()
 
-    override fun onEnabled() {
+    override fun enable() {
         circles.clear()
     }
 

@@ -69,7 +69,7 @@ object ModuleTimer : ClientModule("Timer", Category.WORLD, disableOnQuit = true)
         private val onMove by boolean("OnMove", false)
         private var currentState: TimerState = TimerState.NORMAL_SPEED
 
-        override fun onEnabled() {
+        override fun enabled() {
             currentState = TimerState.NORMAL_SPEED
         }
 

@@ -36,7 +36,7 @@ object ImageMode : JumpEffectMode("Image") {
         Image.entries.forEach { it.texture }
     }
 
-    override fun onEnabled() {
+    override fun enable() {
         cache.clear()
         circles.clear()
     }
