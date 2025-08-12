@@ -65,13 +65,19 @@ object ModuleBlink : ClientModule("Blink", Category.PLAYER) {
         tree(AutoResetOption)
     }
 
-    override fun enable() {
+    override fun onEnabled() {
         if (dummy) {
             val clone = OtherClientPlayerEntity(world, player.gameProfile)
+
             clone.headYaw = player.headYaw
             clone.copyPositionAndRotation(player)
+            /**
+             * A different UUID has to be set, to avoid [dummyPlayer] from being invisible to [player]
+             * @see net.minecraft.world.entity.EntityIndex.add
+             */
             clone.uuid = UUID.randomUUID()
             world.addEntity(clone)
+
             dummyPlayer = clone
         }
 
@@ -82,6 +88,7 @@ object ModuleBlink : ClientModule("Blink", Category.PLAYER) {
         )
     }
 
+    override fun onDisabled() {
     override fun disable() {
         notification(
             "Blink",
@@ -95,7 +102,6 @@ object ModuleBlink : ClientModule("Blink", Category.PLAYER) {
         blinkPacketCount = 0
         lastNotifyCount = -1
     }
-
 
     private fun removeClone() {
         val clone = dummyPlayer ?: return
@@ -179,7 +185,6 @@ object ModuleBlink : ClientModule("Blink", Category.PLAYER) {
             }
         }
     }
-
 
     @Suppress("unused")
     private val fakeLagHandler = handler<QueuePacketEvent> { event ->

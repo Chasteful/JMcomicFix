@@ -50,6 +50,7 @@ import net.minecraft.client.gui.screen.multiplayer.ConnectScreen
  *
  * The client in-game dashboard.
  */
+
 object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = true) {
 
     override val running
@@ -136,25 +137,25 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
         tree(Configurable("Custom", value = customComponents as MutableList<Value<*>>))
     }
 
-    override fun enable() {
-
-
+    override fun onEnabled() {
         if (isHidingNow) {
             chat(markAsError(message("hidingAppearance")))
         }
 
-
+        // Minimap
         RenderedEntities.subscribe(this)
         ChunkScanner.subscribe(ChunkRenderer.MinimapChunkUpdateSubscriber)
+
         if (visible) {
             open()
         }
     }
 
-    override fun disable() {
+    override fun onDisabled() {
         // Closes tab entirely
         browserBrowser?.close()
         browserBrowser = null
+
         // Minimap
         RenderedEntities.unsubscribe(this)
         ChunkScanner.unsubscribe(ChunkRenderer.MinimapChunkUpdateSubscriber)
@@ -166,6 +167,7 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
         tree(GlobalBrowserSettings)
         browserSettings = tree(BrowserSettings(60, ::reopen))
     }
+
     @Suppress("unused")
     private val screenHandler = handler<ScreenEvent> { event ->
         // Close the tab when the HUD is not running, is hiding now, or the player is not in-game
@@ -173,6 +175,7 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
             close()
             return@handler
         }
+
         // Otherwise, open the tab and set its visibility
         val browserTab = open()
         browserTab.visible = event.screen !is DisconnectedScreen && event.screen !is ConnectScreen
@@ -200,9 +203,7 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
         }
     }
 
-
     private fun close() {
-
         browserBrowser?.close()
         browserBrowser = null
     }

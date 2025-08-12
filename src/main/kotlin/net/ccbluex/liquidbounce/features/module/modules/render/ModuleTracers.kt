@@ -66,11 +66,12 @@ object ModuleTracers : ClientModule("Tracers", Category.RENDER) {
             return Color4b(255, 0, 0, 255) to Color4b(0, 255, 0, 255)
         }
     }
-    override fun enable() {
+
+    override fun onEnabled() {
         RenderedEntities.subscribe(this)
     }
 
-    override fun disable() {
+    override fun onDisabled() {
         RenderedEntities.unsubscribe(this)
     }
 
@@ -161,5 +162,6 @@ object ModuleTracers : ClientModule("Tracers", Category.RENDER) {
                 }
             }
         }
+
     }
 }

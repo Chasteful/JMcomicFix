@@ -92,9 +92,9 @@ object ModuleEagle : ClientModule(
         tree(Conditional)
     }
 
-    override fun disable() {
+    override fun onDisabled() {
         wasSneaking = false
-        super.disable()
+        super.onDisabled()
     }
 
     @Suppress("unused")

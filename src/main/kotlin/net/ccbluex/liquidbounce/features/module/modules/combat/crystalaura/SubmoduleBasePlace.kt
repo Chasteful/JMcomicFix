@@ -151,7 +151,7 @@ object SubmoduleBasePlace : ToggleableConfigurable(ModuleCrystalAura, "BasePlace
         }
     }
 
-    override fun disable() {
+    override fun onDisabled() {
         placer.disable()
         currentTarget = null
     }

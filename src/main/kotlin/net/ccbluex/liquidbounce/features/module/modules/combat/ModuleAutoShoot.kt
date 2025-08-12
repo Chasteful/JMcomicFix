@@ -42,6 +42,7 @@ import net.ccbluex.liquidbounce.utils.client.interactItem
 import net.ccbluex.liquidbounce.utils.combat.CombatManager
 import net.ccbluex.liquidbounce.utils.combat.TargetPriority
 import net.ccbluex.liquidbounce.utils.combat.TargetTracker
+import net.ccbluex.liquidbounce.utils.inventory.*
 import net.ccbluex.liquidbounce.utils.inventory.HotbarItemSlot
 import net.ccbluex.liquidbounce.utils.inventory.InventoryManager
 import net.ccbluex.liquidbounce.utils.inventory.OffHandSlot
@@ -151,8 +152,6 @@ object ModuleAutoShoot : ClientModule("AutoShoot", Category.COMBAT) {
             return@handler
         }
 
-
-
         // Check if we have a throwable, if not we can't shoot.
         val slot = getThrowable() ?: return@handler
 
@@ -169,7 +168,7 @@ object ModuleAutoShoot : ClientModule("AutoShoot", Category.COMBAT) {
         )
     }
 
-    override fun disable() {
+    override fun onDisabled() {
         targetTracker.reset()
     }
 
@@ -186,6 +185,7 @@ object ModuleAutoShoot : ClientModule("AutoShoot", Category.COMBAT) {
         if (notDuringCombat && CombatManager.isInCombat) {
             return@tickHandler
         }
+
         // Check if we have a throwable, if not we can't shoot.
         val slot = getThrowable() ?: return@tickHandler
 
@@ -235,7 +235,6 @@ object ModuleAutoShoot : ClientModule("AutoShoot", Category.COMBAT) {
                 // Should not happen, we convert [gravityType] to LINEAR or PROJECTILE before.
                 return null
             }
-
             GravityType.LINEAR -> Rotation.lookingAt(pointOnHitbox.toPoint, pointOnHitbox.fromPoint)
             // Determines the required yaw and pitch angles to hit a target with a projectile,
             // considering gravity's effect on the projectile's motion.

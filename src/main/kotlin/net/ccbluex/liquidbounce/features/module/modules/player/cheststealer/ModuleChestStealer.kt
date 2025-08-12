@@ -30,6 +30,7 @@ import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.features.module.modules.player.cheststealer.features.FeatureChestAura
 import net.ccbluex.liquidbounce.features.module.modules.player.invcleaner.*
 import net.ccbluex.liquidbounce.utils.inventory.*
+import net.ccbluex.liquidbounce.utils.item.*
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
 import net.minecraft.text.Text
 import kotlin.math.ceil
@@ -42,9 +43,9 @@ import kotlin.math.ceil
 
 object ModuleChestStealer : ClientModule("ChestStealer", Category.PLAYER) {
 
-
     private val inventoryConstrains = tree(InventoryConstraints())
     private val autoClose by boolean("AutoClose", true)
+
     private val selectionMode by enumChoice("SelectionMode", SelectionMode.DISTANCE)
     private val itemMoveMode by enumChoice("MoveMode", ItemMoveMode.QUICK_MOVE)
     private val quickSwaps by boolean("QuickSwaps", true)
@@ -61,11 +62,9 @@ object ModuleChestStealer : ClientModule("ChestStealer", Category.PLAYER) {
         tree(FeatureChestAura)
     }
 
-    override fun disable() {
+    override fun onDisabled() {
         FeatureChestAura.interactedBlocksSet.clear()
-        initialItemCount = 0
-        remainingItems = 0
-        super.disable()
+        super.onDisabled()
     }
 
     val scheduleInventoryAction = handler<ScheduleInventoryActionEvent> { event ->
@@ -104,7 +103,7 @@ object ModuleChestStealer : ClientModule("ChestStealer", Category.PLAYER) {
         }
         updateRemainingItems(itemsToCollect.size)
 
-
+        // Quick swap items in hotbar (i.e. swords), some servers hate them
         if (quickSwaps && performQuickSwaps(event, cleanupPlan, screen) != null) {
             return@handler
         }
@@ -120,11 +119,13 @@ object ModuleChestStealer : ClientModule("ChestStealer", Category.PLAYER) {
             val emptySlot = findEmptyStorageSlotsInInventory().firstOrNull() ?: break
             val actions = getActionsForMove(screen, from = slot, to = emptySlot)
 
-            event.schedule(
-                inventoryConstrains, actions,
+            event.schedule(inventoryConstrains, actions,
+                /**
+                 * we prioritize item based on how important it is
+                 * for example we should prioritize armor over apples
+                 */
                 ItemCategorization(listOf()).getItemFacets(slot).maxOf { it.category.type.allocationPriority }
             )
-            break
         }
 
         if (autoClose && (sortedItemsToCollect.isEmpty() || !hasInventorySpace() && stillRequiredSpace > 0)) {

@@ -24,6 +24,7 @@ import net.ccbluex.liquidbounce.event.tickHandler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.features.module.modules.movement.elytrafly.modes.ElytraFlyModeBoost
+import net.ccbluex.liquidbounce.features.module.modules.movement.elytrafly.modes.ElytraFlyModePitch40Infinite
 import net.ccbluex.liquidbounce.features.module.modules.movement.elytrafly.modes.ElytraFlyModeStatic
 import net.ccbluex.liquidbounce.features.module.modules.movement.elytrafly.modes.ElytraFlyModeVanilla
 import net.ccbluex.liquidbounce.utils.entity.moving
@@ -48,6 +49,7 @@ object ModuleElytraFly : ClientModule("ElytraFly", Category.MOVEMENT) {
     }
 
 
+
     private val notInFluid by boolean("NotInFluid", false)
 
     /**
@@ -60,21 +62,20 @@ object ModuleElytraFly : ClientModule("ElytraFly", Category.MOVEMENT) {
         tree(Speed)
     }
 
-    internal val modes = choices(
-        "Mode", ElytraFlyModeStatic, arrayOf(
-            ElytraFlyModeStatic,
-            ElytraFlyModeVanilla,
-            ElytraFlyModeBoost
-        )
-    )
+    internal val modes = choices("Mode", ElytraFlyModeStatic, arrayOf(
+        ElytraFlyModeStatic,
+        ElytraFlyModeVanilla,
+        ElytraFlyModeBoost,
+        ElytraFlyModePitch40Infinite
+    ))
 
     private var needsToRestart = false
 
-    override fun enable() {
+    override fun onEnabled() {
         needsToRestart = false
     }
 
-    override fun disable() {
+    override fun onDisabled() {
         needsToRestart = true
     }
 
@@ -88,9 +89,9 @@ object ModuleElytraFly : ClientModule("ElytraFly", Category.MOVEMENT) {
 
         val stop =
             mc.options.sneakKey.isPressed
-                && Instant.STOP in instant
-                && player.isOnGround
-                || notInFluid && player.isInFluid
+            && Instant.STOP in instant
+            && player.isOnGround
+            || notInFluid && player.isInFluid
 
         if (stop && player.isGliding) {
             player.stopGliding()

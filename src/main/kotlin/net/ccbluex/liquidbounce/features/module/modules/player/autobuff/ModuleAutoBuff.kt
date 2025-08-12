@@ -164,11 +164,11 @@ object ModuleAutoBuff : ClientModule(
         }
     }
 
-    override fun disable() {
+    override fun onDisabled() {
         SilentHotbar.resetSlot(ModuleAutoBuff)
 
-        features.forEach { it.disable() }
-        super.disable()
+        features.forEach { it.onDisabled() }
+        super.onDisabled()
     }
 
 }
