@@ -49,7 +49,7 @@ import org.lwjgl.glfw.GLFW
 object ModuleClickGui :
     ClientModule("ClickGUI", Category.RENDER, bind = GLFW.GLFW_KEY_RIGHT_SHIFT, disableActivation = true) {
 
-    override val running = true
+    override val running get() = true
 
     @Suppress("UnusedPrivateProperty")
     private val scale by float("Scale", 1f, 0.5f..2f).onChanged {
@@ -145,8 +145,10 @@ object ModuleClickGui :
      * Closes the ClickGUI view
      */
     private fun close() {
-        clickGuiBrowser?.close()
-        clickGuiBrowser = null
+        clickGuiBrowser?.let {
+            it.close()
+            clickGuiBrowser = null
+        }
     }
 
     /**
@@ -169,7 +171,7 @@ object ModuleClickGui :
         }
     @Suppress("unused")
     private val browserReadyHandler = handler<BrowserReadyEvent>(priority = READ_FINAL_STATE) {
-        tree(IntegrationListener.browserSettings!!)
+        tree(IntegrationListener.browserSettings)
         open()
     }
 
@@ -198,6 +200,10 @@ object ModuleClickGui :
      * An empty screen that acts as hint when to draw the clickgui
      */
     class ClickScreen : Screen("ClickGUI".asText()) {
+
+        override fun init() {
+            super.init()
+        }
 
         override fun close() {
             mc.mouse.lockCursor()

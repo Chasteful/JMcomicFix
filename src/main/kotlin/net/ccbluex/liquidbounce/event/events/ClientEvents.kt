@@ -30,6 +30,7 @@ import net.ccbluex.liquidbounce.event.Event
 import net.ccbluex.liquidbounce.features.chat.packet.User
 import net.ccbluex.liquidbounce.features.misc.proxy.Proxy
 import net.ccbluex.liquidbounce.features.module.modules.misc.nameprotect.ModuleNameProtect
+import net.ccbluex.liquidbounce.integration.VirtualScreenType
 import net.ccbluex.liquidbounce.integration.interop.protocol.event.WebSocketEvent
 import net.ccbluex.liquidbounce.integration.interop.protocol.rest.v1.game.PlayerData
 import net.ccbluex.liquidbounce.integration.theme.component.Component
@@ -196,7 +197,11 @@ object BrowserReadyEvent : Event()
 
 @Nameable("virtualScreen")
 @WebSocketEvent
-class VirtualScreenEvent(val screenName: String, val action: Action) : Event() {
+class VirtualScreenEvent(
+    val type: VirtualScreenType,
+    @Deprecated("Use `type` instead") val screenName: String = type.routeName,
+    val action: Action
+) : Event() {
 
     enum class Action {
         @SerializedName("open")
@@ -255,7 +260,7 @@ class ScheduleInventoryActionEvent(val schedule: MutableList<InventoryActionChai
 }
 
 @Nameable("selectHotbarSlotSilently")
-class SelectHotbarSlotSilentlyEvent(val requester: Any?, val slot: Int) : CancellableEvent()
+class SelectHotbarSlotSilentlyEvent(val requester: Any?, val slot: Int): CancellableEvent()
 
 @Nameable("browserUrlChange")
 @WebSocketEvent
