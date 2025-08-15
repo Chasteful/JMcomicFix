@@ -70,23 +70,23 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     @Suppress("unused")
     private val algorithm by enumChoice("Algorithm", Algorithm.SimulatedAnnealing)
 
-    private val voidEvasionFrequency by int("VoidEvasionFrequency", 14, 5..20)
     private val voidThreshold by int("VoidLevel", 0, -256..0)
-    private val landTimeLimit by int ("LandTimeLimit", 40, 2..40)
-    private val maxIterations by int("MaxIterations", 5000, 50..10000)
-    private val stagnationLimit by int("StagnationLimit", 2333, 1000..10000)
-    private val coolingFactor by float("CoolingFactor", 0.97f, 0.95f..0.99f)
-    private val iterationSpeed by float("IterationsSpeed", 5f, 1f..50f)
-    private val initialTemperature by float("InitialTemp", 20f, 5f..50f)
+    private val voidCheckInterval by int("VoidCheckInterval", 14, 5..20)
+    private val pearlTrajectorySteps by int ("PearlTrajectorySteps", 40, 20..100)
+    private val maxIterations by int("MaxIterations", 2000, 50..10000)
+    private val stagnationLimit by int("StagnationLimit", 1337, 1000..10000)
+    private val iterationSpeed by float("IterationsSpeed", 5f, 1f..5f)
     private val minTemperature by float("MinTemperature", 0.01f, 0.01f..0.1f)
+    private val initialTemperature by float("InitialTemp", 20f, 5f..50f)
+    private val temperatureDecayRate by float("TemperatureDecayRate", 0.97f, 0.80f..0.99f)
     private val aimPrecision by float("AimPrecision", 0.1f, 0.1f..1f)
     private val pitchRange by floatRange("PitchLimit", -90f..0f, -90f..45f)
     private val adjacentSafeBlocks by int("AdjacentSafeBlocks", 0, 0..3)
     private val simulateTime by int("SimulationTime", 30, 30..50, "ticks")
-    private var cooldownTicks by int("PauseOnFinish", 0, 0..20, "ticks")
+    private var postThrowCooldownTicks by int("PauseOnFinish", 0, 0..20, "ticks")
 
     private val allowClutchWithStuck by boolean("AllowClutchWithStuck", true)
-    private val checkHeadSpace by boolean("EnsureHeadSpace", true)
+    private val ensureCompleteSpace by boolean("EnsureCompleteSpace", true)
     private val playerTrajectory by boolean("PlayerTrajectory", true)
     private val onlyDuringCombat by boolean("OnlyDuringCombat", false)
 
@@ -108,22 +108,22 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
 
     var state = State.IDLE
 
-    private val positionCache = ConcurrentHashMap<BlockPos, Double>()
+    private val blockPositionScoreCache = ConcurrentHashMap<BlockPos, Double>()
     private var currentSolution = Rotation(0f, 0f)
     private var bestEnergy = Double.MAX_VALUE
     private var currentEnergy = Double.MAX_VALUE
     private var temperature = initialTemperature
     private var iterations = 0
-    private var avgCalcTime = 0.1f
-    private var noImprovementCount = 0
     private var safetyCheckCounter = 0
-    private var pearlThrowTick: Long = 0L
+    private var iterationsWithoutImprovement = 0
+    private var averageCalculationTimeSeconds = 0.1f
+    private var pearlThrownTick: Long = 0L
     private var lastPearlThrowTime: Long = 0L
     private var lastTrajectoryUpdate: Long = 0L
     private var isPearlInFlight = false
     private var safetyCheckActive = false
     private var manualPearlThrown = false
-    private var isLikelyFallingIntoVoid = false
+    private var isVoidFallImminent = false
     private var triggerPosition: Vec3d? = null
     private var bestSolution: Rotation? = null
     private var pearlSlot: HotbarItemSlot? = null
@@ -131,7 +131,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     private var predictedThrowPosition: Vec3d? = null
     private var cachedTrajectory: List<TrajectorySegment>? = null
     private var lastPlayerState: Triple<Vec3d, Vec3d, DirectionalInput>? = null
-    private val backgroundDone = AtomicBoolean(false)
+    private val calculationComplete = AtomicBoolean(false)
 
     data class TrajectorySegment(
         val start: Vector3f,
@@ -156,8 +156,8 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         }
 
         when (state) {
-            State.CALCULATING -> if (backgroundDone.get()) {
-                backgroundDone.set(false)
+            State.CALCULATING -> if (calculationComplete.get()) {
+                calculationComplete.set(false)
                 state = State.ROTATING
             }
             else -> handleStateMachine()
@@ -195,7 +195,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         if (event.packet is PlayerPositionLookS2CPacket) {
 
             isPearlInFlight = false
-            pearlThrowTick = 0L
+            pearlThrownTick = 0L
             notification(
                 "AutoClutch",
                 "Pearl landed, resuming calculations.",
@@ -248,9 +248,9 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         }
 
 
-        if (isPearlInFlight  && pearlThrowTick > 100) {
+        if (isPearlInFlight  && pearlThrownTick > 100) {
             isPearlInFlight = false
-            pearlThrowTick = 0L
+            pearlThrownTick = 0L
             notification(
                 "AutoClutch",
                 "Pearl timed out, resuming calculations.",
@@ -278,12 +278,12 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     }
 
     private fun pruneCache() {
-        while (positionCache.size > 1000) {
-            positionCache.entries.take(100).forEach { positionCache.remove(it.key) }
+        while (blockPositionScoreCache.size > 1000) {
+            blockPositionScoreCache.entries.take(100).forEach { blockPositionScoreCache.remove(it.key) }
         }
 
         val currentTime = System.currentTimeMillis()
-        positionCache.entries.removeIf { currentTime - it.value.toLong() > 15000 }
+        blockPositionScoreCache.entries.removeIf { currentTime - it.value.toLong() > 15000 }
     }
 
     private fun checkActivationConditions() {
@@ -299,7 +299,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
             return
         }
 
-        if (isLikelyFallingIntoVoid) {
+        if (isVoidFallImminent) {
             triggerPosition = player.pos
             state = State.FINDING_PEARL
             if (allowClutchWithStuck && !ModuleAutoStuck.enabled) {
@@ -375,7 +375,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         cachedTrajectory = null
         lastPlayerState = null
         lastTrajectoryUpdate = 0
-        positionCache.clear()
+        blockPositionScoreCache.clear()
     }
 
     private fun generateTrajectorySegments(
@@ -449,7 +449,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
 
     private fun canReachSafeBlockFrom(pos: Vec3d = player.pos): Boolean {
         val cache = PlayerSimulationCache.getSimulationForLocalPlayer()
-        val snapshots = (0 until voidEvasionFrequency).map { cache.getSnapshotAt(it) }
+        val snapshots = (0 until voidCheckInterval).map { cache.getSnapshotAt(it) }
 
         for (snapshot in snapshots) {
             val currentPos = snapshot.pos
@@ -469,7 +469,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     }
 
     private fun checkVoidFall() {
-        isLikelyFallingIntoVoid = isPredictingFall() && !canReachSafeBlock() && !isBlockUnder(2.0)
+        isVoidFallImminent = isPredictingFall() && !canReachSafeBlock() && !isBlockUnder(2.0)
     }
 
     private fun isPlayerSafe(): Boolean {
@@ -548,12 +548,12 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
             state = State.IDLE
             return
         }
-        predictedThrowPosition = predictFuturePosition(avgCalcTime.toDouble())
+        predictedThrowPosition = predictFuturePosition(averageCalculationTimeSeconds.toDouble())
         resetAnnealing()
 
         CompletableFuture.supplyAsync({
             calculateSolutionBackground()
-            backgroundDone.set(true)
+            calculationComplete.set(true)
         }, Util.getMainWorkerExecutor()).exceptionally { e ->
             notification(
                 "AutoClutch",
@@ -565,7 +565,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         }
         state = State.CALCULATING
         val endTime = System.currentTimeMillis()
-        avgCalcTime = (avgCalcTime * 0.9 + (endTime - startTime) / 1000.0 * 0.1).toFloat()
+        averageCalculationTimeSeconds = (averageCalculationTimeSeconds * 0.9 + (endTime - startTime) / 1000.0 * 0.1).toFloat()
     }
 
     private fun calculateSolutionBackground() {
@@ -588,10 +588,10 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
                     if (currentEnergy < bestEnergy) {
                         bestSolution = currentSolution
                         bestEnergy = currentEnergy
-                        noImprovementCount = 0
+                        iterationsWithoutImprovement = 0
                     } else {
-                        noImprovementCount++
-                        if (noImprovementCount > stagnationLimit && bestEnergy > 5000.0) {
+                        iterationsWithoutImprovement++
+                        if (iterationsWithoutImprovement > stagnationLimit && bestEnergy > 5000.0) {
                             state = State.IDLE
                             return
                         }
@@ -636,7 +636,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         val pearlEntity = EnderPearlEntity(mc.world!!, player, player.getStackInHand(Hand.MAIN_HAND))
         var pos = Vec3d(predictedPos.x, predictedPos.y + player.standingEyeHeight, predictedPos.z)
 
-        repeat(landTimeLimit) {
+        repeat(pearlTrajectorySteps) {
             val newPos = pos + motion
             val drag = if (!world.getBlockState(newPos.toBlockPos()).fluidState.isEmpty) {
                 trajectoryInfo.dragInWater
@@ -719,7 +719,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         bestEnergy = currentEnergy
         temperature = initialTemperature
         iterations = 0
-        noImprovementCount = 0
+        iterationsWithoutImprovement = 0
     }
 
     private fun calculateSolution() {
@@ -741,16 +741,16 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
                 if (currentEnergy < bestEnergy) {
                     bestSolution = currentSolution
                     bestEnergy = currentEnergy
-                    noImprovementCount = 0
+                    iterationsWithoutImprovement = 0
                 } else {
-                    noImprovementCount++
-                    if (noImprovementCount > stagnationLimit) {
+                    iterationsWithoutImprovement++
+                    if (iterationsWithoutImprovement > stagnationLimit) {
                         state = State.ROTATING
                         return@repeat
                     }
                 }
             }
-            temperature = (scaledTemperature * coolingFactor) / 100
+            temperature = (scaledTemperature * temperatureDecayRate) / 100
             iterations++
         }
     }
@@ -775,7 +775,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
             return Double.MAX_VALUE
         }
 
-        return positionCache.computeIfAbsent(blockPos) { _ ->
+        return blockPositionScoreCache.computeIfAbsent(blockPos) { _ ->
             val belowPos = blockPos.down()
             val belowState = world.getBlockState(belowPos)
             val hasGround = !belowState.isAir && belowState.block !in unsafeBlocks
@@ -813,7 +813,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
                     break
                 }
 
-                if (checkHeadSpace) {
+                if (ensureCompleteSpace) {
                     val abovePos = belowTestPos.up(2)
                     val aboveState = world.getBlockState(abovePos)
                     if (!aboveState.isAir || world.getBlockCollisions(player, playerBox.offset(0.0, 2.0, 0.0)).any()) {
@@ -868,7 +868,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
                         val state = world.getBlockState(checkPos)
                         if (!state.isAir && state.block !in unsafeBlocks && state.isFullCube(world, checkPos)) {
                             val abovePos = checkPos.up()
-                            if (!checkHeadSpace || world.getBlockState(abovePos).isAir) {
+                            if (!ensureCompleteSpace || world.getBlockState(abovePos).isAir) {
                                 nearest = center.add(0.0, 1.0, 0.0)
                                 bestDist = distSq
                             }
@@ -936,11 +936,11 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
 
     private fun throwPearl() {
         val currentTime = System.currentTimeMillis()
-        if (currentTime - lastPearlThrowTime < cooldownTicks * 50L) {
+        if (currentTime - lastPearlThrowTime < postThrowCooldownTicks * 50L) {
             state = State.IDLE
             return
         }
-        if (!isLikelyFallingIntoVoid && isPlayerSafe()) {
+        if (!isVoidFallImminent && isPlayerSafe()) {
             state = State.IDLE
             return
         }
@@ -951,7 +951,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
             useHotbarSlotOrOffhand(it, 0, bestSolution?.yaw ?: 0f, bestSolution?.pitch ?: 0f)
             lastPearlThrowTime = currentTime
             isPearlInFlight = true
-            pearlThrowTick = player.age.toLong()
+            pearlThrownTick = player.age.toLong()
             scheduleSafetyCheck()
         }
         ModuleAutoStuck.shouldEnableStuck = false
@@ -973,7 +973,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         iterations = 0
         triggerPosition = null
         pearlSlot = null
-        isLikelyFallingIntoVoid = false
+        isVoidFallImminent = false
         safetyCheckCounter = 0
         safetyCheckActive = false
         predictedThrowPosition = null
@@ -1015,7 +1015,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         resetAllVariables()
         lastPlayerPosition = null
         manualPearlThrown = false
-        positionCache.clear()
+        blockPositionScoreCache.clear()
     }
 
 }
