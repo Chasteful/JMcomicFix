@@ -82,7 +82,6 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     private val aimPrecision by float("AimPrecision", 0.1f, 0.1f..1f)
     private val pitchRange by floatRange("PitchLimit", -90f..0f, -90f..45f)
     private val adjacentSafeBlocks by int("AdjacentSafeBlocks", 0, 0..3)
-    private val searchRadius  by int("SearchRadius", 50, 30..50)
     private val simulateTime by int("SimulationTime", 30, 30..50, "ticks")
     private var cooldownTicks by int("PauseOnFinish", 0, 0..20, "ticks")
 
@@ -303,6 +302,9 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         if (isLikelyFallingIntoVoid) {
             triggerPosition = player.pos
             state = State.FINDING_PEARL
+            if (allowClutchWithStuck && !ModuleAutoStuck.enabled) {
+                ModuleAutoStuck.enabled = true
+            }
         }
     }
 
@@ -846,50 +848,44 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     }
 
     private fun findNearestSafeBlock(pos: Vec3d): Vec3d? {
-        val centerPos = pos.toBlockPos()
-        var nearestPos: BlockPos? = null
-        var minDistanceSq = Double.MAX_VALUE
+        val blockPos = pos.toBlockPos()
+        val maxThrowDistance = 50
+        val maxVerticalDistance = 40
+        var searchRadius = 6
 
-        // Search from player's y-level upwards first, then downwards
-        val yRange = (centerPos.y downTo max(centerPos.y - searchRadius, world.bottomY)) +
-            (centerPos.y + 1..min(centerPos.y + searchRadius, world.topYInclusive))
+        while (searchRadius <= maxThrowDistance) {
+            var nearest: Vec3d? = null
+            var bestDist = Double.MAX_VALUE
 
-        for (y in yRange) {
-            // Search in expanding rings outward from the center
-            for (radius in 0..searchRadius) {
-                for (x in -radius..radius) {
-                    for (z in -radius..radius) {
-                        // Only check blocks at the current radius
-                        if (max(abs(x), abs(z)) != radius) continue
+            for (y in -maxVerticalDistance..maxVerticalDistance) {
+                for (x in -searchRadius..searchRadius) {
+                    for (z in -searchRadius..searchRadius) {
+                        val checkPos = blockPos.add(x, y, z)
+                        val center = checkPos.toVec3d().add(0.5, 0.0, 0.5)
+                        val distSq = distanceSq2D(pos, center)
+                        if (distSq > maxThrowDistance * maxThrowDistance || distSq >= bestDist) continue
 
-                        val checkPos = BlockPos(centerPos.x + x, y, centerPos.z + z)
                         val state = world.getBlockState(checkPos)
-
                         if (!state.isAir && state.block !in unsafeBlocks && state.isFullCube(world, checkPos)) {
                             val abovePos = checkPos.up()
                             if (!checkHeadSpace || world.getBlockState(abovePos).isAir) {
-                                val distanceSq = pos.squaredDistanceTo(checkPos.x + 0.5, checkPos.y + 1.0, checkPos.z + 0.5)
-                                if (distanceSq < minDistanceSq) {
-                                    minDistanceSq = distanceSq
-                                    nearestPos = checkPos
-                                }
+                                nearest = center.add(0.0, 1.0, 0.0)
+                                bestDist = distSq
                             }
                         }
                     }
                 }
             }
 
-            if (nearestPos != null && minDistanceSq < 9.0) {
-                break
-            }
+            if (nearest != null) return nearest
+            searchRadius += 6
         }
-
-        return nearestPos?.let { nearestPos.toVec3d().add(0.5, 1.0, 0.5) }
+        return null
     }
+
 
     private fun rotateToSolution() {
         if (allowClutchWithStuck) {
-            ModuleAutoStuck.enabled = true
             ModuleAutoStuck.shouldEnableStuck = true
         }
 
