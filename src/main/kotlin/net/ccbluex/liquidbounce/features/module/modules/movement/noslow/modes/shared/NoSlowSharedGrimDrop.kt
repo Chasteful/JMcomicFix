@@ -33,7 +33,7 @@ internal class NoSlowSharedGrimDrop (override val parent: ChoiceConfigurable<*>)
         }
     }
 
-    override fun OnEnabled() {
+    override fun enable() {
         dropped = false
     }
 }

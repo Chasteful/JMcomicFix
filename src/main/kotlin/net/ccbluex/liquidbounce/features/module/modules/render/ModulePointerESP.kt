@@ -190,7 +190,7 @@ object ModulePointerESP : ClientModule("PointerESP", Category.RENDER) {
 
     override fun onDisabled() {
         pointerData.clear()
-        super.Disabled()
+        super.onDisabled()
     }
 
     override fun onEnabled() {

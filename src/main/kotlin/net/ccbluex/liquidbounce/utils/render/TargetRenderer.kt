@@ -60,7 +60,7 @@ sealed class TargetRenderer<T : RenderEnvironment>(
     private var lastChangeTime = 0L
 
     override fun onDisabled() {
-        super.Disabled()
+        super.onDisabled()
         reset()
     }
 

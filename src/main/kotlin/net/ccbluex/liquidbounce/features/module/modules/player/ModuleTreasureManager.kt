@@ -97,7 +97,7 @@ object ModuleTreasureManager : ClientModule("TreasureManager", Category.PLAYER) 
         initialItemCount = 0
         remainingItems = 0
         isInBedWars = false
-        super.Disabled()
+        super.onDisabled()
     }
 
 

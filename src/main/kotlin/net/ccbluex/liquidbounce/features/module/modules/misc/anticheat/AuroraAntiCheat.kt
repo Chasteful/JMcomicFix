@@ -67,7 +67,7 @@ object ModuleAntiCheat : ClientModule("AuroraAntiCheat", Category.MISC) {
 
     private val hackData = ConcurrentHashMap<Int, HackerLivingBase>()
 
-    override fun enable() {
+    override fun onEnabled() {
         chat(warning(translation("liquidbounce.module.disabler.messages.auroraAntiCheat")))
     }
 

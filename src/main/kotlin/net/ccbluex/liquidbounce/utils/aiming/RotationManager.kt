@@ -153,7 +153,7 @@ object RotationManager : EventListener {
         val activeRotationTarget = this.activeRotationTarget ?: return
         if (activeRotationTarget != previousRotationTarget) {
             (activeRotationTarget.processors.find { it is NeuralNetworkRotationProcessor }
-                as? NeuralNetworkRotationProcessor)?.newState(true)
+                as? NeuralNetworkRotationProcessor)?.onToggled(true)
         }
         val playerRotation = player.rotation
 

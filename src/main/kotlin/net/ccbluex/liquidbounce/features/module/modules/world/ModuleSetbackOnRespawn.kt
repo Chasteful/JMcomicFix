@@ -151,7 +151,7 @@ object ModuleSetbackOnRespawn : ClientModule("SetbackOnRespawn", Category.WORLD)
             }
         }
 
-        override fun onEnabled() {
+        override fun enable() {
             wasDamaged = false
             damageTime = 0L
         }

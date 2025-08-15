@@ -49,7 +49,7 @@ object ModuleFullBright : ClientModule("FullBright", Category.RENDER) {
 
         var gamma = 0.0
 
-        override fun onEnabled() {
+        override fun enable() {
             gamma = mc.options.gamma.value
             if (removeNightVision) {
                 player.removeStatusEffect(StatusEffects.NIGHT_VISION)
