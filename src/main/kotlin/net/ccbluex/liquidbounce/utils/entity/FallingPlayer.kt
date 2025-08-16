@@ -105,7 +105,13 @@ class FallingPlayer(
 
         this.simulatedTicks++
     }
-    private fun applyElytraPhysics(velocity: Vec3d, rotationVec: Vec3d, pitch: Float, horizontalSpeed: Double, rotationHorizontal: Double, gravity: Double): Vec3d {
+    private fun applyElytraPhysics(
+        velocity: Vec3d,
+        rotationVec: Vec3d,
+        pitch: Float,
+        horizontalSpeed: Double,
+        rotationHorizontal: Double,
+        gravity: Double): Vec3d {
         var result = velocity.add(0.0, gravity * (-1.0 + MathHelper.cos(pitch) * 0.75), 0.0)
 
         if (result.y < 0.0 && rotationHorizontal > 0.0) {
@@ -115,7 +121,10 @@ class FallingPlayer(
 
         if (pitch < 0.0f && rotationHorizontal > 0.0) {
             val q = horizontalSpeed * (-MathHelper.sin(pitch)) * 0.04
-            result = result.add(-rotationVec.x * q / rotationHorizontal, q * 3.2, -rotationVec.z * q / rotationHorizontal)
+            result = result.add(
+                -rotationVec.x * q / rotationHorizontal,
+                q * 3.2,
+                -rotationVec.z * q / rotationHorizontal)
         }
 
         if (rotationHorizontal > 0.0) {
