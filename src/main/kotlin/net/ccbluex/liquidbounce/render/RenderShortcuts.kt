@@ -41,6 +41,7 @@ import net.minecraft.util.math.Vec3d
 import org.joml.Matrix4f
 import org.lwjgl.opengl.GL11C
 import net.minecraft.client.gui.DrawContext
+import net.minecraft.item.ItemStack
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.math.PI
@@ -108,6 +109,56 @@ class WorldRenderEnvironment(matrixStack: MatrixStack, val camera: Camera) : Ren
 }
 
 fun newDrawContext(): DrawContext = DrawContext(mc, mc.bufferBuilders.entityVertexConsumers)
+private const val ITEM_SIZE = 16
+
+/**
+ * Draw a tag for a list of [ItemStack]s.
+ *
+ * @param centerPos The render position, also the center of the whole tag.
+ * @param rowLength The maximum count of stack which can be placed in one row.
+ */
+@Suppress("LongParameterList")
+fun DrawContext.drawItemTags(
+    stacks: List<ItemStack>,
+    centerPos: Vec3,
+    backgroundColor: Int = Int.MIN_VALUE,
+    backgroundMargin: Int = 2,
+    scale: Float = 1.0F,
+    rowLength: Int = 9,
+) {
+    if (stacks.isEmpty()) return
+
+    val width = ITEM_SIZE * minOf(stacks.size, rowLength)
+    val height = ITEM_SIZE * (stacks.size / rowLength + if (stacks.size % rowLength != 0) 1 else 0)
+
+    matrices.push()
+
+    matrices.translate(centerPos.x, centerPos.y, 0.0F)
+    matrices.scale(scale, scale, 1.0F)
+    matrices.translate(-width / 2f, -height / 2f, centerPos.z)
+
+    // draw background
+    fill(
+        -backgroundMargin,
+        -backgroundMargin,
+        width + backgroundMargin,
+        height + backgroundMargin,
+        backgroundColor
+    )
+
+    // render stacks
+    stacks.forEachIndexed { i, stack ->
+        if (stack.isEmpty) return@forEachIndexed
+
+        val leftX = i % rowLength * ITEM_SIZE
+        val topY = i / rowLength * ITEM_SIZE
+
+        drawItem(stack, leftX, topY)
+        drawStackOverlay(mc.textRenderer, stack, leftX, topY)
+    }
+
+    matrices.pop()
+}
 
 /**
  * Helper function to render an environment with the specified [matrixStack] and [draw] block.

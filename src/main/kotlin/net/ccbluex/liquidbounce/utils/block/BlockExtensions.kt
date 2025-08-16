@@ -403,6 +403,16 @@ fun BlockPos.canStandOn(): Boolean {
     return this.getState()!!.isSideSolid(world, this, Direction.UP, SideShapeType.CENTER)
 }
 
+fun BlockState?.anotherChestPartDirection(): Direction? {
+    if (this?.block !is ChestBlock) return null
+
+    if (ChestBlock.getDoubleBlockType(this) === DoubleBlockProperties.Type.SINGLE) {
+        return null
+    }
+
+    return ChestBlock.getFacing(this)
+}
+
 /**
  * Check if box is reaching of specified blocks
  */

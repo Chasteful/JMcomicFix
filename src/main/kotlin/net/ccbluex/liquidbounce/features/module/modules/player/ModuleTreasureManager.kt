@@ -9,8 +9,10 @@ import net.ccbluex.liquidbounce.event.events.ScheduleInventoryActionEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
+import net.ccbluex.liquidbounce.features.module.modules.player.cheststealer.features.FeatureSilentScreen
 import net.ccbluex.liquidbounce.utils.inventory.*
 import net.ccbluex.liquidbounce.utils.kotlin.Priority
+import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
 import net.minecraft.item.Item
 import net.minecraft.item.Items
@@ -84,6 +86,7 @@ object ModuleTreasureManager : ClientModule("TreasureManager", Category.PLAYER) 
 
     init {
         tree(OnlyCurrency)
+
         handler<PacketEvent> { event ->
             if (!checkGaming) return@handler
             val scoreboard = mc.world?.scoreboard ?: return@handler
@@ -213,13 +216,16 @@ object ModuleTreasureManager : ClientModule("TreasureManager", Category.PLAYER) 
         ).any { Text.translatable(it).string == titleString }
     }
 
+
     private fun getChestScreen(): GenericContainerScreen? {
-        val screen = mc.currentScreen
-        return if (screen is GenericContainerScreen && (!checkTitle || isScreenTitleChest(screen))) {
-            screen
-        } else {
-            null
-        }
+        return mc.currentScreen?.takeIf { it.canBeStore() } as GenericContainerScreen?
+
+    }
+
+    private fun Screen.canBeStore(): Boolean {
+        return running && this is GenericContainerScreen && (!checkTitle || isScreenTitleChest(
+            this
+        ))
     }
 
     private fun findValuableItemsInInventory(): List<ItemSlot> {

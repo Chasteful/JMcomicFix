@@ -7,6 +7,7 @@ import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.event.tickHandler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
+import net.ccbluex.liquidbounce.utils.client.MovePacketType
 import net.ccbluex.liquidbounce.utils.client.SilentHotbar
 import net.ccbluex.liquidbounce.utils.combat.TargetPriority
 import net.ccbluex.liquidbounce.utils.combat.TargetTracker
@@ -36,6 +37,8 @@ object ModuleBowAura : ClientModule("TPBowAura", Category.COMBAT, disableOnQuit 
     private val antiLag by boolean("AntiLag", true)
     private val antiLagHighVersion by boolean("AntiLag-1.9+", true)
     private val throughWalls by boolean("IgnoreWalls", true)
+
+    private val packetType by enumChoice("PacketType", MovePacketType.FULL)
 
     internal val targetTracker = tree(object : TargetTracker(
         TargetPriority.DISTANCE,
@@ -333,18 +336,13 @@ object ModuleBowAura : ClientModule("TPBowAura", Category.COMBAT, disableOnQuit 
             )
         )
 
-        // 3. Aim at target
-        repeat(20) {
+
+        repeat(20) { // 20 tick = 满蓄力
             val (yaw, pitch) = calculateBowAngles(target, x, z)
-            network.sendPacket(
-                PlayerMoveC2SPacket.LookAndOnGround(
-                    yaw,
-                    pitch,
-                    player.isOnGround,
-                    false
-                )
-            )
+            network.sendPacket(PlayerMoveC2SPacket.LookAndOnGround(yaw, pitch, player.isOnGround, false))
+            network.sendPacket(packetType.generatePacket()) // 关键：多次 tick 让服务端计数增加
         }
+
 
         // 4. Release the bow (equivalent to C07PacketPlayerDigging.Action.RELEASE_USE_ITEM)
         network.sendPacket(
