@@ -1,22 +1,14 @@
 <script lang="ts">
     import {onDestroy} from 'svelte';
-    import {listen} from "../../../integration/ws";
-    import type {ClientPlayerDataEvent} from "../../../integration/events";
-    import type {PlayerData} from "../../../integration/types";
-    import {throttle} from "lodash";
+    import {getBPS} from "../../../util/movement_utils";
 
     export let width: number = 250;
     export let amplitude: number = 50;
     export let yOffset: number = -210;
-    export let tickrate: number = 20;
 
     let speeds: number[] = [];
     let maxSpeed: number = 0.1;
     let pathD: string = '';
-    let lastUpdate = Date.now();
-
-    let playerData: PlayerData | null = null;
-    let lastPosition = {x: 0, z: 0};
 
     const updateGraph = () => {
         const MAX_POINTS = 100;
@@ -29,14 +21,6 @@
             updatePath();
         }
     };
-
-    const interval = setInterval(() => {
-        const now = Date.now();
-        if (now - lastUpdate > 500) {
-            speeds = [...speeds, 0];
-            updateGraph();
-        }
-    }, 20);
 
     function updatePath() {
         const points = speeds.map((speed, i) => ({
@@ -55,29 +39,10 @@
         pathD = d;
     }
 
-    listen(
-        "clientPlayerData",
-        throttle((event: ClientPlayerDataEvent) => {
-            lastUpdate = Date.now();
-            if (!playerData) {
-                playerData = event.playerData;
-                lastPosition = {
-                    x: playerData.position.x,
-                    z: playerData.position.z
-                };
-                return;
-            }
-
-            const newPos = event.playerData.position;
-            const dx = newPos.x - lastPosition.x;
-            const dz = newPos.z - lastPosition.z;
-            const speed = Math.sqrt(dx * dx + dz * dz) * tickrate;
-
-            speeds = [...speeds, speed];
-            lastPosition = {x: newPos.x, z: newPos.z};
-            updateGraph();
-        }, 50)
-    );
+    const interval = setInterval(() => {
+        speeds = [...speeds, getBPS.current];
+        updateGraph();
+    }, 50);
 
     onDestroy(() => {
         clearInterval(interval);
