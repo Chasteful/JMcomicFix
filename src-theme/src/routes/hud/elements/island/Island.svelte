@@ -455,13 +455,21 @@
     }
     $: {
         if (nextContent) {
-            const baseWidth = contentRefs.status?.scrollWidth || 312;
+
             w.set(
                 nextContent === 'chest'
-                    ? (chestMeasured ? chestWidth : (contentRefs.chest?.scrollWidth || baseWidth))
+                    ? (contentRefs.chest?.scrollWidth || 312)
                     : nextContentWidth
             );
-            h.set(nextContent === 'alert' ? 50 : nextContent === 'chest' ? (openChest.length > 27 ? 200 : 104) : 40);
+
+            h.set(
+                nextContent === 'alert'
+                    ? 50
+                    : nextContent === 'chest'
+                        ? (contentRefs.chest?.scrollHeight || 104) + 32
+                        : 40
+            );
+
         } else {
             const widthMap = {
                 alert: 280 + 32,
@@ -473,13 +481,21 @@
                 ? widthMap.alert
                 : widthMap[currentContent];
             w.set(targetWidth);
-            h.set(currentContent === 'alert' ? 50 : currentContent === 'chest' ? (openChest.length > 27 ? 200 : 104) : 40);
+            h.set(
+                currentContent === 'alert'
+                    ? 50
+                    : currentContent === 'chest'
+                        ? (contentRefs.chest?.scrollHeight || 104) + 32
+                        : 40
+            );
         }
     }
-    $: if (currentContent === 'chest' && !chestMeasured && contentRefs.chest?.scrollWidth) {
-        chestWidth = contentRefs.chest.scrollWidth + 32;
+    $: if (currentContent === 'chest' && contentRefs.chest?.scrollWidth) {
+        chestWidth = contentRefs.chest.scrollWidth;
         chestMeasured = true;
+        w.set(chestWidth);
     }
+
 
     $: if (openChest.length > 0 && currentContent !== 'alert' && !initialAnimation && progressEvent?.title === "ChestStealer") {
         switchContent('chest');
