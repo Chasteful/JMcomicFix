@@ -50,6 +50,31 @@
     });
 
 </script>
+
+<div class="stats-container" transition:fly={{duration: 700, x: -50, easing: expoInOut}}>
+    {#if clientInfo}
+        <div class="stat">
+            <span class="label">FPS:&nbsp;</span>
+            <span class="value">{clientInfo.fps}</span>
+        </div>
+    {/if}
+    {#if playerData}
+        {@const bpsValue = roundToDecimal(getBPS.current, 2).toString().padStart(6, " ")}
+
+        <div class="stat">
+            <span class="label">BPS:&nbsp;</span>
+            <span class="value">{bpsValue}</span>
+        </div>
+        {@const x = formatCoordinate($xPos)}
+        {@const y = formatCoordinate($yPos)}
+        {@const z = formatCoordinate($zPos)}
+        <div class="stat">
+            <span class="label">XYZ:&nbsp;</span>
+            <span class="value">{x}, {y}, {z}</span>
+        </div>
+    {/if}
+</div>
+
 <style lang="scss">
   @use "../../../colors.scss" as *;
 
@@ -93,27 +118,3 @@
     }
   }
 </style>
-
-<div class="stats-container" transition:fly={{duration: 700, x: -50, easing: expoInOut}}>
-    {#if clientInfo}
-        <div class="stat">
-            <span class="label">FPS:&nbsp;</span>
-            <span class="value">{clientInfo.fps}</span>
-        </div>
-    {/if}
-    {#if playerData}
-        {@const bpsValue = roundToDecimal(getBPS.current, 2).toString().padStart(6, " ")}
-
-        <div class="stat">
-            <span class="label">BPS:&nbsp;</span>
-            <span class="value">{bpsValue}</span>
-        </div>
-        {@const x = formatCoordinate($xPos)}
-        {@const y = formatCoordinate($yPos)}
-        {@const z = formatCoordinate($zPos)}
-        <div class="stat">
-            <span class="label">XYZ:&nbsp;</span>
-            <span class="value">{x}, {y}, {z}</span>
-        </div>
-    {/if}
-</div>

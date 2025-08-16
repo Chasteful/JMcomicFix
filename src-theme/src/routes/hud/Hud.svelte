@@ -43,10 +43,9 @@
     const {width, height, destroy} = WindowSize();
     let components: Component[] = [];
 
+    $: ScaleFactor.set($hudScaleFactor * calcResolutionCoefficient());
 
-    $: {
-        ScaleFactor.set($hudScaleFactor * calcResolutionCoefficient())
-    }
+
     type ComponentWrapperParams = {
         component: Component;
 
@@ -127,32 +126,59 @@
                 componentId={component.name.toLowerCase()}
                 defaultPosition={{ x: component.settings.x ?? 0, y: component.settings.y ?? 0 }}
         >
-            {#if component.name === 'Watermark'}
-                <Watermark/>
+            {#if component.name === 'ArmorItems'}
+                <ArmorItems/>
             {/if}
             {#if component.name === 'ArrayList'}
                 <ArrayList/>
             {/if}
-            {#if component.name === 'TabGui'}
-                <TabGui/>
+            {#if component.name === 'BlockCounter'}
+                <BlockCounter/>
             {/if}
-            {#if component.name === 'Island'}
-                <Island/>
+            {#if component.name === 'ChatHUD'}
+                <ChatHUD/>
             {/if}
-            {#if component.name === 'Logo'}
-                <Logo/>
+            {#if component.name === 'CraftingInput'}
+                <CraftingInput/>
             {/if}
-            {#if component.name === 'Notifications'}
-                <Notifications/>
-            {/if}
-            {#if component.name === 'TargetHud'}
-                <TargetHud/>
+            {#if component.name === 'Effects'}
+                <Effects/>
             {/if}
             {#if component.name === 'HealthBar'}
                 <HealthBar/>
             {/if}
-            {#if component.name === 'BlockCounter'}
-                <BlockCounter/>
+            {#if component.name === 'Information'}
+                <Information/>
+            {/if}
+            {#if component.name === 'InventoryContainer'}
+                <InventoryContainer/>
+            {/if}
+            {#if component.name === 'Island'}
+                <Island/>
+            {/if}
+            {#if component.name === 'ItemColumn'}
+                <ItemColumn/>
+            {/if}
+            {#if component.name === 'ItemColumnHUD'}
+                <ItemColumnHUD/>
+            {/if}
+            {#if component.name === 'KeyBinds'}
+                <KeyBinds/>
+            {/if}
+            {#if component.name === 'Keystrokes'}
+                <Keystrokes/>
+            {/if}
+            {#if component.name === 'Logo'}
+                <Logo/>
+            {/if}
+            {#if component.name === 'Message'}
+                <Message/>
+            {/if}
+            {#if component.name === 'MotionGraph'}
+                <MotionGraph/>
+            {/if}
+            {#if component.name === 'Notifications'}
+                <Notifications/>
             {/if}
             {#if component.name === 'PlayerListHUD'}
                 <PlayerListHUD/>
@@ -163,59 +189,31 @@
             {#if component.name === 'Scoreboard'}
                 <Scoreboard/>
             {/if}
-            {#if component.name === 'ArmorItems'}
-                <ArmorItems/>
-            {/if}
             {#if component.name === 'SessionInfo'}
                 <SessionInfo/>
-            {/if}
-            {#if component.name === 'ChatHUD'}
-                <ChatHUD/>
-            {/if}
-            {#if component.name === 'InventoryContainer'}
-                <InventoryContainer/>
-            {/if}
-            {#if component.name === 'CraftingInput'}
-                <CraftingInput/>
-            {/if}
-            {#if component.name === 'Information'}
-                <Information/>
-            {/if}
-            {#if component.name === 'KeyBinds'}
-                <KeyBinds/>
-            {/if}
-            {#if component.name === 'Keystrokes'}
-                <Keystrokes/>
-            {/if}
-            {#if component.name === 'MotionGraph'}
-                <MotionGraph/>
-            {/if}
-            {#if component.name === 'Effects'}
-                <Effects/>
-            {/if}
-            {#if component.name === 'Message'}
-                <Message/>
-            {/if}
-            {#if component.name === 'StatusBar'}
-                <StatusBar/>
-            {/if}
-            {#if component.name === 'TitleControl'}
-                <TitleControl/>
-            {/if}
-            {#if component.name === 'ItemColumn'}
-                <ItemColumn/>
-            {/if}
-            {#if component.name === 'ItemColumnHUD'}
-                <ItemColumnHUD/>
             {/if}
             {#if component.name === 'SFZ'}
                 <SFZ/>
             {/if}
+            {#if component.name === 'StatusBar'}
+                <StatusBar/>
+            {/if}
+            {#if component.name === 'TabGui'}
+                <TabGui/>
+            {/if}
+            {#if component.name === 'TargetHud'}
+                <TargetHud/>
+            {/if}
+            {#if component.name === 'TitleControl'}
+                <TitleControl/>
+            {/if}
+            {#if component.name === 'Watermark'}
+                <Watermark/>
+            {/if}
         </LayoutEditor>
     {/if}
-{/snippet}
-
- <Vignette/>
+{/snippet} 
+<Vignette/>
 
 
 

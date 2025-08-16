@@ -31,12 +31,10 @@ import net.ccbluex.liquidbounce.utils.render.Alignment
 abstract class Component(
     name: String,
     enabled: Boolean,
-    mode: ComponentMode = ComponentMode.quality(),
     alignment: Alignment = Alignment.center()
 ) : ToggleableConfigurable(parent = ComponentOverlay, name = name, enabled = enabled) {
 
     val alignment = tree(alignment)
-    val mode = tree(mode)
     protected fun registerComponentListen(cfg: Configurable = this) {
         for (v in cfg.inner) {
             if (v is Configurable) {
