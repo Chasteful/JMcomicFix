@@ -29,7 +29,6 @@ import net.ccbluex.liquidbounce.event.CancellableEvent
 import net.ccbluex.liquidbounce.event.Event
 import net.ccbluex.liquidbounce.features.chat.packet.User
 import net.ccbluex.liquidbounce.features.misc.proxy.Proxy
-import net.ccbluex.liquidbounce.features.module.modules.misc.nameprotect.ModuleNameProtect
 import net.ccbluex.liquidbounce.integration.VirtualScreenType
 import net.ccbluex.liquidbounce.integration.interop.protocol.event.WebSocketEvent
 import net.ccbluex.liquidbounce.integration.interop.protocol.rest.v1.game.PlayerData
@@ -48,15 +47,14 @@ import net.minecraft.world.GameMode
 class ClickGuiValueChangeEvent(val configurable: Configurable) : Event(), WebSocketEvent
 
 @Nameable("hudValueChange")
-@WebSocketEvent
-class HudValueChangeEvent(val configurable: Configurable) : Event()
+class HudValueChangeEvent(val configurable: Configurable) : Event(),WebSocketEvent
+
 @Nameable("hudLayoutEditorValueChange")
-@WebSocketEvent
-class HudLayoutEditorValueChangeEvent(val configurable: Configurable) : Event()
+class HudLayoutEditorValueChangeEvent(val configurable: Configurable) : Event(),WebSocketEvent
 
 @Nameable("betterTabValueChange")
-@WebSocketEvent
-class BetterTabChangeEvent(val configurable: Configurable) : Event()
+
+class BetterTabChangeEvent(val configurable: Configurable) : Event(),WebSocketEvent
 
 @Nameable("spaceSeperatedNamesChange")
 class SpaceSeperatedNamesChangeEvent(val value: Boolean) : Event(), WebSocketEvent
@@ -80,8 +78,7 @@ class ModuleActivationEvent(val moduleName: String) : Event(), WebSocketEvent
 class ModuleToggleEvent(val moduleName: String, val hidden: Boolean, val enabled: Boolean) : Event(), WebSocketEvent
 
 @Nameable("refreshArrayList")
-@WebSocketEvent
-object RefreshArrayListEvent : Event()
+object RefreshArrayListEvent : Event(),WebSocketEvent
 
 @Nameable("notification")
 class NotificationEvent(val title: String, val message: String, val severity: Severity) : Event(), WebSocketEvent {
@@ -90,17 +87,16 @@ class NotificationEvent(val title: String, val message: String, val severity: Se
     }
 }
 @Nameable("progress")
-@WebSocketEvent
 class ProgressEvent(
     val title: String,
     val progress: Float,
     val maxProgress: Float = 1f,
     val timeRemaining: Long? = null,
-) : Event()
+) : Event(),WebSocketEvent
 
 @Nameable("nameProtect")
-@WebSocketEvent
-class NameProtectEvent(val configurable: Configurable) : Event()
+class NameProtectEvent(val configurable: Configurable) : Event(),WebSocketEvent
+
 @Nameable("gameModeChange")
 class GameModeChangeEvent(val gameMode: GameMode) : Event(), WebSocketEvent
 

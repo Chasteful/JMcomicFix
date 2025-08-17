@@ -184,11 +184,10 @@ class ItemLoreQueryEvent(
 ) : Event()
 
 @Nameable("overlayTitle")
-@WebSocketEvent
 class OverlayTitleEvent(
     var title: Text,
     var subtitle: Text
-) : Event() {
+) : Event(),WebSocketEvent {
     var isCancelled = false
 
     fun cancel() {
@@ -199,25 +198,22 @@ class OverlayTitleEvent(
 }
 
 @Nameable("overlayDisconnection")
-@WebSocketEvent
 class OverlayDisconnectionEvent(
     var parent: Screen,
     var info: Text
-) : Event()
+) : Event(),WebSocketEvent
 
 @Nameable("connectionDetails")
-@WebSocketEvent
 class ConnectionDetailsEvent(
     val result: Text,
-) : Event()
+) : Event(),WebSocketEvent
 
 @Nameable("overlayPlayList")
-@WebSocketEvent
 class OverlayPlayListEvent(
     var header: Text,
     var footer: Text,
     var players: List<PlayerEntry>
-) : Event()
+) : Event(),WebSocketEvent
 
 data class PlayerEntry(
     val name: Text,
@@ -228,10 +224,8 @@ data class PlayerEntry(
 )
 
 @Nameable("overlayChatMessage")
-@WebSocketEvent
-
 class OverlayChatEvent(
     val content: Text,
     val timestamp: Long,
     val isSystem: Boolean
-) : Event()
+) : Event(),WebSocketEvent

@@ -30,4 +30,3 @@ import net.ccbluex.liquidbounce.config.gson.interopGson
 interface WebSocketEvent {
     val serializer: Gson get() = interopGson
 }
-
