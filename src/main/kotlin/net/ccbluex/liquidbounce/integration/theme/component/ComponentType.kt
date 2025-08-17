@@ -63,8 +63,8 @@ enum class ComponentType(
 
         )
     ),
-    ITEMCOLUMN(
-        "ItemColumn", componentTweaks = arrayOf(
+    HOTBAR(
+        "HotBar", componentTweaks = arrayOf(
             FeatureTweak.TWEAK_HOTBAR,
             FeatureTweak.DISABLE_EXP_BAR,
             FeatureTweak.DISABLE_HELD_ITEM_TOOL_TIP,

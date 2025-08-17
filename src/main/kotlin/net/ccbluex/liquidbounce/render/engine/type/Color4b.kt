@@ -25,7 +25,7 @@ import java.awt.Color
 import kotlin.math.abs
 
 @JvmRecord
-data class Color4b(val r: Int, val g: Int, val b: Int, val a: Int = 255) {
+data class Color4b @JvmOverloads constructor(val r: Int, val g: Int, val b: Int, val a: Int = 255) {
 
     companion object {
 
@@ -62,6 +62,14 @@ data class Color4b(val r: Int, val g: Int, val b: Int, val a: Int = 255) {
         @JvmField
         val TRANSPARENT = Color4b(0, 0, 0, 0)
 
+        /**
+         * Create a color from a hex string.
+         *
+         * @param hex The hex string. Can be in the format of "#RRGGBB" or "#AARRGGBB". (Prefix '#' is optional)
+         * @return The color.
+         * @throws IllegalArgumentException If the hex string is invalid.
+         */
+        @JvmStatic
         @Throws(IllegalArgumentException::class)
         fun fromHex(hex: String): Color4b {
             val cleanHex = hex.removePrefix("#")
@@ -71,12 +79,7 @@ data class Color4b(val r: Int, val g: Int, val b: Int, val a: Int = 255) {
 
             return if (hasAlpha) {
                 val rgba = cleanHex.toLong(16)
-                Color4b(
-                    (rgba shr 24).toInt() and 0xFF,
-                    (rgba shr 16).toInt() and 0xFF,
-                    (rgba shr 8).toInt() and 0xFF,
-                    rgba.toInt() and 0xFF
-                )
+                Color4b(rgba.toInt(), hasAlpha = true)
             } else {
                 val rgb = cleanHex.toInt(16)
                 Color4b(
@@ -117,10 +120,9 @@ data class Color4b(val r: Int, val g: Int, val b: Int, val a: Int = 255) {
         }
 
         fun hslToRgb(h: Float, s: Float, l: Float, alpha: Int = 255): Color4b {
-            // 确保色相在 [0,1] 范围内
+
             val normalizedH = ((h % 1f) + 1f) % 1f
 
-            // 其余代码保持不变
             val r: Float
             val g: Float
             val b: Float
@@ -164,8 +166,13 @@ data class Color4b(val r: Int, val g: Int, val b: Int, val a: Int = 255) {
     }
 
     constructor(color: Color) : this(color.red, color.green, color.blue, color.alpha)
-    constructor(hex: Int, hasAlpha: Boolean = false) : this(Color(hex, hasAlpha))
-
+    @JvmOverloads
+    constructor(hex: Int, hasAlpha: Boolean = false) : this(
+        r = (hex shr 16) and 0xFF,
+        g = (hex shr 8) and 0xFF,
+        b = hex and 0xFF,
+        a = if (hasAlpha) (hex shr 24) and 0xFF else 255
+    )
     fun blend(other: Color4b, factor: Float): Color4b {
         val invFactor = 1f - factor
         return Color4b(
@@ -183,8 +190,7 @@ data class Color4b(val r: Int, val g: Int, val b: Int, val a: Int = 255) {
     ): Color4b {
         return Color4b(r, g, b, a)
     }
-
-    fun alpha(alpha: Int) = Color4b(this.r, this.g, this.b, alpha)
+    fun alpha(alpha: Int) = with(a = alpha)
 
     fun toARGB() = (a shl 24) or (r shl 16) or (g shl 8) or b
 
@@ -235,10 +241,10 @@ data class Color4b(val r: Int, val g: Int, val b: Int, val a: Int = 255) {
         tB: Double,
         tA: Double
     ): Color4b = Color4b(
-        ((r + (other.r - r) * tR)).toInt().coerceIn(0, 255),
-        ((g + (other.g - g) * tG)).toInt().coerceIn(0, 255),
-        ((b + (other.b - b) * tB)).toInt().coerceIn(0, 255),
-        ((a + (other.a - a) * tA)).toInt().coerceIn(0, 255)
+        (r + (other.r - r) * tR).toInt().coerceIn(0, 255),
+        (g + (other.g - g) * tG).toInt().coerceIn(0, 255),
+        (b + (other.b - b) * tB).toInt().coerceIn(0, 255),
+        (a + (other.a - a) * tA).toInt().coerceIn(0, 255)
     )
 
     /**

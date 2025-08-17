@@ -52,7 +52,7 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class MixinLivingEntityRenderer<T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> {
 
     @Unique
-    private static final int ESP_TRUE_SIGHT_REQUIREMENT_COLOR = new Color4b(255, 255, 255, 255).alpha(100).toARGB();
+    private static final int ESP_TRUE_SIGHT_REQUIREMENT_COLOR = new Color4b(255, 255, 255, 100).toARGB();
 
     @ModifyReturnValue(method = "shouldFlipUpsideDown", at = @At("RETURN"))
     private static boolean injectShouldFlipUpsideDown(boolean original, LivingEntity entity) {

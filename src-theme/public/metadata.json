@@ -205,6 +205,36 @@
       ]
     },
     {
+      "name": "HotBar",
+      "value": [
+        {
+          "name": "Enabled",
+          "value": true
+        },
+        {
+          "name": "Alignment",
+          "value": [
+            {
+              "name": "Horizontal",
+              "value": "CenterTranslated"
+            },
+            {
+              "name": "HorizontalOffset",
+              "value": 0
+            },
+            {
+              "name": "Vertical",
+              "value": "Bottom"
+            },
+            {
+              "name": "VerticalOffset",
+              "value": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "Information",
       "value": [
         {
@@ -289,36 +319,6 @@
             {
               "name": "VerticalOffset",
               "value": 15
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "ItemColumn",
-      "value": [
-        {
-          "name": "Enabled",
-          "value": true
-        },
-        {
-          "name": "Alignment",
-          "value": [
-            {
-              "name": "Horizontal",
-              "value": "CenterTranslated"
-            },
-            {
-              "name": "HorizontalOffset",
-              "value": 0
-            },
-            {
-              "name": "Vertical",
-              "value": "Bottom"
-            },
-            {
-              "name": "VerticalOffset",
-              "value": 0
             }
           ]
         }

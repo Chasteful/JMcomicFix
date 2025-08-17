@@ -10,7 +10,7 @@
     import Logo from "./elements/Logo.svelte";
     import Information from "./elements/Information.svelte";
     import ItemColumnHUD from "./elements/inventory/ItemColumnHUD.svelte";
-    import ItemColumn from "./elements/itemcolumn/ItemColumn.svelte";
+    import HotBar from "./elements/hotbar/HotBar.svelte";
     import Keystrokes from "./elements/keystrokes/Keystrokes.svelte";
     import Effects from "./elements/Effects.svelte";
     import BlockCounter from "./elements/BlockCounter.svelte";
@@ -147,6 +147,9 @@
             {#if component.name === 'HealthBar'}
                 <HealthBar/>
             {/if}
+            {#if component.name === 'HotBar'}
+                <HotBar/>
+            {/if}
             {#if component.name === 'Information'}
                 <Information/>
             {/if}
@@ -155,9 +158,6 @@
             {/if}
             {#if component.name === 'Island'}
                 <Island/>
-            {/if}
-            {#if component.name === 'ItemColumn'}
-                <ItemColumn/>
             {/if}
             {#if component.name === 'ItemColumnHUD'}
                 <ItemColumnHUD/>
