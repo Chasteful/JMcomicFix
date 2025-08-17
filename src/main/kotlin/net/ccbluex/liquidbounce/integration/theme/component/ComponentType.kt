@@ -22,6 +22,7 @@
 package net.ccbluex.liquidbounce.integration.theme.component
 
 import net.ccbluex.liquidbounce.config.types.NamedChoice
+import net.ccbluex.liquidbounce.integration.theme.component.types.HotBarComponent
 import net.ccbluex.liquidbounce.integration.theme.component.types.IntegratedComponent
 import net.ccbluex.liquidbounce.integration.theme.component.types.minimap.MinimapComponent
 
@@ -64,15 +65,19 @@ enum class ComponentType(
         )
     ),
     HOTBAR(
-        "HotBar", componentTweaks = arrayOf(
-            FeatureTweak.TWEAK_HOTBAR,
-            FeatureTweak.DISABLE_EXP_BAR,
-            FeatureTweak.DISABLE_HELD_ITEM_TOOL_TIP,
-            FeatureTweak.DISABLE_OVERLAY_MESSAGE,
-            FeatureTweak.DISABLE_ITEM_ICONS
-
-        )
+        "HotBar",
+        createComponent = { HotBarComponent(
+            tweaks = arrayOf(
+                FeatureTweak.TWEAK_HOTBAR,
+                FeatureTweak.DISABLE_EXP_BAR,
+                FeatureTweak.DISABLE_HELD_ITEM_TOOL_TIP,
+                FeatureTweak.DISABLE_OVERLAY_MESSAGE,
+                FeatureTweak.DISABLE_ITEM_ICONS
+            )
+        ) }
     ),
+
+
 
     TITLE_CONTROL(
         "TitleControl", componentTweaks = arrayOf(

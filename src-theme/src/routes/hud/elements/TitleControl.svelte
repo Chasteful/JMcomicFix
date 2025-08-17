@@ -3,10 +3,10 @@
     import {listen} from "../../../integration/ws";
     import type { OverlayTitleEvent} from "../../../integration/events";
     import TextComponent from "../../menu/common/TextComponent.svelte";
-    import {TimeoutManager} from "../../../util/Theme/TimeoutManager";
+    import {Interval} from "../../../util/timeout_utils";
 
     let OverlayTitle: OverlayTitleEvent | null = null;
-    const timeouts = new TimeoutManager();
+    const timeouts = new Interval();
     const OVERLAY_TIMEOUT = 3000;
 
     listen("overlayTitle", (event: OverlayTitleEvent) => {

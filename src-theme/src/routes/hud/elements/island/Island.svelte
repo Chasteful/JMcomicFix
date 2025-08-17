@@ -35,7 +35,7 @@
         showUsername,
         useGarbled
     } from "../../../../util/Theme/NameProtectManager";
-    import {TimeoutManager} from "../../../../util/Theme/TimeoutManager";
+    import {Interval} from "../../../../util/timeout_utils";
     import ItemStackView from "../../common/ItemView/ItemStackView.svelte";
 
     const ALERT_DISPLAY_DURATION_MS = 2500;
@@ -45,6 +45,9 @@
     const ANIMATION_DURATION_MS = 300;
     const DURABILITY_COOLDOWN_MS = 1000;
     const TOTEM_WARNING_COOLDOWN_MS = 5000;
+    const PADDING = 32;
+    const PADDING_SIDES = 64;
+
     const userData = JSON.parse(
         localStorage.getItem('userSettings') ||
         JSON.stringify({username: 'Customer'})
@@ -101,7 +104,7 @@
 
     const lastArmorAlertTimes = new Map<string, number>();
     const warnedSlots = new Set<string>();
-    const timeoutManager = new TimeoutManager();
+    const timeoutManager = new Interval();
     const warnTimestamps = new Map<string, number>();
     const contentRefs = {
         alert: null as HTMLDivElement | null,
@@ -289,7 +292,7 @@
 
             tick().then(() => {
                 const targetEl = contentRefs.alert;
-                nextContentWidth = targetEl ? targetEl.scrollWidth + 64 : 300;
+                nextContentWidth = targetEl ? targetEl.scrollWidth + PADDING_SIDES : 300;
                 w.set(nextContentWidth);
                 h.set(50);
 
@@ -361,7 +364,7 @@
         const targetEl = contentRefs[type];
 
         const baseWidth = contentRefs.status?.scrollWidth || 312;
-        nextContentWidth = type === 'chest' ? baseWidth : (targetEl ? targetEl.scrollWidth + 64 : 300);
+        nextContentWidth = type === 'chest' ? baseWidth : (targetEl ? targetEl.scrollWidth + PADDING_SIDES : 300);
         animationPhase = 'contract';
         currentContent = type;
         w.set(nextContentWidth);
@@ -445,6 +448,15 @@
     };
 
     $: loaded = timeLoaded && clientInfo;
+    $: if ($showUsername || $useGarbled || $nameProtect) {
+        tick().then(() => {
+            const targetEl = contentRefs[currentContent];
+            if (targetEl) {
+                const contentWidth = targetEl.scrollWidth;
+                w.set(contentWidth);
+            }
+        });
+    }
     $: {
         if ($armorDurabilityStore) checkArmorDurability();
         if ($blockCount !== undefined) checkBlockAlert($blockCount);
@@ -466,16 +478,16 @@
                 nextContent === 'alert'
                     ? 50
                     : nextContent === 'chest'
-                        ? (contentRefs.chest?.scrollHeight || 104) + 32
+                        ? (contentRefs.chest?.scrollHeight || 104) + PADDING
                         : 40
             );
 
         } else {
             const widthMap = {
-                alert: 280 + 32,
-                greeting: (contentRefs.greeting?.scrollWidth || 0) + 32,
-                status: (contentRefs.status?.scrollWidth || 0) + 32,
-                chest: chestMeasured ? chestWidth : (contentRefs.chest?.scrollWidth || 0) + 32
+                alert: 280 + PADDING,
+                greeting: (contentRefs.greeting?.scrollWidth || 0) + PADDING,
+                status: (contentRefs.status?.scrollWidth || 0) + PADDING,
+                chest: chestMeasured ? chestWidth : (contentRefs.chest?.scrollWidth || 0) + PADDING
             };
             const targetWidth = currentContent === 'alert' && currentAlert?.type === 'eating'
                 ? widthMap.alert
@@ -485,7 +497,7 @@
                 currentContent === 'alert'
                     ? 50
                     : currentContent === 'chest'
-                        ? (contentRefs.chest?.scrollHeight || 104) + 32
+                        ? (contentRefs.chest?.scrollHeight || 104) + PADDING
                         : 40
             );
         }
@@ -507,7 +519,7 @@
         isMounted = true;
         (async () => {
             await tick();
-            await initialWidth.set((wrapper?.scrollWidth || 312) + 64);
+            await initialWidth.set((wrapper?.scrollWidth || 312) + PADDING_SIDES);
             await initialOpacity.set(1);
             await updateAllData().catch(console.error);
             await handleInitialAnimationEnd();
@@ -738,6 +750,11 @@
       text-shadow: 0 0 3px rgba(255, 255, 255, 0.9);
       font-feature-settings: "tnum";
       font-variant-numeric: tabular-nums;
+    }
+    .username::after {
+      content: "";
+      display: inline-block;
+      width: 32px;
     }
 
     .client {

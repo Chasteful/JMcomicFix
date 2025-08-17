@@ -79,13 +79,15 @@ public abstract class MixinConnectScreen extends MixinScreen {
             cancellable = true
     )
     private void onRenderHead(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        if (!HideAppearance.INSTANCE.isHidingNow()) {
 
-        if (this.connection != null && this.serverAddress != null && !HideAppearance.INSTANCE.isHidingNow()) {
-            Text details = getConnectionDetails(this.connection, this.serverAddress);
-            EventManager.INSTANCE.callEvent(new ConnectionDetailsEvent(details));
+            if (this.connection != null && this.serverAddress != null && !HideAppearance.INSTANCE.isHidingNow()) {
+                Text details = getConnectionDetails(this.connection, this.serverAddress);
+                EventManager.INSTANCE.callEvent(new ConnectionDetailsEvent(details));
+            }
+
+            ci.cancel();
         }
-
-        ci.cancel();
     }
 
     @Redirect(

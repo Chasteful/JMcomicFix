@@ -119,6 +119,8 @@
 {#snippet componentWrapper({component}: ComponentWrapperParams)}
     {#if component.name === 'Text'}
         <Text settings={component.settings}/>
+    {:else if component.name === 'HotBar'}
+        <HotBar settings={component.settings}/>
     {:else if component.name === 'Image'}
         <img alt="" src={component.settings.src} style="scale: {component.settings.scale};"/>
     {:else}
@@ -146,9 +148,6 @@
             {/if}
             {#if component.name === 'HealthBar'}
                 <HealthBar/>
-            {/if}
-            {#if component.name === 'HotBar'}
-                <HotBar/>
             {/if}
             {#if component.name === 'Information'}
                 <Information/>

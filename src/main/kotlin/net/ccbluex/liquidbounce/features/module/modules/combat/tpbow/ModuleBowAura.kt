@@ -141,7 +141,9 @@ object ModuleBowAura : ClientModule("TPBowAura", Category.COMBAT, disableOnQuit 
         val steps = (distance / maxDistance).toInt().coerceAtLeast(1)
         return (1..steps).map { step ->
             val ratio = step.toDouble() / steps
-            Vec3d(start.x + (end.x - start.x) * ratio, start.y + (end.y - start.y) * ratio, start.z + (end.z - start.z) * ratio)
+            Vec3d(start.x + (end.x - start.x) * ratio,
+                start.y + (end.y - start.y) * ratio,
+                start.z + (end.z - start.z) * ratio)
         }.plus(end)
     }
 
@@ -241,8 +243,12 @@ object ModuleBowAura : ClientModule("TPBowAura", Category.COMBAT, disableOnQuit 
 
     private fun sendPositionPacket(vec: Vec3d) {
         when (packetMode) {
-            PacketMode.C04 -> network.sendPacket(PlayerMoveC2SPacket.PositionAndOnGround(vec.x, vec.y, vec.z, true, false))
-            PacketMode.C06 -> network.sendPacket(PlayerMoveC2SPacket.Full(vec.x, vec.y, vec.z, player.yaw, player.pitch, true, false))
+            PacketMode.C04 -> network.sendPacket(
+                PlayerMoveC2SPacket.PositionAndOnGround(vec.x, vec.y, vec.z,
+                    true, false))
+            PacketMode.C06 -> network.sendPacket(
+                PlayerMoveC2SPacket.Full(vec.x, vec.y, vec.z,
+                    player.yaw, player.pitch, true, false))
         }
     }
 

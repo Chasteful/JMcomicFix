@@ -6,13 +6,13 @@
     import type {ClientPlayerDataEvent, OverlayMessageEvent} from "../../../integration/events";
     import type {PlayerData, TextComponent as TTextComponent} from "../../../integration/types";
     import TextComponent from "../../menu/common/TextComponent.svelte";
-    import {TimeoutManager} from "../../../util/Theme/TimeoutManager";
+    import {Interval} from "../../../util/timeout_utils";
 
     let playerData: PlayerData | null = null;
     let overlayMessage: OverlayMessageEvent | null = null;
     let itemStackName: TTextComponent | string | null = null;
     let showItemStackName = false;
-    const timeouts = new TimeoutManager();
+    const timeouts = new Interval();
     const ITEM_NAME_TIMEOUT = 2000;
     const OVERLAY_TIMEOUT = 3000;
 

@@ -1,4 +1,4 @@
-export class TimeoutManager {
+export class Interval {
     private timeouts = new Map<string, NodeJS.Timeout>();
 
     set(key: string, callback: () => void, delay: number) {

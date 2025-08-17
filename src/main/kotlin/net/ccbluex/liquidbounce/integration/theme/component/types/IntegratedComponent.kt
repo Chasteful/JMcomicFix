@@ -30,7 +30,7 @@ import net.ccbluex.liquidbounce.integration.theme.component.FeatureTweak
  *
  * TODO: These should be serializable from the Metadata JSON
  */
-class IntegratedComponent(
+open class IntegratedComponent(
     name: String,
     val tweaks: Array<FeatureTweak> = emptyArray()
 ) : Component(name, true) {

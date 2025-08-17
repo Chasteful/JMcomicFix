@@ -1,11 +1,10 @@
-import {TimeoutManager} from "./TimeoutManager";
-import type {ConfigurableSetting, TextSetting, TogglableSetting} from "../../integration/types";
-import {getModules, getModuleSettings} from "../../integration/rest";
+import {Interval} from "../timeout_utils";
+import type {ConfigurableSetting, TextSetting} from "../../integration/types";
+import {getModules} from "../../integration/rest";
 import { writable, get} from "svelte/store";
-import {onMount} from "svelte";
-import {listen} from "../../integration/ws";
 
-const timeoutManager = new TimeoutManager();
+
+const timeoutManager = new Interval();
 const userData = JSON.parse(
     localStorage.getItem('userSettings') ||
     JSON.stringify({

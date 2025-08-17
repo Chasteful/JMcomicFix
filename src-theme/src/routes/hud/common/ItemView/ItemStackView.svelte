@@ -5,6 +5,7 @@
 
 <ItemStackDisplay
         {stack}
+        dyedMode={true}
         showDurability={stack.damage > 0}
         durabilityColorMode={true}
 />

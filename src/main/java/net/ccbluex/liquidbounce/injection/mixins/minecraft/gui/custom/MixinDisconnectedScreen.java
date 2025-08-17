@@ -22,6 +22,7 @@ package net.ccbluex.liquidbounce.injection.mixins.minecraft.gui.custom;
 
 import net.ccbluex.liquidbounce.event.EventManager;
 import net.ccbluex.liquidbounce.event.events.OverlayDisconnectionEvent;
+import net.ccbluex.liquidbounce.features.misc.HideAppearance;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.network.DisconnectionInfo;
@@ -51,20 +52,22 @@ public abstract class MixinDisconnectedScreen extends Screen {
 
     @Inject(method = "init", at = @At("HEAD"), cancellable = true)
     private void onInit(CallbackInfo ci) {
-        if (!eventFired && this.parent != null && this.info != null) {
-            eventFired = true;
+        if (!HideAppearance.INSTANCE.isHidingNow()){
+            if (!eventFired && this.parent != null && this.info != null) {
+                eventFired = true;
 
-            new Thread(() -> {
-                try {
-                    Thread.sleep(800);
-                } catch (InterruptedException ignored) {
-                }
-                EventManager.INSTANCE.callEvent(new OverlayDisconnectionEvent(
-                        parent,
-                        info.reason()
-                ));
-            }).start();
-            ci.cancel();
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(800);
+                    } catch (InterruptedException ignored) {
+                    }
+                    EventManager.INSTANCE.callEvent(new OverlayDisconnectionEvent(
+                            parent,
+                            info.reason()
+                    ));
+                }).start();
+                ci.cancel();
+            }
         }
     }
 }
