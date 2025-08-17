@@ -236,7 +236,10 @@ class ScheduleInventoryActionEvent(val schedule: MutableList<InventoryActionChai
 }
 
 @Nameable("selectHotbarSlotSilently")
-class SelectHotbarSlotSilentlyEvent(val requester: Any?, val slot: Int): CancellableEvent()
+class SelectHotbarSlotSilentlyEvent(val requester: Any?, val slot: Int): CancellableEvent(), WebSocketEvent
 
 @Nameable("browserUrlChange")
 class BrowserUrlChangeEvent(val index: Int, val url: String) : Event(), WebSocketEvent
+
+@Nameable("resetHotbarSlotSilently")
+class ResetHotbarSlotSilentlyEvent : Event(), WebSocketEvent

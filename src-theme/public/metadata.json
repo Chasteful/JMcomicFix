@@ -629,6 +629,36 @@
       ]
     },
     {
+      "name": "SilentHand",
+      "value": [
+        {
+          "name": "Enabled",
+          "value": true
+        },
+        {
+          "name": "Alignment",
+          "value": [
+            {
+              "name": "Horizontal",
+              "value": "CenterTranslated"
+            },
+            {
+              "name": "HorizontalOffset",
+              "value": -40
+            },
+            {
+              "name": "Vertical",
+              "value": "CenterTranslated"
+            },
+            {
+              "name": "VerticalOffset",
+              "value": 300
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "SFZ",
       "value": [
         {

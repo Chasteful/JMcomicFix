@@ -39,6 +39,7 @@
     import {hudScaleFactor} from "../../util/Theme/ThemeManager";
     import {calcResolutionCoefficient} from "../../util/ResolutionScaler";
     import ProgressBar from "./elements/progressBar/ProgressBar.svelte";
+    import SilentHand from "./elements/SilentHand.svelte";
 
     const {width, height, destroy} = WindowSize();
     let components: Component[] = [];
@@ -193,6 +194,9 @@
             {/if}
             {#if component.name === 'SFZ'}
                 <SFZ/>
+            {/if}
+            {#if component.name === 'SilentHand'}
+                <SilentHand/>
             {/if}
             {#if component.name === 'StatusBar'}
                 <StatusBar/>

@@ -134,7 +134,9 @@ enum class ComponentType(
     KEYSTROKES("Keystrokes"),
     ISLAND("Island"),
     NOTIFICATIONS("Notifications"),
-    VIGNETTE("Vignette");
+    VIGNETTE("Vignette"),
+    SILENT_HOTBAR("SilentHand"),
+    ;
 
     companion object {
         fun byName(name: String) = entries.find { it.choiceName == name }

@@ -34,8 +34,8 @@
 </script>
 
 {#if playerData && playerData.gameMode !== "spectator"}
-    <div class="hotbar">
-        <div class="hotbar-elements">
+    <div class="hotbar ">
+        <div class="hotbar-elements hud-container">
             <div class="slider" style="left: {currentSlot * 45}px"></div>
             <div class="slots">
                 {#each hotbar as stack (stack)}
@@ -59,11 +59,10 @@
   }
 
   .hotbar-elements {
-    background-color: rgba(0, 0, 0, 0.4);
     position: relative;
-    border-radius: 16px;
-    box-shadow: 0 0 2px 2px rgba(0,0,0,0.4);
     overflow: hidden;
+    border-radius: 16px;
+    padding: 0;
 
     .slider {
       border: none;

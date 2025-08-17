@@ -189,3 +189,8 @@ export interface SpaceSeperatedNamesChangeEvent  extends Event {
 export interface BrowserUrlChangeEvent  extends Event {
     url: string;
 }
+
+export interface SelectHotbarSlotSilentlyEvent extends Event {
+    requester: any;
+    slot: number;
+}
