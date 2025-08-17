@@ -17,7 +17,6 @@
  * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
  */
 @file:Suppress("TooManyFunctions")
-
 package net.ccbluex.liquidbounce.render.engine.type
 
 import org.lwjgl.opengl.GL20
@@ -173,6 +172,7 @@ data class Color4b @JvmOverloads constructor(val r: Int, val g: Int, val b: Int,
         b = hex and 0xFF,
         a = if (hasAlpha) (hex shr 24) and 0xFF else 255
     )
+
     fun blend(other: Color4b, factor: Float): Color4b {
         val invFactor = 1f - factor
         return Color4b(
@@ -190,9 +190,12 @@ data class Color4b @JvmOverloads constructor(val r: Int, val g: Int, val b: Int,
     ): Color4b {
         return Color4b(r, g, b, a)
     }
+
     fun alpha(alpha: Int) = with(a = alpha)
 
     fun toARGB() = (a shl 24) or (r shl 16) or (g shl 8) or b
+
+    fun toABGR() = (a shl 24) or (b shl 16) or (g shl 8) or r
 
     fun withAlpha(alpha: Int): Color4b {
         return Color4b(r, g, b, alpha.coerceIn(0, 255))
@@ -252,4 +255,5 @@ data class Color4b @JvmOverloads constructor(val r: Int, val g: Int, val b: Int,
      *
      * @return The Color object representation
      */
+    fun toAwtColor(): Color = Color(r, g, b, a)
 }

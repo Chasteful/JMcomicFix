@@ -15,19 +15,31 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
- *
  */
-package net.ccbluex.liquidbounce.integration.interop.protocol.event
+package net.ccbluex.liquidbounce.utils.block.bed
 
-import com.google.gson.Gson
-import net.ccbluex.liquidbounce.config.gson.interopGson
+import net.minecraft.block.Block
+import net.minecraft.util.math.Vec3d
 
 /**
- * Interface indicating that the marked event is designated for transmission through WebSocket communication.
- * This interface serves as a declarative marker for WebSocket-compatible events, signaling their eligibility for
- * propagation over WebSocket connections.
+ * Represents a bed state.
  */
-interface WebSocketEvent {
-    val serializer: Gson get() = interopGson
+data class BedState(
+    val block: Block,
+    val pos: Vec3d,
+    val surroundingBlocks: Collection<SurroundingBlock>,
+) {
+    val compactSurroundingBlocks: Collection<SurroundingBlock> by lazy {
+        surroundingBlocks.groupBy { surrounding ->
+            surrounding.block
+        }.map { (block, group) ->
+            group.reduce { acc, item ->
+                SurroundingBlock(
+                    block = block,
+                    count = acc.count + item.count,
+                    layer = minOf(acc.layer, item.layer)
+                )
+            }
+        }
+    }
 }
-
