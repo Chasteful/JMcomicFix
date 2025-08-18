@@ -60,7 +60,8 @@ open class InventoryConstraints : Configurable("Constraints") {
         default = emptyEnumSet(),
         choices = EnumSet.of(
             InventoryRequirements.NO_MOVEMENT,
-            InventoryRequirements.NO_ROTATION
+            InventoryRequirements.NO_ROTATION,
+            InventoryRequirements.NO_FALLING
         ).also {
             if (this is PlayerInventoryConstraints) {
                 it.add(InventoryRequirements.OPEN_INVENTORY)
@@ -91,10 +92,13 @@ internal enum class InventoryRequirements(
     NO_MOVEMENT("NoMovement", { _ ->
         player.input.movementForward == 0.0f && player.input.movementSideways == 0.0f
     }),
-
+    NO_FALLING("NoFalling", { _ ->
+        player.fallDistance == 0.0f
+    }),
     NO_ROTATION("NoRotation", { _ ->
         RotationManager.rotationMatchesPreviousRotation()
     }),
+
 
     /**
      * When this option is not enabled, the inventory will be opened silently

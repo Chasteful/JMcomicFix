@@ -42,6 +42,7 @@ object ModuleAutoDodge : ClientModule("AutoDodge", Category.COMBAT) {
     private val ignore by multiEnumChoice("Ignore", Ignore.entries)
     private val OnlyArrow by boolean("OnlyArrow", false)
     private val ignoreOwn by boolean("IgnoreOwn", false)
+
     init {
         tree(AllowRotationChange)
         tree(AllowTimer)
@@ -56,8 +57,8 @@ object ModuleAutoDodge : ClientModule("AutoDodge", Category.COMBAT) {
                 && !(Ignore.OPEN_INVENTORY !in ignore
                 && (InventoryManager.isInventoryOpen || mc.currentScreen is GenericContainerScreen))
                 && !(Ignore.USING_ITEM !in ignore && player.isUsingItem)
+                && !(Ignore.CLIMBING !in ignore && player.isClimbing)
                 && !(Ignore.USING_SCAFFOLD !in ignore && ModuleScaffold.running)
-
     @Suppress("unused")
     val tickRep = handler<MovementInputEvent> { event ->
         val arrows = world.findFlyingArrows()
@@ -103,9 +104,6 @@ object ModuleAutoDodge : ClientModule("AutoDodge", Category.COMBAT) {
 
         isRelevantProjectile && !(ignoreOwn && isOwn)
     }
-
-
-
 
     private fun <T : PlayerSimulation> getInflictedHits(
         simulatedPlayer: T,
@@ -214,6 +212,7 @@ object ModuleAutoDodge : ClientModule("AutoDodge", Category.COMBAT) {
         override val choiceName: String
     ) : NamedChoice {
         OPEN_INVENTORY("OpenInventory"),
+        CLIMBING("Climbing"),
         USING_ITEM("UsingItem"),
         USING_SCAFFOLD("UsingScaffold")
     }

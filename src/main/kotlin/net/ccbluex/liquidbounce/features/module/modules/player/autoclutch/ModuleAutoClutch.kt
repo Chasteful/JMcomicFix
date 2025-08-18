@@ -281,9 +281,6 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         while (blockPositionScoreCache.size > 1000) {
             blockPositionScoreCache.entries.take(100).forEach { blockPositionScoreCache.remove(it.key) }
         }
-
-        val currentTime = System.currentTimeMillis()
-        blockPositionScoreCache.entries.removeIf { currentTime - it.value.toLong() > 15000 }
     }
 
     private fun checkActivationConditions() {
