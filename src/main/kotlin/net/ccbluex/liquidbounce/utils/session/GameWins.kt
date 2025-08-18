@@ -108,7 +108,6 @@ object GameWins: EventListener {
         "vittoria",
         "¡ganaste!", "victoria",
         "победа",
-        "Fly",
         "승리",
         "勝った", "勝利"
     )

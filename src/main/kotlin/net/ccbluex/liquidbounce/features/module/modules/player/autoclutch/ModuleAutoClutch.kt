@@ -3,7 +3,6 @@
 package net.ccbluex.liquidbounce.features.module.modules.player.autoclutch
 
 import com.mojang.blaze3d.systems.RenderSystem
-import com.viaversion.viaversion.api.minecraft.Vector3f
 import net.ccbluex.liquidbounce.config.types.NamedChoice
 import net.ccbluex.liquidbounce.config.types.nesting.Configurable
 import net.ccbluex.liquidbounce.config.types.nesting.ToggleableConfigurable
@@ -36,7 +35,7 @@ import net.ccbluex.liquidbounce.utils.math.toBlockPos
 import net.ccbluex.liquidbounce.utils.math.toVec3d
 import net.ccbluex.liquidbounce.utils.movement.DirectionalInput
 import net.ccbluex.liquidbounce.utils.render.trajectory.TrajectoryInfo
-import net.ccbluex.liquidbounce.utils.render.trajectory.TrajectorySegments.generateTrajectorySegments
+import net.ccbluex.liquidbounce.utils.render.trajectory.TrajectorySegments
 import net.minecraft.block.Blocks
 import net.minecraft.client.gl.ShaderProgramKeys
 import net.minecraft.client.render.BufferRenderer
@@ -82,9 +81,12 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     private val onlyDuringCombat by boolean("OnlyDuringCombat", false)
 
     object PlayerTrajectory: ToggleableConfigurable(this,"PlayerTrajectory",false) {
-        val trajectoryLength by int("TrajectoryLength", 30, 30..200)
+        val trajectoryLength by int("TrajectoryLength", 100, 30..200)
+        val securitySection by color("Security", Color4b.CYAN.withAlpha(50))
+        val hazardSection by color("Hazard", Color4b.RED.withAlpha(50))
     }
     init {
+
         tree(PlayerTrajectory)
     }
     private val rotationConfig = tree(RotationsConfigurable(this))
@@ -136,15 +138,9 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     private var pearlSlot: HotbarItemSlot? = null
     private var lastPlayerPosition: Vec3d? = null
     private var predictedThrowPosition: Vec3d? = null
-    private var cachedTrajectory: List<TrajectorySegment>? = null
+    private var cachedTrajectory: List<TrajectorySegments.TrajectorySegment>? = null
     private var lastPlayerState: Triple<Vec3d, Vec3d, DirectionalInput>? = null
     private val calculationComplete = AtomicBoolean(false)
-
-    data class TrajectorySegment(
-        val start: Vector3f,
-        val end: Vector3f,
-        val color: Color4b
-    )
 
     override val running: Boolean
         get() =
@@ -332,7 +328,11 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
                 val isSafe = canReachSafeBlockFrom() && !isInVoid(currentPos)
                 trajectoryPoints.add(currentPos to isSafe)
             }
-            cachedTrajectory = generateTrajectorySegments(trajectoryPoints, camera)
+            cachedTrajectory = TrajectorySegments.generateTrajectorySegments(
+                trajectoryPoints,
+                PlayerTrajectory.securitySection,
+                PlayerTrajectory.hazardSection
+            )
         }
 
         renderEnvironmentForWorld(matrixStack) {
@@ -340,13 +340,13 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
                 val matrix = matrixStack.peek().positionMatrix
                 val buffer = RenderSystem.renderThreadTesselator().begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR)
                 RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR)
-
                 cachedTrajectory?.let { segments ->
                     buffer.apply {
+                        val camPos = camera.pos
                         for ((start, end, color) in segments) {
-                            vertex(matrix, start.x, start.y, start.z)
+                            vertex(matrix, start.x - camPos.x.toFloat(), start.y - camPos.y.toFloat(), start.z - camPos.z.toFloat())
                                 .color(color.r / 255f, color.g / 255f, color.b / 255f, color.a / 255f)
-                            vertex(matrix, end.x, end.y, end.z)
+                            vertex(matrix, end.x - camPos.x.toFloat(), end.y - camPos.y.toFloat(), end.z - camPos.z.toFloat())
                                 .color(color.r / 255f, color.g / 255f, color.b / 255f, color.a / 255f)
                         }
                         BufferRenderer.drawWithGlobalProgram(end())
@@ -435,7 +435,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     private fun predictFuturePosition(deltaTimeSeconds: Double): Vec3d {
         val deltaTicks = (deltaTimeSeconds * 20).toInt()
         val cache = PlayerSimulationCache.getSimulationForLocalPlayer()
-        return if (deltaTicks < 30) {
+        return if (deltaTicks < PlayerTrajectory.trajectoryLength) {
             cache.getSnapshotAt(deltaTicks).pos
         } else {
             var futurePos = player.pos
@@ -677,8 +677,8 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
 
     private fun findNearestSafeBlock(pos: Vec3d): Vec3d? {
         val blockPos = pos.toBlockPos()
-        val maxThrowDistance = 50
-        val maxVerticalDistance = 40
+        val maxThrowDistance = 10
+        val maxVerticalDistance = 5
         var searchRadius = 6
 
         while (searchRadius <= maxThrowDistance) {

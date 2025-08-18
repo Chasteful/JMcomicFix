@@ -91,7 +91,7 @@ object ModuleBowBomb : ClientModule("BowBomb", Category.COMBAT) {
             active = true
         }
     }
-    @Suppress("unused")
+    @Suppress("unused","ComplexCondition")
     private val packetHandler = handler<PacketEvent> { event ->
         val packet = event.packet
         if (packet is PlayerActionC2SPacket && packet.action == PlayerActionC2SPacket.Action.RELEASE_USE_ITEM &&
