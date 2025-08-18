@@ -19,6 +19,7 @@
 
 package net.ccbluex.liquidbounce.features.module.modules.movement.noslow.modes.shared
 
+import net.ccbluex.liquidbounce.config.types.nesting.Choice
 import net.ccbluex.liquidbounce.config.types.nesting.ChoiceConfigurable
 import net.ccbluex.liquidbounce.event.tickHandler
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket

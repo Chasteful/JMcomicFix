@@ -79,12 +79,6 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends MixinS
         }
     }
 
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    private void cancelRenderByChestStealer(CallbackInfo ci) {
-        if (FeatureSilentScreen.getShouldHide()) {
-            ci.cancel();
-        }
-    }
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawSlots(Lnet/minecraft/client/gui/DrawContext;)V", shift = At.Shift.AFTER))
     private void hookDrawSlot(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
@@ -124,7 +118,10 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends MixinS
 
     @Unique
     private boolean matchingItemScrollerMoveConditions(int mouseX, int mouseY) {
-        var handle = this.client.getWindow().getHandle();
+        long handle = 0;
+        if (this.client != null) {
+            handle = this.client.getWindow().getHandle();
+        }
 
         return (InputUtil.isKeyPressed(handle, GLFW.GLFW_KEY_LEFT_SHIFT)
                 || InputUtil.isKeyPressed(handle, GLFW.GLFW_KEY_RIGHT_SHIFT))

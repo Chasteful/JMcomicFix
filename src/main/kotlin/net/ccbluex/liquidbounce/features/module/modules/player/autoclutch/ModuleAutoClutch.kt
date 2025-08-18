@@ -139,21 +139,19 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         val color: Color4b
     )
 
-    private fun shouldCalculateTrajectory(): Boolean {
-        return !(onlyDuringCombat && !CombatManager.isInCombat)&&
-            !(ModuleAutoStuck.shouldActivate) &&
-            !ModuleScaffold.running &&
-            !ModuleFreeze.running &&
-            !ModuleAirJump.running &&
-            !ModuleFly.running
-    }
+    override val running: Boolean
+        get() =
+            super.running
+                && !(onlyDuringCombat && !CombatManager.isInCombat)
+                && !ModuleScaffold.running
+                && !ModuleFreeze.running
+                && !ModuleAirJump.running
+                && !ModuleFly.running
+
 
     @Suppress("unused")
     private val tickHandler = handler<GameTickEvent> {
-        if (!shouldCalculateTrajectory()) {
-            clearTrajectoryAndCache()
-            return@handler
-        }
+
 
         when (state) {
             State.CALCULATING -> if (calculationComplete.get()) {
@@ -182,10 +180,6 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
 
     @Suppress("unused")
     private val worldRenderHandler = handler<WorldRenderEvent> { event ->
-        if (!shouldCalculateTrajectory() && !playerTrajectory ) {
-            clearTrajectoryAndCache()
-            return@handler
-        }
         drawPlayerTrajectory(event.matrixStack)
     }
 
@@ -318,11 +312,6 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
 
     private fun drawPlayerTrajectory(matrixStack: MatrixStack) {
         if (!playerTrajectory) {
-            clearTrajectoryAndCache()
-            return
-        }
-
-        if (!shouldCalculateTrajectory()) {
             clearTrajectoryAndCache()
             return
         }
@@ -466,7 +455,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     }
 
     private fun checkVoidFall() {
-        isVoidFallImminent = isPredictingFall() && !canReachSafeBlock() && !isBlockUnder(2.0)
+        isVoidFallImminent = isPredictingFall() && !canReachSafeBlock() && !isBlockUnder(2.0) && !isPlayerSafe()
     }
 
     private fun isPlayerSafe(): Boolean {
@@ -753,13 +742,11 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     }
 
     private fun assessRotation(rotation: Rotation): Double {
-        if (!shouldCalculateTrajectory()) return Double.MAX_VALUE
         val pearlPos = simulatePearlTrajectory(rotation) ?: return Double.MAX_VALUE
         return evaluateLandingPosition(pearlPos)
     }
 
     private fun evaluateLandingPosition(pos: Vec3d): Double {
-        if (!shouldCalculateTrajectory()) return Double.MAX_VALUE
 
         val blockPos = BlockPos(pos.x.toInt(), (pos.y - 0.5).toInt(), pos.z.toInt())
         val maxThrowDistance = 50.0
@@ -937,7 +924,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
             state = State.IDLE
             return
         }
-        if (!isVoidFallImminent && isPlayerSafe()) {
+        if (!isVoidFallImminent) {
             state = State.IDLE
             return
         }

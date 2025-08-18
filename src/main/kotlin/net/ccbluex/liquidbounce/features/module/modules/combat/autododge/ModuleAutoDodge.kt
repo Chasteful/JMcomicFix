@@ -27,7 +27,6 @@ import net.minecraft.entity.projectile.ProjectileEntity
 import net.minecraft.entity.projectile.SpectralArrowEntity
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.Vec3d
-import net.minecraft.util.shape.VoxelShapes
 
 @Suppress("MagicNumber")
 object ModuleAutoDodge : ClientModule("AutoDodge", Category.COMBAT) {
