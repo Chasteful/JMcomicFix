@@ -55,29 +55,17 @@ object TrajectorySegments {
 
             if (last != null) {
                 val color = getSegmentColor(isSafePair.first, isSafePair.second, t, safeColor, unsafeColor)
-                val fadeFactor = getFadeFactor(result.size, SEGMENTS_PER_TICK)
-
                 result.add(
                     TrajectorySegment(
                         Vector3f(last.x.toFloat(), last.y.toFloat(), last.z.toFloat()),
                         Vector3f(interpolated.x.toFloat(), interpolated.y.toFloat(), interpolated.z.toFloat()),
-                        color.with(a = (color.a * fadeFactor).toInt())
+                        color
                     )
                 )
             }
             last = interpolated
         }
     }
-
-    private fun getFadeFactor(index: Int, segmentCount: Int): Float {
-        val fadeLength = segmentCount * 2 // 前后各留一部分用于渐变
-        return when {
-            index < fadeLength -> index / fadeLength.toFloat()          // 开头淡入
-            index > segmentCount - fadeLength -> (segmentCount - index) / fadeLength.toFloat() // 结尾淡出
-            else -> 1f
-        }.coerceIn(0f, 1f)
-    }
-
 
     private fun catmullRom(t: Float, p0: Vec3d, p1: Vec3d, p2: Vec3d, p3: Vec3d): Vec3d {
         val t2 = t * t
@@ -93,12 +81,17 @@ object TrajectorySegments {
         )
     }
 
-    private fun getSegmentColor(isSafe1: Boolean, isSafe2: Boolean, t: Float, safeColor: Color4b, unsafeColor: Color4b): Color4b {
+    private fun getSegmentColor(
+        isSafe1: Boolean,
+        isSafe2: Boolean,
+        alpha: Float,
+        safeColor: Color4b,
+        unsafeColor: Color4b): Color4b {
         if (isSafe1 == isSafe2) {
             return if (isSafe1) safeColor else unsafeColor
         }
         val startColor = if (isSafe1) safeColor else unsafeColor
         val endColor = if (isSafe2) safeColor else unsafeColor
-        return Color4b.lerp(startColor, endColor, t)
+        return Color4b.lerp(startColor, endColor, alpha)
     }
 }
