@@ -21,16 +21,20 @@ package net.ccbluex.liquidbounce.features.module.modules.movement.noslow
 import it.unimi.dsi.fastutil.floats.FloatFloatImmutablePair
 import it.unimi.dsi.fastutil.floats.FloatFloatPair
 import net.ccbluex.liquidbounce.config.types.nesting.ToggleableConfigurable
-import net.ccbluex.liquidbounce.features.module.modules.movement.noslow.modes.NoSlowMode
+import net.ccbluex.liquidbounce.features.module.modules.movement.noslow.modes.shared.NoSlowSharedGrim2371
 
 abstract class NoSlowUseActionHandler(name: String) : ToggleableConfigurable(ModuleNoSlow, name, true) {
 
     private val forwardMultiplier by float("Forward", 1f, 0.2f..1f)
     private val sidewaysMultiplier by float("Sideways", 1f, 0.2f..1f)
 
+    companion object {
+        val DEFAULT_USE_MUL = FloatFloatImmutablePair(0.2f, 0.2f)
+    }
+
     open fun getMultiplier() : FloatFloatPair {
-        if (!this.enabled || !NoSlowMode.working) {
-            return FloatFloatImmutablePair(0.2f, 0.2f)
+        if (!this.enabled || !NoSlowSharedGrim2371.doNotSlow) {
+            return DEFAULT_USE_MUL
         }
 
         return FloatFloatImmutablePair(forwardMultiplier, sidewaysMultiplier)

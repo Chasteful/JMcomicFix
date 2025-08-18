@@ -109,6 +109,7 @@ class WorldRenderEnvironment(matrixStack: MatrixStack, val camera: Camera) : Ren
 }
 
 fun newDrawContext(): DrawContext = DrawContext(mc, mc.bufferBuilders.entityVertexConsumers)
+
 private const val ITEM_SIZE = 16
 
 /**

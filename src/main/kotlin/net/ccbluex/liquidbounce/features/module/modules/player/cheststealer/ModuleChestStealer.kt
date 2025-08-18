@@ -313,14 +313,15 @@ object ModuleChestStealer : ClientModule("ChestStealer", Category.PLAYER) {
      */
     private fun getChestScreen(): GenericContainerScreen? {
         return mc.currentScreen?.takeIf { it.canBeStolen() } as GenericContainerScreen?
-
     }
+
     fun Screen.canBeStolen(): Boolean {
         return running && this is GenericContainerScreen && (!checkTitle || isScreenTitleChest(this))
     }
+
     private enum class ItemMoveMode(override val choiceName: String) : NamedChoice {
         QUICK_MOVE("QuickMove"),
         DRAG_AND_DROP("DragAndDrop"),
     }
-}
 
+}

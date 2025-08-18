@@ -100,6 +100,7 @@ object ModuleNameProtect : ClientModule("NameProtect", Category.MISC) {
     init {
         tree(ReplaceFriendNames)
         tree(ReplaceOthers)
+
         // Entirely keep out from public config
         doNotIncludeAlways()
     }
