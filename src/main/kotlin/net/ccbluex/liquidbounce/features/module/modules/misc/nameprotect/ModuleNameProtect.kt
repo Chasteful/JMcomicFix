@@ -34,7 +34,6 @@ import net.ccbluex.liquidbounce.render.engine.font.processor.LegacyTextSanitizer
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.ccbluex.liquidbounce.utils.client.bypassesNameProtection
 import net.ccbluex.liquidbounce.utils.client.toText
-import net.ccbluex.liquidbounce.utils.kotlin.mapString
 import net.minecraft.text.CharacterVisitor
 import net.minecraft.text.OrderedText
 import net.minecraft.text.Style
@@ -140,9 +139,8 @@ object ModuleNameProtect : ClientModule("NameProtect", Category.MISC) {
             emptyList()
         }
 
-
-        val playerName = player.gameProfile?.name
-        val selfPair = mc.session.username to if (applyGarbled) {
+        val playerName = player.gameProfile?.name ?: mc.session.username
+        val selfPair = playerName to if (applyGarbled) {
            getGarbledName(replacement)
         } else {
             replacement
@@ -222,9 +220,11 @@ object ModuleNameProtect : ClientModule("NameProtect", Category.MISC) {
                 }
             }
 
-            val rawText = originalCharacters.mapString { it.codePoint.toChar() }
-            val replacements = replacementMappings.findReplacements(rawText)
 
+            val text = buildString(originalCharacters.size) {
+                originalCharacters.forEach { appendCodePoint(it.codePoint) }
+            }
+            val replacements = replacementMappings.findReplacements(text)
             var currentIdx = 0
             var replacementIdx = 0
 
