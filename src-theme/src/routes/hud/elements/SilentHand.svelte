@@ -3,23 +3,22 @@
     import type {
         BlockCountChangeEvent,
         ClientPlayerDataEvent,
-        SelectHotbarSlotSilentlyEvent
     } from "../../../integration/events"
-    import type { PlayerData, SilentHand } from "../../../integration/types"
+    import type { PlayerData} from "../../../integration/types"
     import { listen } from "../../../integration/ws"
     import { getPlayerData, getModules } from "../../../integration/rest"
     import { FadeOut } from "../../../util/animate_utils"
     import { REST_BASE } from "../../../integration/host"
 
-    let silentHand: SilentHand | null = null
+    let selectingHotbar = false
     let silentHotbarEnabled = false
     let count: number | undefined
     let playerData: PlayerData | null = null
 
     listen("blockCountChange", (e: BlockCountChangeEvent) => count = e.count)
     listen("clientPlayerData", (e: ClientPlayerDataEvent) => playerData = e.playerData)
-    listen("selectHotbarSlotSilently", (e: SelectHotbarSlotSilentlyEvent) => silentHand = { requester: e.requester, slot: e.slot })
-    listen("resetHotbarSlotSilently", () => silentHand = null)
+    listen("selectingHotbarSlotSilently", () =>selectingHotbar = true)
+    listen("resetHotbarSlotSilently", () => selectingHotbar = false)
     listen("moduleToggle", () => checkSilentHotbar())
 
     async function checkSilentHotbar() {
@@ -33,7 +32,7 @@
     })
 </script>
 
-{#if silentHotbarEnabled && silentHand}
+{#if silentHotbarEnabled && selectingHotbar}
     {#if count === undefined && playerData?.mainHandStack && playerData.mainHandStack.identifier !== "minecraft:air"}
         <div class="silent-hand-container" out:FadeOut|global={{ duration: 150 }}>
             <div class="item-icon hud-container">

@@ -21,10 +21,9 @@ import net.minecraft.util.math.BlockPos
 object ModuleAutoStuck : ClientModule("AutoStuck", Category.WORLD) {
 
     private val resetTicks by int("ResetTicks", 300, 200..500, "ticks")
-
+    private val fallDistance by int("FallDistance", 5, 0..25, "blocks")
     private val onlyPearl by boolean("OnlyPearl", true)
     private val onlyDuringCombat by boolean("OnlyDuringCombat", false)
-    private val fallDistance by int("FallDistance", 5, 0..45, "blocks")
 
     private const val LOWEST_Y = -64
 

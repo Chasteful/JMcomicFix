@@ -1,9 +1,12 @@
 @file:Suppress("detekt:all")
+
 package net.ccbluex.liquidbounce.features.module.modules.player.autoclutch
 
 import com.mojang.blaze3d.systems.RenderSystem
 import com.viaversion.viaversion.api.minecraft.Vector3f
 import net.ccbluex.liquidbounce.config.types.NamedChoice
+import net.ccbluex.liquidbounce.config.types.nesting.Configurable
+import net.ccbluex.liquidbounce.config.types.nesting.ToggleableConfigurable
 import net.ccbluex.liquidbounce.event.events.*
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
@@ -33,10 +36,10 @@ import net.ccbluex.liquidbounce.utils.math.toBlockPos
 import net.ccbluex.liquidbounce.utils.math.toVec3d
 import net.ccbluex.liquidbounce.utils.movement.DirectionalInput
 import net.ccbluex.liquidbounce.utils.render.trajectory.TrajectoryInfo
+import net.ccbluex.liquidbounce.utils.render.trajectory.TrajectorySegments.generateTrajectorySegments
 import net.minecraft.block.Blocks
 import net.minecraft.client.gl.ShaderProgramKeys
 import net.minecraft.client.render.BufferRenderer
-import net.minecraft.client.render.Camera
 import net.minecraft.client.render.VertexFormat
 import net.minecraft.client.render.VertexFormats
 import net.minecraft.client.util.math.MatrixStack
@@ -52,14 +55,12 @@ import net.minecraft.util.Hand
 import net.minecraft.util.Util
 import net.minecraft.util.hit.HitResult
 import net.minecraft.util.math.*
-import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.RaycastContext
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.*
 import kotlin.random.Random
-
 
 object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
 
@@ -70,28 +71,24 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     @Suppress("unused")
     private val algorithm by enumChoice("Algorithm", Algorithm.SimulatedAnnealing)
 
-    private val voidThreshold by int("VoidLevel", 0, -256..0)
-    private val voidCheckInterval by int("VoidCheckInterval", 14, 5..20)
-    private val pearlTrajectorySteps by int ("PearlTrajectorySteps", 40, 20..100)
-    private val maxIterations by int("MaxIterations", 2000, 50..10000)
-    private val stagnationLimit by int("StagnationLimit", 1337, 1000..10000)
-    private val iterationSpeed by float("IterationsSpeed", 5f, 1f..5f)
-    private val minTemperature by float("MinTemperature", 0.01f, 0.01f..0.1f)
-    private val initialTemperature by float("InitialTemp", 20f, 5f..50f)
-    private val temperatureDecayRate by float("TemperatureDecayRate", 0.97f, 0.80f..0.99f)
+    val voidThreshold by int("VoidLevel", 0, -256..0)
+    val adjacentSafeBlocks by int("AdjacentSafeBlocks", 0, 0..3)
     private val aimPrecision by float("AimPrecision", 0.1f, 0.1f..1f)
     private val pitchRange by floatRange("PitchLimit", -90f..0f, -90f..45f)
-    private val adjacentSafeBlocks by int("AdjacentSafeBlocks", 0, 0..3)
-    private val simulateTime by int("SimulationTime", 30, 30..50, "ticks")
-    private var postThrowCooldownTicks by int("PauseOnFinish", 0, 0..20, "ticks")
-
+    private val pearlTrajectorySteps by int("PearlTrajectorySteps", 40, 20..100)
+    private val postThrowCooldownTicks by int("PauseOnFinish", 0, 0..20, "ticks")
     private val allowClutchWithStuck by boolean("AllowClutchWithStuck", true)
     private val ensureCompleteSpace by boolean("EnsureCompleteSpace", true)
-    private val playerTrajectory by boolean("PlayerTrajectory", true)
     private val onlyDuringCombat by boolean("OnlyDuringCombat", false)
 
-    private val defaultUnsafeBlocks = setOf(
-        Blocks.WATER,
+    object PlayerTrajectory: ToggleableConfigurable(this,"PlayerTrajectory",false) {
+        val trajectoryLength by int("TrajectoryLength", 30, 30..200)
+    }
+    init {
+        tree(PlayerTrajectory)
+    }
+    private val rotationConfig = tree(RotationsConfigurable(this))
+    val unsafeBlocks by blocks("UnsafeBlocks", setOf(
         Blocks.LAVA,
         Blocks.COBWEB,
         Blocks.MAGMA_BLOCK,
@@ -102,17 +99,27 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         Blocks.WITHER_ROSE,
         Blocks.POWDER_SNOW,
         Blocks.POINTED_DRIPSTONE
-    )
-    private val unsafeBlocks by blocks("UnsafeBlocks", defaultUnsafeBlocks.toMutableSet())
-    private val rotationConfig = tree(RotationsConfigurable(this))
+    ).toMutableSet())
+
+    class SimulatedAnnealing : Configurable("SimulatedAnnealing") {
+        val maxIterations by int("MaxIterations", 2000, 50..10000)
+        val stagnationLimit by int("StagnationLimit", 1337, 1000..10000)
+        val iterationSpeed by float("IterationsSpeed", 5f, 1f..5f)
+        val minTemperature by float("MinTemperature", 0.01f, 0.01f..0.1f)
+        val initialTemperature by float("InitialTemp", 20f, 5f..50f)
+        val temperatureDecayRate by float("TemperatureDecayRate", 0.97f, 0.80f..0.99f)
+    }
+
+    init {
+        tree(SimulatedAnnealing())
+    }
 
     var state = State.IDLE
-
     private val blockPositionScoreCache = ConcurrentHashMap<BlockPos, Double>()
     private var currentSolution = Rotation(0f, 0f)
     private var bestEnergy = Double.MAX_VALUE
     private var currentEnergy = Double.MAX_VALUE
-    private var temperature = initialTemperature
+    private var temperature = SimulatedAnnealing().initialTemperature
     private var iterations = 0
     private var safetyCheckCounter = 0
     private var iterationsWithoutImprovement = 0
@@ -148,11 +155,8 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
                 && !ModuleAirJump.running
                 && !ModuleFly.running
 
-
     @Suppress("unused")
     private val tickHandler = handler<GameTickEvent> {
-
-
         when (state) {
             State.CALCULATING -> if (calculationComplete.get()) {
                 calculationComplete.set(false)
@@ -187,7 +191,6 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     private val packetEventHandler = handler<PacketEvent> { event ->
         if (!isPearlInFlight) return@handler
         if (event.packet is PlayerPositionLookS2CPacket) {
-
             isPearlInFlight = false
             pearlThrownTick = 0L
             notification(
@@ -196,7 +199,6 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
                 NotificationEvent.Severity.INFO
             )
             if (!isPlayerSafe()) {
-
                 triggerPosition = player.pos
                 state = State.FINDING_PEARL
             } else {
@@ -215,9 +217,9 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
             if (safetyCheckCounter <= 0) {
                 safetyCheckActive = false
                 manualPearlThrown = false
-                state = if (isPlayerSafe()){
-                    State.IDLE }
-                else {
+                state = if (isPlayerSafe()) {
+                    State.IDLE
+                } else {
                     triggerPosition = player.pos
                     State.FINDING_PEARL
                 }
@@ -231,7 +233,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
             safetyCheckCounter--
             if (safetyCheckCounter <= 0) {
                 safetyCheckActive = false
-                state = if (isPlayerSafe()){
+                state = if (isPlayerSafe()) {
                     State.IDLE
                 } else {
                     triggerPosition = player.pos
@@ -241,8 +243,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
             return
         }
 
-
-        if (isPearlInFlight  && pearlThrownTick > 100) {
+        if (isPearlInFlight && pearlThrownTick > 100) {
             isPearlInFlight = false
             pearlThrownTick = 0L
             notification(
@@ -251,7 +252,6 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
                 NotificationEvent.Severity.ERROR
             )
         }
-
 
         if (isPearlInFlight && state == State.FINDING_PEARL) {
             return
@@ -272,7 +272,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     }
 
     private fun pruneCache() {
-        while (blockPositionScoreCache.size > 1000) {
+        while (blockPositionScoreCache.size > 10000) {
             blockPositionScoreCache.entries.take(100).forEach { blockPositionScoreCache.remove(it.key) }
         }
     }
@@ -309,9 +309,8 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         lastPlayerPosition = currentPos
     }
 
-
     private fun drawPlayerTrajectory(matrixStack: MatrixStack) {
-        if (!playerTrajectory) {
+        if (!PlayerTrajectory.enabled) {
             clearTrajectoryAndCache()
             return
         }
@@ -327,7 +326,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
             val cache = PlayerSimulationCache.getSimulationForLocalPlayer()
             val trajectoryPoints = mutableListOf<Pair<Vec3d, Boolean>>()
 
-            for (tick in 0 until simulateTime) {
+            for (tick in 0 until PlayerTrajectory.trajectoryLength) {
                 val snapshot = cache.getSnapshotAt(tick)
                 val currentPos = snapshot.pos
                 val isSafe = canReachSafeBlockFrom() && !isInVoid(currentPos)
@@ -364,164 +363,8 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         blockPositionScoreCache.clear()
     }
 
-    private fun generateTrajectorySegments(
-        points: List<Pair<Vec3d, Boolean>>,
-        camera: Camera
-    ): List<TrajectorySegment> {
-        val result = mutableListOf<TrajectorySegment>()
-        val segmentsPerTick = 5
-
-        if (points.size < 2) return emptyList()
-
-        fun catmullRom(t: Float, p0: Vec3d, p1: Vec3d, p2: Vec3d, p3: Vec3d): Vec3d {
-            val t2 = t * t
-            val t3 = t2 * t
-            val a = -0.5 * t3 + t2 - 0.5 * t
-            val b = 1.5 * t3 - 2.5 * t2 + 1.0
-            val c = -1.5 * t3 + 2.0 * t2 + 0.5 * t
-            val d = 0.5 * t3 - 0.5 * t2
-            return Vec3d(
-                a * p0.x + b * p1.x + c * p2.x + d * p3.x,
-                a * p0.y + b * p1.y + c * p2.y + d * p3.y,
-                a * p0.z + b * p1.z + c * p2.z + d * p3.z
-            )
-        }
-
-        val pointList = points.map { it.first }
-        val isSafeList = points.map { it.second }
-
-        for (i in 0 until pointList.size - 1) {
-            val p1 = pointList[i]
-            val p2 = pointList[i + 1]
-            val p0 = if (i > 0) pointList[i - 1] else p1
-            val p3 = if (i < pointList.size - 2) pointList[i + 2] else p2
-
-            val isSafe1 = isSafeList[i]
-            val isSafe2 = isSafeList[i + 1]
-
-            var last: Vector3f? = null
-            for (j in 0..segmentsPerTick) {
-                val t = j / segmentsPerTick.toFloat()
-                val interpolated = catmullRom(t, p0, p1, p2, p3)
-                val rel = Vector3f(
-                    (interpolated.x - camera.pos.x).toFloat(),
-                    (interpolated.y - camera.pos.y).toFloat() + 0.1f,
-                    (interpolated.z - camera.pos.z).toFloat()
-                )
-
-                val color = if (isSafe1 == isSafe2) {
-                    if (isSafe1){
-                        Color4b(0x20, 0xC2, 0x06, 200)
-                    } else {
-                        Color4b(0xD7, 0x09, 0x09, 200)
-                    }
-                } else {
-                    val colorT = t
-                    val r = ((if (isSafe1) 0x20 else 0xD7) + ((if (isSafe2) 0x20 else 0xD7) - (if (isSafe1) 0x20 else 0xD7)) * colorT).toInt()
-                    val g = ((if (isSafe1) 0xC2 else 0x09) + ((if (isSafe2) 0xC2 else 0x09) - (if (isSafe1) 0xC2 else 0x09)) * colorT).toInt()
-                    val b = ((if (isSafe1) 0x06 else 0x09) + ((if (isSafe2) 0x06 else 0x09) - (if (isSafe1) 0x06 else 0x09)) * colorT).toInt()
-                    Color4b(r, g, b, 200)
-                }
-
-                if (last != null) {
-                    result.add(TrajectorySegment(last, rel, color))
-                }
-                last = rel
-            }
-        }
-
-        return result
-    }
-
-    private fun canReachSafeBlockFrom(pos: Vec3d = player.pos): Boolean {
-        val cache = PlayerSimulationCache.getSimulationForLocalPlayer()
-        val snapshots = (0 until voidCheckInterval).map { cache.getSnapshotAt(it) }
-
-        for (snapshot in snapshots) {
-            val currentPos = snapshot.pos
-            val blockPos = BlockPos(currentPos.x.toInt(), currentPos.y.toInt(), currentPos.z.toInt())
-            val belowPos = blockPos.down()
-            val belowState = world.getBlockState(belowPos)
-            val isSafeLanding = !belowState.isAir && belowState.block !in unsafeBlocks
-
-            val playerBox = player.boundingBox.offset(currentPos.subtract(pos))
-            val safeBlockCount = countAdjacentSafeBlocks(blockPos)
-            val isNearSafeBlock = isSafeLanding && safeBlockCount >= adjacentSafeBlocks
-            if (isNearSafeBlock && !world.getBlockCollisions(player, playerBox).any()) {
-                return true
-            }
-        }
-        return false
-    }
-
     private fun checkVoidFall() {
         isVoidFallImminent = isPredictingFall() && !canReachSafeBlock() && !isBlockUnder(2.0) && !isPlayerSafe()
-    }
-
-    private fun isPlayerSafe(): Boolean {
-        if (player.isSneaking && isBlockUnder(1.0)) return true
-        if (!isInVoid(player.pos) || canReachSafeBlock()) return true
-        if (player.velocity.y > 0.2 && canReachSafeBlock()) return true
-        return false
-    }
-
-    private fun isPredictingFall(): Boolean {
-        if (player.isOnGround) return false
-        val velY = player.velocity.y
-        if (velY < -0.2 && !canReachSafeBlock()) return true
-        if (player.fallDistance > 2f && velY <= 0.0 && !canReachSafeBlock()) return true
-
-        return simulatePlayerTrajectory { pos, _, _ ->
-            pos.y <= voidThreshold.toDouble() && !canReachSafeBlock()
-        }
-    }
-
-    private fun countAdjacentSafeBlocks(center: BlockPos): Int {
-        var count = 0
-        for (dx in -1..1) for (dz in -1..1) {
-            val nearby = BlockPos(center.x + dx, center.y - 1, center.z + dz)
-            val state = world.getBlockState(nearby)
-            if (!state.isAir && state.block !in unsafeBlocks) count++
-        }
-        return count
-    }
-
-    private fun canReachSafeBlock(): Boolean {
-        return simulatePlayerTrajectory { pos, playerBox, blockPos ->
-            val belowPos = blockPos.down()
-            val belowState = world.getBlockState(belowPos)
-            val isSafeLanding = !belowState.isAir && belowState.block !in unsafeBlocks
-
-            val hasCollision = world.getBlockCollisions(player, playerBox).iterator().hasNext()
-            val safeBlockCount = countAdjacentSafeBlocks(blockPos)
-
-            hasCollision && isSafeLanding && safeBlockCount >= adjacentSafeBlocks
-        }
-    }
-
-
-    private fun isInVoid(pos: Vec3d): Boolean {
-        val boundingBox = player.boundingBox
-            .offset(pos.subtract(player.pos))
-            .withMinY(voidThreshold.toDouble())
-        val collisions = world.getBlockCollisions(player, boundingBox)
-        return collisions.none() || collisions.all { shape -> shape == VoxelShapes.empty() }
-    }
-
-    private fun isBlockUnder(height: Double = 5.0): Boolean {
-        val world = mc.world ?: return false
-        val player = mc.player ?: return false
-        var offset = 0.0
-        while (offset < height) {
-            val motionX = player.velocity.x
-            val motionZ = player.velocity.z
-            val playerBox = player.boundingBox.offset(motionX * offset, -offset, motionZ * offset)
-            if (world.getBlockCollisions(player, playerBox).iterator().hasNext()) {
-                return true
-            }
-            offset += 0.5
-        }
-        return false
     }
 
     private fun findPearl() {
@@ -557,9 +400,9 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     private fun calculateSolutionBackground() {
         resetAnnealing()
         val batchSize = 1000
-        while (iterations < maxIterations && temperature >= minTemperature) {
+        while (iterations < SimulatedAnnealing().maxIterations && temperature >= SimulatedAnnealing().minTemperature) {
             repeat(batchSize) {
-                if (iterations >= maxIterations || temperature < minTemperature || bestEnergy < 1000.0) {
+                if (iterations >= SimulatedAnnealing().maxIterations || temperature < SimulatedAnnealing().minTemperature || bestEnergy < 1000.0) {
                     return@repeat
                 }
                 val newSolution = Rotation(
@@ -577,7 +420,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
                         iterationsWithoutImprovement = 0
                     } else {
                         iterationsWithoutImprovement++
-                        if (iterationsWithoutImprovement > stagnationLimit && bestEnergy > 5000.0) {
+                        if (iterationsWithoutImprovement > SimulatedAnnealing().stagnationLimit && bestEnergy > 5000.0) {
                             state = State.IDLE
                             return
                         }
@@ -585,13 +428,14 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
                 }
                 iterations++
             }
-            temperature *= 0.98f
+            temperature *= SimulatedAnnealing().temperatureDecayRate
         }
     }
+
     private fun predictFuturePosition(deltaTimeSeconds: Double): Vec3d {
         val deltaTicks = (deltaTimeSeconds * 20).toInt()
         val cache = PlayerSimulationCache.getSimulationForLocalPlayer()
-        return if (deltaTicks < simulateTime) {
+        return if (deltaTicks < 30) {
             cache.getSnapshotAt(deltaTicks).pos
         } else {
             var futurePos = player.pos
@@ -603,6 +447,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
             futurePos
         }
     }
+
     private fun simulatePearlTrajectory(rotation: Rotation): Vec3d? {
         val predictedPos = predictedThrowPosition ?: player.pos
         val yawRad = Math.toRadians(rotation.yaw.toDouble())
@@ -703,15 +548,15 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         currentEnergy = bestInitialEnergy
         bestSolution = currentSolution
         bestEnergy = currentEnergy
-        temperature = initialTemperature
+        temperature = SimulatedAnnealing().initialTemperature
         iterations = 0
         iterationsWithoutImprovement = 0
     }
 
     private fun calculateSolution() {
         val scaledTemperature = temperature * 100
-        repeat((maxIterations * iterationSpeed).toInt()) {
-            if (iterations >= maxIterations || temperature < minTemperature) {
+        repeat((SimulatedAnnealing().maxIterations * SimulatedAnnealing().iterationSpeed).toInt()) {
+            if (iterations >= SimulatedAnnealing().maxIterations || temperature < SimulatedAnnealing().minTemperature) {
                 state = State.ROTATING
                 return@repeat
             }
@@ -730,13 +575,13 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
                     iterationsWithoutImprovement = 0
                 } else {
                     iterationsWithoutImprovement++
-                    if (iterationsWithoutImprovement > stagnationLimit) {
+                    if (iterationsWithoutImprovement > SimulatedAnnealing().stagnationLimit) {
                         state = State.ROTATING
                         return@repeat
                     }
                 }
             }
-            temperature = (scaledTemperature * temperatureDecayRate) / 100
+            temperature = (scaledTemperature * SimulatedAnnealing().temperatureDecayRate) / 100
             iterations++
         }
     }
@@ -747,7 +592,6 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     }
 
     private fun evaluateLandingPosition(pos: Vec3d): Double {
-
         val blockPos = BlockPos(pos.x.toInt(), (pos.y - 0.5).toInt(), pos.z.toInt())
         val maxThrowDistance = 50.0
         val horizontalDistance = distanceSq2D(pos, triggerPosition ?: player.pos)
@@ -867,7 +711,6 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         return null
     }
 
-
     private fun rotateToSolution() {
         if (allowClutchWithStuck) {
             ModuleAutoStuck.shouldEnableStuck = true
@@ -892,18 +735,17 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
 
         if (!mc.options.pickItemKey.isPressed) {
             bestSolution?.let { sol ->
-
                 if (allowClutchWithStuck) {
                     sendPacketSilently(
                         PlayerMoveC2SPacket.LookAndOnGround(
                             sol.yaw, sol.pitch, player.isOnGround, player.horizontalCollision
                         )
                     )
-                }
-                else { RotationManager.setRotationTarget(
-                    rotationConfig.toRotationTarget(sol),
-                    priority = Priority.IMPORTANT_FOR_USAGE_1,
-                    provider = this
+                } else {
+                    RotationManager.setRotationTarget(
+                        rotationConfig.toRotationTarget(sol),
+                        priority = Priority.IMPORTANT_FOR_USAGE_1,
+                        provider = this
                     )
                 }
 
@@ -953,7 +795,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         bestEnergy = Double.MAX_VALUE
         currentSolution = Rotation(0f, 0f)
         currentEnergy = Double.MAX_VALUE
-        temperature = initialTemperature
+        temperature = SimulatedAnnealing().initialTemperature
         iterations = 0
         triggerPosition = null
         pearlSlot = null
@@ -962,22 +804,6 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         safetyCheckActive = false
         predictedThrowPosition = null
         clearTrajectoryAndCache()
-    }
-
-    private fun simulatePlayerTrajectory(checkCondition: (Vec3d, Box, BlockPos) -> Boolean): Boolean {
-        val cache = PlayerSimulationCache.getSimulationForLocalPlayer()
-
-        for (tick in 0 until simulateTime) {
-            val snapshot = cache.getSnapshotAt(tick)
-            val pos = snapshot.pos
-            val playerBox = player.boundingBox.offset(pos.subtract(player.pos))
-            val blockPos = BlockPos(pos.x.toInt(), (pos.y - 0.5).toInt(), pos.z.toInt())
-
-            if (checkCondition(pos, playerBox, blockPos)) {
-                return true
-            }
-        }
-        return false
     }
 
     private fun distanceSq2D(a: Vec3d, b: Vec3d): Double {
@@ -1001,5 +827,4 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         manualPearlThrown = false
         blockPositionScoreCache.clear()
     }
-
 }

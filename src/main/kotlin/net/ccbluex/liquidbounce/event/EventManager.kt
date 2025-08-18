@@ -157,6 +157,7 @@ val ALL_EVENT_CLASSES: Array<KClass<out Event>> = arrayOf(
     TitleEvent.Clear::class,
     ProgressEvent::class,
     NameProtectEvent::class,
+    SelectingHotbarSlotSilentlyEvent::class,
     ResetHotbarSlotSilentlyEvent::class,
 )
 

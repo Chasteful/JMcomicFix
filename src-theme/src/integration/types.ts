@@ -476,7 +476,3 @@ export interface RegistryItem {
     name: string;
     icon: string | undefined;
 }
-export interface SilentHand {
-    requester: any;
-    slot: number;
-}
