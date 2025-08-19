@@ -36,6 +36,7 @@ import net.ccbluex.liquidbounce.utils.combat.CombatManager
 import net.ccbluex.liquidbounce.utils.combat.TargetTracker
 import net.ccbluex.liquidbounce.utils.inventory.useHotbarSlotOrOffhand
 import net.ccbluex.liquidbounce.utils.kotlin.Priority
+import net.minecraft.entity.player.PlayerEntity
 
 /**
  * Ignite & AutoWeb module
@@ -45,9 +46,10 @@ import net.ccbluex.liquidbounce.utils.kotlin.Priority
  */
 object ModuleAutoTrap : ClientModule("AutoTrap", Category.WORLD, aliases = arrayOf("Ignite", "AutoWeb","PotionAura")) {
 
-    private val range = floatRange("Range", 3.0f..4.5f, 2f..6f)
+    private val range = floatRange("Range", 3.0f..4.5f, 2f..8f)
     private val delay by int("Delay", 20, 0..400, "ticks")
     private val ignoreOpenInventory by boolean("IgnoreOpenInventory", true)
+    private val onlyPlayer by boolean("OnlyPlayer",true)
     private val ignitionTrapPlanner = tree(IgnitionTrapPlanner(this))
     private val webTrapPlanner = tree(WebTrapPlanner(this))
     private val potionPlanner =tree(PotionTrapPlanner(this))
@@ -72,7 +74,10 @@ object ModuleAutoTrap : ClientModule("AutoTrap", Category.WORLD, aliases = array
             return@handler
         }
 
-        val enemies = targetTracker.targets()
+        val enemies = targetTracker.targets().filter {
+            !onlyPlayer || it is PlayerEntity
+        }
+
         TrapPlayerSimulation.runSimulations(enemies)
 
         currentPlan = (if (potionPlanner.enabled) potionPlanner.plan(enemies) else null)

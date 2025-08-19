@@ -140,6 +140,32 @@ fun VoxelShape.shrink(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0): VoxelS
     }
 }
 
+fun VoxelShape.boxWithBoundsX(x: Double) = Box(
+    x,
+    getMin(Direction.Axis.Y),
+    getMin(Direction.Axis.Z),
+    x,
+    getMax(Direction.Axis.Y),
+    getMax(Direction.Axis.Z)
+)
+
+fun VoxelShape.boxWithBoundsY(y: Double) = Box(
+    getMin(Direction.Axis.X),
+    y,
+    getMin(Direction.Axis.Z),
+    getMax(Direction.Axis.X),
+    y,
+    getMax(Direction.Axis.Z)
+)
+
+ fun VoxelShape.boxWithBoundsZ(z: Double) = Box(
+    getMin(Direction.Axis.X),
+    getMin(Direction.Axis.Y),
+    z,
+    getMax(Direction.Axis.X),
+    getMax(Direction.Axis.Y),
+    z
+)
 
 /**
  * Some blocks like slabs or stairs must be placed on upper side in order to be placed correctly.

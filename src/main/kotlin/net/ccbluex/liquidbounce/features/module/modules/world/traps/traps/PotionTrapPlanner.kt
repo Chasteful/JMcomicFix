@@ -36,12 +36,21 @@ class PotionTrapPlanner(parent: EventListener) : TrapPlanner<PotionTrapPlanner.P
     "Potion",
     true
 ) {
-
     private val debuffEffects = arrayOf(
-        StatusEffects.POISON,
         StatusEffects.SLOWNESS,
+        StatusEffects.MINING_FATIGUE,
+        StatusEffects.INSTANT_DAMAGE,
+        StatusEffects.NAUSEA,
+        StatusEffects.BLINDNESS,
+        StatusEffects.HUNGER,
         StatusEffects.WEAKNESS,
-        StatusEffects.INSTANT_DAMAGE
+        StatusEffects.POISON,
+        StatusEffects.WITHER,
+        StatusEffects.GLOWING,
+        StatusEffects.LEVITATION,
+        StatusEffects.UNLUCK,
+        StatusEffects.BAD_OMEN,
+        StatusEffects.DARKNESS,
     )
 
     override fun plan(enemies: List<LivingEntity>): BlockChangeIntent<PotionIntentData>? {

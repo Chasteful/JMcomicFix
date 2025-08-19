@@ -27,6 +27,7 @@ import net.ccbluex.liquidbounce.features.module.modules.render.ModuleFreeCam
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.entity.rotation
+import net.ccbluex.liquidbounce.utils.render.BlockHitRenderer
 import net.ccbluex.liquidbounce.utils.render.trajectory.TrajectoryData
 import net.ccbluex.liquidbounce.utils.render.trajectory.TrajectoryInfoRenderer
 import net.minecraft.entity.player.PlayerEntity
@@ -45,7 +46,8 @@ object ModuleTrajectories : ClientModule("Trajectories", Category.RENDER) {
     private val show by multiEnumChoice(
         "Show",
         Show.OTHER_PLAYERS,
-        Show.ACTIVE_TRAJECTORY_ARROW
+        Show.ACTIVE_TRAJECTORY_ARROW,
+        Show.BLOCK_HIT_ESP
     )
     val arrowColor by color("Arrow", Color4b(Color.RED).withAlpha(100))
     val potionColor by color("Potion", Color4b(Color.PINK).withAlpha(100))
@@ -59,13 +61,17 @@ object ModuleTrajectories : ClientModule("Trajectories", Category.RENDER) {
     val windChargeColor by color("WindCharge", Color4b(Color.LIGHT_GRAY).withAlpha(100))
     val entityHitColor by color("EntityHit", Color4b(255, 0, 0, 100))
 
-    private val alwaysShowBow get() = Show.ALWAYS_SHOW_BOW in show
+    val enableBlockHitESP get() = Show.BLOCK_HIT_ESP in show
+    val enableEntityHitColor get() = Show.ENTITY_HIT_ESP in show
+    val alwaysShowBow get() = Show.ALWAYS_SHOW_BOW in show
     private val otherPlayers get() = Show.OTHER_PLAYERS in show
     private val activeTrajectoryArrow get() = Show.ACTIVE_TRAJECTORY_ARROW in show
     private val activeTrajectoryOther get() = Show.ACTIVE_TRAJECTORY_OTHER in show
-    private val enableEntityHitColor get() = Show.ENTITY_HIT_RENDER in show
+    private val enableEntityHitESP get() = Show.ENTITY_HIT_ESP in show
 
-    val renderHandler = handler<WorldRenderEvent> { event ->
+    private val blockHitRenderer = tree(BlockHitRenderer(this))
+    @Suppress("unused")
+    private val renderHandler = handler<WorldRenderEvent> { event ->
         val matrixStack = event.matrixStack
 
         world.entities.forEach {
@@ -90,8 +96,8 @@ object ModuleTrajectories : ClientModule("Trajectories", Category.RENDER) {
             if (hitResult != null && !(hitResult is EntityHitResult && hitResult.entity == player)) {
                 drawLandingPos(hitResult,
                     trajectoryInfo, event,
-                    color,
-                    if (enableEntityHitColor) color else Color4b(0, 0, 0, 0)
+                    if (enableBlockHitESP)color else Color4b.TRANSPARENT,
+                    if (enableEntityHitColor) color else Color4b.TRANSPARENT
                 )
             }
         }
@@ -106,7 +112,6 @@ object ModuleTrajectories : ClientModule("Trajectories", Category.RENDER) {
 
         drawHypotheticalTrajectory(player, event)
     }
-
     /**
      * Draws the trajectory for an item in the player's hand
      */
@@ -135,19 +140,26 @@ object ModuleTrajectories : ClientModule("Trajectories", Category.RENDER) {
 
         val hitResult = renderer.drawTrajectoryForProjectile(maxSimulatedTicks, Color4b.WHITE, event.matrixStack)
 
-        drawLandingPos(
-            hitResult,
-            trajectoryInfo,
-            event,
-            Color4b(0, 160, 255, 150),
-            if (enableEntityHitColor) entityHitColor else Color4b(0, 0, 0, 0)
-        )
+        if (hitResult != null) {
+            if (hitResult is EntityHitResult && enableEntityHitESP) {
+                drawLandingPos(
+                    hitResult,
+                    trajectoryInfo,
+                    event,
+                    Color4b.TRANSPARENT, // No block hit rendering here
+                    entityHitColor // Entity hit color
+                )
+            } else if (enableBlockHitESP) {
+                blockHitRenderer.render(true, event, hitResult)
+            }
+        }
     }
 
     private enum class Show(
         override val choiceName: String
     ) : NamedChoice {
-        ENTITY_HIT_RENDER("EntityHitRender"),
+        BLOCK_HIT_ESP("BlockHitESP"),
+        ENTITY_HIT_ESP("EntityHitESP"),
         ALWAYS_SHOW_BOW("AlwaysShowBow"),
         OTHER_PLAYERS("OtherPlayers"),
         ACTIVE_TRAJECTORY_ARROW("ActiveTrajectoryArrow"),
