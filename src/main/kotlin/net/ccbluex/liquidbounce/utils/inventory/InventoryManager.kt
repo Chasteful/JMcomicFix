@@ -65,8 +65,8 @@ object InventoryManager : EventListener {
             field = value
         }
 
-    var lastClickedSlot: Int = 0
-        private set
+    var lastClickedSlot: Int = -1
+        internal set
 
     private var recentInventoryOpen = false
 
@@ -178,8 +178,7 @@ object InventoryManager : EventListener {
                     // the action is a throw action (you cannot miss-click really when throwing)
                     if (index == 0 && action is ClickInventoryAction
                         && constraints.missChance.random() > Random.nextInt(100)
-                        && action.actionType != SlotActionType.THROW
-                    ) {
+                        && action.actionType != SlotActionType.THROW) {
                         // Simulate a miss click (this is only possible for container-type slots)
                         // TODO: Add support for inventory slots
                         if (action.performMissClick()) {
@@ -208,7 +207,7 @@ object InventoryManager : EventListener {
             closeInventorySilently()
         }
 
-        lastClickedSlot = 0
+        lastClickedSlot = -1
     }
 
     /**
@@ -291,7 +290,7 @@ object InventoryManager : EventListener {
         }.thenByDescending {
             it.priority
         }
-    
+
 }
 
 sealed interface InventoryAction {
@@ -309,12 +308,10 @@ data class ClickInventoryAction(
 
     companion object {
 
-        fun click(
-            screen: GenericContainerScreen? = null,
-            slot: ItemSlot,
-            button: Int,
-            actionType: SlotActionType
-        ) = ClickInventoryAction(
+        fun click(screen: GenericContainerScreen? = null,
+                  slot: ItemSlot,
+                  button: Int,
+                  actionType: SlotActionType) = ClickInventoryAction(
             screen,
             slot = slot,
             button = button,
@@ -382,8 +379,7 @@ data class ClickInventoryAction(
 
         // Screen is null, which means we are targeting the player inventory
         if (requiresPlayerInventoryOpen() && player.currentScreenHandler.isPlayerInventory &&
-            !interaction.hasRidingInventory()
-        ) {
+            !interaction.hasRidingInventory()) {
             return true
         }
 
@@ -395,6 +391,7 @@ data class ClickInventoryAction(
     override fun performAction(): Boolean {
         val slotId = slot.getIdForServer(screen) ?: return false
         interaction.clickSlot(screen?.syncId ?: 0, slotId, button, actionType, player)
+        InventoryManager.lastClickedSlot = slotId
 
         return true
     }
@@ -410,10 +407,9 @@ data class ClickInventoryAction(
             .filter { it.itemStack.isEmpty }
             .minByOrNull { slot.distance(it) } ?: return false
 
-        interaction.clickSlot(
-            screen.syncId, closestEmptySlot.getIdForServer(screen), 0,
-            SlotActionType.PICKUP, player
-        )
+        val slotId = closestEmptySlot.getIdForServer(screen)
+        interaction.clickSlot(screen.syncId, slotId, 0, SlotActionType.PICKUP, player)
+        InventoryManager.lastClickedSlot = slotId
         return true
     }
 
@@ -472,8 +468,7 @@ data class CreativeInventoryAction(
 
         // Screen is null, which means we are targeting the player inventory
         if (requiresPlayerInventoryOpen() && player.currentScreenHandler.isPlayerInventory &&
-            !interaction.hasRidingInventory()
-        ) {
+            !interaction.hasRidingInventory()) {
             return true
         }
 
@@ -486,6 +481,7 @@ data class CreativeInventoryAction(
         if (slot != null) {
             val slotId = slot.getIdForServer(null) ?: return false
             interaction.clickCreativeStack(itemStack, slotId)
+            InventoryManager.lastClickedSlot = slotId
         } else {
             interaction.dropCreativeStack(itemStack)
         }

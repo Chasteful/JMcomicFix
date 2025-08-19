@@ -58,7 +58,7 @@ object ModuleNoSlow : ClientModule("NoSlow", Category.MOVEMENT) {
     }
 
     @Suppress("unused")
-    val multiplierHandler = handler<PlayerUseMultiplier> { event ->
+    private val multiplierHandler = handler<PlayerUseMultiplier> { event ->
         val action = player.activeItem.useAction ?: return@handler
         val mul = multiplier(action)
 

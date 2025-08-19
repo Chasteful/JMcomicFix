@@ -5,6 +5,7 @@ import kotlin.random.Random;
 import kotlin.random.RandomKt;
 import net.ccbluex.liquidbounce.features.module.modules.misc.ModuleItemScroller;
 import net.ccbluex.liquidbounce.features.module.modules.movement.inventorymove.ModuleInventoryMove;
+import net.ccbluex.liquidbounce.features.module.modules.render.ModuleBetterInventory;
 import net.ccbluex.liquidbounce.features.module.modules.player.cheststealer.features.FeatureSilentScreen;
 import net.ccbluex.liquidbounce.utils.client.Chronometer;
 import net.minecraft.client.gui.DrawContext;
@@ -79,6 +80,10 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends MixinS
         }
     }
 
+    @Inject(method = "drawSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;translate(FFF)V", shift = At.Shift.AFTER))
+    private void drawSlotOutline(DrawContext context, Slot slot, CallbackInfo ci) {
+        ModuleBetterInventory.INSTANCE.drawHighlightSlot(context, slot);
+    }
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawSlots(Lnet/minecraft/client/gui/DrawContext;)V", shift = At.Shift.AFTER))
     private void hookDrawSlot(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
@@ -118,13 +123,10 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends MixinS
 
     @Unique
     private boolean matchingItemScrollerMoveConditions(int mouseX, int mouseY) {
-        long handle = 0;
-        if (this.client != null) {
-            handle = this.client.getWindow().getHandle();
-        }
+        var handle = this.client.getWindow().getHandle();
 
         return (InputUtil.isKeyPressed(handle, GLFW.GLFW_KEY_LEFT_SHIFT)
-                || InputUtil.isKeyPressed(handle, GLFW.GLFW_KEY_RIGHT_SHIFT))
+                        || InputUtil.isKeyPressed(handle, GLFW.GLFW_KEY_RIGHT_SHIFT))
                 && getSlotAt(mouseX, mouseY) != null
                 && ModuleItemScroller.INSTANCE.getRunning()
                 && GLFW.glfwGetMouseButton(handle, GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS
