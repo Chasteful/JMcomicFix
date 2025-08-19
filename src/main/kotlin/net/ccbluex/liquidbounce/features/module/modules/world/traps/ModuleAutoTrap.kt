@@ -24,6 +24,7 @@ import net.ccbluex.liquidbounce.event.tickHandler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.features.module.modules.world.traps.traps.IgnitionTrapPlanner
+import net.ccbluex.liquidbounce.features.module.modules.world.traps.traps.PotionTrapPlanner
 import net.ccbluex.liquidbounce.features.module.modules.world.traps.traps.TrapPlayerSimulation
 import net.ccbluex.liquidbounce.features.module.modules.world.traps.traps.WebTrapPlanner
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
@@ -33,6 +34,7 @@ import net.ccbluex.liquidbounce.utils.block.doPlacement
 import net.ccbluex.liquidbounce.utils.client.SilentHotbar
 import net.ccbluex.liquidbounce.utils.combat.CombatManager
 import net.ccbluex.liquidbounce.utils.combat.TargetTracker
+import net.ccbluex.liquidbounce.utils.inventory.useHotbarSlotOrOffhand
 import net.ccbluex.liquidbounce.utils.kotlin.Priority
 
 /**
@@ -41,16 +43,16 @@ import net.ccbluex.liquidbounce.utils.kotlin.Priority
  * Ignite: Automatically sets targets around you on fire.
  * AutoWeb: Automatically places cobwebs at targets around you.
  */
-object ModuleAutoTrap : ClientModule("AutoTrap", Category.WORLD, aliases = arrayOf("Ignite", "AutoWeb")) {
+object ModuleAutoTrap : ClientModule("AutoTrap", Category.WORLD, aliases = arrayOf("Ignite", "AutoWeb","PotionAura")) {
 
     private val range = floatRange("Range", 3.0f..4.5f, 2f..6f)
     private val delay by int("Delay", 20, 0..400, "ticks")
     private val ignoreOpenInventory by boolean("IgnoreOpenInventory", true)
-
     private val ignitionTrapPlanner = tree(IgnitionTrapPlanner(this))
     private val webTrapPlanner = tree(WebTrapPlanner(this))
+    private val potionPlanner =tree(PotionTrapPlanner(this))
     val targetTracker = tree(TargetTracker(range = range))
-    private val rotationsConfigurable = tree(RotationsConfigurable(this))
+    val rotationsConfigurable = tree(RotationsConfigurable(this))
 
     private var currentPlan: BlockChangeIntent<*>? = null
 
@@ -73,16 +75,26 @@ object ModuleAutoTrap : ClientModule("AutoTrap", Category.WORLD, aliases = array
         val enemies = targetTracker.targets()
         TrapPlayerSimulation.runSimulations(enemies)
 
-        currentPlan = webTrapPlanner.plan(enemies) ?: ignitionTrapPlanner.plan(enemies)
+        currentPlan = (if (potionPlanner.enabled) potionPlanner.plan(enemies) else null)
+            ?: (if (webTrapPlanner.enabled) webTrapPlanner.plan(enemies) else null)
+                ?: (if (ignitionTrapPlanner.enabled) ignitionTrapPlanner.plan(enemies) else null)
+
         currentPlan?.let { intent ->
-            RotationManager.setRotationTarget(
-                (intent.blockChangeInfo as BlockChangeInfo.PlaceBlock).blockPlacementTarget.rotation,
-                considerInventory = !ignoreOpenInventory,
-                configurable = rotationsConfigurable,
-                Priority.IMPORTANT_FOR_PLAYER_LIFE,
-                this
-            )
+            when (val info = intent.blockChangeInfo) {
+                is BlockChangeInfo.PlaceBlock -> {
+                    RotationManager.setRotationTarget(
+                        info.blockPlacementTarget.rotation,
+                        considerInventory = !ignoreOpenInventory,
+                        configurable = rotationsConfigurable,
+                        Priority.IMPORTANT_FOR_PLAYER_LIFE,
+                        this
+                    )
+                }
+                is BlockChangeInfo.UseItem -> {
+                }
+            }
         }
+
     }
 
     @Suppress("unused")
@@ -96,7 +108,12 @@ object ModuleAutoTrap : ClientModule("AutoTrap", Category.WORLD, aliases = array
 
         CombatManager.pauseCombatForAtLeast(1)
         SilentHotbar.selectSlotSilently(this, plan.slot, 1)
-        doPlacement(raycast, hand = plan.slot.useHand)
+
+        when (plan.blockChangeInfo) {
+            is BlockChangeInfo.PlaceBlock -> doPlacement(raycast, hand = plan.slot.useHand)
+            is BlockChangeInfo.UseItem -> useHotbarSlotOrOffhand(plan.slot)
+        }
+
         timeout = true
         plan.onIntentFullfilled()
         waitTicks(delay)

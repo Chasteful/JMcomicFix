@@ -57,11 +57,13 @@ object ModuleTrajectories : ClientModule("Trajectories", Category.RENDER) {
     val expBottleColor by color("ExpBottle", Color4b(Color.GREEN).withAlpha(100))
     val fireballColor by color("Fireball", Color4b(Color.ORANGE).withAlpha(100))
     val windChargeColor by color("WindCharge", Color4b(Color.LIGHT_GRAY).withAlpha(100))
+    val entityHitColor by color("EntityHit", Color4b(255, 0, 0, 100))
 
     private val alwaysShowBow get() = Show.ALWAYS_SHOW_BOW in show
     private val otherPlayers get() = Show.OTHER_PLAYERS in show
     private val activeTrajectoryArrow get() = Show.ACTIVE_TRAJECTORY_ARROW in show
     private val activeTrajectoryOther get() = Show.ACTIVE_TRAJECTORY_OTHER in show
+    private val enableEntityHitColor get() = Show.ENTITY_HIT_RENDER in show
 
     val renderHandler = handler<WorldRenderEvent> { event ->
         val matrixStack = event.matrixStack
@@ -86,7 +88,11 @@ object ModuleTrajectories : ClientModule("Trajectories", Category.RENDER) {
             val hitResult = trajectoryRenderer.drawTrajectoryForProjectile(maxSimulatedTicks, color, matrixStack)
 
             if (hitResult != null && !(hitResult is EntityHitResult && hitResult.entity == player)) {
-                drawLandingPos(hitResult, trajectoryInfo, event, color, color)
+                drawLandingPos(hitResult,
+                    trajectoryInfo, event,
+                    color,
+                    if (enableEntityHitColor) color else Color4b(0, 0, 0, 0)
+                )
             }
         }
 
@@ -134,13 +140,14 @@ object ModuleTrajectories : ClientModule("Trajectories", Category.RENDER) {
             trajectoryInfo,
             event,
             Color4b(0, 160, 255, 150),
-            Color4b(255, 0, 0, 100)
+            if (enableEntityHitColor) entityHitColor else Color4b(0, 0, 0, 0)
         )
     }
 
     private enum class Show(
         override val choiceName: String
     ) : NamedChoice {
+        ENTITY_HIT_RENDER("EntityHitRender"),
         ALWAYS_SHOW_BOW("AlwaysShowBow"),
         OTHER_PLAYERS("OtherPlayers"),
         ACTIVE_TRAJECTORY_ARROW("ActiveTrajectoryArrow"),
