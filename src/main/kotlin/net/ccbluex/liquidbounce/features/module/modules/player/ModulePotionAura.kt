@@ -1,36 +1,28 @@
 package net.ccbluex.liquidbounce.features.module.modules.player
 
 import net.ccbluex.liquidbounce.config.types.NamedChoice
-import net.ccbluex.liquidbounce.config.types.nesting.ToggleableConfigurable
 import net.ccbluex.liquidbounce.event.events.MovementInputEvent
 import net.ccbluex.liquidbounce.event.events.RotationUpdateEvent
-import net.ccbluex.liquidbounce.event.events.WorldRenderEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.event.tickHandler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.ModuleScaffold
-import net.ccbluex.liquidbounce.render.renderEnvironmentForWorld
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.aiming.RotationsConfigurable
 import net.ccbluex.liquidbounce.utils.aiming.data.Rotation
 import net.ccbluex.liquidbounce.utils.client.SilentHotbar
 import net.ccbluex.liquidbounce.utils.combat.CombatManager
 import net.ccbluex.liquidbounce.utils.combat.TargetTracker
-import net.ccbluex.liquidbounce.utils.combat.shouldBeAttacked
-import net.ccbluex.liquidbounce.utils.entity.squaredBoxedDistanceTo
 import net.ccbluex.liquidbounce.utils.inventory.HotbarItemSlot
-import net.ccbluex.liquidbounce.utils.inventory.InventoryManager.isInventoryOpen
 import net.ccbluex.liquidbounce.utils.inventory.Slots
 import net.ccbluex.liquidbounce.utils.inventory.findClosestSlot
-import net.ccbluex.liquidbounce.utils.inventory.isInContainerScreen
 import net.ccbluex.liquidbounce.utils.inventory.useHotbarSlotOrOffhand
 import net.ccbluex.liquidbounce.utils.item.getPotionEffects
 import net.ccbluex.liquidbounce.utils.kotlin.EventPriorityConvention.CRITICAL_MODIFICATION
 import net.ccbluex.liquidbounce.utils.kotlin.Priority
 import net.ccbluex.liquidbounce.utils.math.getRandomInRange
 import net.ccbluex.liquidbounce.utils.math.toBlockPos
-import net.ccbluex.liquidbounce.utils.render.WorldTargetRenderer
 import net.minecraft.entity.EntityPose
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.effect.StatusEffects
@@ -43,28 +35,32 @@ import net.minecraft.util.hit.HitResult
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.RaycastContext
-import kotlin.math.*
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.exp
+import kotlin.math.sin
 
 object ModulePotionAura : ClientModule("PotionAura", Category.PLAYER, aliases = arrayOf("AutoDebuff")) {
     private val delay by int("Delay", 20, 0..400, "ticks")
+    private val throwRange = floatRange("ThrowRange", 5f..16f, 0f..20f)
+    private val onlyPlayer by boolean("OnlyPlayer", true)
+    private val boost by boolean("Boost", true)
+    private val required by multiEnumChoice(
+        "Required",
+        Required.NO_MOVEMENT,
+        Required.NO_FALLING
 
-    private val range = floatRange("Range", 5f..16f, 2f..20f)
-    private val throwRange by floatRange("ThrowRange", 5f..12f, 5f..20f)
-    private val ignoreOpenInventory by boolean("IgnoreOpenInventory", true)
+    )
+    override val running: Boolean
+        get() =
+            super.running
+                    && !ModuleScaffold.running
+                    && (Required.NO_MOVEMENT !in required || (player.input.movementForward == 0.0f && player.input.movementSideways == 0.0f))
+                    && (Required.NO_FALLING !in required || player.fallDistance <= 1.5f)
 
-    object AllowMoveBoost : ToggleableConfigurable(this, "AllowMoveBoost", false) {
-        val jump by boolean("Jump", true)
-        val move by boolean("Move", true)
-    }
+    private val targetTracker = tree(TargetTracker(range = throwRange))
+    private val rotationsConfigurable = tree(RotationsConfigurable(this))
 
-    init {
-        tree(AllowMoveBoost)
-    }
-
-    private val required by multiEnumChoice("Required", Required.NO_MOVEMENT)
-    private val targetTracker = tree(TargetTracker(range = range))
-    private val rotations = tree(RotationsConfigurable(this))
-    private val targetRenderer = tree(WorldTargetRenderer(this))
     private var currentPlan: BlockChangeIntent? = null
     private var timeout = false
 
@@ -75,24 +71,13 @@ object ModulePotionAura : ClientModule("PotionAura", Category.PLAYER, aliases = 
         StatusEffects.POISON
     )
 
-    override val running: Boolean
-        get() = super.running &&
-                !ModuleScaffold.running &&
-                (Required.NO_MOVEMENT !in required || (player.input.movementForward == 0.0f && player.input.movementSideways == 0.0f)) &&
-                (Required.NO_FALLING !in required || player.fallDistance <= 1.5f)
-
     @Suppress("unused")
     private val rotationUpdateHandler = handler<RotationUpdateEvent> {
-        if (timeout || (isInventoryOpen || isInContainerScreen) && !ignoreOpenInventory) {
-            targetTracker.reset()
-            currentPlan = null
-            return@handler
-        }
+        if (timeout) return@handler
 
-        val enemies = targetTracker.targets().filter { it is PlayerEntity }
+        val enemies = targetTracker.targets().filter { !onlyPlayer || it is PlayerEntity }
         if (enemies.isEmpty()) {
             currentPlan = null
-            targetTracker.reset()
             return@handler
         }
 
@@ -101,7 +86,7 @@ object ModulePotionAura : ClientModule("PotionAura", Category.PLAYER, aliases = 
             RotationManager.setRotationTarget(
                 plan.rotation,
                 false,
-                rotations,
+                rotationsConfigurable,
                 Priority.NORMAL,
                 this
             )
@@ -110,28 +95,26 @@ object ModulePotionAura : ClientModule("PotionAura", Category.PLAYER, aliases = 
     }
     @Suppress("unused")
     private val moveInputHandler = handler<MovementInputEvent>(priority = CRITICAL_MODIFICATION) { event ->
-        if (!AllowMoveBoost.enabled) return@handler
+        if (!boost){
+            return@handler
+        }
         val plan = currentPlan ?: return@handler
 
-        if (AllowMoveBoost.jump && player.isOnGround) {
+        if (player.isOnGround) {
             player.jump()
-            if (AllowMoveBoost.move) event.directionalInput = event.directionalInput.copy(forwards = true)
+           event.directionalInput = event.directionalInput.copy(forwards = true)
         }
 
         val jumpStartY = plan.target.pos?.y?.let { it - 0.01 } ?: player.pos.y
         val maxY = jumpStartY + 1.25
         if (player.pos.y >= maxY) {
+
             event.directionalInput = event.directionalInput.copy(forwards = true)
         }
     }
 
     @Suppress("unused")
     private val tickHandler = tickHandler {
-        if (player.isDead || player.isSpectator || CombatManager.shouldPauseCombat) {
-            currentPlan = null
-            return@tickHandler
-        }
-
         val plan = currentPlan ?: return@tickHandler
         if (!(plan.slot.itemStack.item is SplashPotionItem &&
                     plan.slot.itemStack.getPotionEffects().any { it.effectType in debuffEffects })) {
@@ -140,7 +123,7 @@ object ModulePotionAura : ClientModule("PotionAura", Category.PLAYER, aliases = 
         }
 
         val target = plan.target
-        if (!validateThrow(target, null)) {
+        if (!target.isAlive || hasDebuff(target) || target.pos == null) {
             currentPlan = null
             return@tickHandler
         }
@@ -155,33 +138,19 @@ object ModulePotionAura : ClientModule("PotionAura", Category.PLAYER, aliases = 
         timeout = false
         currentPlan = null
     }
-    @Suppress("unused")
-    private val renderHandler = handler<WorldRenderEvent> { event ->
-        val matrixStack = event.matrixStack
-        val target = targetTracker.target?.takeIf { targetRenderer.enabled } ?: return@handler
 
-        renderEnvironmentForWorld(matrixStack) {
-            targetRenderer.render(this, target, event.partialTicks)
-        }
-    }
     private fun plan(enemies: List<LivingEntity>): BlockChangeIntent? {
         val slot = findDebuffPotion() ?: return null
-        val maximumRange = throwRange.endInclusive
-        val squaredMaxRange = maximumRange * maximumRange
-        val squaredNormalRange = throwRange.endInclusive * throwRange.endInclusive
-
         val sortedTargets = enemies
-            .filter {
-                !hasDebuff(it) && it.pos != null && it.shouldBeAttacked() &&
-                        it.squaredBoxedDistanceTo(player) <= squaredMaxRange
-            }
-            .sortedBy {
-                if (it.squaredBoxedDistanceTo(player) <= squaredNormalRange) 0 else 1
-            }
+            .filter { !hasDebuff(it) && it.pos != null }
+            .sortedBy { it.pos!!.distanceTo(player.pos) }
+            .take(2)
 
         for (target in sortedTargets) {
-            val (rotation, landingPos) = findOptimalThrowRotation(target.pos!!, slot.itemStack) ?: continue
-            if (!validateThrow(target, landingPos)) continue
+            if (hasDebuff(target) || target.pos == null) continue
+
+            val targetPos = target.pos ?: continue
+            val (rotation, _) = findOptimalThrowRotation(targetPos, slot.itemStack) ?: continue
 
             return BlockChangeIntent(
                 BlockChangeInfo.UseItem(slot.useHand),
@@ -203,12 +172,6 @@ object ModulePotionAura : ClientModule("PotionAura", Category.PLAYER, aliases = 
 
     private fun hasDebuff(entity: LivingEntity): Boolean {
         return entity.statusEffects.any { it.effectType in debuffEffects }
-    }
-
-    private fun validateThrow(target: LivingEntity, landingPos: Vec3d?): Boolean {
-        if (landingPos == null) return false
-        val isInInventoryScreen = isInventoryOpen || isInContainerScreen
-        return !isInInventoryScreen && target.isAlive && !hasDebuff(target)
     }
 
     private fun findOptimalThrowRotation(targetPos: Vec3d, potionStack: ItemStack): Pair<Rotation, Vec3d>? {
@@ -292,17 +255,10 @@ object ModulePotionAura : ClientModule("PotionAura", Category.PLAYER, aliases = 
     }
 
     private fun evaluateLandingPosition(landingPos: Vec3d, targetPos: Vec3d, potionStack: ItemStack): Double {
-        val playerDistance = landingPos.distanceTo(player.pos.add(player.velocity.multiply(0.5)))
-        if (playerDistance < 6) return Double.MAX_VALUE
+        if (landingPos.squaredDistanceTo(player.pos.add(player.velocity.multiply(0.5))) <= 4.1 * 4.1) return Double.MAX_VALUE
 
         val targetDistance = landingPos.distanceTo(targetPos)
-        if (targetDistance > 4) return Double.MAX_VALUE
-
-        val blockPos = landingPos.toBlockPos()
-        val blockState = world.getBlockState(blockPos)
-        if (blockState.isFullCube(world, blockPos) || !blockState.getCollisionShape(world, blockPos).isEmpty) {
-            return Double.MAX_VALUE
-        }
+        if (targetDistance > 4.0) return Double.MAX_VALUE
 
         val box = Box(landingPos.x, landingPos.y, landingPos.z, landingPos.x, landingPos.y, landingPos.z).expand(4.0)
         val entities = world.getEntitiesByClass(LivingEntity::class.java, box) { it.isAlive && it.isAffectedBySplashPotions }
@@ -310,9 +266,7 @@ object ModulePotionAura : ClientModule("PotionAura", Category.PLAYER, aliases = 
                 potionStack.getPotionEffects().any { effect ->
                     entity.statusEffects.any { it.effectType == effect.effectType && it.amplifier >= effect.amplifier }
                 }
-            }) {
-            return Double.MAX_VALUE
-        }
+            }) return Double.MAX_VALUE
 
         val effectStrength = potionStack.getPotionEffects().sumOf { (it.amplifier + 1.0) * it.duration / 20.0 }
         return targetDistance * targetDistance / (effectStrength + 1.0)
@@ -337,8 +291,6 @@ object ModulePotionAura : ClientModule("PotionAura", Category.PLAYER, aliases = 
     override fun onDisabled() {
         timeout = false
         currentPlan = null
-        targetTracker.reset()
-        targetRenderer.reset()
     }
     private enum class Required(
         override val choiceName: String
@@ -347,3 +299,4 @@ object ModulePotionAura : ClientModule("PotionAura", Category.PLAYER, aliases = 
         NO_FALLING("NoFalling"),
     }
 }
+
