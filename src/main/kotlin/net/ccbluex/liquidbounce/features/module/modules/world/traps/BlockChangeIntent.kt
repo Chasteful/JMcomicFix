@@ -21,7 +21,6 @@ package net.ccbluex.liquidbounce.features.module.modules.world.traps
 import net.ccbluex.liquidbounce.utils.inventory.HotbarItemSlot
 import net.ccbluex.liquidbounce.utils.block.targetfinding.BlockPlacementTarget
 import net.minecraft.item.Item
-import net.minecraft.util.Hand
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.Vec3i
@@ -54,15 +53,12 @@ sealed class BlockChangeInfo {
     class PlaceBlock(
         val blockPlacementTarget: BlockPlacementTarget
     ) : BlockChangeInfo()
-    class UseItem(
-        val hand: Hand
-    ) : BlockChangeInfo()
-//    class InteractWithBlock(
-//        val itemPredicate: (Item) -> Boolean,
-//        val side: Direction,
-//        val alternativeOffsets: List<Vec3i> = listOf(Vec3i.ZERO)
-//    ) : BlockChangeInfo()
 
+    class InteractWithBlock(
+        val itemPredicate: (Item) -> Boolean,
+        val side: Direction,
+        val alternativeOffsets: List<Vec3i> = listOf(Vec3i.ZERO)
+    ) : BlockChangeInfo()
 }
 
 enum class IntentTiming {

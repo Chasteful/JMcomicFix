@@ -380,10 +380,12 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleTreasureManager,
             ModuleAutoClutch,
             ModuleInstakillAxeFucker,
+            ModulePotionAura,
 
             // Render
             ModuleAnimations,
             ModuleAntiBlind,
+            ModuleBetterInventory,
             ModuleHalo,
             ModuleBlockESP,
             ModuleBlockOutline,

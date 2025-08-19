@@ -1,16 +1,21 @@
-package net.ccbluex.liquidbounce.features.module.modules.world.traps.traps
+package net.ccbluex.liquidbounce.features.module.modules.player
 
-import net.ccbluex.liquidbounce.event.EventListener
-import net.ccbluex.liquidbounce.features.module.modules.world.traps.BlockChangeInfo
-import net.ccbluex.liquidbounce.features.module.modules.world.traps.BlockChangeIntent
-import net.ccbluex.liquidbounce.features.module.modules.world.traps.IntentTiming
-import net.ccbluex.liquidbounce.features.module.modules.world.traps.ModuleAutoTrap
-import net.ccbluex.liquidbounce.features.module.modules.world.traps.ModuleAutoTrap.targetTracker
+import net.ccbluex.liquidbounce.event.events.RotationUpdateEvent
+import net.ccbluex.liquidbounce.event.handler
+import net.ccbluex.liquidbounce.event.tickHandler
+import net.ccbluex.liquidbounce.features.module.Category
+import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
+import net.ccbluex.liquidbounce.utils.aiming.RotationsConfigurable
 import net.ccbluex.liquidbounce.utils.aiming.data.Rotation
+import net.ccbluex.liquidbounce.utils.aiming.utils.raycast
+import net.ccbluex.liquidbounce.utils.client.SilentHotbar
+import net.ccbluex.liquidbounce.utils.combat.CombatManager
+import net.ccbluex.liquidbounce.utils.combat.TargetTracker
 import net.ccbluex.liquidbounce.utils.inventory.HotbarItemSlot
 import net.ccbluex.liquidbounce.utils.inventory.Slots
 import net.ccbluex.liquidbounce.utils.inventory.findClosestSlot
+import net.ccbluex.liquidbounce.utils.inventory.useHotbarSlotOrOffhand
 import net.ccbluex.liquidbounce.utils.item.getPotionEffects
 import net.ccbluex.liquidbounce.utils.kotlin.Priority
 import net.ccbluex.liquidbounce.utils.math.toBlockPos
@@ -18,10 +23,11 @@ import net.ccbluex.liquidbounce.utils.render.trajectory.TrajectoryInfo
 import net.minecraft.entity.EntityPose
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.effect.StatusEffects
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.projectile.thrown.PotionEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.item.SplashPotionItem
-import net.minecraft.util.hit.BlockHitResult
+import net.minecraft.util.Hand
 import net.minecraft.util.hit.HitResult
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.Vec3d
@@ -31,11 +37,18 @@ import kotlin.math.cos
 import kotlin.math.exp
 import kotlin.math.sin
 
-class PotionTrapPlanner(parent: EventListener) : TrapPlanner<PotionTrapPlanner.PotionIntentData>(
-    parent,
-    "Potion",
-    true
-) {
+object ModulePotionAura : ClientModule("PotionAura", Category.PLAYER, aliases = arrayOf("AutoDebuff")) {
+
+    private val range = floatRange("Range", 3.0f..4.5f, 2f..8f)
+    private val delay by int("Delay", 20, 0..400, "ticks")
+    private val ignoreOpenInventory by boolean("IgnoreOpenInventory", true)
+    private val onlyPlayer by boolean("OnlyPlayer", true)
+    private val targetTracker = tree(TargetTracker(range = range))
+    private val rotationsConfigurable = tree(RotationsConfigurable(this))
+
+    private var currentPlan: BlockChangeIntent<PotionIntentData>? = null
+    private var timeout = false
+
     private val debuffEffects = arrayOf(
         StatusEffects.SLOWNESS,
         StatusEffects.MINING_FATIGUE,
@@ -50,27 +63,80 @@ class PotionTrapPlanner(parent: EventListener) : TrapPlanner<PotionTrapPlanner.P
         StatusEffects.LEVITATION,
         StatusEffects.UNLUCK,
         StatusEffects.BAD_OMEN,
-        StatusEffects.DARKNESS,
+        StatusEffects.DARKNESS
     )
 
-    override fun plan(enemies: List<LivingEntity>): BlockChangeIntent<PotionIntentData>? {
+    override fun onEnabled() {
+        timeout = false
+    }
+
+    override fun onDisabled() {
+        timeout = false
+    }
+
+    @Suppress("unused")
+    private val rotationUpdateHandler = handler<RotationUpdateEvent> {
+        if (timeout) {
+            return@handler
+        }
+
+        val enemies = targetTracker.targets().filter {
+            !onlyPlayer || it is PlayerEntity
+        }
+
+        currentPlan = plan(enemies)
+
+        currentPlan?.let { intent ->
+            when (val info = intent.blockChangeInfo) {
+                is BlockChangeInfo.UseItem -> {
+                    RotationManager.setRotationTarget(
+                        intent.planningInfo.rotation,
+                        considerInventory = !ignoreOpenInventory,
+                        configurable = rotationsConfigurable,
+                        Priority.IMPORTANT_FOR_PLAYER_LIFE,
+                        this
+                    )
+                }
+            }
+        }
+    }
+
+    @Suppress("unused")
+    private val placementHandler = tickHandler {
+        val plan = currentPlan ?: return@tickHandler
+
+        val raycast = raycast()
+        if (!validate(plan)) {
+            return@tickHandler
+        }
+
+        CombatManager.pauseCombatForAtLeast(1)
+        SilentHotbar.selectSlotSilently(this, plan.slot, 1)
+
+        when (plan.blockChangeInfo) {
+            is BlockChangeInfo.UseItem -> useHotbarSlotOrOffhand(plan.slot)
+        }
+
+        timeout = true
+        onIntentFullfilled(plan)
+        waitTicks(delay)
+        timeout = false
+    }
+
+    private fun plan(enemies: List<LivingEntity>): BlockChangeIntent<PotionIntentData>? {
         val slot = findDebuffPotion() ?: return null
 
         for (target in enemies) {
-
             if (hasDebuff(target)) continue
 
-            val targetPos = TrapPlayerSimulation.findPosForTrap(
-                target, isTargetLocked = targetTracker.target == target
-            ) ?: continue
-
+            val targetPos = target.pos ?: continue
             val (rotation, _) = findOptimalThrowRotation(targetPos, slot.itemStack) ?: continue
 
             RotationManager.setRotationTarget(
                 rotation,
                 priority = Priority.IMPORTANT_FOR_PLAYER_LIFE,
-                configurable = ModuleAutoTrap.rotationsConfigurable,
-                provider = ModuleAutoTrap
+                configurable = rotationsConfigurable,
+                provider = this
             )
 
             targetTracker.target = target
@@ -78,11 +144,10 @@ class PotionTrapPlanner(parent: EventListener) : TrapPlanner<PotionTrapPlanner.P
                 BlockChangeInfo.UseItem(slot.useHand),
                 slot,
                 IntentTiming.NEXT_PROPITIOUS_MOMENT,
-                PotionIntentData(target),
+                PotionIntentData(target,rotation),
                 this
             )
         }
-
         return null
     }
 
@@ -98,7 +163,7 @@ class PotionTrapPlanner(parent: EventListener) : TrapPlanner<PotionTrapPlanner.P
         return entity.statusEffects.any { it.effectType in debuffEffects }
     }
 
-    private fun findOptimalThrowRotation(targetPos: Vec3d, potionStack: ItemStack): Pair<Rotation, Vec3d>?{
+    private fun findOptimalThrowRotation(targetPos: Vec3d, potionStack: ItemStack): Pair<Rotation, Vec3d>? {
         var bestRotation: Rotation? = null
         var bestScore = Double.MAX_VALUE
         var currentRotation = Rotation(player.yaw, 0f)
@@ -212,20 +277,38 @@ class PotionTrapPlanner(parent: EventListener) : TrapPlanner<PotionTrapPlanner.P
         val effectStrength = potionStack.getPotionEffects().sumOf { (it.amplifier + 1.0) * it.duration / 20.0 }
         return targetDistance * targetDistance / (effectStrength + 1.0)
     }
+
     private fun getRandomInRange(min: Float, max: Float): Float {
         return (Math.random() * (max - min) + min).toFloat()
     }
 
-    override fun validate(plan: BlockChangeIntent<PotionIntentData>, raycast: BlockHitResult): Boolean {
+    private fun validate(plan: BlockChangeIntent<PotionIntentData>): Boolean {
         return plan.slot.itemStack.item is SplashPotionItem &&
             plan.slot.itemStack.getPotionEffects().any { it.effectType in debuffEffects }
     }
 
-    override fun onIntentFullfilled(intent: BlockChangeIntent<PotionIntentData>) {
+    private fun onIntentFullfilled(intent: BlockChangeIntent<PotionIntentData>) {
         targetTracker.target = intent.planningInfo.target
     }
 
-    class PotionIntentData(
-        val target: LivingEntity
+    private data class BlockChangeIntent<T>(
+        val blockChangeInfo: BlockChangeInfo,
+        val slot: HotbarItemSlot,
+        val intentTiming: IntentTiming,
+        val planningInfo: T,
+        val planner: ModulePotionAura
+    )
+
+    private sealed class BlockChangeInfo {
+        data class UseItem(val hand: Hand) : BlockChangeInfo()
+    }
+
+    private enum class IntentTiming {
+        NEXT_PROPITIOUS_MOMENT
+    }
+
+    private data class PotionIntentData(
+        val target: LivingEntity,
+        val rotation: Rotation
     )
 }
