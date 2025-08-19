@@ -749,7 +749,9 @@
   "liquidbounce.module.fPSBoost.description":"Displays a false FPS value.",
   "liquidbounce.module.particleCosmetics.description":"Form a fashion of particles around you.",
   "liquidbounce.module.treasureManager.description":"Automatically store valuable items in boxes.",
-  "liquidbounce.module.instakillAxeFucker.description":"In KKCraft SkyWars,No probability of automatically selecting a instakillAxe",
-  "liquidbounce.module.targetInfo.description":"Semi-finished product。",
-  "liquidbounce.module.antiExplosion.description":"Automatically, builds a protective wall to shield against nearby explosives"
+  "liquidbounce.module.instakillAxeFucker.description":"In KKCraft SkyWars,No probability of automatically selecting a instakillAxe.",
+  "liquidbounce.module.targetInfo.description":"Semi-finished product.",
+  "liquidbounce.module.antiExplosion.description":"Automatically, builds a protective wall to shield against nearby explosives.",
+  "liquidbounce.module.bowBomb.description": "Use the OneShot bug to shoot an arrow with infinite power.",
+  "liquidbounce.module.bowBomb.potionAura":"Automatically throws side effects and damage potions at the target."
 }

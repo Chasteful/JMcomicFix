@@ -30,6 +30,7 @@ import net.ccbluex.liquidbounce.utils.inventory.HotbarItemSlot
 import net.ccbluex.liquidbounce.utils.inventory.Slots
 import net.ccbluex.liquidbounce.utils.inventory.useHotbarSlotOrOffhand
 import net.ccbluex.liquidbounce.utils.kotlin.Priority
+import net.ccbluex.liquidbounce.utils.math.getRandomInRange
 import net.ccbluex.liquidbounce.utils.math.plus
 import net.ccbluex.liquidbounce.utils.math.toBlockPos
 import net.ccbluex.liquidbounce.utils.math.toVec3d
@@ -810,10 +811,6 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         val dx = a.x - b.x
         val dz = a.z - b.z
         return dx * dx + dz * dz
-    }
-
-    private fun getRandomInRange(min: Float, max: Float): Float {
-        return (Random.nextFloat() * (max - min) + min)
     }
 
     override fun onEnabled() {

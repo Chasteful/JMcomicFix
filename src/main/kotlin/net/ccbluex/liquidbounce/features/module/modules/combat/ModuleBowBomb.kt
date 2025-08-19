@@ -23,7 +23,7 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket
 import net.minecraft.util.math.MathHelper
 import java.util.*
 
-object ModuleBowBomb : ClientModule("BowBomb", Category.COMBAT) {
+object ModuleBowBomb : ClientModule("BowBomb", Category.COMBAT, aliases = arrayOf("OneShot")){
     private val spoofs by int("Spoofs", 50, 0..200)
     private val delay by float("Delay", 5f, 0f..10f, "s")
     private val activeTime by float("ActiveTime", 0.4f, 0f..3f, "s")

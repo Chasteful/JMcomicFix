@@ -1,25 +1,36 @@
 package net.ccbluex.liquidbounce.features.module.modules.player
 
+import net.ccbluex.liquidbounce.config.types.NamedChoice
+import net.ccbluex.liquidbounce.config.types.nesting.ToggleableConfigurable
+import net.ccbluex.liquidbounce.event.events.MovementInputEvent
 import net.ccbluex.liquidbounce.event.events.RotationUpdateEvent
+import net.ccbluex.liquidbounce.event.events.WorldRenderEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.event.tickHandler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
+import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.ModuleScaffold
+import net.ccbluex.liquidbounce.render.renderEnvironmentForWorld
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.aiming.RotationsConfigurable
 import net.ccbluex.liquidbounce.utils.aiming.data.Rotation
-import net.ccbluex.liquidbounce.utils.aiming.utils.raycast
 import net.ccbluex.liquidbounce.utils.client.SilentHotbar
 import net.ccbluex.liquidbounce.utils.combat.CombatManager
 import net.ccbluex.liquidbounce.utils.combat.TargetTracker
+import net.ccbluex.liquidbounce.utils.combat.shouldBeAttacked
+import net.ccbluex.liquidbounce.utils.entity.squaredBoxedDistanceTo
 import net.ccbluex.liquidbounce.utils.inventory.HotbarItemSlot
+import net.ccbluex.liquidbounce.utils.inventory.InventoryManager.isInventoryOpen
 import net.ccbluex.liquidbounce.utils.inventory.Slots
 import net.ccbluex.liquidbounce.utils.inventory.findClosestSlot
+import net.ccbluex.liquidbounce.utils.inventory.isInContainerScreen
 import net.ccbluex.liquidbounce.utils.inventory.useHotbarSlotOrOffhand
 import net.ccbluex.liquidbounce.utils.item.getPotionEffects
+import net.ccbluex.liquidbounce.utils.kotlin.EventPriorityConvention.CRITICAL_MODIFICATION
 import net.ccbluex.liquidbounce.utils.kotlin.Priority
+import net.ccbluex.liquidbounce.utils.math.getRandomInRange
 import net.ccbluex.liquidbounce.utils.math.toBlockPos
-import net.ccbluex.liquidbounce.utils.render.trajectory.TrajectoryInfo
+import net.ccbluex.liquidbounce.utils.render.WorldTargetRenderer
 import net.minecraft.entity.EntityPose
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.effect.StatusEffects
@@ -32,120 +43,151 @@ import net.minecraft.util.hit.HitResult
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.RaycastContext
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.exp
-import kotlin.math.sin
+import kotlin.math.*
 
 object ModulePotionAura : ClientModule("PotionAura", Category.PLAYER, aliases = arrayOf("AutoDebuff")) {
-
-    private val range = floatRange("Range", 3.0f..4.5f, 2f..8f)
     private val delay by int("Delay", 20, 0..400, "ticks")
-    private val ignoreOpenInventory by boolean("IgnoreOpenInventory", true)
-    private val onlyPlayer by boolean("OnlyPlayer", true)
-    private val targetTracker = tree(TargetTracker(range = range))
-    private val rotationsConfigurable = tree(RotationsConfigurable(this))
 
-    private var currentPlan: BlockChangeIntent<PotionIntentData>? = null
+    private val range = floatRange("Range", 5f..16f, 2f..20f)
+    private val throwRange by floatRange("ThrowRange", 5f..12f, 5f..20f)
+    private val ignoreOpenInventory by boolean("IgnoreOpenInventory", true)
+
+    object AllowMoveBoost : ToggleableConfigurable(this, "AllowMoveBoost", false) {
+        val jump by boolean("Jump", true)
+        val move by boolean("Move", true)
+    }
+
+    init {
+        tree(AllowMoveBoost)
+    }
+
+    private val required by multiEnumChoice("Required", Required.NO_MOVEMENT)
+    private val targetTracker = tree(TargetTracker(range = range))
+    private val rotations = tree(RotationsConfigurable(this))
+    private val targetRenderer = tree(WorldTargetRenderer(this))
+    private var currentPlan: BlockChangeIntent? = null
     private var timeout = false
 
     private val debuffEffects = arrayOf(
         StatusEffects.SLOWNESS,
-        StatusEffects.MINING_FATIGUE,
         StatusEffects.INSTANT_DAMAGE,
-        StatusEffects.NAUSEA,
-        StatusEffects.BLINDNESS,
-        StatusEffects.HUNGER,
         StatusEffects.WEAKNESS,
-        StatusEffects.POISON,
-        StatusEffects.WITHER,
-        StatusEffects.GLOWING,
-        StatusEffects.LEVITATION,
-        StatusEffects.UNLUCK,
-        StatusEffects.BAD_OMEN,
-        StatusEffects.DARKNESS
+        StatusEffects.POISON
     )
 
-    override fun onEnabled() {
-        timeout = false
-    }
-
-    override fun onDisabled() {
-        timeout = false
-    }
+    override val running: Boolean
+        get() = super.running &&
+                !ModuleScaffold.running &&
+                (Required.NO_MOVEMENT !in required || (player.input.movementForward == 0.0f && player.input.movementSideways == 0.0f)) &&
+                (Required.NO_FALLING !in required || player.fallDistance <= 1.5f)
 
     @Suppress("unused")
     private val rotationUpdateHandler = handler<RotationUpdateEvent> {
-        if (timeout) {
+        if (timeout || (isInventoryOpen || isInContainerScreen) && !ignoreOpenInventory) {
+            targetTracker.reset()
+            currentPlan = null
             return@handler
         }
 
-        val enemies = targetTracker.targets().filter {
-            !onlyPlayer || it is PlayerEntity
+        val enemies = targetTracker.targets().filter { it is PlayerEntity }
+        if (enemies.isEmpty()) {
+            currentPlan = null
+            targetTracker.reset()
+            return@handler
         }
 
         currentPlan = plan(enemies)
+        currentPlan?.let { plan ->
+            RotationManager.setRotationTarget(
+                plan.rotation,
+                false,
+                rotations,
+                Priority.NORMAL,
+                this
+            )
+            targetTracker.target = plan.target
+        }
+    }
+    @Suppress("unused")
+    private val moveInputHandler = handler<MovementInputEvent>(priority = CRITICAL_MODIFICATION) { event ->
+        if (!AllowMoveBoost.enabled) return@handler
+        val plan = currentPlan ?: return@handler
 
-        currentPlan?.let { intent ->
-            when (val info = intent.blockChangeInfo) {
-                is BlockChangeInfo.UseItem -> {
-                    RotationManager.setRotationTarget(
-                        intent.planningInfo.rotation,
-                        considerInventory = !ignoreOpenInventory,
-                        configurable = rotationsConfigurable,
-                        Priority.IMPORTANT_FOR_PLAYER_LIFE,
-                        this
-                    )
-                }
-            }
+        if (AllowMoveBoost.jump && player.isOnGround) {
+            player.jump()
+            if (AllowMoveBoost.move) event.directionalInput = event.directionalInput.copy(forwards = true)
+        }
+
+        val jumpStartY = plan.target.pos?.y?.let { it - 0.01 } ?: player.pos.y
+        val maxY = jumpStartY + 1.25
+        if (player.pos.y >= maxY) {
+            event.directionalInput = event.directionalInput.copy(forwards = true)
         }
     }
 
     @Suppress("unused")
-    private val placementHandler = tickHandler {
-        val plan = currentPlan ?: return@tickHandler
+    private val tickHandler = tickHandler {
+        if (player.isDead || player.isSpectator || CombatManager.shouldPauseCombat) {
+            currentPlan = null
+            return@tickHandler
+        }
 
-        val raycast = raycast()
-        if (!validate(plan)) {
+        val plan = currentPlan ?: return@tickHandler
+        if (!(plan.slot.itemStack.item is SplashPotionItem &&
+                    plan.slot.itemStack.getPotionEffects().any { it.effectType in debuffEffects })) {
+            currentPlan = null
+            return@tickHandler
+        }
+
+        val target = plan.target
+        if (!validateThrow(target, null)) {
+            currentPlan = null
             return@tickHandler
         }
 
         CombatManager.pauseCombatForAtLeast(1)
         SilentHotbar.selectSlotSilently(this, plan.slot, 1)
-
-        when (plan.blockChangeInfo) {
-            is BlockChangeInfo.UseItem -> useHotbarSlotOrOffhand(plan.slot)
-        }
+        useHotbarSlotOrOffhand(plan.slot)
 
         timeout = true
-        onIntentFullfilled(plan)
+        targetTracker.target = plan.target
         waitTicks(delay)
         timeout = false
+        currentPlan = null
     }
+    @Suppress("unused")
+    private val renderHandler = handler<WorldRenderEvent> { event ->
+        val matrixStack = event.matrixStack
+        val target = targetTracker.target?.takeIf { targetRenderer.enabled } ?: return@handler
 
-    private fun plan(enemies: List<LivingEntity>): BlockChangeIntent<PotionIntentData>? {
+        renderEnvironmentForWorld(matrixStack) {
+            targetRenderer.render(this, target, event.partialTicks)
+        }
+    }
+    private fun plan(enemies: List<LivingEntity>): BlockChangeIntent? {
         val slot = findDebuffPotion() ?: return null
+        val maximumRange = throwRange.endInclusive
+        val squaredMaxRange = maximumRange * maximumRange
+        val squaredNormalRange = throwRange.endInclusive * throwRange.endInclusive
 
-        for (target in enemies) {
-            if (hasDebuff(target)) continue
+        val sortedTargets = enemies
+            .filter {
+                !hasDebuff(it) && it.pos != null && it.shouldBeAttacked() &&
+                        it.squaredBoxedDistanceTo(player) <= squaredMaxRange
+            }
+            .sortedBy {
+                if (it.squaredBoxedDistanceTo(player) <= squaredNormalRange) 0 else 1
+            }
 
-            val targetPos = target.pos ?: continue
-            val (rotation, _) = findOptimalThrowRotation(targetPos, slot.itemStack) ?: continue
+        for (target in sortedTargets) {
+            val (rotation, landingPos) = findOptimalThrowRotation(target.pos!!, slot.itemStack) ?: continue
+            if (!validateThrow(target, landingPos)) continue
 
-            RotationManager.setRotationTarget(
-                rotation,
-                priority = Priority.IMPORTANT_FOR_PLAYER_LIFE,
-                configurable = rotationsConfigurable,
-                provider = this
-            )
-
-            targetTracker.target = target
             return BlockChangeIntent(
                 BlockChangeInfo.UseItem(slot.useHand),
                 slot,
-                IntentTiming.NEXT_PROPITIOUS_MOMENT,
-                PotionIntentData(target,rotation),
-                this
+                target,
+                rotation
             )
         }
         return null
@@ -161,6 +203,12 @@ object ModulePotionAura : ClientModule("PotionAura", Category.PLAYER, aliases = 
 
     private fun hasDebuff(entity: LivingEntity): Boolean {
         return entity.statusEffects.any { it.effectType in debuffEffects }
+    }
+
+    private fun validateThrow(target: LivingEntity, landingPos: Vec3d?): Boolean {
+        if (landingPos == null) return false
+        val isInInventoryScreen = isInventoryOpen || isInContainerScreen
+        return !isInInventoryScreen && target.isAlive && !hasDebuff(target)
     }
 
     private fun findOptimalThrowRotation(targetPos: Vec3d, potionStack: ItemStack): Pair<Rotation, Vec3d>? {
@@ -196,7 +244,6 @@ object ModulePotionAura : ClientModule("PotionAura", Category.PLAYER, aliases = 
                     if (iterationsWithoutImprovement > 1500) break
                 }
             }
-
             temperature *= 0.99f
             iterations++
         }
@@ -207,17 +254,12 @@ object ModulePotionAura : ClientModule("PotionAura", Category.PLAYER, aliases = 
     private fun simulatePotionTrajectory(rotation: Rotation, potionStack: ItemStack): Vec3d? {
         val yawRad = Math.toRadians(rotation.yaw.toDouble())
         val pitchRad = Math.toRadians(rotation.pitch.toDouble())
-        val trajectoryInfo = TrajectoryInfo.POTION
-        val velocity = trajectoryInfo.initialVelocity
+        val velocity = 0.5
         var motion = Vec3d(
             -sin(yawRad) * cos(pitchRad) * velocity,
             -sin(pitchRad) * velocity,
             cos(yawRad) * cos(pitchRad) * velocity
-        )
-
-        if (trajectoryInfo.copiesPlayerVelocity) {
-            motion = motion.add(player.velocity)
-        }
+        ).add(player.velocity)
 
         val potionEntity = PotionEntity(mc.world!!, player, potionStack)
         var pos = player.pos.add(0.0, player.getEyeHeight(EntityPose.STANDING) - 0.2, 0.0)
@@ -225,12 +267,11 @@ object ModulePotionAura : ClientModule("PotionAura", Category.PLAYER, aliases = 
         repeat(100) {
             val newPos = pos.add(motion)
             val drag = if (!world.getBlockState(newPos.toBlockPos()).fluidState.isEmpty) {
-                trajectoryInfo.dragInWater
+                0.96
             } else {
-                trajectoryInfo.drag
+                0.96
             }
-            motion = motion.multiply(drag, drag, drag)
-            motion = motion.add(0.0, -trajectoryInfo.gravity, 0.0)
+            motion = motion.multiply(drag, drag, drag).add(0.0, -0.05, 0.0)
 
             val blockHitResult = mc.world!!.raycast(
                 RaycastContext(
@@ -244,7 +285,6 @@ object ModulePotionAura : ClientModule("PotionAura", Category.PLAYER, aliases = 
             if (blockHitResult != null && blockHitResult.type != HitResult.Type.MISS) {
                 return blockHitResult.pos
             }
-
             pos = newPos
             if (motion.lengthSquared() < 0.01) return null
         }
@@ -278,37 +318,32 @@ object ModulePotionAura : ClientModule("PotionAura", Category.PLAYER, aliases = 
         return targetDistance * targetDistance / (effectStrength + 1.0)
     }
 
-    private fun getRandomInRange(min: Float, max: Float): Float {
-        return (Math.random() * (max - min) + min).toFloat()
-    }
-
-    private fun validate(plan: BlockChangeIntent<PotionIntentData>): Boolean {
-        return plan.slot.itemStack.item is SplashPotionItem &&
-            plan.slot.itemStack.getPotionEffects().any { it.effectType in debuffEffects }
-    }
-
-    private fun onIntentFullfilled(intent: BlockChangeIntent<PotionIntentData>) {
-        targetTracker.target = intent.planningInfo.target
-    }
-
-    private data class BlockChangeIntent<T>(
+    private data class BlockChangeIntent(
         val blockChangeInfo: BlockChangeInfo,
         val slot: HotbarItemSlot,
-        val intentTiming: IntentTiming,
-        val planningInfo: T,
-        val planner: ModulePotionAura
+        val target: LivingEntity,
+        val rotation: Rotation
     )
 
     private sealed class BlockChangeInfo {
         data class UseItem(val hand: Hand) : BlockChangeInfo()
     }
 
-    private enum class IntentTiming {
-        NEXT_PROPITIOUS_MOMENT
+    override fun onEnabled() {
+        timeout = false
+        currentPlan = null
     }
 
-    private data class PotionIntentData(
-        val target: LivingEntity,
-        val rotation: Rotation
-    )
+    override fun onDisabled() {
+        timeout = false
+        currentPlan = null
+        targetTracker.reset()
+        targetRenderer.reset()
+    }
+    private enum class Required(
+        override val choiceName: String
+    ) : NamedChoice {
+        NO_MOVEMENT("NoMovement"),
+        NO_FALLING("NoFalling"),
+    }
 }
