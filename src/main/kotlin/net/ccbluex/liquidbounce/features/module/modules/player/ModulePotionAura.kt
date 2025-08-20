@@ -58,9 +58,10 @@ object ModulePotionAura : ClientModule("PotionAura", Category.PLAYER, aliases = 
     override val running: Boolean
         get() =
             super.running
-                    && !ModuleScaffold.running
-                    && (Required.NO_MOVEMENT !in required || (player.input.movementForward == 0.0f && player.input.movementSideways == 0.0f))
-                    && (Required.NO_FALLING !in required || player.fallDistance <= 1.5f)
+                && !ModuleScaffold.running
+                && (Required.NO_MOVEMENT !in required
+                || (player.input.movementForward == 0.0f && player.input.movementSideways == 0.0f))
+                && (Required.NO_FALLING !in required || player.fallDistance <= 1.5f)
 
     private val targetTracker = tree(TargetTracker(range = throwRange))
     private val rotationsConfigurable = tree(RotationsConfigurable(this))
@@ -183,6 +184,7 @@ object ModulePotionAura : ClientModule("PotionAura", Category.PLAYER, aliases = 
         return entity.statusEffects.any { it.effectType in debuffEffects }
     }
 
+    @Suppress("NestedBlockDepth")
     private fun findOptimalThrowRotation(targetPos: Vec3d, potionStack: ItemStack): Pair<Rotation, Vec3d>? {
         var bestRotation: Rotation? = null
         var bestScore = Double.MAX_VALUE
@@ -196,8 +198,8 @@ object ModulePotionAura : ClientModule("PotionAura", Category.PLAYER, aliases = 
 
         while (iterations < 2000 && temperature >= 0.01f) {
             val newRotation = Rotation(
-                yaw = (targetYaw + getRandomInRange(-temperature * 10f, temperature * 10f)).coerceIn(-180f, 180f),
-                pitch = (currentRotation.pitch + getRandomInRange(-temperature * 5f, temperature * 5f)).coerceIn(-90f, 90f)
+                (targetYaw + getRandomInRange(-temperature * 10f, temperature * 10f)).coerceIn(-180f, 180f),
+               (currentRotation.pitch + getRandomInRange(-temperature * 5f, temperature * 5f)).coerceIn(-90f, 90f)
             )
 
             val landingPos = simulatePotionTrajectory(newRotation, potionStack) ?: continue
@@ -292,7 +294,9 @@ object ModulePotionAura : ClientModule("PotionAura", Category.PLAYER, aliases = 
 
 
     private fun evaluateLandingPosition(landingPos: Vec3d, targetPos: Vec3d, potionStack: ItemStack): Double {
-        if (landingPos.squaredDistanceTo(player.pos.add(player.velocity.multiply(0.5))) <= 4.1 * 4.1) return Double.MAX_VALUE
+        if (landingPos.squaredDistanceTo(player.pos.add(player.velocity.multiply(0.5))) <= 4.1 * 4.1){
+            return Double.MAX_VALUE
+        }
 
         val targetDistance = landingPos.distanceTo(targetPos)
         if (targetDistance > 4.0) return Double.MAX_VALUE
@@ -305,7 +309,9 @@ object ModulePotionAura : ClientModule("PotionAura", Category.PLAYER, aliases = 
                 potionStack.getPotionEffects().any { effect ->
                     entity.statusEffects.any { it.effectType == effect.effectType && it.amplifier >= effect.amplifier }
                 }
-            }) return Double.MAX_VALUE
+            }){
+            return Double.MAX_VALUE
+        }
 
         val effectStrength = potionStack.getPotionEffects().sumOf { (it.amplifier + 1.0) * it.duration / 20.0 }
         return targetDistance * targetDistance / (effectStrength + 1.0)

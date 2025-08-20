@@ -1,3 +1,4 @@
+@file:Suppress("detekt:all")
 package net.ccbluex.liquidbounce.features.module.modules.player.autoclutch
 
 import net.ccbluex.liquidbounce.features.module.modules.player.autoclutch.ModuleAutoClutch.adjacentSafeBlocks

@@ -138,7 +138,9 @@ object ModuleAntiInstakillAxe : ClientModule("AntiInstakillAxe", Category.PLAYER
         val placementTarget = findBestBlockPlacementTarget(
             targetBlockPos,
             BlockPlacementTargetFindingOptions(
-                BlockOffsetOptions(listOf(Vec3i.ZERO), BlockPlacementTargetFindingOptions.PRIORITIZE_LEAST_BLOCK_DISTANCE),
+                BlockOffsetOptions(
+                    listOf(Vec3i.ZERO),
+                    BlockPlacementTargetFindingOptions.PRIORITIZE_LEAST_BLOCK_DISTANCE),
                 FaceHandlingOptions(CenterTargetPositionFactory),
                 stackToPlaceWith = slot.itemStack,
                 PlayerLocationOnPlacement(position = playerPos)

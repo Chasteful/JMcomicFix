@@ -22,7 +22,7 @@ import net.minecraft.util.math.Direction
 import net.minecraft.util.math.MathHelper
 import net.minecraft.util.shape.VoxelShape
 
-class BlockHitRenderer(
+class BlockRenderer(
     module: ClientModule
 ) : ToggleableConfigurable(module, "BlockHitRendering", true) {
     private val slideTime by int("SlideTime", 150, 1..1000, "ms")
