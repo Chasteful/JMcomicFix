@@ -61,7 +61,10 @@ object ModuleAutoStuck : ClientModule("AutoStuck", Category.WORLD) {
             isInAir = true
 
             when (event.packet) {
-                is PlayerPositionLookS2CPacket -> shouldEnableStuck = false
+                is PlayerPositionLookS2CPacket -> {
+                    shouldEnableStuck = false
+                    shouldActivate = false
+                }
                 is PlayerMoveC2SPacket -> event.cancelEvent()
                 is PlayerInteractItemC2SPacket -> {
                     event.cancelEvent()

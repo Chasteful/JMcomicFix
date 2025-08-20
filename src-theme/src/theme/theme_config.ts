@@ -6,10 +6,9 @@ import type {SpaceSeperatedNamesChangeEvent} from "../integration/events";
 export let spaceSeperatedNames = writable(false);
 
 export function convertToSpacedString(name: unknown): string {
-    const regex = /[A-Z]?[a-z]+|[0-9]+|[A-Z]+(?![a-z])/g;
-    // @ts-ignore
-    return (name.match(regex) as string[]).join(" ");
+    return String(name).replace(/([a-z])([A-Z])/g, "$1 $2");
 }
+
 
 async function updateSettings() {
     const hudSettings = await getModuleSettings("HUD");

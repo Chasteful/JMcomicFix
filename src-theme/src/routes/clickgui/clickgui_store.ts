@@ -28,7 +28,7 @@ export const scaleFactor: Writable<number> = writable(2);
 export const panelLength: Writable<number> = writable(66);
 export const fontSize: Writable<number> = writable(14);
 export const showGrid: Writable<boolean> = writable(false);
-
+export const moduleAutoClose: Writable<boolean> = writable(false);
 export const snappingEnabled: Writable<boolean> = writable(true);
 
 export const gridSize: Writable<number> = writable(10);

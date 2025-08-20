@@ -85,7 +85,10 @@ object ModuleClickGui :
     private val searchBarAutoFocus by boolean("SearchBarAutoFocus", true).onChanged {
         EventManager.callEvent(ClickGuiValueChangeEvent(this))
     }
-
+    @Suppress("UnusedPrivateProperty")
+    private val moduleAutoClose by boolean("ModuleAutoClose", true).onChanged {
+        EventManager.callEvent(ClickGuiValueChangeEvent(this))
+    }
     val isInSearchBar: Boolean
         get() = (mc.currentScreen is VirtualDisplayScreen || mc.currentScreen is ClickScreen) && isTyping
 
