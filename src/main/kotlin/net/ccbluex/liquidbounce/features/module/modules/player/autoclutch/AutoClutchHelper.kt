@@ -9,10 +9,10 @@ import net.ccbluex.liquidbounce.utils.entity.PlayerSimulationCache
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.Vec3d
-import net.minecraft.util.shape.VoxelShapes
+import kotlin.math.ceil
+import kotlin.math.floor
 
-
- fun canReachSafeBlockFrom(pos: Vec3d = player.pos): Boolean {
+fun canReachSafeBlockFrom(pos: Vec3d = player.pos): Boolean {
     val cache = PlayerSimulationCache.getSimulationForLocalPlayer()
     val snapshots = (0 until 20).map { cache.getSnapshotAt(it) }
 
@@ -75,12 +75,28 @@ fun canReachSafeBlock(): Boolean {
 }
 
 
- fun isInVoid(pos: Vec3d): Boolean {
-    val boundingBox = player.boundingBox
-        .offset(pos.subtract(player.pos))
-        .withMinY(voidThreshold.toDouble())
-    val collisions = world.getBlockCollisions(player, boundingBox)
-    return collisions.none() || collisions.all { shape -> shape == VoxelShapes.empty() }
+fun isInVoid(pos: Vec3d, voidDistance: Int = -1): Boolean {
+    val xRange = mutableListOf(0)
+    val zRange = mutableListOf(0)
+
+    if (pos.x - floor(pos.x) <= 0.3) xRange.add(-1)
+    else if (ceil(pos.x) - pos.x <= 0.3) xRange.add(1)
+
+    if (pos.z - floor(pos.z) <= 0.3) zRange.add(-1)
+    else if (ceil(pos.z) - pos.z <= 0.3) zRange.add(1)
+
+    val minY = if (voidDistance == -1) - 64 else pos.y.toInt() - voidDistance
+    val maxY = pos.y.toInt()
+
+    for (xOffset in xRange) {
+        for (zOffset in zRange) {
+            for (y in minY..maxY) {
+                val block = world.getBlockState(BlockPos(pos.x.toInt() + xOffset, y, pos.z.toInt() + zOffset))
+                if (!block.isAir) return false
+            }
+        }
+    }
+    return true
 }
 
  fun isBlockUnder(height: Double = 5.0): Boolean {
@@ -100,16 +116,10 @@ fun canReachSafeBlock(): Boolean {
 
 fun simulatePlayerTrajectory(checkCondition: (Vec3d, Box, BlockPos) -> Boolean): Boolean {
     val cache = PlayerSimulationCache.getSimulationForLocalPlayer()
-
-    for (tick in 0 until ModuleAutoClutch.PlayerTrajectory.trajectoryLength) {
-        val snapshot = cache.getSnapshotAt(tick)
+        val snapshot = cache.getSnapshotAt(1)
         val pos = snapshot.pos
         val playerBox = player.boundingBox.offset(pos.subtract(player.pos))
         val blockPos = BlockPos(pos.x.toInt(), (pos.y - 0.5).toInt(), pos.z.toInt())
 
-        if (checkCondition(pos, playerBox, blockPos)) {
-            return true
-        }
-    }
-    return false
+    return checkCondition(pos, playerBox, blockPos)
 }

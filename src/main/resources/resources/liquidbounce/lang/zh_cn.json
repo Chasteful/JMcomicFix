@@ -755,6 +755,6 @@
   "liquidbounce.module.targetInfo.description":"孩子们这不好写",
   "liquidbounce.module.antiExplosion.description":"自动搭建防护墙以抵御附近的爆炸物。",
   "liquidbounce.module.bowBomb.description": "利用漏洞射出一发威力无限的箭矢。",
-  "liquidbounce.module.bowBomb.potionAura":"自动朝目标投掷副作用与伤害药水。",
+  "liquidbounce.module.potionAura.description":"自动朝目标投掷副作用与伤害药水。",
   "liquidbounce.module.antiInstakillAxe.description":"当对方手持秒人斧时且瞄准你时，试图放置生物蛋抵挡秒杀。"
 }

@@ -82,7 +82,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     private val onlyDuringCombat by boolean("OnlyDuringCombat", false)
 
     object PlayerTrajectory: ToggleableConfigurable(this,"PlayerTrajectory",false) {
-        val trajectoryLength by int("TrajectoryLength", 100, 30..200)
+        val trajectoryLength by int("TrajectoryLength", 30, 30..200)
         val securitySection by color("Security", Color4b.CYAN.withAlpha(50))
         val hazardSection by color("Hazard", Color4b.RED.withAlpha(50))
     }
@@ -112,12 +112,13 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
         val initialTemperature by float("InitialTemp", 20f, 5f..50f)
         val temperatureDecayRate by float("TemperatureDecayRate", 0.97f, 0.80f..0.99f)
     }
-
+    private val annealingConfig = SimulatedAnnealing()
     init {
-        tree(SimulatedAnnealing())
+        tree(annealingConfig)
     }
 
     var state = State.IDLE
+
     private val blockPositionScoreCache = ConcurrentHashMap<BlockPos, Double>()
     private var currentSolution = Rotation(0f, 0f)
     private var bestEnergy = Double.MAX_VALUE
@@ -269,7 +270,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     }
 
     private fun pruneCache() {
-        while (blockPositionScoreCache.size > 10000) {
+        while (blockPositionScoreCache.size > 2560) {
             blockPositionScoreCache.entries.take(100).forEach { blockPositionScoreCache.remove(it.key) }
         }
     }
@@ -401,9 +402,9 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     private fun calculateSolutionBackground() {
         resetAnnealing()
         val batchSize = 1000
-        while (iterations < SimulatedAnnealing().maxIterations && temperature >= SimulatedAnnealing().minTemperature) {
+        while (iterations < annealingConfig.maxIterations && temperature >= annealingConfig.minTemperature) {
             repeat(batchSize) {
-                if (iterations >= SimulatedAnnealing().maxIterations || temperature < SimulatedAnnealing().minTemperature || bestEnergy < 1000.0) {
+                if (iterations >= annealingConfig.maxIterations || temperature < annealingConfig.minTemperature || bestEnergy < 1000.0) {
                     return@repeat
                 }
                 val newSolution = Rotation(
@@ -421,7 +422,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
                         iterationsWithoutImprovement = 0
                     } else {
                         iterationsWithoutImprovement++
-                        if (iterationsWithoutImprovement > SimulatedAnnealing().stagnationLimit && bestEnergy > 5000.0) {
+                        if (iterationsWithoutImprovement > annealingConfig.stagnationLimit && bestEnergy > 5000.0) {
                             state = State.IDLE
                             return
                         }
@@ -429,14 +430,15 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
                 }
                 iterations++
             }
-            temperature *= SimulatedAnnealing().temperatureDecayRate
+            temperature *= annealingConfig.temperatureDecayRate
         }
     }
+
 
     private fun predictFuturePosition(deltaTimeSeconds: Double): Vec3d {
         val deltaTicks = (deltaTimeSeconds * 20).toInt()
         val cache = PlayerSimulationCache.getSimulationForLocalPlayer()
-        return if (deltaTicks < PlayerTrajectory.trajectoryLength) {
+        return if (deltaTicks < 30) {
             cache.getSnapshotAt(deltaTicks).pos
         } else {
             var futurePos = player.pos
