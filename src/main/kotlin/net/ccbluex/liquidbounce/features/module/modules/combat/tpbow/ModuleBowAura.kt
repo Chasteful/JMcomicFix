@@ -30,14 +30,14 @@ import kotlin.math.*
 @Suppress("TooManyFunctions")
 object ModuleBowAura : ClientModule("TPBowAura", Category.COMBAT, disableOnQuit = true) {
 
-    private val mode by enumChoice("Mode", Mode.VELOCITY_1_8, Mode.entries.toTypedArray())
-    private val packetMode by enumChoice("PacketMode", PacketMode.C04, PacketMode.entries.toTypedArray())
+    private val mode by enumChoice("Mode", Mode.VELOCITY_1_9, Mode.entries.toTypedArray())
+    private val packetMode by enumChoice("PacketMode", PacketMode.C06, PacketMode.entries.toTypedArray())
     private val delay by intRange("Delay", 200..5000, 10..10000, "ms")
     private val maxTargets by int("MaxTargets", 1, 1..150)
     private val moveDistance by float("MoveDistance", 2f, 0.1f..20f, "m")
-    private val antiLag by boolean("AntiLag", true)
-    private val antiLagHighVersion by boolean("AntiLag-1.9+", true)
-    private val throughWalls by boolean("IgnoreWalls", true)
+    private val antiLag by boolean("AntiLag", false)
+    private val antiLagHighVersion by boolean("AntiLag-1.9+", false)
+    private val throughWalls by boolean("IgnoreWalls", false)
 
     internal val targetTracker = tree(object : TargetTracker(
         TargetPriority.DISTANCE,

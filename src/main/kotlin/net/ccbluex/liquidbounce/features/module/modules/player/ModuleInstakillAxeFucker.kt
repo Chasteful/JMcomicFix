@@ -1,20 +1,25 @@
-package net.ccbluex.liquidbounce.features.module.modules.misc
+package net.ccbluex.liquidbounce.features.module.modules.player
 
-import net.ccbluex.liquidbounce.event.events.ScheduleInventoryActionEvent
-import net.ccbluex.liquidbounce.event.handler
-import net.ccbluex.liquidbounce.features.module.Category
-import net.ccbluex.liquidbounce.features.module.ClientModule
-import net.ccbluex.liquidbounce.utils.inventory.*
-import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket
 import net.ccbluex.liquidbounce.event.events.ChatReceiveEvent
 import net.ccbluex.liquidbounce.event.events.NotificationEvent
 import net.ccbluex.liquidbounce.event.events.PacketEvent
+import net.ccbluex.liquidbounce.event.events.ScheduleInventoryActionEvent
 import net.ccbluex.liquidbounce.event.events.WorldChangeEvent
+import net.ccbluex.liquidbounce.event.handler
+import net.ccbluex.liquidbounce.features.module.Category
+import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.utils.client.SilentHotbar
 import net.ccbluex.liquidbounce.utils.client.notification
+import net.ccbluex.liquidbounce.utils.inventory.ClickInventoryAction
+import net.ccbluex.liquidbounce.utils.inventory.CloseContainerAction
+import net.ccbluex.liquidbounce.utils.inventory.ContainerItemSlot
+import net.ccbluex.liquidbounce.utils.inventory.InventoryConstraints
+import net.ccbluex.liquidbounce.utils.inventory.Slots
+import net.ccbluex.liquidbounce.utils.kotlin.Priority
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
 import net.minecraft.client.option.KeyBinding
 import net.minecraft.item.Items
+import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket
 import net.minecraft.screen.slot.Slot
 import net.minecraft.screen.slot.SlotActionType
 
@@ -45,7 +50,7 @@ object ModuleInstakillAxeFucker : ClientModule("InstakillAxeFucker", Category.PL
         if (chestSlot != null) {
             event.schedule(
                 inventoryConstraints,
-                ClickInventoryAction.click(screen, chestSlot.toContainerItemSlot(), 0, SlotActionType.PICKUP)
+                ClickInventoryAction.Companion.click(screen, chestSlot.toContainerItemSlot(), 0, SlotActionType.PICKUP)
             )
         }
 
@@ -53,11 +58,11 @@ object ModuleInstakillAxeFucker : ClientModule("InstakillAxeFucker", Category.PL
         if (helmetSlot != null) {
             event.schedule(
                 inventoryConstraints,
-                ClickInventoryAction.click(screen, helmetSlot.toContainerItemSlot(), 0, SlotActionType.PICKUP)
+                ClickInventoryAction.Companion.click(screen, helmetSlot.toContainerItemSlot(), 0, SlotActionType.PICKUP)
             )
             if (hasPerformedActions) {
                 KeyBinding.setKeyPressed(mc.options.useKey.boundKey, false)
-                mc.setScreen(null)
+                event.schedule(inventoryConstraints, CloseContainerAction(screen), Priority.IMPORTANT_FOR_USER_SAFETY)
                 notification(
                     "InstakillAxeFucker", "InstakillAxe has been auto selected with no probability.",
                     NotificationEvent.Severity.INFO
