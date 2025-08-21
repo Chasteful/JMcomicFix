@@ -305,6 +305,8 @@ open class Configurable(
     fun <C : MutableSet<Identifier>> serverPackets(name: String, default: C) =
         registryList(name, default, ValueType.SERVER_PACKET)
 
+    fun <C : MutableSet<String>> players(name: String, default: C) =
+        registryList(name, default, ValueType.PLAYERS)
     inline fun <reified T> multiEnumChoice(
         name: String,
         vararg default: T,

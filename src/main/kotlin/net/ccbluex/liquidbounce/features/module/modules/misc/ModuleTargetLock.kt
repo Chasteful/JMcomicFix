@@ -61,7 +61,7 @@ object ModuleTargetLock : ClientModule("TargetLock", Category.MISC) {
 
     private object Filter : LockChoice("Filter") {
 
-        private val usernames by textList("Usernames", mutableListOf("Notch"))
+        private val players by players("Players", hashSetOf())
         private val filterType by enumChoice("FilterType", FilterType.WHITELIST)
 
         enum class FilterType(override val choiceName: String) : NamedChoice {
@@ -70,15 +70,12 @@ object ModuleTargetLock : ClientModule("TargetLock", Category.MISC) {
         }
 
         override fun isLockedOn(playerEntity: AbstractClientPlayerEntity): Boolean {
-            val name = playerEntity.gameProfile.name
+            val uuid = playerEntity.uuid.toString()
 
             return when (filterType) {
-                FilterType.WHITELIST -> usernames.any { it.equals(name, true) }
-                FilterType.BLACKLIST -> usernames.none {
-                    it.equals(name, true)
-                }
+                FilterType.WHITELIST -> players.any { it.equals(uuid, true) }
+                FilterType.BLACKLIST -> players.none { it.equals(uuid, true) }
             }
-
         }
     }
 

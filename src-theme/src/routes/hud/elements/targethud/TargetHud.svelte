@@ -6,6 +6,7 @@
     import {armorValue, targetId} from '../island/Island';
     import {REST_BASE} from "../../../../integration/host";
     import {popOut, popIn} from "../../../../util/animate_utils";
+    import {removeColorCodes} from "../../../../util/color_utils";
     import {onMount, onDestroy} from "svelte";
     import {calcArmorColor, detectTeamColor, type TeamColor} from "../../../../util/Client/calcArmorColor";
     import ArmorStatus from "../../common/ItemView/ArmorStatus.svelte";
@@ -73,10 +74,6 @@
     }
 
 
-    function removeColorCodes(str: string): string {
-
-        return str.replace(/§[0-9a-fA-F]/g, '');
-    }
 
     function getRandomThemeColor(): string {
 

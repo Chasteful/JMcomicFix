@@ -24,6 +24,7 @@
 package net.ccbluex.liquidbounce.integration.interop.protocol.rest.v1.game
 
 import com.google.gson.JsonObject
+import net.ccbluex.liquidbounce.features.module.modules.misc.nameprotect.ModuleNameProtect
 import net.ccbluex.liquidbounce.integration.interop.ClientInteropServer
 import net.ccbluex.liquidbounce.utils.client.convertToString
 import net.ccbluex.liquidbounce.utils.client.logger
@@ -242,7 +243,17 @@ fun getRegistry(requestObject: RequestObject) = httpOk(JsonObject().apply {
                 })
             }
         }
-
+        "players" -> {
+            val world = mc.world ?: return httpForbidden("Invalid world")
+            val players = world.players
+            players.forEach { player ->
+                val uuid = player.uuidAsString
+                add(uuid, JsonObject().apply {
+                    addProperty("name", ModuleNameProtect.replace(player.name.string))
+                    addProperty("icon", "")
+                })
+            }
+        }
         else -> return httpForbidden("Invalid registry name: $registryName")
     }
 })

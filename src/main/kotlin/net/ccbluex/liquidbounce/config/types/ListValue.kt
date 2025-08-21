@@ -150,6 +150,7 @@ open class RegistryListValue<T : MutableSet<E>, E>(
         ValueType.STATUS_EFFECT -> "statuseffects"
         ValueType.CLIENT_PACKET -> "clientpackets"
         ValueType.SERVER_PACKET -> "serverpackets"
+        ValueType.PLAYERS->"players"
         else -> error("Unsupported registry type: $innerValueType")
     }
 

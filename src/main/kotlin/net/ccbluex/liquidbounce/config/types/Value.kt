@@ -445,6 +445,7 @@ enum class ValueType(
 
     // Client Types
     FRIEND,
+    PLAYERS,
     PROXY,
     ACCOUNT,
 

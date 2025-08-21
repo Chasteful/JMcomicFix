@@ -22,6 +22,11 @@ export type ThemeColors = {
     secondary: ColorFormats;
 };
 
+export function removeColorCodes(str: string): string {
+
+    return str.replace(/§[0-9a-fA-F]/g, '');
+}
+
 export function color4bToRgb(color4b: number): { r: number; g: number; b: number } {
     const unsigned = color4b >>> 0;
     return {
