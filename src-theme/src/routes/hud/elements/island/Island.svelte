@@ -576,7 +576,7 @@
 </script>
 {#if loaded}
     <div class="dynamic-island-container">
-        <div class="dynamic-island {alertState}"
+        <div class="dynamic-island hud-container {alertState}"
              class:notification-active={currentAlert !== null}
              class:contract={animationPhase === 'contract'}
              class:expand={animationPhase === 'expand'}
@@ -664,7 +664,7 @@
   }
 
   :root {
-    --island-bg: rgba(20, 20, 20, 0.5);
+
     --text-primary: rgba(255, 255, 255, 0.9);
   }
 
@@ -681,19 +681,15 @@
 
   .dynamic-island {
     overflow: hidden;
-    border-radius: 20px;
-    background: var(--island-bg);
     color: var(--text-primary);
     padding: 0 16px;
+    border-radius:24px;
     display: flex;
     align-items: center;
     transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1),
-    height 0.3s cubic-bezier(0.25, 1, 0.5, 1),
-    border-radius 0.3s 0.1s cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow 0.3s ease;
+    height 0.3s cubic-bezier(0.25, 1, 0.5, 1);
     transform-style: preserve-3d;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6),
-    inset 0 0 10px rgba(255, 255, 255, 0.05);
+
     transform-origin: top center;
 
     &.expand {

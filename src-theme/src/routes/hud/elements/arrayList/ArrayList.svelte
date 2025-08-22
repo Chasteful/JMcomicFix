@@ -9,9 +9,7 @@
 <div class="arraylist" id="arraylist"
      transition:fade|global={{ duration: 500,  easing: expoInOut }}
 >
-    <GlitchedLayers size={1000}>
         <Modules/>
-    </GlitchedLayers>
 </div>
 
 <style lang="scss">

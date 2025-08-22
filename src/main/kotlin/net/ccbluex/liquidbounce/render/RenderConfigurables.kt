@@ -30,15 +30,15 @@ class GenericStaticColorMode(
 
     override fun getColors(param: Any?) = staticColor to staticColor
 }
-
 class GenericSyncColorMode(
     override val parent: ChoiceConfigurable<*>
 ) : GenericColorMode<Any?>("Sync") {
 
     override fun getColors(param: Any?): Pair<Color4b, Color4b> {
-        return ModuleHud.PrimaryColor to ModuleHud.SecondaryColor
+        return ModuleHud.getThemeColor()
     }
 }
+
 class GenericRainbowColorMode(
     override val parent: ChoiceConfigurable<*>,
     private val alpha: Int = 50

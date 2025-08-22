@@ -73,7 +73,7 @@
                     rgba(20, 20, 20, 0.5) 0%,
                     rgba(darken($base, 5%), 0.5) 100%
     );
-    border-radius: 14px;
+    border-radius: var(--border-radius);
     width: 400px;
     padding: 16px;
     margin-bottom: 12px;

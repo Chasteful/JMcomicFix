@@ -42,11 +42,13 @@ import java.io.File
 // Chat formatting
 private fun getClientPrefix(): Text = Text.empty()
     .formatted(Formatting.RESET, Formatting.GRAY)
-    .append(gradientText(
-        ModuleHud.clientName.ifEmpty { "JMcomicFix" },
-        ModuleHud.PrimaryColor,
-        ModuleHud.SecondaryColor
-    ))
+    .append(
+        gradientText(
+            ModuleHud.clientName.ifEmpty { "JMcomicFix" },
+            ModuleHud.getThemeColor().first,
+            ModuleHud.getThemeColor().second
+        )
+    )
     .append(Text.literal(" ▸ ").formatted(Formatting.RESET, Formatting.GRAY))
 
 fun regular(text: MutableText): MutableText = text.formatted(Formatting.GRAY)

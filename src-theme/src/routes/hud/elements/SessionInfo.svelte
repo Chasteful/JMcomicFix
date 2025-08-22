@@ -92,7 +92,6 @@
     font-family: 'Alibaba', sans-serif;
     display: flex;
     align-items: center;
-    border-radius: 12px;
     padding: 10px 16px;
     width: fit-content;
     color: white;

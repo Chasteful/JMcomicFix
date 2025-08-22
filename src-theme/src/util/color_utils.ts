@@ -20,6 +20,7 @@ export type ColorFormats = {
 export type ThemeColors = {
     primary: ColorFormats;
     secondary: ColorFormats;
+    shadowColor: ColorFormats;
 };
 
 export function removeColorCodes(str: string): string {

@@ -111,6 +111,7 @@ import net.ccbluex.jmcomicfix.features.module.modules.render.*
 import net.ccbluex.jmcomicfix.features.module.modules.misc.ModuleAutoScreenShot
 import net.ccbluex.liquidbounce.features.module.modules.misc.anticheat.ModuleAntiCheat
 import net.ccbluex.liquidbounce.features.module.modules.player.ModuleAutoStuck
+import net.ccbluex.liquidbounce.features.module.modules.render.ModuleHud
 import net.ccbluex.liquidbounce.features.module.modules.render.targetinfo.ModuleTargetInfo
 import org.lwjgl.glfw.GLFW
 

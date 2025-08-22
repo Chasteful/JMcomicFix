@@ -231,8 +231,7 @@
 
   .chat-hud.focused {
     transition: box-shadow 0.3s ease;
-    box-shadow: 0 4px 16px color-mix(in srgb, var(--primary-color) 50%, transparent),
-    inset 0 0 10px rgba(255, 255, 255, 0.05);
+    box-shadow: var(--box-shadow);
   }
 
   .messages-container {
