@@ -216,25 +216,23 @@ object ModuleAntiInstakillAxe : ClientModule("AntiInstakillAxe", Category.PLAYER
         return null
     }
 
+    @Suppress("NestedBlockDepth","CognitiveComplexMethod")
     private fun planPearl(): Plan.PearlPlan? {
         val slot = findPearlSlot() ?: return null
-        val player = mc.player ?: return null
-        val playerPos = player.pos
 
         var bestRotation: Rotation? = null
         var bestDistance = 0.0
         var bestLandingPos: Vec3d? = null
-
-        val maxIterations = 1000
-        val initialTemperature = 20f
         val minTemperature = 0.01f
         val temperatureDecayRate = 0.97f
-        var temperature = initialTemperature
-        var currentRotation = Rotation(getRandomInRange(-180f, 180f), getRandomInRange(pitchRange.start, pitchRange.endInclusive))
+        var temperature = 20f
+        var currentRotation = Rotation(
+            getRandomInRange(-180f, 180f),
+            getRandomInRange(pitchRange.start, pitchRange.endInclusive))
         var currentDistance = 0.0
         var iterations = 0
 
-        while (iterations < maxIterations && temperature >= minTemperature) {
+        while (iterations < 1000 && temperature >= minTemperature) {
 
             val newRotation = Rotation(
                 (currentRotation.yaw + getRandomInRange(-temperature * 18f, temperature * 18f)),
@@ -256,7 +254,7 @@ object ModuleAntiInstakillAxe : ClientModule("AntiInstakillAxe", Category.PLAYER
                 val belowState = mc.world?.getBlockState(belowPos) ?: return null
 
                 if (!belowState.isAir && belowState.isFullCube(world, belowPos)) {
-                    val distance = playerPos.distanceTo(landingPos)
+                    val distance = player.pos.distanceTo(landingPos)
                     if (distance > bestDistance) {
                         bestDistance = distance
                         bestRotation = newRotation

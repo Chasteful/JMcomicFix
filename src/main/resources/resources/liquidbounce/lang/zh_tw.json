@@ -720,7 +720,6 @@
   "liquidbounce.module.replenish.description": "自動用物品欄中的物品填充快捷欄，使物品數量保持設定的閾值。",
   "liquidbounce.module.anchor.description": "讓你移動到水晶PvP的安全點里。",
   "liquidbounce.module.antiCheatDetect.messages.description": "Anti Cheat Detect 將嘗試在你下次加入任何伺服器/遊戲時，通過監控 ping 參數來檢測伺服器的反作弊系統。請注意，結果可能不準確，特別是當伺服器上有多個反作弊系統時。",
-  "liquidbounce.module.titleControl.description": "過濾伺服器的字幕上，你不想看到關鍵詞。",
   "liquidbounce.module.capes.description": "显示一個只有你能見到的披風。",
   "liquidbounce.module.halo.description": "在玩家頭頂放一個蔚藍案人物的光環。",
   "liquidbounce.module.packetQueueColor.description": "設置 PacketQueue 的玩家模型顏色。",
@@ -733,5 +732,18 @@
   "liquidbounce.module.autoClutch.description ":  "基於類比退火算法的自動珍珠自救。 " ,
   "liquidbounce.module.noweb.mode.grim.messages.Protocol ":  "請使用1.18.2以上的協定以繞過Grim高版本弱檢測！ " ,
   "liquidbounce.module.autoRod.description ":  "自動使用魚竿控距，需要準星指向對方。 " ,
-  "liquidbounce.module.autoScreenShot.description ":  "自動在勝利時執行某些動作並截圖。 "
+  "liquidbounce.module.autoScreenShot.description ":  "自動在勝利時執行某些動作並截圖。 ",
+  "liquidbounce.module.noBooks.description": "攔截並關閉伺服器開啟的書本介面。",
+  "liquidbounce.module.pointerESP.description": "朝向目標的指針組成的環。",
+  "liquidbounce.module.tPBowAura.description": "「天堂隕落長弓」",
+  "liquidbounce.module.fPSBoost.description": "顯示一個虛假的FPS值。",
+  "liquidbounce.module.particleCosmetics.description": "在你身邊形成一個粒子組成的裝飾效果。",
+  "liquidbounce.module.treasureManager.description": "自動將貴重的物品儲存進箱子中。",
+  "liquidbounce.module.instakillAxeFucker.description": "在KKCraft空島戰爭自動選擇秒人斧無機率。",
+  "liquidbounce.module.targetInfo.description": "孩子們這不好寫",
+  "liquidbounce.module.antiExplosion.description": "自動搭建防護牆以抵禦附近的爆炸物。",
+  "liquidbounce.module.bowBomb.description": "利用漏洞射出一發威力無限的箭矢。",
+  "liquidbounce.module.potionAura.description": "自動朝目標投擲副作用與傷害藥水。",
+  "liquidbounce.module.antiInstakillAxe.description": "當對方手持秒人斧且瞄準你時，試圖放置生物蛋抵擋秒殺。",
+  "liquidbounce.module.motionCamera.description": "動態調整遊戲中的相機位置。"
 }

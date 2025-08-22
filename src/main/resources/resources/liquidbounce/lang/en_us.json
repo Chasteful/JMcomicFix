@@ -727,7 +727,6 @@
   "liquidbounce.module.autoPearl.description": "Aims and throws a pearl at an enemies pearl trajectory.",
   "liquidbounce.module.replenish.description": "Automatically refills your hotbar with items from your inventory when the count drops to a certain threshold.",
   "liquidbounce.module.anchor.description": "Pulls you into safe holes for crystal PvP.",
-  "liquidbounce.module.titleControl.description": "Filter the title of the server for keywords you don't want to see.",
   "liquidbounce.module.capes.description": "Customize a cape that is only visible to you.",
   "liquidbounce.module.halo.description": "Displays the aura of a BlueArchive character above the player's head.",
   "liquidbounce.module.packetQueueColor.description": "Setting the player Wireframe model color for the PacketQueue.",
@@ -753,5 +752,7 @@
   "liquidbounce.module.targetInfo.description":"Semi-finished product.",
   "liquidbounce.module.antiExplosion.description":"Automatically, builds a protective wall to shield against nearby explosives.",
   "liquidbounce.module.bowBomb.description": "Use the OneShot bug to shoot an arrow with infinite power.",
-  "liquidbounce.module.bowBomb.potionAura":"Automatically throws side effects and damage potions at the target."
+  "liquidbounce.module.bowBomb.potionAura":"Automatically throws side effects and damage potions at the target.",
+  "liquidbounce.module.antiInstakillAxe.description":"When the opponent is holding a one-hit axe and aiming at you, try placing a spawn egg to block the instant kill.",
+  "liquidbounce.module.motionCamera.description":"Dynamically adjust the camera position in the game."
 }

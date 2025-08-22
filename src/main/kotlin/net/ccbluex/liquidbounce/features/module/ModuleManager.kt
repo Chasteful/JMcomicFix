@@ -285,7 +285,7 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleSkinDerp,
             ModuleTwerk,
             ModuleVomit,
-
+            ModuleMotionCamera,
             // Misc
             ModuleAutoGG,
             ModuleBookBot,

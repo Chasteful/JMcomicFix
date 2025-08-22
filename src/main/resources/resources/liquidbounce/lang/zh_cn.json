@@ -729,7 +729,6 @@
   "liquidbounce.module.replenish.description": "自动用物品栏中的物品填充快捷栏，使物品数量保持设定的阈值。",
   "liquidbounce.module.anchor.description": "让你移动到水晶PvP的安全点里。",
   "liquidbounce.module.antiCheatDetect.messages.description": "Anti Cheat Detect 将尝试在你下次加入任何服务器/游戏时，通过监测 ping 参数来检测服务器的反作弊系统。请注意，结果可能不准确，特别是当服务器上有多个反作弊系统时。",
-  "liquidbounce.module.titleControl.description": "过滤服务器的字幕上，你不想看见的关键词。",
   "liquidbounce.module.capes.description": "显示一个仅你可见的披风。",
   "liquidbounce.module.halo.description": "在玩家头顶显示一个蔚蓝档案人物的光环。",
   "liquidbounce.module.packetQueueColor.description": "设置PacketQueue的玩家模型颜色。",
@@ -756,5 +755,6 @@
   "liquidbounce.module.antiExplosion.description":"自动搭建防护墙以抵御附近的爆炸物。",
   "liquidbounce.module.bowBomb.description": "利用漏洞射出一发威力无限的箭矢。",
   "liquidbounce.module.potionAura.description":"自动朝目标投掷副作用与伤害药水。",
-  "liquidbounce.module.antiInstakillAxe.description":"当对方手持秒人斧时且瞄准你时，试图放置生物蛋抵挡秒杀。"
+  "liquidbounce.module.antiInstakillAxe.description":"当对方手持秒人斧时且瞄准你时，试图放置生物蛋抵挡秒杀。",
+  "liquidbounce.module.motionCamera.description":"动态调整游戏中的相机位置。"
 }
