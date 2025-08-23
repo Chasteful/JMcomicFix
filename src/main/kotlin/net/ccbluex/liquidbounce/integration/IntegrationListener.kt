@@ -25,6 +25,8 @@ import net.ccbluex.liquidbounce.event.events.*
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.misc.HideAppearance
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleClickGui
+import net.ccbluex.liquidbounce.features.module.modules.render.ModuleClickGui.ClickScreen
+import net.ccbluex.liquidbounce.features.module.modules.render.ModuleClickGui.clickGuiBrowserSettings
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleHud
 import net.ccbluex.liquidbounce.integration.backend.BrowserBackendManager
 import net.ccbluex.liquidbounce.integration.backend.browser.Browser
@@ -230,6 +232,8 @@ object IntegrationListener : EventListener {
         }
 
         event.fps = min(event.fps, browserSettings.currentFps)
+        if (!clickGuiBrowserSettings!!.syncGameFps || mc.currentScreen !is ClickScreen) return@handler
+        event.fps = min(event.fps, clickGuiBrowserSettings!!.currentFps)
     }
 
     @Suppress("unused")

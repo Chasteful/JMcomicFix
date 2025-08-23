@@ -48,7 +48,7 @@
             },
             {
               "name": "VerticalOffset",
-              "value": -50
+              "value": 0
             }
           ]
         }
@@ -190,7 +190,7 @@
             },
             {
               "name": "HorizontalOffset",
-              "value": 0
+              "value": -200
             },
             {
               "name": "Vertical",
@@ -352,7 +352,7 @@
             },
             {
               "name": "VerticalOffset",
-              "value": 20
+              "value": 50
             }
           ]
         }
@@ -374,7 +374,7 @@
             },
             {
               "name": "HorizontalOffset",
-              "value": -400
+              "value": -450
             },
             {
               "name": "Vertical",
@@ -622,7 +622,7 @@
             },
             {
               "name": "HorizontalOffset",
-              "value": 10
+              "value": 30
             },
             {
               "name": "Vertical",
@@ -630,7 +630,7 @@
             },
             {
               "name": "VerticalOffset",
-              "value": 20
+              "value": 50
             }
           ]
         }
@@ -666,36 +666,8 @@
         }
       ]
     },
-    {
-      "name": "SFZ",
-      "value": [
-        {
-          "name": "Enabled",
-          "value": true
-        },
-        {
-          "name": "Alignment",
           "value": [
             {
-              "name": "Horizontal",
-              "value": "Center"
-            },
-            {
-              "name": "HorizontalOffset",
-              "value": 100
-            },
-            {
-              "name": "Vertical",
-              "value": "CenterTranslated"
-            },
-            {
-              "name": "VerticalOffset",
-              "value": 100
-            }
-          ]
-        }
-      ]
-    },
     {
       "name": "SessionInfo",
       "value": [
@@ -720,7 +692,7 @@
             },
             {
               "name": "VerticalOffset",
-              "value": 100
+              "value": 200
             }
           ]
         }
@@ -787,7 +759,7 @@
       ]
     },
     {
-      "name": "TargetHud",
+      "name": "TargetHUD",
       "value": [
         {
           "name": "Enabled",
@@ -870,7 +842,7 @@
             },
             {
               "name": "VerticalOffset",
-              "value": 20
+              "value": 70
             }
           ]
         }

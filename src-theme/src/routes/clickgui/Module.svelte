@@ -6,7 +6,7 @@
     import {onMount} from "svelte";
     import {getModuleSettings, setModuleSettings, setModuleEnabled} from "../../integration/rest";
     import GenericSetting from "./setting/common/GenericSetting.svelte";
-    import {description as descriptionStore, highlightModuleName, scaleFactor,moduleAutoClose} from "./clickgui_store";
+    import {description as descriptionStore, highlightModuleName, scaleFactor,moduleAutoCollapse} from "./clickgui_store";
     import {convertToSpacedString, spaceSeperatedNames} from "../../theme/theme_config";
 
     export let name: string;
@@ -20,7 +20,7 @@
     let configurable: ConfigurableSetting;
     let moduleNameElement: HTMLElement;
     let hasSettings = false;
-    $: if ($moduleAutoClose) {
+    $: if ($moduleAutoCollapse) {
         expanded = $expandedModuleName === name;
     }
     highlightModuleName.subscribe((name) => {
@@ -88,7 +88,7 @@
     }
 
     async function toggleExpanded() {
-        if ($moduleAutoClose) {
+        if ($moduleAutoCollapse) {
             const panelId = moduleNameElement.closest("[data-panel-id]")?.getAttribute("data-panel-id");
 
             if (get(expandedModuleName) === name) {
@@ -116,7 +116,7 @@
         await fetchModuleSettings();
 
         setTimeout(() => {
-            if ($moduleAutoClose) {
+            if ($moduleAutoCollapse) {
                 document.querySelectorAll("[data-panel-id]").forEach(panel => {
                     const firstModule = panel.querySelector<HTMLElement>("[data-module-name]");
                     if (firstModule) {

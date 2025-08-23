@@ -24,8 +24,11 @@ import net.ccbluex.liquidbounce.event.events.AttackEntityEvent
 import net.ccbluex.liquidbounce.event.events.GameTickEvent
 import net.ccbluex.liquidbounce.event.events.TargetChangeEvent
 import net.ccbluex.liquidbounce.event.handler
+import net.ccbluex.liquidbounce.features.module.modules.combat.ModuleAimbot
 import net.ccbluex.liquidbounce.features.module.modules.combat.killaura.ModuleKillAura
+import net.ccbluex.liquidbounce.features.module.modules.combat.tpaura.ModuleTpAura.targetSelector
 import net.ccbluex.liquidbounce.integration.interop.protocol.rest.v1.game.PlayerData
+import net.ccbluex.liquidbounce.utils.client.player
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 
@@ -80,9 +83,18 @@ object CombatManager : EventListener {
         updatePauseBlocking()
         updateDuringCombat()
     }
-
     val tickHandler = handler<GameTickEvent> {
         update()
+
+        val target =(ModuleKillAura.targetTracker.target
+            ?: ModuleAimbot.targetTracker.target
+            ) as? PlayerEntity ?: return@handler
+        EventManager.callEvent(
+            TargetChangeEvent(
+                PlayerData.fromPlayer(target),
+                player.distanceTo(target)
+            )
+        )
     }
 
     @Suppress("unused")
@@ -93,7 +105,12 @@ object CombatManager : EventListener {
             duringCombat = PAUSE_COMBAT
 
             if (entity is PlayerEntity) {
-                EventManager.callEvent(TargetChangeEvent(PlayerData.fromPlayer(entity)))
+                EventManager.callEvent(
+                    TargetChangeEvent(
+                        PlayerData.fromPlayer(entity),
+                        player.distanceTo(entity)
+                    )
+                )
             }
         }
     }

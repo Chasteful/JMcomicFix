@@ -1,7 +1,7 @@
 <script lang="ts">
     import {onDestroy, onMount} from "svelte";
     import ArrayList from "./elements/arrayList/ArrayList.svelte";
-    import TargetHud from "./elements/targethud/TargetHud.svelte";
+    import ModernTargetHud from "./elements/targethud/Mode/Modern_TargetHud.svelte";
     import Notifications from "./elements/notifications/Notifications.svelte";
     import TabGui from "./elements/tabgui/TabGui.svelte";
     import HealthBar from "./elements/HealthBar.svelte";
@@ -24,7 +24,6 @@
     import KeyBinds from "./elements/KeyBinds.svelte";
     import MotionGraph from "./elements/MotionGraph.svelte";
     import TitleControl from "./elements/TitleControl.svelte";
-    import SFZ from "./elements/targethud/Mode/SFZ.svelte";
     import SessionInfo from "./elements/SessionInfo.svelte";
     import PlayerListHUD from "./elements/PlayerListHUD.svelte";
     import ChatHUD from "./elements/chat/Chat.svelte";
@@ -40,6 +39,7 @@
     import {calcResolutionCoefficient} from "../../util/ResolutionScaler";
     import ProgressBar from "./elements/progressBar/ProgressBar.svelte";
     import SilentHand from "./elements/SilentHand.svelte";
+    import TargetHud from "./elements/targethud/TargetHud.svelte";
 
     const {width, height, destroy} = WindowSize();
     let components: Component[] = [];
@@ -192,9 +192,6 @@
             {#if component.name === 'SessionInfo'}
                 <SessionInfo/>
             {/if}
-            {#if component.name === 'SFZ'}
-                <SFZ/>
-            {/if}
             {#if component.name === 'SilentHand'}
                 <SilentHand/>
             {/if}
@@ -204,8 +201,8 @@
             {#if component.name === 'TabGui'}
                 <TabGui/>
             {/if}
-            {#if component.name === 'TargetHud'}
-                <TargetHud/>
+            {#if component.name === 'TargetHUD'}
+                <TargetHud settings={component.settings}/>
             {/if}
             {#if component.name === 'TitleControl'}
                 <TitleControl/>

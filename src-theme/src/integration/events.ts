@@ -131,6 +131,7 @@ export interface KeyEvent  extends Event {
 
 export interface TargetChangeEvent  extends Event {
     target: PlayerData | null;
+    distant:number;
 }
 
 export interface BlockCountChangeEvent  extends Event {

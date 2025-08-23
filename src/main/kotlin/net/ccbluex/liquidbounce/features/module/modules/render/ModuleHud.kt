@@ -171,7 +171,7 @@ object ModuleHud : ClientModule("HUD", Category.RENDER, state = true, hide = tru
 
     private val browserReadyHandler = handler<BrowserReadyEvent> { event ->
         tree(GlobalBrowserSettings)
-        browserSettings = tree(BrowserSettings(60, ::reopen))
+        browserSettings = tree(BrowserSettings(30, ::reopen))
     }
 
     private val screenHandler = handler<ScreenEvent> { event ->

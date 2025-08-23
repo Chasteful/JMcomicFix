@@ -52,6 +52,8 @@ import net.ccbluex.liquidbounce.features.misc.proxy.ProxyManager
 import net.ccbluex.liquidbounce.features.module.ModuleManager
 import net.ccbluex.liquidbounce.features.module.modules.client.ipcConfiguration
 import net.ccbluex.liquidbounce.features.module.modules.combat.backtrack.BacktrackPacketManager
+import net.ccbluex.liquidbounce.features.module.modules.player.delayblink.DelayBlinkPacketManager
+import net.ccbluex.liquidbounce.features.module.modules.player.fireballfly.FireballFlyPacketManager
 import net.ccbluex.liquidbounce.features.spoofer.SpooferManager
 import net.ccbluex.liquidbounce.integration.IntegrationListener
 import net.ccbluex.liquidbounce.integration.backend.BrowserBackendManager
@@ -236,6 +238,9 @@ object LiquidBounce : EventListener {
         runCatching(ScriptManager::initializeEngine).onFailure { error ->
             logger.error("[ScriptAPI] Failed to initialize script engine.", error)
         }
+        // Modules
+        DelayBlinkPacketManager
+        FireballFlyPacketManager
 
         // Utility managers
         RotationManager

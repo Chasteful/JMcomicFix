@@ -18,7 +18,8 @@
         showSearch,
         panelLength,
         fontSize,
-        moduleAutoClose
+        moduleAutoCollapse,
+        moduleDescription
     } from "./clickgui_store";
     import type {
         ClickGuiValueChangeEvent,
@@ -53,9 +54,11 @@
         panelLengthFactor = configurable.value.find(v => v.name === "Length")?.value as number ?? 66
         ClickGuiFontSizeFactor = configurable.value.find(v => v.name === "FontSize")?.value as number ?? 14
         const snappingValue = configurable.value.find(v => v.name === "Snapping") as TogglableSetting;
+        $moduleDescription = configurable.value.find(v => v.name === "Description")?.value as boolean ?? false;
+        $moduleAutoCollapse = configurable.value.find(v => v.name === "ModuleAutoCollapse")?.value as boolean ?? true;
         $snappingEnabled = snappingValue?.value.find(v => v.name === "Enabled")?.value as boolean ?? true;
         $gridSize = snappingValue?.value.find(v => v.name === "GridSize")?.value as number ?? 10;
-        $moduleAutoClose = configurable.value.find(v => v.name === "ModuleAutoClose")?.value as boolean ?? true;
+
     };
     fontSize.subscribe((fontSize) => {
         if (typeof document === 'undefined') return;
@@ -106,8 +109,9 @@
 
     <CtrlFTip showSearch={showSearch}/>
 
+    {#if $moduleDescription}
     <Description/>
-
+    {/if}
     <Search modules={structuredClone(modules)}/>
 
 

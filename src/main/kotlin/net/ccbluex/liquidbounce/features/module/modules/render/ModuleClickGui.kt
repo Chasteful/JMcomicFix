@@ -30,6 +30,7 @@ import net.ccbluex.liquidbounce.integration.IntegrationListener
 import net.ccbluex.liquidbounce.integration.VirtualDisplayScreen
 import net.ccbluex.liquidbounce.integration.VirtualScreenType
 import net.ccbluex.liquidbounce.integration.backend.browser.Browser
+import net.ccbluex.liquidbounce.integration.backend.browser.BrowserSettings
 import net.ccbluex.liquidbounce.integration.interop.protocol.rest.v1.game.isTyping
 import net.ccbluex.liquidbounce.integration.theme.ThemeManager
 import net.ccbluex.liquidbounce.utils.client.asText
@@ -86,7 +87,11 @@ object ModuleClickGui :
         EventManager.callEvent(ClickGuiValueChangeEvent(this))
     }
     @Suppress("UnusedPrivateProperty")
-    private val moduleAutoClose by boolean("ModuleAutoClose", true).onChanged {
+    private val moduleAutoCollapse by boolean("ModuleAutoCollapse", true).onChanged {
+        EventManager.callEvent(ClickGuiValueChangeEvent(this))
+    }
+    @Suppress("UnusedPrivateProperty")
+    private val moduleDescription by boolean("Description", true).onChanged {
         EventManager.callEvent(ClickGuiValueChangeEvent(this))
     }
     val isInSearchBar: Boolean
@@ -128,20 +133,24 @@ object ModuleClickGui :
         )
         super.onEnabled()
     }
+    var clickGuiBrowserSettings: BrowserSettings? = null
 
     private fun open() {
         if (clickGuiBrowser != null) {
             return
         }
-
-        clickGuiBrowser = ThemeManager.openInputAwareImmediate(
-            VirtualScreenType.CLICK_GUI,
-            true,
-            priority = 20,
-            settings = IntegrationListener.browserSettings
-        ) {
-            mc.currentScreen is ClickScreen
+        clickGuiBrowserSettings = BrowserSettings(60) { reload() }
+        clickGuiBrowser = clickGuiBrowserSettings?.let {
+            ThemeManager.openInputAwareImmediate(
+                VirtualScreenType.CLICK_GUI,
+                true,
+                priority = 20,
+                settings = it
+            ) {
+                mc.currentScreen is ClickScreen
+            }
         }
+
     }
 
     /**

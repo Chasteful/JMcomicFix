@@ -34,6 +34,7 @@ import net.ccbluex.liquidbounce.render.engine.font.processor.LegacyTextSanitizer
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.ccbluex.liquidbounce.utils.client.bypassesNameProtection
 import net.ccbluex.liquidbounce.utils.client.toText
+import net.minecraft.client.MinecraftClient
 import net.minecraft.text.CharacterVisitor
 import net.minecraft.text.OrderedText
 import net.minecraft.text.Style
@@ -65,6 +66,7 @@ object ModuleNameProtect : ClientModule("NameProtect", Category.MISC) {
     val applyGarbled by boolean("Garbled", false).onChanged {
         EventManager.callEvent(NameProtectEvent(ModuleNameProtect))
     }
+    private val disengageFix by boolean("脱盒修复", false)
 
     object ReplaceFriendNames : ToggleableConfigurable(this, "ObfuscateFriends", true) {
         val friendsApplyGarbled by boolean("FriendsApplyGarbled", false)
@@ -112,6 +114,8 @@ object ModuleNameProtect : ClientModule("NameProtect", Category.MISC) {
         otherPlayers = { ReplaceOthers.colorMode.activeChoice.getColor(Unit) },
     )
     private const val ALPHABET = "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ"
+    private var lastPlayerNameCheck = 0L
+    private const val NAME_CHECK_INTERVAL = 3000L
 
     fun getGarbledName(baseName: String): String {
         val nowTick = (System.currentTimeMillis() / 10).toInt()
@@ -138,8 +142,22 @@ object ModuleNameProtect : ClientModule("NameProtect", Category.MISC) {
         } else {
             emptyList()
         }
+        val mc = MinecraftClient.getInstance()
+        val player = mc.player ?: return@handler
+        val currentTime = System.currentTimeMillis()
+        var cachedPlayerName = player.name.string
+        if (currentTime - lastPlayerNameCheck >= NAME_CHECK_INTERVAL) {
+            cachedPlayerName = player.name.string
+            lastPlayerNameCheck = currentTime
+        }
 
-        val playerName = player.gameProfile?.name ?: mc.session.username
+        val playerName = if (disengageFix) {
+            cachedPlayerName
+        } else {
+            player.gameProfile?.name ?: mc.session.username
+        }
+
+
         val selfPair = playerName to if (applyGarbled) {
            getGarbledName(replacement)
         } else {

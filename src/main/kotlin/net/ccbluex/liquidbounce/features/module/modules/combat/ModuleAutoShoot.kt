@@ -29,6 +29,8 @@ import net.ccbluex.liquidbounce.event.tickHandler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.features.module.modules.combat.killaura.ModuleKillAura
+import net.ccbluex.liquidbounce.features.module.modules.player.ModuleAutoStuck
+import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.ModuleScaffold
 import net.ccbluex.liquidbounce.render.renderEnvironmentForWorld
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.aiming.RotationsConfigurable
@@ -43,12 +45,6 @@ import net.ccbluex.liquidbounce.utils.combat.CombatManager
 import net.ccbluex.liquidbounce.utils.combat.TargetPriority
 import net.ccbluex.liquidbounce.utils.combat.TargetTracker
 import net.ccbluex.liquidbounce.utils.inventory.*
-import net.ccbluex.liquidbounce.utils.inventory.HotbarItemSlot
-import net.ccbluex.liquidbounce.utils.inventory.InventoryManager
-import net.ccbluex.liquidbounce.utils.inventory.OffHandSlot
-import net.ccbluex.liquidbounce.utils.inventory.Slots
-import net.ccbluex.liquidbounce.utils.inventory.findClosestSlot
-import net.ccbluex.liquidbounce.utils.item.isConsumable
 import net.ccbluex.liquidbounce.utils.item.isNothing
 import net.ccbluex.liquidbounce.utils.kotlin.Priority
 import net.ccbluex.liquidbounce.utils.render.WorldTargetRenderer
@@ -101,9 +97,9 @@ object ModuleAutoShoot : ClientModule("AutoShoot", Category.COMBAT) {
     private val targetRenderer = tree(WorldTargetRenderer(this))
 
     private val selectSlotAutomatically by boolean("SelectSlotAutomatically", true)
-    private val tickUntilSlotReset by int("TicksUntillSlotReset", 1, 0..20)
+    private val tickUntilSlotReset by int("TicksUntilSlotReset", 1, 0..20)
     private val considerInventory by boolean("ConsiderInventory", true)
-
+    private val notDuringUsingItem by boolean("NotDuringUsingItem", true)
     private val requiresKillAura by boolean("RequiresKillAura", false)
     private val notDuringCombat by boolean("NotDuringCombat", false)
     val constantLag by boolean("ConstantLag", false)
@@ -133,82 +129,44 @@ object ModuleAutoShoot : ClientModule("AutoShoot", Category.COMBAT) {
      * Simulates the next tick, which we use to figure out the required rotation for the next tick to react
      * as fast possible. This means we already pre-aim before we peek around the corner.
      */
+    private fun commonChecks(target: LivingEntity?, slot: HotbarItemSlot?): Boolean {
+        if (target == null || slot == null) return false
+        if (requiresKillAura && (!ModuleKillAura.running || !ModuleKillAura.enabled)) return false
+        if (notDuringCombat && CombatManager.isInCombat) return false
+        if (notDuringUsingItem && player.usingItem) return false
+        if (ModuleScaffold.enabled) return false
+        if (ModuleAutoStuck.shouldActivate) return false
+        if (!trySelect(slot)) return false
+        return true
+    }
+
     @Suppress("unused")
     private val simulatedTickHandler = handler<RotationUpdateEvent> {
-        // Find the recommended target
-        val target = targetTracker.selectFirst {
-            // Check if we can see the enemy
-            player.canSee(it)
-        } ?: return@handler
-
-        if (player.isUsingItem && player.activeItem.isConsumable) {
-            return@handler
-        }
-        if (notDuringCombat && CombatManager.isInCombat) {
-            return@handler
-        }
-
-        if (requiresKillAura && (!ModuleKillAura.running || !ModuleKillAura.enabled)) {
-            return@handler
-        }
-
-        // Check if we have a throwable, if not we can't shoot.
+        val target = targetTracker.selectFirst { player.canSee(it) } ?: return@handler
         val slot = getThrowable() ?: return@handler
+        if (!commonChecks(target, slot)) return@handler
 
-        if (!trySelect(slot)) {
-            return@handler
-        }
-
-        val rotation = generateRotation(target, GravityType.from(slot))
-
-        // Set the rotation with the usage priority of 2.
+        val rotation = generateRotation(target, GravityType.from(slot)) ?: return@handler
         RotationManager.setRotationTarget(
-            rotationConfigurable.toRotationTarget(rotation ?: return@handler, considerInventory = considerInventory),
+            rotationConfigurable.toRotationTarget(rotation, considerInventory = considerInventory),
             Priority.IMPORTANT_FOR_USAGE_2, this
         )
     }
 
-    override fun onDisabled() {
-        targetTracker.reset()
-    }
-
-    /**
-     * Handles the auto shoot logic.
-     */
     @Suppress("unused")
     private val handleAutoShoot = tickHandler {
         val target = targetTracker.target ?: return@tickHandler
-
-        if (requiresKillAura && (!ModuleKillAura.running || !ModuleKillAura.enabled)) {
-            return@tickHandler
-        }
-        if (notDuringCombat && CombatManager.isInCombat) {
-            return@tickHandler
-        }
-
-        // Check if we have a throwable, if not we can't shoot.
         val slot = getThrowable() ?: return@tickHandler
+        if (!commonChecks(target, slot)) return@tickHandler
 
-        if (!trySelect(slot)) {
-            return@tickHandler
-        }
+        val rotation = generateRotation(target, GravityType.from(slot)) ?: return@tickHandler
+        val rotationDifference = RotationManager.serverRotation.angleTo(rotation)
+        if (rotationDifference > aimOffThreshold) return@tickHandler
 
-        val rotation = generateRotation(target, GravityType.from(slot))
-
-        // Check the difference between server and client rotation
-        val rotationDifference = RotationManager.serverRotation.angleTo(rotation ?: return@tickHandler)
-
-        // Check if we are not aiming at the target yet
-        if (rotationDifference > aimOffThreshold) {
-            return@tickHandler
-        }
-
-        // Check if we are still aiming at the target
         clicker.click {
             if (player.isUsingItem || (considerInventory && InventoryManager.isInventoryOpen)) {
                 return@click false
             }
-
             interaction.interactItem(
                 player,
                 slot.useHand,
@@ -217,7 +175,9 @@ object ModuleAutoShoot : ClientModule("AutoShoot", Category.COMBAT) {
             ).isAccepted
         }
     }
-
+    override fun onDisabled() {
+        targetTracker.reset()
+    }
     val renderHandler = handler<WorldRenderEvent> { event ->
         val matrixStack = event.matrixStack
         val target = targetTracker.target ?: return@handler

@@ -101,7 +101,7 @@ class NameProtectEvent(val configurable: Configurable) : Event(),WebSocketEvent
 class GameModeChangeEvent(val gameMode: GameMode) : Event(), WebSocketEvent
 
 @Nameable("targetChange")
-class TargetChangeEvent(val target: PlayerData?) : Event(), WebSocketEvent
+class TargetChangeEvent(val target: PlayerData?,val distant:Float) : Event(), WebSocketEvent
 
 @Nameable("blockCountChange")
 class BlockCountChangeEvent(val count: Int?) : Event(), WebSocketEvent

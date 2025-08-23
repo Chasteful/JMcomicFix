@@ -52,10 +52,12 @@ object ModuleVelocity : ClientModule("Velocity", Category.COMBAT, aliases = arra
             VelocityReversal,
             VelocityStrafe,
             VelocityFlag,
+            VelocityStuck,
             VelocityJumpReset,
             VelocityAdvancedJumpReset,
 
             // Server modes
+            VelocityGrimACNoXZ,
             VelocityHypixel,
             VelocityDexland,
             VelocityHylex,
@@ -65,7 +67,7 @@ object ModuleVelocity : ClientModule("Velocity", Category.COMBAT, aliases = arra
             VelocityAAC442,
             VelocityKarhu,
             VelocityExemptGrim117,
-            VelocityGrimAC,
+            VelocityGrimFull,
             VelocityGrimAttacked,
             VelocityIntave,
             VelocityPolar,

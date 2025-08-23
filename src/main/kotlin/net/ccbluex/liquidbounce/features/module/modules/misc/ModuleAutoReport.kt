@@ -32,8 +32,7 @@ object ModuleAutoReport : ClientModule("AutoReport", Category.MISC) {
             playerName = player.name.string
             lastPlayerNameCheckTime = currentTime
         }
-        if (!enabled || killerName == null) return@tickHandler
-
+        if (killerName == null) return@tickHandler
         when (stage) {
             0 -> sendReportCommand()
             1 -> handleReportGuiLoading()
@@ -138,12 +137,12 @@ object ModuleAutoReport : ClientModule("AutoReport", Category.MISC) {
 
         val patterns = listOf(
             Regex("(.+?)被(.+?)击败"),
-            Regex("(.+?)被炸成了粉尘, 最终还是被(.+?)击败!"),
-            Regex("(.+?)消逝了, 最终还是被(.+?)击败!"),
-            Regex("(.+?)被架在了烧烤架上, 熟透了, 最终还是被(.+?)击败!"),
-            Regex("(.+?)跑得很快, 但是他还是摔了一跤, 最终被(.+?)击败"),
+            Regex("(.+?)被炸成了粉尘, 最终还是被(.+?)击败!?"),
+            Regex("(.+?)消逝了, 最终还是被(.+?)击败!?"),
+            Regex("(.+?)被架在了烧烤架上, 熟透了, 最终还是被(.+?)击败!?"),
+            Regex("(.+?)跑得很快, 但是他还是摔了一跤, 最终被(.+?)击败?"),
             Regex("(.+?)被(.+?)用弓箭射穿了"),
-            Regex("(.+?)被重压地无法呼吸, 最终还是被(.+?)击败!")
+            Regex("(.+?)被重压地无法呼吸, 最终还是被(.+?)击败!?")
         )
 
         for (pattern in patterns) {

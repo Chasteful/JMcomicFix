@@ -24,6 +24,7 @@ package net.ccbluex.liquidbounce.integration.theme.component
 import net.ccbluex.liquidbounce.config.types.NamedChoice
 import net.ccbluex.liquidbounce.integration.theme.component.types.HotBarComponent
 import net.ccbluex.liquidbounce.integration.theme.component.types.IntegratedComponent
+import net.ccbluex.liquidbounce.integration.theme.component.types.TargetHUDComponent
 import net.ccbluex.liquidbounce.integration.theme.component.types.minimap.MinimapComponent
 
 enum class ComponentType(
@@ -124,8 +125,10 @@ enum class ComponentType(
         "Minimap",
         createComponent = { MinimapComponent }
     ),
-    TARGET_HUD("TargetHud"),
-    HJ_HUD("SFZ"),
+    TARGET_HUD("TargetHUD",
+        createComponent = { TargetHUDComponent()}
+    ),
+
     BLOCK_COUNTER("BlockCounter"),
     ARMOR_ITEMS("ArmorItems"),
     INVENTORY("InventoryContainer"),

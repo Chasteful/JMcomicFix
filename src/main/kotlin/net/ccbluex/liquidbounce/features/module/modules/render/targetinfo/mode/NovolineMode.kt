@@ -2,7 +2,9 @@ package net.ccbluex.liquidbounce.features.module.modules.render.targetinfo.mode
 
 import net.ccbluex.liquidbounce.event.events.OverlayRenderEvent
 import net.ccbluex.liquidbounce.event.handler
+import net.ccbluex.liquidbounce.features.module.modules.combat.ModuleAimbot
 import net.ccbluex.liquidbounce.features.module.modules.combat.killaura.ModuleKillAura
+import net.ccbluex.liquidbounce.features.module.modules.combat.tpaura.ModuleTpAura.targetSelector
 import net.ccbluex.liquidbounce.features.module.modules.render.targetinfo.ModuleTargetInfo
 import net.ccbluex.liquidbounce.features.module.modules.render.targetinfo.ModuleTargetInfo.colorModes
 import net.ccbluex.liquidbounce.features.module.modules.render.targetinfo.TargetInfoMode
@@ -32,9 +34,11 @@ object NovolineMode : TargetInfoMode("Novoline") {
     }
 
     private fun determineTarget(): LivingEntity? {
-        val kaTarget = ModuleKillAura.targetTracker.target?.takeIf { it is PlayerEntity }
+        val target =(ModuleKillAura.targetTracker.target
+            ?: ModuleAimbot.targetTracker.target)?.takeIf { it is PlayerEntity }
+
         return when {
-            kaTarget != null -> kaTarget.also {
+            target != null -> target.also {
                 delayCounter = 0
                 lastTarget = it
             }
@@ -105,8 +109,8 @@ object NovolineMode : TargetInfoMode("Novoline") {
 
         previousEasingHealth += (easingHealth - previousEasingHealth) * fadeSmoothing * delta
         previousEasingHealth = previousEasingHealth.coerceIn(0f, max)
-
-        val targetAlpha = if (ModuleKillAura.targetTracker.target != null || delayCounter < 10) 255 else 0
+        val target = determineTarget()
+        val targetAlpha = if (target  != null || delayCounter < 10) 255 else 0
         alpha = (alpha + (targetAlpha - alpha) * smoothing * delta).toInt().coerceIn(0, 255)
     }
 

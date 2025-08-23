@@ -1,49 +1,32 @@
-/*
- * This file is part of LiquidBounce (https://github.com/CCBlueX/LiquidBounce)
- *
- * Copyright (c) 2015 - 2025 CCBlueX
- *
- * LiquidBounce is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * LiquidBounce is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
- */
-
 package net.ccbluex.liquidbounce.features.module.modules.player.autoqueue.presets
 
-
+import kotlinx.coroutines.delay
 import net.ccbluex.liquidbounce.config.types.nesting.Choice
 import net.ccbluex.liquidbounce.config.types.nesting.ChoiceConfigurable
 import net.ccbluex.liquidbounce.event.events.ChatReceiveEvent
-import net.ccbluex.liquidbounce.event.handler
+import net.ccbluex.liquidbounce.event.sequenceHandler
 import net.ccbluex.liquidbounce.event.tickHandler
 import net.ccbluex.liquidbounce.features.module.modules.player.autoqueue.ModuleAutoQueue
 
-object AutoQueueHeypixel : Choice("Heypixel") {
+object AutoQueueHeypixel : Choice("HeypixelSW") {
 
     override val parent: ChoiceConfigurable<*>
         get() = ModuleAutoQueue.presets
 
     private val spectatorCheck by boolean("SpectatorCheck", false)
+    private val delay by float("Delay", 2f, 0f..10f, "seconds")
 
     @Suppress("unused")
-    private val chatReceiveEventHandler = handler<ChatReceiveEvent> { event ->
+    private val chatReceiveEventHandler = sequenceHandler<ChatReceiveEvent> { event ->
         val message = event.message
 
         if (event.type != ChatReceiveEvent.ChatType.GAME_MESSAGE) {
-            return@handler
+            return@sequenceHandler
         }
 
         if (event.message.contains("可以用 /hub 退出观察者模式并返回大厅")) {
             if (!spectatorCheck || (!player.isSpectator && !player.abilities.flying)) {
+                delay((delay * 1000f).toLong())
                 network.sendCommand("again")
             }
         }
@@ -53,6 +36,7 @@ object AutoQueueHeypixel : Choice("Heypixel") {
     private val tickHandler = tickHandler {
         if (spectatorCheck) {
             waitUntil { player.isSpectator || player.abilities.flying }
+            delay((delay * 1000f).toLong())
             network.sendCommand("again")
             waitUntil { !player.isSpectator && !player.abilities.flying }
         }

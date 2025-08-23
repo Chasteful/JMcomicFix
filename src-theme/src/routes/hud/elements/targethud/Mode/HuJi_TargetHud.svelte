@@ -7,6 +7,7 @@
     import type {TargetChangeEvent} from "../../../../../integration/events.js";
     import {popOut, popIn} from "../../../../../util/animate_utils";
     import PlayerView from "../../../common/PlayerView/PlayerView.svelte";
+    import {visible} from "../TargetHud";
 
     interface NameHistoryEntry {
         name: string;
@@ -18,8 +19,6 @@
     }
 
     let target: PlayerData | null = null;
-    let visible = true;
-    let hideTimeout: ReturnType<typeof setTimeout>;
     let teamColor: TeamColor = null;
     let xp = "不明";
 
@@ -43,10 +42,6 @@
         return xpCache.get(id)!;
     }
 
-
-    function startHideTimeout() {
-        hideTimeout = setTimeout(() => (visible = false), 2000);
-    }
 
     function isOfflineUUID(uuid: string) {
         return !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(uuid);
@@ -144,9 +139,6 @@
 
     listen("targetChange", (data: TargetChangeEvent) => {
         target = data.target;
-        visible = true;
-        clearTimeout(hideTimeout);
-        startHideTimeout();
 
         if (target) {
             xp = getXPForTarget(target.username);
@@ -156,10 +148,9 @@
         }
     });
 
-    startHideTimeout();
 </script>
-<div class="main-wrapper" class:draggable={!visible && !target}>
-    {#if visible && target }
+<div class="main-wrapper" class:draggable={!$visible && !target}>
+    {#if $visible && target }
         {#if !target.isDead}
             <div class="id-card"
                  in:popIn|global={{ duration: 400 }}

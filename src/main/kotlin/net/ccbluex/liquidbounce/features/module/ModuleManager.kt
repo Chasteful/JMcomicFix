@@ -111,6 +111,8 @@ import net.ccbluex.jmcomicfix.features.module.modules.render.*
 import net.ccbluex.jmcomicfix.features.module.modules.misc.ModuleAutoScreenShot
 import net.ccbluex.liquidbounce.features.module.modules.misc.anticheat.ModuleAntiCheat
 import net.ccbluex.liquidbounce.features.module.modules.player.ModuleAutoStuck
+import net.ccbluex.liquidbounce.features.module.modules.player.delayblink.ModuleDelayBlink
+import net.ccbluex.liquidbounce.features.module.modules.player.fireballfly.ModuleFireballFly
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleHud
 import net.ccbluex.liquidbounce.features.module.modules.render.targetinfo.ModuleTargetInfo
 import org.lwjgl.glfw.GLFW
@@ -287,6 +289,7 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleTwerk,
             ModuleVomit,
             ModuleMotionCamera,
+
             // Misc
             ModuleAutoGG,
             ModuleBookBot,
@@ -383,6 +386,8 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleInstakillAxeFucker,
             ModulePotionAura,
             ModuleAntiInstakillAxe,
+            ModuleDelayBlink,
+            ModuleFireballFly,
 
             // Render
             ModuleAnimations,

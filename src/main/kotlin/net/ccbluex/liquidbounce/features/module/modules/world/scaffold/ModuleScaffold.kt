@@ -140,7 +140,12 @@ object ModuleScaffold : ClientModule("Scaffold", Category.WORLD) {
             } else {
                 blockPos.copy(y = startY - 1)
             }
-        })
+        }),
+
+        PRESS("Press", { blockPos ->
+            if (mc.options.jumpKey.isPressed) { null }
+            else { blockPos.copy(y = placementY) }
+        }),
 
     }
 

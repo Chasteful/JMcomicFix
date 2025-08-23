@@ -31,7 +31,7 @@ import net.minecraft.util.Hand
 import net.minecraft.util.hit.BlockHitResult
 
 @Suppress("all")
-internal object VelocityGrimAC : VelocityMode("GrimAC") {
+internal object VelocityStuck : VelocityMode("Freeze") {
     private var canCancelVelocity = false
     private var isDelayingPackets = false
     private var requiresClickAction = false
@@ -160,7 +160,7 @@ internal object VelocityGrimAC : VelocityMode("GrimAC") {
             queuedPackets.forEach { handlePacket(it.packet) }
             queuedPackets.clear()
 
-            interaction?.interactBlock(player, Hand.MAIN_HAND, hitResult)?.let {
+            interaction.interactBlock(player, Hand.MAIN_HAND, hitResult)?.let {
                 if (it == ActionResult.SUCCESS) {
                     player.swingHand(Hand.MAIN_HAND)
                 }

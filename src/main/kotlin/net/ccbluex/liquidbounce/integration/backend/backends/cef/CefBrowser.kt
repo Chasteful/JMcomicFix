@@ -68,9 +68,9 @@ class CefBrowser(
             // To ensure the texture is updated, we clear the renderer. This call invalidates the
             // current UI.
             mcefBrowser.clear()
-
-            logger.info("Browser $this viewport updated: $value," +
-                " scaled to $scaledWidth x $scaledHeight at zoom level $zoomLevel")
+//
+//            logger.info("Browser $this viewport updated: $value," +
+//                " scaled to $scaledWidth x $scaledHeight at zoom level $zoomLevel")
         }
     override var visible = true
     private val mcefBrowser: MCEFBrowser
@@ -212,8 +212,8 @@ class CefBrowser(
         val (scaledWidth, scaledHeight) = viewport.getScaledDimensions(GlobalBrowserSettings.quality)
 
         if (scaledWidth != width || scaledHeight != height) {
-            logger.warn("Browser $this viewport size mismatch: " +
-                "expected $scaledWidth x $scaledHeight, but got $width x $height. ")
+//            logger.warn("Browser $this viewport size mismatch: " +
+//                "expected $scaledWidth x $scaledHeight, but got $width x $height. ")
             invalidate()
         }
     }
