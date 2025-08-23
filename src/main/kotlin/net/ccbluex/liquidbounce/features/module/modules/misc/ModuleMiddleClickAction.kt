@@ -65,11 +65,16 @@ object ModuleMiddleClickAction : ClientModule(
     object Pearl : Choice("Pearl") {
 
         private val slotResetDelay by int("SlotResetDelay", 1, 0..10, "ticks")
-
+        private val stopOnSubmit by boolean("StopOnSubmit",false)
         var wasPressed = false
 
         val repeatable = tickHandler {
             if (mc.currentScreen != null) {
+                wasPressed = false
+                return@tickHandler
+            }
+
+            if (stopOnSubmit && player.pitch in 85f..90f) {
                 wasPressed = false
                 return@tickHandler
             }
