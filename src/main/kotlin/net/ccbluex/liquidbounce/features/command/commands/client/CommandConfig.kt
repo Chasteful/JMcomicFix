@@ -67,6 +67,7 @@ object CommandConfig : CommandFactory {
             browseUrl(CONFIGS_URL)
         }
         .build()
+
     private fun reloadSubcommand() = CommandBuilder
         .begin("reload")
         .suspendHandler { command, _ ->
@@ -90,7 +91,7 @@ object CommandConfig : CommandFactory {
                 val width = configs.maxOf { mc.textRenderer.getWidth(it.settingId) }
 
                 // In the case of the chat, we want to show the newest config at the bottom for visibility
-                configs.sortedBy { it.javaDate }.forEach {
+                configs.sortedBy { it.date }.forEach {
                     val settingName = it.settingId // there is also .name, but we use it for GUI instead
 
                     // Append spaces to the setting name to align the date and status

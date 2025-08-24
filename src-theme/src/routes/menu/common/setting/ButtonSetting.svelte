@@ -8,6 +8,8 @@
     export let inset = false;
     export let listenForEnter = false;
     export let loading = false;
+    export let centerText = false;
+    export let matchWidth = false;
 
     const dispatch = createEventDispatcher();
 
@@ -20,14 +22,23 @@
         }
     }
 </script>
-
 <svelte:window on:keydown={handleKeyDown}/>
-<button class="button-setting" class:inset class:secondary {disabled} on:click={() => dispatch("click")} type="button">
+<button
+        class="button-setting"
+        class:inset
+        class:secondary
+        class:centerText
+        class:matchWidth
+        {disabled}
+        on:click={() => dispatch("click")}
+        type="button"
+>
     {#if loading}
         <CircleLoader/>
     {/if}
     {title}
 </button>
+
 
 <style lang="scss">
   @use "sass:color";
@@ -35,7 +46,7 @@
 
   .button-setting {
     position: relative;
-    color: $text;
+    color: rgba($text, 0.6);
     font-weight: 600;
     font-size: 20px;
     padding: 20px;
@@ -45,11 +56,22 @@
     background: rgba($base, 0.5);
     box-shadow: 0 0 8px rgba($base, 0.6);
 
+    &.centerText {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    &.matchWidth {
+      width: 100%;
+    }
+
     &.inset {
       margin: 0 30px;
     }
 
     &:not([disabled]):hover {
+      color: $text;
       background-color: color.adjust(color.adjust(rgba($accent-mix, 0.4), $saturation: -30%), $lightness: -10%);
       cursor: pointer;
 
@@ -60,6 +82,7 @@
 
     &[disabled] {
       opacity: .6;
+
     }
   }
 </style>

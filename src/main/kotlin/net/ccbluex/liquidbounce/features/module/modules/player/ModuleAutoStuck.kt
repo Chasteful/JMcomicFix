@@ -123,6 +123,9 @@ object ModuleAutoStuck : ClientModule("AutoStuck", Category.WORLD) {
     }
     @Suppress("unused")
     private val tickHandler = tickHandler {
+        val world = mc.world ?: return@tickHandler
+        val player = mc.player ?: return@tickHandler
+
         if (!alwaysInVoid && player.isOnGround) lastGroundY = player.y.toInt() - 1
 
         if (stuckCooldown > 0) {

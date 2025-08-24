@@ -286,7 +286,6 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleFPSBoost,
             ModuleHandDerp,
             ModuleMotionCamera,
-            ModulePendant,
             ModuleSkinDerp,
             ModuleTwerk,
             ModuleVomit,

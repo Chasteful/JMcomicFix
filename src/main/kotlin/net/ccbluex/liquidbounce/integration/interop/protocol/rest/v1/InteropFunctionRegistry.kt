@@ -27,6 +27,7 @@ import net.ccbluex.liquidbounce.integration.interop.protocol.rest.v1.client.*
 import net.ccbluex.liquidbounce.integration.interop.protocol.rest.v1.features.*
 import net.ccbluex.liquidbounce.integration.interop.protocol.rest.v1.game.*
 import net.ccbluex.netty.http.rest.Node
+import org.spongepowered.asm.mixin.Mixins.getConfigs
 
 internal fun registerInteropFunctions(node: Node) = node.withPath("/api/v1/client") {
     // Client Functions
@@ -70,6 +71,11 @@ internal fun registerInteropFunctions(node: Node) = node.withPath("/api/v1/clien
     }
     get("/module/:name", ::getModule)
 
+    // Config Functions
+    get("/configs", ::getConfigs)
+    post("/config/load", ::loadConfig)
+    post("/config/save", ::saveConfig)
+    delete("/config", ::deleteConfig)
 
     // Component Functions
     get("/components", ::getComponents)

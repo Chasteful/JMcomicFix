@@ -82,7 +82,45 @@ fun getSettings(requestObject: RequestObject): FullHttpResponse {
 fun putSettings(requestObject: RequestObject): FullHttpResponse {
     return ModuleRequest(requestObject.queryParams["name"] ?: "").acceptPutSettingsRequest(requestObject.body)
 }
+fun getConfigs(requestObject: RequestObject): FullHttpResponse {
+    val folder = ConfigSystem.userConfigsFolder
+    logger.info("Config folder: ${folder.absolutePath}, exists: ${folder.exists()}")
+    val configs = JsonArray().apply {
+        folder.listFiles()?.forEach {
+            logger.info("Found config: ${it.nameWithoutExtension}")
+            add(it.nameWithoutExtension)
+        }
+    }
+    logger.info("Returning configs: $configs")
+    return httpOk(configs)
+}
 
+fun loadConfig(requestObject: RequestObject): FullHttpResponse {
+    val name = requestObject.queryParams["name"] ?: return httpForbidden("Name required")
+    val file = ConfigSystem.userConfigsFolder.resolve("$name.json")
+    if (!file.exists()) return httpForbidden("$name not found")
+
+    file.bufferedReader().use { r ->
+        AutoConfig.withLoading { AutoConfig.loadAutoConfig(r) }
+    }
+    return httpOk(JsonObject().apply { addProperty("loaded", name) })
+}
+
+fun saveConfig(requestObject: RequestObject): FullHttpResponse {
+    val name = requestObject.queryParams["name"] ?: return httpForbidden("Name required")
+    val file = ConfigSystem.userConfigsFolder.resolve("$name.json")
+    file.createNewFile()
+    file.bufferedWriter().use { AutoConfig.serializeAutoConfig(it) }
+    return httpOk(JsonObject().apply { addProperty("saved", name) })
+}
+
+fun deleteConfig(requestObject: RequestObject): FullHttpResponse {
+    val name = requestObject.queryParams["name"] ?: return httpForbidden("Name required")
+    val file = ConfigSystem.userConfigsFolder.resolve("$name.json")
+    if (!file.exists()) return httpForbidden("$name not found")
+    file.delete()
+    return httpOk(JsonObject().apply { addProperty("deleted", name) })
+}
 // POST /api/v1/client/modules/panic
 @Suppress("UNUSED_PARAMETER")
 fun postPanic(requestObject: RequestObject): FullHttpResponse {
@@ -140,5 +178,4 @@ data class ModuleRequest(val name: String) {
         ConfigSystem.storeConfigurable(modulesConfigurable)
         return httpOk(emptyJsonObject())
     }
-
 }

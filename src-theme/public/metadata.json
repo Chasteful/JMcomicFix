@@ -17,6 +17,7 @@
   "overlays": [
     "hud",
     "inventory",
+    "chest",
     "container",
     "browser",
     "chat",

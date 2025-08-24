@@ -65,6 +65,49 @@ export async function setModuleSettings(name: string, settings: ConfigurableSett
         body: JSON.stringify(settings)
     });
 }
+export async function getConfigs(): Promise<string[]> {
+        const response = await fetch(`${API_BASE}/client/configs`);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch configs: ${response.statusText}`);
+        }
+        const data: string[] = await response.json();
+        console.log("Fetched configs:", data);
+        return data || [];
+}
+export async function loadConfig(name: string): Promise<string> {
+        const searchParams = new URLSearchParams({ name });
+        const response = await fetch(`${API_BASE}/client/config/load?${searchParams.toString()}`, {
+            method: "POST"
+        });
+        if (!response.ok) {
+            throw new Error(`Failed to load config ${name}: ${response.statusText}`);
+        }
+        const data = await response.json();
+        console.log("Loaded config:", data);
+        return data.loaded || name;
+}
+export async function saveConfig(name: string): Promise<string> {
+    const searchParams = new URLSearchParams({ name });
+    const response = await fetch(`${API_BASE}/client/config/save?${searchParams.toString()}`, {
+        method: "POST"
+    });
+    if (!response.ok) {
+        throw new Error(`Failed to save config ${name}: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return data.saved || name;
+}
+export async function deleteConfig(name: string): Promise<string> {
+    const searchParams = new URLSearchParams({ name });
+    const response = await fetch(`${API_BASE}/client/config?${searchParams.toString()}`, {
+        method: "DELETE"
+    });
+    if (!response.ok) {
+        throw new Error(`Failed to delete config ${name}: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return data.deleted || name;
+}
 
 export async function getSpooferSettings(): Promise<ConfigurableSetting> {
     const response = await fetch(`${API_BASE}/client/spoofer`);

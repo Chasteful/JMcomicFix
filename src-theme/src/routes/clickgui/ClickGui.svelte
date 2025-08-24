@@ -32,6 +32,7 @@
         TogglableSetting
     } from "../../integration/types";
     import CtrlFTip from "./CtrlFTip.svelte";
+    import ConfigManager from "./ConfigManager.svelte";
 
     let resolutionScaler = new ResolutionScaler({
         baseResolution: {width: 1920, height: 1080}
@@ -114,6 +115,7 @@
     {/if}
     <Search modules={structuredClone(modules)}/>
 
+    <ConfigManager/>
 
     {#each Object.entries(categories) as [category, modules], panelIndex}
         <Panel {category} {modules} {panelIndex}/>
