@@ -21,23 +21,28 @@ package net.ccbluex.liquidbounce.integration.interop.protocol.rest.v1.client
 
 import com.google.gson.JsonObject
 import io.netty.handler.codec.http.FullHttpResponse
-import net.ccbluex.liquidbounce.LiquidBounce
 import net.ccbluex.jmcomicfix.features.module.modules.`fun`.ModuleFPSBoost
+import net.ccbluex.liquidbounce.LiquidBounce
 import net.ccbluex.liquidbounce.api.services.client.ClientUpdate.update
+import net.ccbluex.liquidbounce.config.ConfigSystem
+import net.ccbluex.liquidbounce.config.types.FileDialogMode
 import net.ccbluex.liquidbounce.utils.client.inGame
 import net.ccbluex.liquidbounce.utils.client.mc
 import net.ccbluex.liquidbounce.utils.client.usesViaFabricPlus
 import net.ccbluex.netty.http.model.RequestObject
+import net.ccbluex.netty.http.util.httpBadRequest
 import net.ccbluex.netty.http.util.httpForbidden
+import net.ccbluex.netty.http.util.httpNoContent
+import net.ccbluex.netty.http.util.httpNotFound
 import net.ccbluex.netty.http.util.httpOk
 import net.minecraft.util.Util
+import java.io.File
 import java.net.URI
 import java.util.*
 
 // GET /api/v1/client/info
 @Suppress("UNUSED_PARAMETER")
 fun getClientInfo(requestObject: RequestObject) = httpOk(JsonObject().apply {
-    addProperty("os", Util.getOperatingSystem().getName())
     addProperty("gameVersion", mc.gameVersion)
     addProperty("clientVersion", LiquidBounce.clientVersion)
     addProperty("clientName", LiquidBounce.CLIENT_NAME)
@@ -46,6 +51,7 @@ fun getClientInfo(requestObject: RequestObject) = httpOk(JsonObject().apply {
         if (it) ModuleFPSBoost.getModifiedFPS(mc.currentFps) else mc.currentFps
     })
     addProperty("gameDir", mc.runDirectory.path)
+    addProperty("clientDir", ConfigSystem.rootFolder.path)
     addProperty("inGame", inGame)
     addProperty("viaFabricPlus", usesViaFabricPlus)
     addProperty("hasProtocolHack", usesViaFabricPlus)
@@ -77,7 +83,7 @@ fun getUpdateInfo(requestObject: RequestObject) = httpOk(JsonObject().apply {
 @Suppress("UNUSED_PARAMETER")
 fun postExit(requestObject: RequestObject): FullHttpResponse {
     mc.scheduleStop()
-    return httpOk(JsonObject())
+    return httpNoContent()
 }
 
 // GET /api/v1/client/window
@@ -99,7 +105,34 @@ fun postBrowse(requestObject: RequestObject): FullHttpResponse {
     val url = POSSIBLE_URL_TARGETS[target] ?: return httpForbidden("Unknown target")
 
     Util.getOperatingSystem().open(url)
-    return httpOk(JsonObject())
+    return httpNoContent()
+}
+
+// POST /api/v1/client/browseFile
+fun postBrowseFile(requestObject: RequestObject): FullHttpResponse {
+    val jsonObj = requestObject.asJson<JsonObject>()
+    val f = jsonObj["file"]?.asString ?: return httpForbidden("No file specified")
+
+    val file = File(f).let {
+        if (it.isAbsolute) it else ConfigSystem.rootFolder.resolve(it)
+    }.takeIf(File::exists) ?: return httpNotFound(f, "File not exists")
+
+    Util.getOperatingSystem().open(file)
+    return httpNoContent()
+}
+
+// POST /api/v1/client/fileDialog
+fun postFileDialog(requestObject: RequestObject): FullHttpResponse {
+    data class RequestBody(val mode: FileDialogMode, val supportedExtensions: List<String>? = null)
+    val (mode, supportedExtensions) = runCatching {
+        requestObject.asJson<RequestBody>()
+    }.getOrNull() ?: return httpBadRequest("No dialog mode provided")
+
+    val files = mode.selectFiles(supportedExtensions)
+
+    return httpOk(JsonObject().apply {
+        files.firstOrNull()?.let { addProperty("file", it) }
+    })
 }
 
 private val POSSIBLE_URL_TARGETS: Map<String, URI> = run {

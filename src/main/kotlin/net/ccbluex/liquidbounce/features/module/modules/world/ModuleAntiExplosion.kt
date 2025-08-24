@@ -8,6 +8,7 @@ import net.ccbluex.liquidbounce.event.events.RotationUpdateEvent
 import net.ccbluex.liquidbounce.event.tickHandler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
+import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.ScaffoldBlockItemSelection.isValidBlock
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.aiming.RotationsConfigurable
 import net.ccbluex.liquidbounce.utils.aiming.utils.raytraceBlock
@@ -21,6 +22,7 @@ import net.ccbluex.liquidbounce.utils.inventory.HotbarItemSlot
 import net.ccbluex.liquidbounce.utils.inventory.ItemSlot
 import net.ccbluex.liquidbounce.utils.inventory.Slots
 import net.ccbluex.liquidbounce.utils.kotlin.Priority
+import net.minecraft.client.MinecraftClient
 import net.minecraft.client.network.ClientPlayerEntity
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
@@ -33,6 +35,7 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.Vec3d
 import net.minecraft.util.math.Vec3i
+import net.minecraft.util.shape.VoxelShapes
 import kotlin.math.abs
 
 /**
@@ -148,7 +151,7 @@ object ModuleAntiExplosion : ClientModule("AntiExplosion", Category.WORLD) {
      * Starts building a new protective wall.
      */
     private fun startNewWall(player: ClientPlayerEntity, nearbyExplosive: Entity) {
-        if (!canBuildWall(player, nearbyExplosive.pos)) {
+        if (!canBuildWall(player, nearbyExplosive.pos) || findBlockSlot() == null) {
             return
         }
 
@@ -197,12 +200,12 @@ object ModuleAntiExplosion : ClientModule("AntiExplosion", Category.WORLD) {
      * Switches to the best block slot in the hotbar.
      */
     private fun switchToBlockSlot(player: ClientPlayerEntity) {
-        val blockSlot = findBlockSlot()
-        if (blockSlot is HotbarItemSlot) {
-            player.inventory.selectedSlot = blockSlot.hotbarSlot
+        val slot = findBlockSlot()
+        if (slot is HotbarItemSlot && slot.useHand == Hand.MAIN_HAND) {
+            val hotbar = slot.hotbarSlot
+            if (hotbar in 0..8) player.inventory.selectedSlot = hotbar
         }
     }
-
     /**
      * Finds the best block slot based on hardness and count.
      */
@@ -210,13 +213,12 @@ object ModuleAntiExplosion : ClientModule("AntiExplosion", Category.WORLD) {
         return Slots.OffhandWithHotbar
             .filter { slot ->
                 val stack = slot.itemStack
-                stack.item is BlockItem &&
-                    stack.count >= minBlockCount &&
-                    stack.item != Items.TNT
+                stack.count >= minBlockCount && stack.item != Items.TNT && isValidBlock(stack)
             }
             .maxByOrNull { slot ->
                 val stack = slot.itemStack
-                val hardness = (stack.item as? BlockItem)?.block?.hardness ?: 0f
+                val block = (stack.item as? BlockItem)?.block
+                val hardness = block?.hardness ?: 0f
                 if (preferHarderBlocks) hardness else stack.count.toFloat()
             }
     }
@@ -312,17 +314,19 @@ object ModuleAntiExplosion : ClientModule("AntiExplosion", Category.WORLD) {
             return
         }
 
-        val targetPos = wallPositions[currentWallIndex]
         val blockSlot = findBlockSlot() ?: run {
             stopBuildingWall()
             return
         }
 
-        if (blockSlot is HotbarItemSlot && player.inventory.selectedSlot != blockSlot.hotbarSlot) {
-            player.inventory.selectedSlot = blockSlot.hotbarSlot
+        if (blockSlot is HotbarItemSlot && blockSlot.useHand == Hand.MAIN_HAND) {
+            val hotbar = blockSlot.hotbarSlot
+            if (hotbar in 0..8 && player.inventory.selectedSlot != hotbar) {
+                player.inventory.selectedSlot = hotbar
+            }
         }
 
-        placeBlockAtPosition(player, targetPos, blockSlot)
+        placeBlockAtPosition(player, wallPositions[currentWallIndex], blockSlot)
         placedAnyBlock = true
         currentWallIndex++
     }

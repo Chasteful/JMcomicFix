@@ -427,6 +427,7 @@ enum class ValueType(
     CLIENT_PACKET,
     SERVER_PACKET,
     KEY(HumanInputDeserializer.keyDeserializer),
+    FILE(HumanInputDeserializer.pathDeserializer),
     BIND,
     VECTOR_I,
     VECTOR_D,

@@ -19,6 +19,7 @@
     import MutableListSetting from "../list/MutableListSetting.svelte";
     import ItemListSetting from "../list/ItemListSetting.svelte";
     import RegistryListSetting from "../list/RegistryListSetting.svelte";
+    import FileSetting from "../FileSetting.svelte";
 
     export let setting: ModuleSetting;
     export let path: string;
@@ -30,6 +31,8 @@
         <BooleanSetting bind:setting={setting} on:change/>
     {:else if setting.valueType === "CHOICE"}
         <ChoiceSetting {path} bind:setting={setting} on:change/>
+    {:else if setting.valueType === "FILE"}
+        <FileSetting bind:setting={setting} on:change/>
     {:else if setting.valueType === "CHOOSE"}
         <ChooseSetting bind:setting={setting} on:change/>
     {:else if setting.valueType === "MULTI_CHOOSE"}

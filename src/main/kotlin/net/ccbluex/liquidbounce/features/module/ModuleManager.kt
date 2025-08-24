@@ -279,16 +279,17 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleGodMode,
 
             // Fun
+            ModuleAutoVoid,
             ModuleDankBobbing,
             ModuleDerp,
             ModuleIQBoost,
             ModuleFPSBoost,
             ModuleHandDerp,
+            ModuleMotionCamera,
             ModulePendant,
             ModuleSkinDerp,
             ModuleTwerk,
             ModuleVomit,
-            ModuleMotionCamera,
 
             // Misc
             ModuleAutoGG,

@@ -23,10 +23,9 @@ import kotlin.math.floor
 
 @Suppress("TooManyFunctions")
 object ModuleAutoStuck : ClientModule("AutoStuck", Category.WORLD) {
-
-    private val alwaysInVoid by boolean("AlwaysInVoid", true)
     private val resetTicks by int("ResetTicks", 300, 200..500, "ticks")
     private val fallDistance by int("FallDistance", 5, 0..25, "blocks")
+    private val alwaysInVoid by boolean("AlwaysInVoid", true)
     private val onlyPearl by boolean("OnlyPearl", true)
     private val onlyDuringCombat by boolean("OnlyDuringCombat", false)
 
@@ -94,6 +93,7 @@ object ModuleAutoStuck : ClientModule("AutoStuck", Category.WORLD) {
     private fun shouldDisableStuck(): Boolean =
         player.isInsideWaterOrBubbleColumn || hasSolidBlockBelow()
 
+    @Suppress("NestedBlockDepth")
     private fun hasSolidBlockBelow(): Boolean {
         val checkDepth = 3
         val bb = player.boundingBox
@@ -141,14 +141,7 @@ object ModuleAutoStuck : ClientModule("AutoStuck", Category.WORLD) {
             stuckTicks = 0
         }
 
-        shouldActivate = (!onlyDuringCombat || CombatManager.isInCombat) &&
-            (!onlyPearl || hasPearlInHotbar()) &&
-            !player.isOnGround &&
-            if (alwaysInVoid) {
-                isVoidFallImminent
-            } else {
-                player.y <= lastGroundY + 1 - fallDistance
-            }
+        shouldActivate = isReadyToActivate()
 
         if (shouldActivate && !shouldEnableStuck && stuckCooldown <= 0 && !shouldDisableStuck()) {
             shouldEnableStuck = true
@@ -157,11 +150,7 @@ object ModuleAutoStuck : ClientModule("AutoStuck", Category.WORLD) {
             shouldEnableStuck = false
         }
 
-        if (alwaysInVoid &&
-            isVoidFallImminent &&
-            ScaffoldAutoClutchHelper.enabled &&
-            (!ScaffoldAutoClutchHelper.scaffoldOnlyDuringCombat || CombatManager.isInCombat)
-        ) {
+        if (shouldEnableScaffold()) {
             if (!ModuleScaffold.enabled) {
                 ModuleScaffold.enabled = true
             }
@@ -169,6 +158,18 @@ object ModuleAutoStuck : ClientModule("AutoStuck", Category.WORLD) {
                 ModuleScaffold.enabled = false
             }
         }
+    }
+    private fun shouldEnableScaffold(): Boolean {
+        val scaffoldCombatReady = !ScaffoldAutoClutchHelper.scaffoldOnlyDuringCombat || CombatManager.isInCombat
+        return alwaysInVoid && isVoidFallImminent && ScaffoldAutoClutchHelper.enabled && scaffoldCombatReady
+    }
+
+    private fun isReadyToActivate(): Boolean {
+        val combatReady = !onlyDuringCombat || CombatManager.isInCombat
+        val pearlReady = !onlyPearl || hasPearlInHotbar()
+        val airReady = !player.isOnGround
+        val voidReady = if (alwaysInVoid) isVoidFallImminent else player.y <= lastGroundY + 1 - fallDistance
+        return combatReady && pearlReady && airReady && voidReady
     }
 
     override fun onEnabled() {

@@ -182,7 +182,7 @@ data class PlayerInventoryData(
             enderChest = player.enderChestInventory.heldStacks.map(ItemStack::copy),
             openChest = player.currentScreenHandler.let { handler ->
                 if (handler !== player.playerScreenHandler) {
-                    val containerSize = handler.slots.size - 36
+                    val containerSize = (handler.slots.size - 36).coerceAtLeast(0)
                     handler.slots.subList(0, containerSize).map { it.stack.copy() }
                 } else {
                     emptyList()

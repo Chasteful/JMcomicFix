@@ -35,6 +35,7 @@ import net.minecraft.util.Identifier
 import net.minecraft.util.math.Vec3d
 import net.minecraft.util.math.Vec3i
 import org.lwjgl.glfw.GLFW
+import java.io.File
 import java.util.*
 import kotlin.enums.EnumEntries
 
@@ -307,6 +308,16 @@ open class Configurable(
 
     fun <C : MutableSet<String>> players(name: String, default: C) =
         registryList(name, default, ValueType.PLAYERS)
+
+    fun file(
+        name: String,
+        default: File? = null,
+        dialogMode: FileDialogMode = FileDialogMode.OPEN_FILE,
+        supportedExtensions: Set<String>? = null
+    ) = FileValue(name, default, dialogMode, supportedExtensions).apply {
+        this@Configurable.inner.add(this)
+    }
+
     inline fun <reified T> multiEnumChoice(
         name: String,
         vararg default: T,
