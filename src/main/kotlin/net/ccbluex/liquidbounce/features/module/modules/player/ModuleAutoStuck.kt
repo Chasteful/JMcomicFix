@@ -7,6 +7,9 @@ import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.event.tickHandler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.ClientModule
+import net.ccbluex.liquidbounce.features.module.modules.player.autoclutch.ModuleAutoClutch.isVoidFallImminent
+import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.ModuleScaffold
+import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.features.ScaffoldAutoClutchHelper
 import net.ccbluex.liquidbounce.utils.block.getState
 import net.ccbluex.liquidbounce.utils.client.sendPacketSilently
 import net.ccbluex.liquidbounce.utils.combat.CombatManager
@@ -16,10 +19,12 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket
 import net.minecraft.util.math.BlockPos
+import kotlin.math.floor
 
 @Suppress("TooManyFunctions")
 object ModuleAutoStuck : ClientModule("AutoStuck", Category.WORLD) {
 
+    private val alwaysInVoid by boolean("AlwaysInVoid", true)
     private val resetTicks by int("ResetTicks", 300, 200..500, "ticks")
     private val fallDistance by int("FallDistance", 5, 0..25, "blocks")
     private val onlyPearl by boolean("OnlyPearl", true)
@@ -91,21 +96,34 @@ object ModuleAutoStuck : ClientModule("AutoStuck", Category.WORLD) {
 
     private fun hasSolidBlockBelow(): Boolean {
         val checkDepth = 3
-        return (0..checkDepth).any {
-            BlockPos(player.x.toInt(), (player.y - it).toInt(), player.z.toInt())
-                .getState()
-                ?.isAir == false
+        val bb = player.boundingBox
+        val minX = floor(bb.minX).toInt()
+        val maxX = floor(bb.maxX).toInt()
+        val minZ = floor(bb.minZ).toInt()
+        val maxZ = floor(bb.maxZ).toInt()
+
+        for (dy in 0..checkDepth) {
+            val y = floor(bb.minY).toInt() - dy
+            for (x in minX..maxX) {
+                for (z in minZ..maxZ) {
+                    val state = BlockPos(x, y, z).getState()
+                    if (state != null && !state.isAir) {
+                        return true
+                    }
+                }
+            }
         }
+        return false
     }
+
 
     @Suppress("unused")
     private val worldChangeEventHandler = handler<WorldChangeEvent> {
         lastGroundY = LOWEST_Y
     }
-
     @Suppress("unused")
     private val tickHandler = tickHandler {
-        if (player.isOnGround) lastGroundY = player.y.toInt() - 1
+        if (!alwaysInVoid && player.isOnGround) lastGroundY = player.y.toInt() - 1
 
         if (stuckCooldown > 0) {
             stuckCooldown--
@@ -123,18 +141,33 @@ object ModuleAutoStuck : ClientModule("AutoStuck", Category.WORLD) {
             stuckTicks = 0
         }
 
-
-
         shouldActivate = (!onlyDuringCombat || CombatManager.isInCombat) &&
-                (!onlyPearl || hasPearlInHotbar()) &&
-                !player.isOnGround &&
+            (!onlyPearl || hasPearlInHotbar()) &&
+            !player.isOnGround &&
+            if (alwaysInVoid) {
+                isVoidFallImminent
+            } else {
                 player.y <= lastGroundY + 1 - fallDistance
+            }
 
         if (shouldActivate && !shouldEnableStuck && stuckCooldown <= 0 && !shouldDisableStuck()) {
             shouldEnableStuck = true
             isInAir = false
         } else if (!shouldActivate && shouldEnableStuck) {
             shouldEnableStuck = false
+        }
+
+        if (alwaysInVoid &&
+            isVoidFallImminent &&
+            ScaffoldAutoClutchHelper.enabled &&
+            (!ScaffoldAutoClutchHelper.scaffoldOnlyDuringCombat || CombatManager.isInCombat)
+        ) {
+            if (!ModuleScaffold.enabled) {
+                ModuleScaffold.enabled = true
+            }
+            if (ScaffoldAutoClutchHelper.disableOnFinish && player.isOnGround) {
+                ModuleScaffold.enabled = false
+            }
         }
     }
 

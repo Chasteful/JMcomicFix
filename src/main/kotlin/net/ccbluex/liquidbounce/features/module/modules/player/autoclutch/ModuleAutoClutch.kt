@@ -118,6 +118,7 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     }
 
     var state = State.IDLE
+    var isVoidFallImminent = false
 
     private val blockPositionScoreCache = ConcurrentHashMap<BlockPos, Double>()
     private var currentSolution = Rotation(0f, 0f)
@@ -134,7 +135,6 @@ object ModuleAutoClutch : ClientModule("AutoClutch", Category.PLAYER) {
     private var isPearlInFlight = false
     private var safetyCheckActive = false
     private var manualPearlThrown = false
-    private var isVoidFallImminent = false
     private var triggerPosition: Vec3d? = null
     private var bestSolution: Rotation? = null
     private var pearlSlot: HotbarItemSlot? = null
