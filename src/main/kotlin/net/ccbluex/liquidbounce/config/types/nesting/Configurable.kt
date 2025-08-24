@@ -28,6 +28,7 @@ import net.ccbluex.liquidbounce.utils.kotlin.toEnumSet
 import net.ccbluex.liquidbounce.utils.math.Easing
 import net.minecraft.block.Block
 import net.minecraft.client.util.InputUtil
+import net.minecraft.entity.EntityType
 import net.minecraft.entity.effect.StatusEffect
 import net.minecraft.item.Item
 import net.minecraft.sound.SoundEvent
@@ -317,6 +318,9 @@ open class Configurable(
     ) = FileValue(name, default, dialogMode, supportedExtensions).apply {
         this@Configurable.inner.add(this)
     }
+
+    fun <C : MutableSet<EntityType<*>>> entityTypes(name: String, default: C) =
+        registryList(name, default, ValueType.ENTITY_TYPE)
 
     inline fun <reified T> multiEnumChoice(
         name: String,

@@ -31,8 +31,9 @@ import net.ccbluex.liquidbounce.event.EventManager
 import net.ccbluex.liquidbounce.event.events.BlockBreakingProgressEvent
 import net.ccbluex.liquidbounce.render.FULL_BOX
 import net.ccbluex.liquidbounce.utils.client.*
-import net.ccbluex.liquidbounce.utils.math.rangeTo
-import net.ccbluex.liquidbounce.utils.math.toVec3d
+import net.ccbluex.liquidbounce.utils.math.expendToBlockBox
+import net.ccbluex.liquidbounce.utils.math.iterator
+import net.ccbluex.liquidbounce.utils.math.sq
 import net.minecraft.block.*
 import net.minecraft.entity.Entity
 import net.minecraft.entity.decoration.EndCrystalEntity
@@ -209,21 +210,15 @@ val BlockPos.weakestBlock: BlockPos?
 /**
  * Scan blocks around the position in a cuboid.
  */
-fun Vec3d.searchBlocksInCuboid(radius: Float): Region {
-    val from = BlockPos(
+fun Vec3d.searchBlocksInCuboid(radius: Float): BlockBox =
+    BlockBox(
         floor(x - radius).toInt(),
         floor(y - radius).toInt(),
         floor(z - radius).toInt(),
-    )
-
-    val to = BlockPos(
         ceil(x + radius).toInt(),
         ceil(y + radius).toInt(),
         ceil(z + radius).toInt(),
     )
-
-    return from..to
-}
 
 /**
  * Scan blocks around the position in a cuboid with filtering.
@@ -231,15 +226,16 @@ fun Vec3d.searchBlocksInCuboid(radius: Float): Region {
 inline fun Vec3d.searchBlocksInCuboid(
     radius: Float,
     crossinline filter: (BlockPos, BlockState) -> Boolean
-): Sequence<Pair<BlockPos, BlockState>> = sequence {
-    searchBlocksInCuboid(radius).forEach {
-        val state = it.getState() ?: return@forEach
+): Sequence<Pair<BlockPos, BlockState>> =
+    searchBlocksInCuboid(radius).iterator().asSequence().mapNotNull {
+        val state = it.getState() ?: return@mapNotNull null
 
         if (filter(it, state)) {
-            yield(Pair(it.toImmutable(), state))
+            it.toImmutable() to state
+        } else {
+            null
         }
     }
-}
 
 /**
  * Search blocks around the position in a specific [radius]
@@ -247,29 +243,22 @@ inline fun Vec3d.searchBlocksInCuboid(
 inline fun Vec3d.searchBlocksInRadius(
     radius: Float,
     crossinline filter: (BlockPos, BlockState) -> Boolean,
-): Sequence<Pair<BlockPos, BlockState>> = sequence {
-    val radiusSquared = (radius * radius).toDouble()
-    searchBlocksInCuboid(radius).forEach {
-        val state = it.getState() ?: return@forEach
+): Sequence<Pair<BlockPos, BlockState>> =
+    searchBlocksInCuboid(radius).iterator().asSequence().mapNotNull {
+        val state = it.getState() ?: return@mapNotNull null
 
-        if (it.getSquaredDistance(this@searchBlocksInRadius) > radiusSquared) {
-            return@forEach
-        }
-
-        if (filter(it, state)) {
-            yield(Pair(it.toImmutable(), state))
+        if (it.getSquaredDistance(this@searchBlocksInRadius) <= radius.sq() && filter(it, state)) {
+            it.toImmutable() to state
+        } else {
+            null
         }
     }
-}
 
 /**
  * Scan blocks around the position in a cuboid.
  */
-fun BlockPos.searchBlocksInCuboid(radius: Int): Region {
-    val from = BlockPos(x - radius, y - radius, z - radius)
-    val to = BlockPos(x + radius, y + radius, z + radius)
-    return from..to
-}
+fun BlockPos.searchBlocksInCuboid(radius: Int): BlockBox =
+    this.expendToBlockBox(radius, radius, radius)
 
 /**
  * Scan blocks outwards from a bed
@@ -457,14 +446,13 @@ inline fun Box.isBlockAtPosition(
  */
 inline fun Box.collideBlockIntersects(
     checkCollisionShape: Boolean = true,
-    isCorrectBlock: (Block?) -> Boolean
+    isCorrectBlock: (Block) -> Boolean
 ): Boolean {
-    collidingRegion.forEach { blockPos ->
-        val blockState = blockPos.getState() ?: return@forEach
-        val block = blockState.block ?: return@forEach
+    for (blockPos in collidingRegion) {
+        val blockState = blockPos.getState()
 
-        if (!isCorrectBlock(block)) {
-            return@forEach
+        if (blockState == null || !isCorrectBlock(blockState.block)) {
+            continue
         }
 
         if (!checkCollisionShape) {
@@ -474,12 +462,10 @@ inline fun Box.collideBlockIntersects(
         val shape = blockState.getCollisionShape(mc.world, blockPos)
 
         if (shape.isEmpty) {
-            return@forEach
+            continue
         }
 
-        val boundingBox = shape.boundingBox
-
-        if (intersects(boundingBox)) {
+        if (intersects(shape.boundingBox)) {
             return true
         }
     }
@@ -487,12 +473,11 @@ inline fun Box.collideBlockIntersects(
     return false
 }
 
-val Box.collidingRegion: Region
-    get() {
-        val from = BlockPos(this.minX.toInt(), this.minY.toInt(), this.minZ.toInt())
-        val to = BlockPos(ceil(this.maxX).toInt(), ceil(this.maxY).toInt(), ceil(this.maxZ).toInt())
-        return from..to
-    }
+val Box.collidingRegion: BlockBox
+    get() = BlockBox(
+        this.minX.toInt(), this.minY.toInt(), this.minZ.toInt(),
+        ceil(this.maxX).toInt(), ceil(this.maxY).toInt(), ceil(this.maxZ).toInt(),
+    )
 
 fun BlockState.canBeReplacedWith(
     pos: BlockPos,

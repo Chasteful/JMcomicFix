@@ -375,6 +375,7 @@ object ModuleManager : EventListener, Iterable<ClientModule> by modules {
             ModuleFastExp,
             ModuleFastUse,
             ModuleInventoryCleaner,
+            ModuleNoEntityInteract,
             ModuleNoFall,
             ModuleNoRotateSet,
             ModuleReach,
