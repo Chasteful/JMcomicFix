@@ -21,7 +21,6 @@ import com.github.gradle.node.npm.task.NpmTask
 import com.github.gradle.node.task.NodeTask
 import groovy.json.JsonOutput
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("fabric-loom")
@@ -406,6 +405,37 @@ tasks.jar {
     }
 }
 
+tasks.register<JavaExec>("proguard") {
+    group = "build"
+    description = "Run ProGuard on the built jar"
+    mainClass.set("proguard.ProGuard")
+    classpath = configurations.detachedConfiguration(dependencies.create("com.guardsquare:proguard-base:7.7.0"))
+
+    val inputJar = layout.buildDirectory.file("libs/${archives_base_name}-${mod_version}.jar").get().asFile
+    val outputJar = layout.buildDirectory.file("libs/${archives_base_name}-${mod_version}-obf.jar").get().asFile
+    val libFile = layout.buildDirectory.file("tmp/proguard-libraries.txt").get().asFile
+    val javaHome = System.getProperty("java.home")
+    val remappedJar = tasks.named("remapJar").get().outputs.files.singleFile
+    val libraryJars = (configurations.runtimeClasspath.get().files + remappedJar).distinctBy { it.absolutePath }
+
+    doFirst {
+        outputJar.parentFile.mkdirs()
+        libFile.parentFile.mkdirs()
+        libFile.writeText(buildString {
+            appendLine("-injars ${inputJar.absolutePath}")
+            appendLine("-outjars ${outputJar.absolutePath}")
+            listOf("java.base", "java.desktop", "java.logging", "java.datatransfer").forEach {
+                appendLine("-libraryjars $javaHome/jmods/$it.jmod(!**.jar;!module-info.class)")
+            }
+            libraryJars.filter { it.exists() && it.isFile && it != inputJar && it != outputJar }
+                .forEach { appendLine("-libraryjars ${it.absolutePath}") }
+        })
+    }
+
+    args("-include", file("proguard-rules.pro").absolutePath, "@${libFile.absolutePath}")
+}
+
+
 tasks.register<Copy>("copyZipInclude") {
     from("zip_include/")
     into("build/libs/zip")
@@ -417,4 +447,7 @@ tasks.named("sourcesJar") {
 
 tasks.named("build") {
     dependsOn("copyZipInclude")
+}
+tasks.named("build") {
+    dependsOn("proguard")
 }

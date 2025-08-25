@@ -31,6 +31,7 @@ import net.ccbluex.liquidbounce.features.misc.FriendManager;
 import net.ccbluex.liquidbounce.features.module.modules.misc.ModuleAntiStaff;
 import net.ccbluex.liquidbounce.features.module.modules.misc.ModuleBetterTab;
 import net.ccbluex.liquidbounce.features.module.modules.misc.Visibility;
+import net.ccbluex.liquidbounce.features.module.modules.misc.nameprotect.ModuleNameProtect;
 import net.ccbluex.liquidbounce.integration.theme.component.ComponentOverlay;
 import net.ccbluex.liquidbounce.integration.theme.component.FeatureTweak;
 import net.minecraft.client.MinecraftClient;
@@ -194,7 +195,8 @@ public abstract class MixinPlayerListHud {
         Text hudFooter = this.footer;
         PlayerListHud self = (PlayerListHud) (Object) this;
         List<PlayerEntry> players = collectPlayerEntries().stream().map(entry -> {
-            Text fullName = self.getPlayerName(entry);
+            String originalName = self.getPlayerName(entry).getString();
+            Text fullName = Text.literal(ModuleNameProtect.INSTANCE.replace(originalName));
             Text latency = Text.literal(entry.getLatency() + "ms")
                     .styled(style -> style.withColor(getLatencyColor(entry.getLatency())));
             boolean isFriend = FriendManager.INSTANCE.isFriend(entry.getProfile().getName());
@@ -202,7 +204,6 @@ public abstract class MixinPlayerListHud {
             String uuid = entry.getProfile().getId().toString();
             return new PlayerEntry(fullName, uuid, latency, isFriend, isStaff);
         }).collect(Collectors.toList());
-
 
         if (hudHeader != null) {
             if (hudFooter != null) {

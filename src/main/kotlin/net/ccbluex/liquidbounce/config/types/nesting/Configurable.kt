@@ -310,15 +310,6 @@ open class Configurable(
     fun <C : MutableSet<String>> players(name: String, default: C) =
         registryList(name, default, ValueType.PLAYERS)
 
-    fun file(
-        name: String,
-        default: File? = null,
-        dialogMode: FileDialogMode = FileDialogMode.OPEN_FILE,
-        supportedExtensions: Set<String>? = null
-    ) = FileValue(name, default, dialogMode, supportedExtensions).apply {
-        this@Configurable.inner.add(this)
-    }
-
     fun <C : MutableSet<EntityType<*>>> entityTypes(name: String, default: C) =
         registryList(name, default, ValueType.ENTITY_TYPE)
 

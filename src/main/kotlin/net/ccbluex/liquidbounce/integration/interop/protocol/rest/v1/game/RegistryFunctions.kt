@@ -245,15 +245,21 @@ fun getRegistry(requestObject: RequestObject) = httpOk(JsonObject().apply {
         }
         "players" -> {
             val world = mc.world ?: return httpForbidden("Invalid world")
-            val players = world.players
-            players.forEach { player ->
+            val self = mc.player
+            world.players.forEach { player ->
                 val uuid = player.uuidAsString
                 add(uuid, JsonObject().apply {
-                    addProperty("name", ModuleNameProtect.replace(player.name.string))
+                    val name = if (player == self) {
+                        ModuleNameProtect.replace(player.name.string)
+                    } else {
+                        player.name.string
+                    }
+                    addProperty("name", name)
                     addProperty("icon", "")
                 })
             }
         }
+
 
         "entity_type" -> {
             Registries.ENTITY_TYPE.forEach { entityType ->

@@ -13,7 +13,7 @@
     import AvatarView from "../common/PlayerView/AvatarView.svelte";
     import {scale} from "svelte/transition"
     import {REST_BASE} from "../../../integration/host";
-
+    import type { TextComponent as TTextComponent} from "../../../integration/types";
     let keyPlayerList: MinecraftKeybind | undefined;
     let OverlayPlayList: OverlayPlayListEvent | null = null;
     let visible = false;
@@ -22,17 +22,38 @@
     let rows = 1;
     const maxHeight = 600;
     const rowHeight = 20;
+    const maxColumns = 4;
+    let columnWidths: number[] = [];
 
-    function calculateLayout(playerCount: number) {
+    function calculateLayout(players: { name: string | TTextComponent }[]) {
+        const playerCount = players.length;
         const maxRows = Math.min(20, Math.floor(maxHeight / rowHeight));
-        const maxColumns = 4;
         rows = Math.min(maxRows, playerCount);
         columns = Math.min(Math.ceil(playerCount / rows), maxColumns);
 
-        while (columns > 4 && rows < maxRows) {
+        while (columns > maxColumns && rows < maxRows) {
             rows++;
             columns = Math.ceil(playerCount / rows);
         }
+
+        columnWidths = Array(columns).fill(0);
+        players.forEach((player, index) => {
+            const col = Math.floor(index / rows);
+            const playerName = getTextString(player.name);
+            const textWidth = playerName.length * 8;
+            columnWidths[col] = Math.max(columnWidths[col], textWidth + 50);
+        });
+    }
+
+    function getTextString(tc: string | TTextComponent): string {
+        if (typeof tc === "string") return tc;
+        let str = tc.text ?? "";
+        if (tc.extra) {
+            for (const e of tc.extra) {
+                str += getTextString(e);
+            }
+        }
+        return str;
     }
 
     async function handleKeyDown(event: KeyEvent) {
@@ -62,10 +83,11 @@
 
     listen("keybindChange", updateKeybinds);
     listen("key", handleKeyDown);
+
     listen("overlayPlayList", (event: OverlayPlayListEvent) => {
         OverlayPlayList = event;
         if (event?.players) {
-            calculateLayout(event.players.length);
+            calculateLayout(event.players);
         }
     });
     listen("betterTabValueChange", (e: ClickGuiValueChangeEvent) => {
@@ -92,8 +114,8 @@
                 {/if}
 
                 <!-- Player Grid - always visible when tab is open -->
-                <div class="player-grid" style="grid-template-columns: repeat({columns}, minmax(360px, 1fr));">
-                    {#each OverlayPlayList.players as player}
+                <div class="player-grid" style="grid-template-columns: {columnWidths.map(w => w + 'px').join(' ')};">
+                    {#each OverlayPlayList.players as player, index}
                         <div class="player-entry" class:friend={player.isFriend} class:staff={player.isStaff}>
                             {#if !isVisible("NameOnly")}
                                 <div class="avatar">
@@ -103,7 +125,7 @@
                                     </div>
                                 </div>
                             {/if}
-                            <div class="player-name">
+                            <div class="player-name" style="max-width: {columnWidths[Math.floor(index / rows)] - 50}px;">
                                 <TextComponent fontSize={20} allowPreformatting={true} textComponent={player.name}/>
                             </div>
                             <div class="player-latency">
@@ -203,7 +225,6 @@
     text-overflow: ellipsis;
     flex: 1 1 auto;
     min-width: 0;
-    max-width: 300px;
   }
 
   .player-latency {

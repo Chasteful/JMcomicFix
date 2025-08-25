@@ -20,7 +20,7 @@
     import MutableListSetting from "../list/MutableListSetting.svelte";
     import ItemListSetting from "../list/ItemListSetting.svelte";
     import RegistryListSetting from "../list/RegistryListSetting.svelte";
-    import FileSetting from "../FileSetting.svelte";
+
 
     export let setting: ModuleSetting;
     export let path: string;

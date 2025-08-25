@@ -109,7 +109,7 @@ data class PlayerData(
 
         @JvmStatic
         fun fromPlayer(player: PlayerEntity) = PlayerData(
-            ModuleNameProtect.replace(player.nameForScoreboard),
+            player.nameForScoreboard,
             player.uuidAsString,
             player.world.registryKey.value,
             player.pos,

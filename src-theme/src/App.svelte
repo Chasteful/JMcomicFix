@@ -17,6 +17,7 @@
     import LockScreen from "./routes/menu/LoginMenu/LockScreen.svelte";
     import ConnectionScreen from "./routes/menu/connected/ConnectionScreen.svelte";
     import SpareModule from "./routes/menu/common/SpareModule.svelte";
+    import Inventory from "./routes/menu/inventory/Inventory.svelte";
 
     const routes = {
         "/loginmenu": LoginMenu,
@@ -24,7 +25,7 @@
         "/clickgui": ClickGui,
         "/hud": Hud,
         "/layouteditor": Hud,
-        "/inventory": SpareModule,
+        "/inventory": Inventory,
         "/chest": SpareModule,
         "/title": Title,
         "/multiplayer": Multiplayer,
