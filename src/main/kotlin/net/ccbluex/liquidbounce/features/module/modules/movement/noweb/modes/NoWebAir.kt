@@ -16,24 +16,15 @@
  * You should have received a copy of the GNU General Public License
  * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
  */
-package net.ccbluex.liquidbounce.utils.block
 
-import net.minecraft.util.math.Direction
+package net.ccbluex.liquidbounce.features.module.modules.movement.noweb.modes
 
-@JvmField
-val DIRECTIONS_EXCLUDING_UP = arrayOf(
-    Direction.WEST,
-    Direction.EAST,
-    Direction.NORTH,
-    Direction.SOUTH,
-    Direction.DOWN,
-)
+import net.ccbluex.liquidbounce.features.module.modules.movement.noweb.NoWebMode
+import net.minecraft.util.math.BlockPos
 
-@JvmField
-val DIRECTIONS_EXCLUDING_DOWN = arrayOf(
-    Direction.WEST,
-    Direction.EAST,
-    Direction.NORTH,
-    Direction.SOUTH,
-    Direction.UP,
-)
+/**
+ * No collision with cobwebs
+ */
+object NoWebAir : NoWebMode("Air") {
+    override fun handleEntityCollision(pos: BlockPos) = true
+}

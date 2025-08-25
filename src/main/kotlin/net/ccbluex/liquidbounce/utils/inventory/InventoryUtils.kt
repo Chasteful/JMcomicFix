@@ -90,7 +90,7 @@ internal enum class InventoryRequirements(
     val testRequirement: (action: InventoryAction) -> Boolean
 ) : NamedChoice {
     NO_MOVEMENT("NoMovement", { _ ->
-        player.input.movementForward == 0.0f && player.input.movementSideways == 0.0f
+        player.input.movementForward == 0.0f && player.input.movementSideways == 0.0f && !player.jumping
     }),
     NO_FALLING("NoFalling", { _ ->
         player.fallDistance == 0.0f

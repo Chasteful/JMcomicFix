@@ -16,24 +16,18 @@
  * You should have received a copy of the GNU General Public License
  * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
  */
-package net.ccbluex.liquidbounce.utils.block
 
-import net.minecraft.util.math.Direction
+package net.ccbluex.liquidbounce.features.module.modules.movement.noweb
 
-@JvmField
-val DIRECTIONS_EXCLUDING_UP = arrayOf(
-    Direction.WEST,
-    Direction.EAST,
-    Direction.NORTH,
-    Direction.SOUTH,
-    Direction.DOWN,
-)
+import net.ccbluex.liquidbounce.config.types.nesting.Choice
+import net.ccbluex.liquidbounce.config.types.nesting.ChoiceConfigurable
+import net.ccbluex.liquidbounce.features.module.modules.movement.noweb.ModuleNoWeb.modes
+import net.minecraft.util.math.BlockPos
 
-@JvmField
-val DIRECTIONS_EXCLUDING_DOWN = arrayOf(
-    Direction.WEST,
-    Direction.EAST,
-    Direction.NORTH,
-    Direction.SOUTH,
-    Direction.UP,
-)
+abstract class NoWebMode(name: String) : Choice(name) {
+
+    override val parent: ChoiceConfigurable<NoWebMode>
+        get() = modes
+
+    abstract fun handleEntityCollision(pos: BlockPos): Boolean
+}

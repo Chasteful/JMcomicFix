@@ -22,9 +22,7 @@
 package net.ccbluex.liquidbounce.utils.block
 
 import it.unimi.dsi.fastutil.booleans.BooleanObjectPair
-import it.unimi.dsi.fastutil.ints.IntArrayFIFOQueue
-import it.unimi.dsi.fastutil.ints.IntObjectPair
-import it.unimi.dsi.fastutil.longs.LongArrayFIFOQueue
+import it.unimi.dsi.fastutil.ints.IntLongPair
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet
 import net.ccbluex.liquidbounce.config.types.NamedChoice
 import net.ccbluex.liquidbounce.event.EventManager
@@ -178,33 +176,29 @@ val Block.mustBePlacedOnUpperSide: Boolean
 
 val BlockPos.hasEntrance: Boolean
     get() {
-        val positionsAround = arrayOf(
-            this.offset(Direction.NORTH),
-            this.offset(Direction.SOUTH),
-            this.offset(Direction.EAST),
-            this.offset(Direction.WEST),
-            this.offset(Direction.UP)
-        )
-
         val block = this.getBlock()
-        return positionsAround.any { it.getState()?.isAir == true && it.getBlock() != block }
+        val cache = BlockPos.Mutable()
+        return DIRECTIONS_EXCLUDING_DOWN.any {
+            val neighbor = cache.set(this, it)
+            neighbor.collisionShape == VoxelShapes.empty() && neighbor.getBlock() !== block
+        }
     }
 
-val BlockPos.weakestBlock: BlockPos?
+val BlockPos.weakestNeighbor: BlockPos?
     get() {
-        val positionsAround = arrayOf(
-            this.offset(Direction.NORTH),
-            this.offset(Direction.SOUTH),
-            this.offset(Direction.EAST),
-            this.offset(Direction.WEST),
-            this.offset(Direction.UP)
-        )
-
         val block = this.getBlock()
-        return positionsAround
-            .filter { it.getBlock() != block && it.getState()?.isAir == false }
-            .sortedBy { player.pos.squaredDistanceTo(it.toCenterPos()) }
-            .minByOrNull { it.getBlock()?.hardness ?: 0f }
+        val cache = BlockPos.Mutable()
+        val neighbors = DIRECTIONS_EXCLUDING_DOWN.mapNotNullTo(mutableListOf()) {
+            val neighbor = cache.set(this, it)
+            val state = neighbor.getState() ?: return@mapNotNullTo null
+            if (state.block !== block && !state.isAir) neighbor.toImmutable() else null
+        }
+
+        if (neighbors.isEmpty()) return null
+
+        val comparator = compareBy<BlockPos> { it.getBlock()?.hardness ?: 0f }
+            .thenBy { it.getCenterDistanceSquaredEyes() }
+        return neighbors.minWith(comparator)
     }
 
 /**
@@ -263,7 +257,7 @@ fun BlockPos.searchBlocksInCuboid(radius: Int): BlockBox =
 /**
  * Scan blocks outwards from a bed
  */
-fun BlockPos.searchBedLayer(state: BlockState, layers: Int): Sequence<IntObjectPair<BlockPos>> {
+fun BlockPos.searchBedLayer(state: BlockState, layers: Int): Sequence<IntLongPair> {
     check(state.isBed) { "This function is only available for Beds" }
 
     var bedDirection = state.get(BedBlock.FACING)
@@ -288,40 +282,34 @@ fun BlockPos.searchBedLayer(state: BlockState, layers: Int): Sequence<IntObjectP
 
 /**
  * Scan blocks outwards from center along given [directions], up to [layers]
+ *
+ * @return The layer to the BlockPos (long value)
  */
 @Suppress("detekt:CognitiveComplexMethod")
-fun BlockPos.searchLayer(layers: Int, vararg directions: Direction): Sequence<IntObjectPair<BlockPos>> =
+fun BlockPos.searchLayer(layers: Int, vararg directions: Direction): Sequence<IntLongPair> =
     sequence {
         val longValueOfThis = this@searchLayer.asLong()
         val initialCapacity = layers * layers * directions.size / 2
 
-        val layerQueue = IntArrayFIFOQueue().apply { enqueue(0) }
-        val longValueQueue = LongArrayFIFOQueue().apply { enqueue(longValueOfThis) }
+        val queue = ArrayDeque<IntLongPair>(initialCapacity).apply { add(IntLongPair.of(0, longValueOfThis)) }
         val visited = LongOpenHashSet(initialCapacity).apply { add(longValueOfThis) }
 
-        val mutable = BlockPos.Mutable()
-
-        while (!longValueQueue.isEmpty) {
-            val layer = layerQueue.dequeueInt()
-            val pos = longValueQueue.dequeueLong()
+        while (queue.isNotEmpty()) {
+            val next = queue.removeFirst()
+            val layer = next.leftInt()
+            val pos = next.rightLong()
 
             if (layer > 0) {
-                yield(IntObjectPair.of(layer, BlockPos.fromLong(pos)))
+                yield(next)
             }
 
-            if (layer >= layers) {
-                continue
-            }
+            if (layer >= layers) continue
 
             // Search next layer
             for (direction in directions) {
-                mutable.set(pos)
-                mutable.move(direction)
-
-                val newLong = mutable.asLong()
+                val newLong = BlockPos.offset(pos, direction)
                 if (visited.add(newLong)) {
-                    layerQueue.enqueue(layer + 1)
-                    longValueQueue.enqueue(newLong)
+                    queue.add(IntLongPair.of(layer + 1, newLong))
                 }
             }
         }

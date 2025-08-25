@@ -30,11 +30,7 @@ import net.ccbluex.liquidbounce.utils.client.inGame
 import net.ccbluex.liquidbounce.utils.client.mc
 import net.ccbluex.liquidbounce.utils.client.usesViaFabricPlus
 import net.ccbluex.netty.http.model.RequestObject
-import net.ccbluex.netty.http.util.httpBadRequest
-import net.ccbluex.netty.http.util.httpForbidden
-import net.ccbluex.netty.http.util.httpNoContent
-import net.ccbluex.netty.http.util.httpNotFound
-import net.ccbluex.netty.http.util.httpOk
+import net.ccbluex.netty.http.util.*
 import net.minecraft.util.Util
 import java.io.File
 import java.net.URI
@@ -108,16 +104,28 @@ fun postBrowse(requestObject: RequestObject): FullHttpResponse {
     return httpNoContent()
 }
 
-// POST /api/v1/client/browseFile
-fun postBrowseFile(requestObject: RequestObject): FullHttpResponse {
+// POST /api/v1/client/browsePath
+@Suppress("ReturnCount")
+fun postBrowsePath(requestObject: RequestObject): FullHttpResponse {
     val jsonObj = requestObject.asJson<JsonObject>()
-    val f = jsonObj["file"]?.asString ?: return httpForbidden("No file specified")
+    val path = jsonObj["path"]?.asString ?: return httpBadRequest("No file specified")
 
-    val file = File(f).let {
-        if (it.isAbsolute) it else ConfigSystem.rootFolder.resolve(it)
-    }.takeIf(File::exists) ?: return httpNotFound(f, "File not exists")
+    val file = File(path).let { file ->
+        if (file.isAbsolute) file else ConfigSystem.rootFolder.resolve(file)
+    }
 
-    Util.getOperatingSystem().open(file)
+    if (!file.exists()) {
+        return httpNotFound(path, "File not exists")
+    }
+
+    // Ensures we open a directory, not a file
+    val directoryToOpen = when {
+        file.isDirectory -> file
+        file.isFile -> file.parentFile ?: return httpForbidden("Cannot access root directory")
+        else -> return httpForbidden("Invalid file type")
+    }
+
+    Util.getOperatingSystem().open(directoryToOpen)
     return httpNoContent()
 }
 

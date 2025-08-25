@@ -285,9 +285,9 @@ internal sealed class GenerationMode(
 
     object File : GenerationMode("File") {
         private const val MAX_CODE_POINTS: Long = 64 * 1024 * 1024
-
-        private val source = file("Source")
         private val cyclic by boolean("Cyclic", true)
+        private val source = file("Source")
+
         /**
          * @author sqlerrorthing, MukjepScarlet
          */

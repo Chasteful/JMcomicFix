@@ -6,20 +6,19 @@ import type {
     ClientUpdate,
     Component,
     ConfigurableSetting,
-    File,
     FileSelectDialog,
     FileSelectResult,
     GameWindow,
     GeneratorResult,
     HitResult,
     MinecraftKeybind,
-    RegistryItem,
     Module,
     PersistentStorageItem,
     PlayerData,
     PrintableKey,
     Protocol,
     Proxy,
+    RegistryItem,
     Server,
     Session,
     Verification,
@@ -156,11 +155,11 @@ export async function setPersistentStorageItems(items: PersistentStorageItem[]) 
     })
 }
 
-export async function getVirtualScreen(): Promise<{ showingSplash: boolean; name: string | null }> {
+export async function getVirtualScreen(): Promise<VirtualScreen> {
     const response = await fetch(`${API_BASE}/client/virtualScreen`);
-    const data = await response.json();
+    const data: VirtualScreen = await response.json();
 
-    return data as { showingSplash: boolean; name: string | null };
+    return data;
 }
 
 export async function confirmVirtualScreen(name: string) {
@@ -253,13 +252,13 @@ export async function browse(target: string) {
     });
 }
 
-export async function browseFile(file: string) {
-    await fetch(`${API_BASE}/client/browseFile`, {
+export async function browsePath(path: string) {
+    await fetch(`${API_BASE}/client/browsePath`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({file})
+        body: JSON.stringify({path})
     });
 }
 
@@ -582,23 +581,23 @@ export async function setProxyFavorite(id: number, favorite: boolean) {
     }
 }
 
-export async function addProxy(host: string, port: number, username: string, password: string, forwardAuthentication: boolean) {
+export async function addProxy(host: string, port: number, username: string, password: string, type: string, forwardAuthentication: boolean) {
     await fetch(`${API_BASE}/client/proxies/add`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({host, port, username, password, forwardAuthentication})
+        body: JSON.stringify({host, port, username, password, type, forwardAuthentication})
     });
 }
 
-export async function editProxy(id: number, host: string, port: number, username: string, password: string, forwardAuthentication: boolean) {
+export async function editProxy(id: number, host: string, port: number, username: string, password: string, type: string, forwardAuthentication: boolean) {
     await fetch(`${API_BASE}/client/proxies/edit`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({id, host, port, username, password, forwardAuthentication})
+        body: JSON.stringify({id, host, port, username, password, type, forwardAuthentication})
     })
 }
 
@@ -753,4 +752,3 @@ export async function setTyping(typing: boolean) {
         body: JSON.stringify({typing})
     });
 }
-

@@ -168,18 +168,9 @@ export interface PlayerInventory  extends Event {
     openChest: ItemStack[];
 }
 
-export interface ProxyAdditionResultEvent extends Event  {
-    proxy: Proxy | null;
-    error: string | null;
-}
 
-export interface ProxyEditResultEvent  extends Event {
+export interface ProxyCheckResultEvent {
     proxy: Proxy | null;
-    error: string | null;
-}
-
-export interface ProxyCheckResultEvent  extends Event {
-    proxy: Proxy;
     error: string | null;
 }
 
@@ -191,7 +182,3 @@ export interface BrowserUrlChangeEvent  extends Event {
     url: string;
 }
 
-export interface SelectHotbarSlotSilentlyEvent extends Event {
-    requester: any;
-    slot: number;
-}
