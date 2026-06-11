@@ -22,6 +22,7 @@ package net.ccbluex.liquidbounce.config.gson.serializer.minecraft
 import com.google.gson.JsonObject
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
+import net.ccbluex.liquidbounce.utils.inventory.getArmorColor
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.item.ItemStack
 import java.lang.reflect.Type
@@ -29,12 +30,16 @@ import java.lang.reflect.Type
 object ItemStackSerializer : JsonSerializer<ItemStack> {
     override fun serialize(src: ItemStack?, typeOfSrc: Type, context: JsonSerializationContext) = src?.let {
         JsonObject().apply {
+            val armorColor = it.getArmorColor()
             addProperty("identifier", BuiltInRegistries.ITEM.getKey(it.item).toString())
             add("displayName", context.serialize(it.hoverName))
             addProperty("count", it.count)
             addProperty("damage", it.damageValue)
             addProperty("maxDamage", it.maxDamage)
             addProperty("empty", it.isEmpty)
+            armorColor?.let { color ->
+                addProperty("dyedColor", color)
+            }
             it.enchantments.entrySet()
                 .takeIf { set -> set.isNotEmpty() }
                 ?.let { entries ->

@@ -31,7 +31,9 @@ import net.ccbluex.liquidbounce.utils.item.durability
 import net.ccbluex.liquidbounce.utils.item.getDestroySpeedWithEnchantment
 import net.ccbluex.liquidbounce.utils.item.isMergeable
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
+import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.util.ARGB.opaque
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.MenuType
@@ -126,4 +128,8 @@ fun <T : ItemSlot> Iterable<T>.findBestToolToMineBlock(
     }
 
     return candidates.firstOrNull()
+}
+
+fun ItemStack.getArmorColor(): Int? {
+    return this[DataComponents.DYED_COLOR]?.rgb?.let { opaque(it) }
 }

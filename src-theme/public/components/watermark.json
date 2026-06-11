@@ -4,8 +4,24 @@
   "singleton": true,
   "alignment": {
     "horizontalAlignment": "Left",
-    "horizontalOffset": 15,
+    "horizontalOffset": 5,
     "verticalAlignment": "Top",
     "verticalOffset": 15
-  }
+  },
+  "values": [
+    {
+      "type": "FLOAT",
+      "name": "Scale",
+      "value": 1.0,
+      "range": {
+        "min": 0.5,
+        "max": 2.0
+      }
+    },
+    {
+      "type": "BOOLEAN",
+      "name": "Glow",
+      "value": true
+    }
+  ]
 }

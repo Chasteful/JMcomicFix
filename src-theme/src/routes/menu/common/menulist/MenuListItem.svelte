@@ -10,19 +10,44 @@
 
     const dispatch = createEventDispatcher();
 
+    const MIN_HOVER_TIME = 50;
+    let hoverTimer: number;
+
+    let isIntent = false;
     let previewImageLoaded = false;
+
+    function handleMouseEnter() {
+
+        clearTimeout(hoverTimer);
+        isIntent = false;
+        hoverTimer = window.setTimeout(() => {
+            isIntent = true;
+        }, MIN_HOVER_TIME);
+    }
+
+    function handleMouseLeave() {
+        clearTimeout(hoverTimer);
+        if (isIntent) {
+            isIntent = false;
+        }
+    }
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class="menu-list-item" on:dblclick={() => dispatch("dblclick")}>
+<div class="menu-list-item"
+     class:intent={isIntent}
+     on:dblclick={() => dispatch("dblclick")}
+     on:mouseenter={handleMouseEnter}
+     on:mouseleave={handleMouseLeave}>
+
     <div class="image">
         {#if !previewImageLoaded}
             <div class="loader">
-                <RippleLoader />
+                <RippleLoader/>
             </div>
         {/if}
-        <img class="preview" on:load={() => previewImageLoaded = true} src={image} alt="preview">
+        <img alt="preview" class="preview" on:load={() => previewImageLoaded = true} src={image}>
         <span class="text" class:visible={imageText !== null && imageTextBackgroundColor !== null}
               style="background-color: {imageTextBackgroundColor};">{imageText}</span>
         {#if favorite}
@@ -46,26 +71,30 @@
 </div>
 
 <style lang="scss">
+  @use "../../../../colors.scss" as *;
 
   .menu-list-item {
+    font-family: 'Alibaba', serif;
     display: grid;
     grid-template-areas:
-        "a b c"
-        "a d c";
+      "a b c"
+      "a d c";
     grid-template-columns: max-content 1fr max-content;
-    background-color: var(--menu-list-item-background-color);
+    background-color: color-mix(in srgb, var(--menu-list-item-background-color) 20%, transparent);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--menu-list-item-background-color) 20%, transparent);
     padding: 15px 25px;
     column-gap: 15px;
-    border-radius: 5px;
-    transition: ease background-color .2s;
+    border-radius: 17px;
+    transition: 0.2s;
     align-items: center;
     cursor: grab;
 
-    &:hover {
-      background-color: var(--menu-list-item-hover-background-color);
+    &.intent {
+      background-color: color-mix(in srgb, var(--menu-list-item-background-color) 40%, transparent);
+      padding-left: 120px;
 
       .subtitle {
-        color: var(--menu-list-item-hover-subtitle-color);
+        color: var(--menu-text-color);
       }
 
       .buttons .active {
@@ -121,6 +150,7 @@
     align-items: center;
 
     .text {
+
       font-size: 20px;
       color: var(--menu-text-color);
       font-weight: 600;
@@ -130,7 +160,7 @@
   .subtitle {
     grid-area: d;
     font-size: 18px;
-    color: var(--menu-text-dimmed-color);
+    color: #6c7089;
     transition: ease color .2s;
     align-self: flex-start;
   }

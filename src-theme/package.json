@@ -12,6 +12,7 @@
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^5.0.0",
     "@tsconfig/svelte": "^5.0.4",
+    "@types/howler": "^2.2.13",
     "sass": "^1.70.0",
     "svelte": "^5.2.7",
     "svelte-check": "^4.1.0",
@@ -25,8 +26,10 @@
     "archiver": "^6.0.1",
     "chart.js": "^4.5.0",
     "chartjs-plugin-dragdata": "^2.3.1",
+    "colorjs.io": "^0.6.1",
     "country-code-lookup": "^0.1.2",
     "dateformat": "^5.0.3",
+    "howler": "^2.2.4",
     "nouislider": "^15.7.1",
     "svelte-spa-router": "^4.0.1"
   }

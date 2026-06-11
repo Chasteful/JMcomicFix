@@ -26,7 +26,10 @@ import net.ccbluex.liquidbounce.config.types.FileDialogMode
 import net.ccbluex.liquidbounce.utils.client.inGame
 import net.ccbluex.liquidbounce.utils.client.mc
 import net.ccbluex.liquidbounce.utils.client.usesViaFabricPlus
+import net.ccbluex.netty.http.model.RequestObject
 import net.ccbluex.netty.http.routing.Routing
+import net.ccbluex.netty.http.util.httpOk
+import net.kotlinmodule.jmcomicfix.api.services.client.ClientUpdate
 import net.minecraft.util.Util
 import java.io.File
 import java.net.URI
@@ -48,6 +51,20 @@ private fun Routing.getClientInfo() = get("/info") {
         addProperty("hasProtocolHack", usesViaFabricPlus)
     })
 }
+
+// GET /api/v1/client/release
+@Suppress("UNUSED_PARAMETER")
+fun getRelease(requestObject: RequestObject) = httpOk(JsonObject().apply {
+    val releaseInfo = ClientUpdate.release
+    if (releaseInfo != null) {
+        addProperty("tagName", releaseInfo.tagName)
+        addProperty("downloadUrl", releaseInfo.downloadUrl)
+        addProperty("publishedAt", releaseInfo.publishedAt.toString())
+        addProperty("prerelease", releaseInfo.prerelease)
+    } else {
+        addProperty("error", "No newer release available")
+    }
+})
 
 // GET /api/v1/client/update
 @Suppress("ReturnCount")

@@ -19,8 +19,10 @@ import type {
 
 export interface EventMap {
     socketReady: void;
-
+    shadowValueChange:ShadowValueChangeEvent;
     themeColorChange: ThemeColorChangeEvent;
+    hudValueChange:HudValueChangeEvent;
+    nameProtectValueChange: ClickGuiValueChangeEvent;
     clickGuiScaleChange: ClickGuiScaleChangeEvent;
     clickGuiValueChange: ClickGuiValueChangeEvent;
     spaceSeperatedNamesChange: SpaceSeperatedNamesChangeEvent;
@@ -64,6 +66,7 @@ export interface EventMap {
     subtitle: TitleEventSubtitle;
     titleFade: TitleEventFade;
     clearTitle: TitleEventClear;
+    connectionDetails: ConnectionDetailsEvent;
 
     //GameEvents.kt
     key: KeyEvent;
@@ -72,6 +75,12 @@ export interface EventMap {
     chatSend: ChatSendEvent;
     chatReceive: ChatReceiveEvent;
     disconnect: void;
+    progress: ProgressEvent;
+    keyBindingCPS:KeyBindingCPSEvent;
+    overlayTitle: OverlayTitleEvent;
+    overlayPlayList: OverlayPlayListEvent;
+    overlayChatMessage: OverlayChatEvent;
+    overlayDisconnection: OverlayDisconnectionEvent;
     overlayMessage: OverlayMessageEvent;
 
     //PlayerEvents.kt
@@ -80,12 +89,20 @@ export interface EventMap {
 
 export interface ThemeColorChangeEvent {
     themeId: string;
-    name: "Accent" | "Tint";
+    name: string;
     value: number;
 }
 
 export interface ClickGuiValueChangeEvent {
     configurable: ConfigurableSetting;
+}
+
+export interface HudValueChangeEvent{
+    configurable: ConfigurableSetting;
+}
+
+export interface ShadowValueChangeEvent{
+    value: boolean;
 }
 
 export interface ModuleToggleEvent {
@@ -140,7 +157,14 @@ export interface OverlayMessageEvent {
 export interface NotificationEvent {
     title: string;
     message: string;
-    severity: "INFO" | "SUCCESS" | "ERROR" | "ENABLED" | "DISABLED";
+    severity: "INFO" | "SUCCESS" | "ERROR" | "ENABLED" | "DISABLED" | "BLINK" | "BLINKED" | "BLINKING";
+}
+
+export interface ProgressEvent {
+    title: string;
+    progress: number;
+    maxProgress: number;
+    timeRemaining: number;
 }
 
 export interface KeyEvent {
@@ -148,8 +172,14 @@ export interface KeyEvent {
     action: number;
 }
 
+export interface KeyBindingCPSEvent {
+    key: string;
+    cps: number;
+}
+
 export interface TargetChangeEvent {
     target: PlayerData | null;
+    distant:number;
 }
 
 export interface BlockCountChangeEvent {
@@ -192,6 +222,7 @@ export interface PlayerInventory {
     main: ItemStack[];
     crafting: ItemStack[];
     enderChest: ItemStack[];
+    openChest: ItemStack[];
 }
 
 export interface ProxyCheckResultEvent {
@@ -281,4 +312,41 @@ export interface TitleEventClear {
 export interface VirtualScreenEvent {
     type: string;
     action: "open" | "close";
+}
+
+export interface ConnectionDetailsEvent {
+    result: TextComponent | string;
+}
+
+export interface OverlayTitleEvent {
+    title: TextComponent | string;
+    subtitle: TextComponent | string;
+}
+
+export interface PlayerEntry {
+    name: TextComponent | string;
+    uuid: string;
+    latency: TextComponent | string;
+    isFriend: boolean;
+    isStaff: boolean;
+    isSelf: boolean;
+}
+
+export interface OverlayPlayListEvent {
+    header: TextComponent | string;
+    footer: TextComponent | string;
+    players: PlayerEntry[];
+
+}
+
+export interface OverlayChatEvent {
+    content: TextComponent | string,
+    timestamp: number;
+    isSystem: Boolean;
+    fadeTimeout?: number;
+}
+
+export interface OverlayDisconnectionEvent  {
+    parent: "title" | "menu" | "custom";
+    info: TextComponent | string;
 }

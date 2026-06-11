@@ -74,6 +74,7 @@
 </div>
 
 <style lang="scss">
+  @use "../../../../colors" as *;
 
   .configurable-title {
     color: var(--menu-text-color);
@@ -87,7 +88,7 @@
 
     &.expanded {
       .header {
-        border-radius: 5px 5px 0 0;
+        border-radius: 12px 12px 0 0;
       }
     }
 
@@ -96,6 +97,7 @@
 
       .header {
         background-color: var(--menu-wrapped-setting-header-background-color);
+        box-shadow: 0 0 8px rgba($base, 0.6);
         padding: 20px;
         display: flex;
         column-gap: 20px;
@@ -110,10 +112,11 @@
   .nested-settings {
     position: absolute;
     z-index: 1000;
-    border-radius: 0 0 5px 5px;
+    border-radius: 0 0 12px 12px;
     background-color: var(--menu-wrapped-setting-content-background-color);
+    box-shadow: 0 4px 8px rgba($base, 0.6);
     padding: 10px 13px;
-    zoom: 1.5;
+    zoom: 1.2;
     width: 100%;
   }
 </style>

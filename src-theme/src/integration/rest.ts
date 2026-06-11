@@ -2,7 +2,7 @@ import {REST_BASE} from "./host";
 import type {
     Account,
     Browser,
-    ClientInfo,
+    ClientInfo, ClientRelease,
     ClientUpdate,
     ClientUser,
     ConfigurableSetting,
@@ -636,6 +636,13 @@ export async function getComponents(id: string): Promise<HudComponent[]> {
 export async function getClientInfo(): Promise<ClientInfo> {
     const response = await fetch(`${API_BASE}/client/info`);
     const data: ClientInfo = await response.json();
+
+    return data;
+}
+
+export async function getClientRelease(): Promise<ClientRelease> {
+    const response = await fetch(`${API_BASE}/client/release`);
+    const data: ClientRelease = await response.json();
 
     return data;
 }

@@ -33,7 +33,7 @@ object CommandClient : Command.Factory {
      * Creates client command with a variety of subcommands.
      */
     override fun createCommand(): Command {
-        return CommandBuilder.begin("client")
+        return CommandBuilder.begin("jmcomicfix/api/services/client")
             .hub()
             .subcommand(CommandClientInfoSubcommand.infoCommand())
             .subcommand(CommandClientBrowserSubcommand.browserCommand())

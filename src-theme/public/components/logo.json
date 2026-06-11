@@ -1,0 +1,23 @@
+{
+  "name": "Logo",
+  "enabled": true,
+  "singleton": true,
+  "alignment": {
+    "horizontalAlignment": "Left",
+    "horizontalOffset": 20,
+    "verticalAlignment": "Bottom",
+    "verticalOffset": 50
+  },
+  "values": [
+    {
+      "type": "BOOLEAN",
+      "name": "Glitched",
+      "value": true
+    },
+    {
+      "type": "BOOLEAN",
+      "name": "Gradient",
+      "value": true
+    }
+  ]
+}

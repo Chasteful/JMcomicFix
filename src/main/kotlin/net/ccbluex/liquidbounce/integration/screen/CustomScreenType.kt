@@ -25,6 +25,8 @@ import net.ccbluex.liquidbounce.integration.screen.impl.CustomSharedMinecraftScr
 import net.ccbluex.liquidbounce.integration.screen.impl.InternetExplorerScreen
 import net.ccbluex.liquidbounce.utils.client.mc
 import net.ccbluex.liquidbounce.utils.client.openVfpProtocolSelection
+import net.minecraft.client.gui.screens.ChatScreen
+import net.minecraft.client.gui.screens.ConnectScreen
 import net.minecraft.client.gui.screens.DisconnectedScreen
 import net.minecraft.client.gui.screens.PauseScreen
 import net.minecraft.client.gui.screens.Screen
@@ -60,7 +62,10 @@ enum class CustomScreenType(
     CLICK_GUI("clickgui"),
     ALT_MANAGER("altmanager"),
     PROXY_MANAGER("proxymanager"),
-
+    CHAT(
+        "chat",
+        recognizer = { it is ChatScreen }
+    ),
     TITLE(
         "title",
         recognizer = { it is TitleScreen || it.isLunar },
@@ -123,6 +128,11 @@ enum class CustomScreenType(
     CONTAINER(
         "container",
         recognizer = { it is ContainerScreen }
+    ),
+
+    CONNECTING_TO_SERVER(
+        "connecting",
+        recognizer = { it is ConnectScreen },
     ),
 
     DISCONNECTED("disconnected",

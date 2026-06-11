@@ -26,10 +26,16 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
+import net.ccbluex.liquidbounce.event.EventManager;
+import net.ccbluex.liquidbounce.event.events.OverlayPlayListEvent;
+import net.ccbluex.liquidbounce.event.events.PlayerEntry;
 import net.ccbluex.liquidbounce.features.misc.FriendManager;
 import net.ccbluex.liquidbounce.features.module.modules.misc.ModuleAntiStaff;
 import net.ccbluex.liquidbounce.features.module.modules.misc.ModuleBetterTab;
 import net.ccbluex.liquidbounce.features.module.modules.misc.Visibility;
+import net.ccbluex.liquidbounce.features.module.modules.misc.nameprotect.ModuleNameProtect;
+import net.ccbluex.liquidbounce.integration.theme.component.HudComponentManager;
+import net.ccbluex.liquidbounce.integration.theme.component.HudComponentTweak;
 import net.ccbluex.liquidbounce.utils.text.PlainText;
 import net.ccbluex.liquidbounce.utils.text.TextBuilder;
 import net.minecraft.client.Minecraft;
@@ -40,9 +46,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.Mth;
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -51,10 +59,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Mixin(PlayerTabOverlay.class)
 public abstract class MixinPlayerTabOverlay {
+
+    @Shadow
+    @Nullable
+    public Component footer;
+    @Shadow
+    @Nullable
+    public Component header;
+
+    @Unique
+    private static int getLatencyColor(int latency) {
+        return latency < 150 ? 0x00E970 : latency < 300 ? 0xE7D020 : 0xD74238;
+    }
 
     @Shadow
     protected abstract List<PlayerInfo> getPlayerInfos();
@@ -158,6 +179,64 @@ public abstract class MixinPlayerTabOverlay {
             context.text(textRenderer, text, x + width - textRenderer.width(text), y, color);
             ci.cancel();
         }
+    }
+
+    @Inject(
+        method = "extractRenderState",
+        at = @At("HEAD"),
+        cancellable = true)
+    private void onRenderHead(CallbackInfo ci) {
+        if (HudComponentManager.isTweakEnabled(HudComponentTweak.DISABLE_PLAYER_LIST_HUD)) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(
+        method = "setVisible",
+        at = @At("HEAD"))
+    private void onsetVisibleHead(CallbackInfo ci) {
+        Minecraft.getInstance().execute(() -> {
+            Component hudHeader = this.header;
+            Component hudFooter = this.footer;
+            PlayerTabOverlay self = (PlayerTabOverlay) (Object) this;
+
+            List<PlayerEntry> players = getPlayerInfos().stream().map(entry -> {
+                Component originalComponent = self.getNameForDisplay(entry);
+                if (originalComponent == null) originalComponent = Component.literal(entry.getProfile().name());
+
+                Component fullName;
+                if (ModuleNameProtect.INSTANCE.getRunning()) {
+                    String originalText = originalComponent.getString();
+                    String processedName = ModuleNameProtect.INSTANCE.replace(originalText);
+
+                    if (!processedName.equals(originalText)) {
+                        fullName = Component.literal(processedName).withStyle(originalComponent.getStyle());
+                    } else {
+                        fullName = originalComponent;
+                    }
+                } else {
+                    fullName = originalComponent;
+                }
+                Component latency = Component.literal(entry.getLatency() + "ms")
+                    .withStyle(style -> style.withColor(net.minecraft.network.chat.TextColor.fromRgb(getLatencyColor(entry.getLatency()))));
+
+                boolean isFriend = FriendManager.INSTANCE.isFriend(entry.getProfile().name());
+                boolean isStaff = ModuleAntiStaff.INSTANCE.shouldShowAsStaffOnTab(entry.getProfile().name());
+                boolean isSelf = Minecraft.getInstance().player != null
+                    && entry.getProfile().id().equals(Minecraft.getInstance().player.getUUID());
+                String uuid = entry.getProfile().id().toString();
+
+                return new PlayerEntry(fullName, uuid, latency, isFriend, isStaff, isSelf);
+            }).collect(Collectors.toList());
+
+            EventManager.INSTANCE.callEvent(
+                new OverlayPlayListEvent(
+                    hudHeader != null ? hudHeader : Component.empty(),
+                    hudFooter != null ? hudFooter : Component.empty(),
+                    players
+                )
+            );
+        });
     }
 
     // ModifyArg breaks lunar compatibility as of 17.1.2025 (minecraft 1.21.4); that's why WrapOperation is used

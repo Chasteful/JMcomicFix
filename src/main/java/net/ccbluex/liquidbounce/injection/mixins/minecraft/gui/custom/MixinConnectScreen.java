@@ -21,6 +21,7 @@ package net.ccbluex.liquidbounce.injection.mixins.minecraft.gui.custom;
 
 import net.ccbluex.liquidbounce.api.thirdparty.IpInfoApi;
 import net.ccbluex.liquidbounce.event.EventManager;
+import net.ccbluex.liquidbounce.event.events.ConnectionDetailsEvent;
 import net.ccbluex.liquidbounce.event.events.ServerConnectEvent;
 import net.ccbluex.liquidbounce.features.misc.HideAppearance;
 import net.ccbluex.liquidbounce.features.misc.proxy.ProxyManager;
@@ -110,9 +111,9 @@ public abstract class MixinConnectScreen extends MixinScreen {
         // This will either be the socket address or the server address
         var socketAddr = getSocketAddress(clientConnection, serverAddress);
         var serverAddr = String.format(
-                "%s:%s",
-                hideSensitiveAddress(serverAddress.getHost()),
-                serverAddress.getPort()
+            "%s:%s",
+            hideSensitiveAddress(serverAddress.getHost()),
+            serverAddress.getPort()
         );
         var ipInfo = IpInfoApi.INSTANCE.getCurrent();
 
@@ -146,9 +147,12 @@ public abstract class MixinConnectScreen extends MixinScreen {
         var server = PlainText.of(serverAddr, ChatFormatting.GREEN);
         textParts.add(server);
 
-        return TextList.of(textParts);
-    }
+        Component result = TextList.of(textParts);
 
+        EventManager.INSTANCE.callEvent(new ConnectionDetailsEvent(result));
+
+        return result;
+    }
     @Unique
     private static String getSocketAddress(Connection clientConnection, ServerAddress serverAddress) {
         String socketAddr;
@@ -169,5 +173,6 @@ public abstract class MixinConnectScreen extends MixinScreen {
         }
         return socketAddr;
     }
+
 
 }

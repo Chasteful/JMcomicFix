@@ -10,6 +10,8 @@
     import Module from "./Module.svelte";
     import type {KeyEvent, ModuleToggleEvent} from "../../../../integration/events";
 
+    export let settings: { [name: string]: any };
+
     let modules: TModule[] = [];
     let groupedModules: GroupedModules = {};
     let categories: string[] = [];
@@ -93,48 +95,51 @@
     });
 </script>
 
-<div class="tabgui">
-    <div class="categories" bind:this={categoriesElement}>
+<div class="tabgui" style="transform: scale({settings.scale});">
+    <div bind:this={categoriesElement} class="categories hud-container">
         {#each categories as name, index}
-            <Category {name} selected={index === selectedCategoryIndex} />
+            <Category {name} selected={index === selectedCategoryIndex}/>
         {/each}
     </div>
 
     {#if renderedModules.length > 0}
-        <div class="modules" transition:fly={{ x: -10, duration: 200 }} style="height: {categoriesElement.offsetHeight}px">
-            {#each renderedModules as { name, enabled }, index}
-                <Module {name} {enabled} selected={selectedModuleIndex === index} />
+        <div class="modules hud-container" transition:fly={{ x: -10, duration: 200 }}
+             style="height: {categoriesElement.offsetHeight}px">
+            {#each renderedModules as {name, enabled}, index}
+                <Module {name} {enabled} selected={selectedModuleIndex === index}/>
             {/each}
         </div>
     {/if}
 </div>
 
 <style lang="scss">
+  @use "../../../../colors.scss" as *;
 
-    .tabgui {
-        display: flex;
+  .tabgui {
+    display: flex;
+  }
+
+  .categories {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 150px;
+    flex-shrink: 0;
+
+  }
+
+  .modules {
+    border-radius: 5px;
+    margin-left: 6px;
+    flex-shrink: 0;
+    min-width: 150px;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+
+
+    &::-webkit-scrollbar {
+      width: 0;
     }
-
-    .categories {
-        background-clip: content-box;
-        display: flex;
-        flex-direction: column;
-        border-radius: 5px;
-        overflow: hidden;
-    }
-
-    .modules {
-      background-clip: content-box;
-      background-color: var(--tabgui-modules-background-color);
-      margin-left: 6px;
-      border-radius: 5px;
-      min-width: 100px;
-      display: flex;
-      flex-direction: column;
-      overflow: auto;
-
-      &::-webkit-scrollbar {
-        width: 0;
-      }
-    }
+  }
 </style>

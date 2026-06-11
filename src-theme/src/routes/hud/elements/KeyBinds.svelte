@@ -1,11 +1,16 @@
 <script lang="ts">
-    import {onMount} from "svelte";
-    import {getModules} from "../../../integration/rest";
-    import {listen} from "../../../integration/ws";
-    import {convertToSpacedString, spaceSeperatedNames} from "../../../theme/theme_config";
-    import type {Module} from "../../../integration/types";
-    import {UNKNOWN_KEY} from "../../../util/utils";
+    import { onMount } from "svelte";
+    import { getModules } from "../../../integration/rest";
+    import { listen } from "../../../integration/ws";
+    import { expoInOut } from "svelte/easing";
+    import { fly } from "svelte/transition";
+    import { convertToSpacedString, spaceSeperatedNames } from "../../../theme/theme_config";
+    import type { Module } from "../../../integration/types";
+    import { UNKNOWN_KEY } from "../../../util/utils";
     import BindDisplay from "../../clickgui/setting/bind/BindDisplay.svelte";
+    import Line from "../common/Trims/Line.svelte";
+
+    let { settings }: { settings: { [name: string]: any } } = $props();
 
     let modules: Module[] = $state([]);
 
@@ -23,18 +28,29 @@
     onMount(async () => {
         await updateModulesWithBinds();
     });
-</script>
 
-<div class="keybinds">
-    <div class="header">
-        <span class="title">Binds</span>
-        <img class="icon" src="img/hud/keybinds/icon-keybinds.svg" alt="keybinds">
-    </div>
-    <div class="entries">
+</script>
+    <div
+            class="hud-container" style="transform: scale({settings.scale});"
+            transition:fly|global={{ duration: 500, y: -50, easing: expoInOut }}
+    >
+        {#if settings?.title}
+            <div class="title">
+                <img class="icon" src="img/hud/keybinds/icon-keybinds.svg" alt="keyboard"/>
+                <span>Keybindings</span>
+            </div>
+        {/if}
+
+        {#if settings?.divider}
+            <Line gradient={settings?.gradient}/>
+        {/if}
+
         {#each modules as m (m.name)}
-            <div class="row" class:enabled={m.enabled}>
-                <span class="module-name">{$spaceSeperatedNames ? convertToSpacedString(m.name) : m.name}</span>
-                <span class="key-bind" class:muted={!m.enabled}>
+            <div class="binding-item" class:disabled={!m.enabled}>
+                <span class="module-name">
+                    {$spaceSeperatedNames ? convertToSpacedString(m.name) : m.name}
+                </span>
+                <span class="key-info">
                     [<BindDisplay boundKey={m.keyBind.boundKey} modifiers={m.keyBind.modifiers}/>]
                 </span>
             </div>
@@ -42,91 +58,63 @@
             <div class="no-binds">No key bindings</div>
         {/each}
     </div>
-</div>
 
 <style lang="scss">
+  @use "../../../colors.scss" as *;
 
-  .keybinds {
+  .hud-container {
     width: max-content;
-    border-radius: 5px;
-    overflow: hidden;
-    font-size: 14px;
-    min-width: 150px;
-    max-width: 200px;
+    position: absolute;
+    padding: 0.5em 0.8em;
+    color: var(--text-color);
+    min-width: 225px;
+    font-size: 1rem;
   }
 
-  .header {
-    background-color: var(--keybinds-background-color);
-    padding: 7px 10px;
+  .title {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-
-    .title {
-      color: var(--keybinds-text-color);
-      font-weight: 600;
-    }
+    font-size: 1em;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5em;
+    color: white;
 
     .icon {
-      width: 16px;
-      height: 16px;
+      margin: 0 0.3em;
+      height: 1.4em;
+      width: auto;
     }
   }
 
-  .entries {
-    background-color: var(--keybinds-header-background-color);
-    padding: 6px 10px;
-    color: var(--keybinds-text-color);
-
-    .no-binds {
-      font-style: italic;
-      margin-bottom: 5px;
-    }
-  }
-
-  .row {
+  .binding-item {
     display: flex;
     justify-content: space-between;
+    padding: 0.2em 0;
+    white-space: nowrap;
+    transition: opacity 0.1s;
+  }
+
+  .disabled {
+    opacity: 0.5;
+    filter: grayscale(1);
+  }
+
+  .module-name {
+    margin-right: 1em;
+  }
+
+  .key-info {
+    color: var(--text-color);
+    font-weight: 500;
+    display: flex;
     align-items: center;
-    margin-bottom: 5px;
-    gap: 12px;
-    min-width: 0;
+    column-gap: 2px;
+  }
 
-    &:last-child {
-      margin-bottom: 0;
-    }
-
-    &.enabled {
-      .module-name {
-        color: var(--keybinds-enabled-color);
-        font-weight: 500;
-      }
-    }
-
-    .module-name {
-      color: var(--keybinds-text-color);
-      font-size: 14px;
-      flex: 1;
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .key-bind {
-      display: inline-flex;
-      align-items: center;
-      font-family: monospace;
-      font-size: 11px;
-      color: var(--keybinds-accent-color);
-      font-weight: 600;
-      flex-shrink: 0;
-      min-width: max-content;
-
-      &.muted {
-        color: var(--keybinds-text-muted-color);
-        font-weight: 500;
-      }
-    }
+  .no-binds {
+    font-style: italic;
+    opacity: 0.6;
+    padding: 0.2em 0;
   }
 </style>

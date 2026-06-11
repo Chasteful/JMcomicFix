@@ -1,7 +1,20 @@
+@use "sass:color";
+
+$base: rgb(20, 20, 20);
+$text: #cdd6f4;
+$subtext0: #a6acd8;
+$subtext1: #bac2de;
+$overlay0: #6c7086;
+$overlay1: #7f849c;
+$overlay2: #9399b2;
+$surface0: #313244;
+$surface1: #45475a;
+$surface2: #585b70;
+
 :root {
     /* Foundation */
-    --surface-color: #000000;
-    --text-color: #ffffff;
+    --surface-color: #141414FF;
+    --text-color: #cdd6f4;
     --text-dimmed-color: #d3d3d3;
 
     --accent-color: #4677ff;
@@ -186,6 +199,10 @@
     --arraylist-tag-color: #aaaaaa;
     --arraylist-background-color: color-mix(in srgb, var(--arraylist-base-color) 68%, transparent);
     --arraylist-border-color: var(--accent-color);
+
+    --chat-base-color: var(--surface-color);
+    --chat-text-color: var(--text-color);
+    --chat-background-color: color-mix(in srgb, var(--chat-base-color) 68%, transparent);
 
     --targethud-base-color: var(--surface-color);
     --targethud-text-color: var(--text-color);

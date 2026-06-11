@@ -37,7 +37,9 @@ import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.function.IntSupplier;
@@ -68,14 +70,13 @@ public abstract class MixinLoadingOverlay {
 
     @Inject(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/packs/resources/ReloadInstance;getActualProgress()F"))
     private void drawClientLogo(
-            GuiGraphicsExtractor graphics,
-            int mouseX,
-            int mouseY,
-            float a,
-            CallbackInfo ci,
-            @Local(name = "color") int color
+        GuiGraphicsExtractor graphics,
+        int mouseX,
+        int mouseY,
+        float a,
+        CallbackInfo ci,
+        @Local(name = "color") int color
     ) {
-        // Don't draw the logo if the appearance is hidden
         if (HideAppearance.INSTANCE.isHidingNow()) {
             return;
         }
@@ -83,30 +84,28 @@ public abstract class MixinLoadingOverlay {
         int screenWidth = graphics.guiWidth();
         int screenHeight = graphics.guiHeight();
 
-        float scaleFactor = Math.min(screenWidth * 0.4f / ClientLogoTexture.WIDTH, screenHeight * 0.25f / ClientLogoTexture.HEIGHT);
-
-        int displayWidth = (int)(ClientLogoTexture.WIDTH * scaleFactor);
-        int displayHeight = (int)(ClientLogoTexture.HEIGHT * scaleFactor);
-
-        int x = (screenWidth - displayWidth) / 2;
-        int y = (screenHeight - displayHeight) / 2;
-
-        // TODO: Draw as SVG instead of PNG
         graphics.blit(
             ClientRenderPipelines.JCEF.SMOOTH_TEXTURE,
-                ClientLogoTexture.CLIENT_LOGO,
-                x,
-                y,
-                0.0F,
-                0.0F,
-                displayWidth,
-                displayHeight,
-                ClientLogoTexture.WIDTH,
-                ClientLogoTexture.HEIGHT,
-                ClientLogoTexture.WIDTH,
-                ClientLogoTexture.HEIGHT,
-                color
+            ClientLogoTexture.CLIENT_LOGO,
+            0,
+            0,
+            0,
+            0,
+            screenWidth,
+            screenHeight,
+            ClientLogoTexture.WIDTH,
+            ClientLogoTexture.HEIGHT,
+            ClientLogoTexture.WIDTH,
+            ClientLogoTexture.HEIGHT,
+            color
         );
+    }
+    @ModifyConstant(
+        method = "extractRenderState",
+        constant = @Constant(doubleValue = 0.8325)
+    )
+    private double adjustProgressBarY(double original) {
+        return 0.91;
     }
 
     @ModifyExpressionValue(method = "extractRenderState", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screens/LoadingOverlay;BRAND_BACKGROUND:Ljava/util/function/IntSupplier;", opcode = Opcodes.GETSTATIC))

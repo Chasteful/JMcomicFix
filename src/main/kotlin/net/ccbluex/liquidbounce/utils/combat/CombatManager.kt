@@ -26,6 +26,7 @@ import net.ccbluex.liquidbounce.event.events.TargetChangeEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.modules.combat.killaura.ModuleKillAura
 import net.ccbluex.liquidbounce.integration.interop.protocol.rest.v1.game.PlayerData
+import net.ccbluex.liquidbounce.utils.client.player
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 
@@ -93,7 +94,12 @@ object CombatManager : EventListener {
             duringCombat = PAUSE_COMBAT
 
             if (entity is Player) {
-                EventManager.callEvent(TargetChangeEvent(PlayerData.fromPlayer(entity)))
+                EventManager.callEvent(
+                    TargetChangeEvent(
+                        PlayerData.fromPlayer(entity),
+                        player.distanceTo(entity)
+                    )
+                )
             }
         }
     }

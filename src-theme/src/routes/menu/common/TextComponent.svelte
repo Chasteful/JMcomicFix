@@ -3,7 +3,7 @@
 
     export let textComponent: TTextComponent | string;
     export let allowPreformatting = false;
-    export let preFormattingMonospace = true;
+    export let preFormattingMonospace = false;
     export let inheritedColor = "#ffffff";
     export let inheritedStrikethrough = false;
     export let inheritedItalic = false;

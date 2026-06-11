@@ -1,17 +1,17 @@
 <script lang="ts">
-    import LiquidBounceLogo from "../../../../components/LiquidBounceLogo.svelte";
     import Account from "./account/Account.svelte";
-    import AnimatedLogo from "./AnimatedLogo.svelte";
     import Notifications from "./Notifications.svelte";
     import {listen} from "../../../../integration/ws";
-    import {location} from "svelte-spa-router";
     import type {
         AccountManagerAdditionEvent,
         AccountManagerLoginEvent,
         AccountManagerMessageEvent
     } from "../../../../integration/events";
     import {notification} from "./notification_store";
-    import {isAnniversary} from "../../../../util/utils";
+    import Logo from "./Logo.svelte";
+
+    export let showAccount: boolean;
+    export let showHeader: boolean;
 
     listen("accountManagerAddition", (e: AccountManagerAdditionEvent) => {
         if (!e.error) {
@@ -54,27 +54,29 @@
     });
 </script>
 
+{#if showHeader}
 <div class="header">
-    {#if $location === "/title" && isAnniversary()}
-        <AnimatedLogo/>
-    {:else}
-        <LiquidBounceLogo
-            width="261.263px"
-            height="98px"
-            badgeFill="var(--accent-color)"
-        />
+    <Logo showLogo={true}/>
+
+    <div class="notifications">
+        <Notifications/>
+    </div>
+    {#if showAccount}
+        <Account/>
     {/if}
-
-    <Notifications />
-
-    <Account/>
 </div>
-
+{/if}
 <style lang="scss">
   .header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 60px;
     align-items: center;
+    margin-bottom: 60px;
+  }
+
+  .notifications {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
   }
 </style>

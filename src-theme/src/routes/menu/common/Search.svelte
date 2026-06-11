@@ -14,13 +14,13 @@
 <style lang="scss">
 
   .search {
-    background-color: var(--menu-search-background-color);
+    background-color: color-mix(in srgb,var(--menu-search-background-color) 70%, transparent);
     border: none;
     color: var(--menu-text-color);
     font-family: "Inter", sans-serif;
     font-size: 20px;
-    border-radius: 5px;
-    border-bottom: solid 4px var(--menu-search-border-color);
+    border-radius: 12px;
+    border-bottom: solid 4px color-mix(in srgb,var(--menu-search-border-color) 70%, transparent);
     background-image: url("/img/menu/icon-search.svg");
     background-repeat: no-repeat;
     background-position: 20px center;

@@ -47,6 +47,7 @@ import net.minecraft.client.gui.render.TextureSetup
 import net.minecraft.resources.Identifier
 import java.io.Closeable
 import java.util.Locale
+import kotlin.math.exp
 
 sealed interface ThemeBackground : Closeable {
 
@@ -68,7 +69,7 @@ sealed interface ThemeBackground : Closeable {
     }
 
     /**
-     * Background implementation that renders a static image texture.
+     * Background implementation that renders a static image texture with smooth mouse parallax effect.
      * @param texture The image texture
      */
     class Image(
@@ -77,7 +78,16 @@ sealed interface ThemeBackground : Closeable {
     ) : ThemeBackground {
 
         private val texture = image.asTexture { "ThemeBackground/Image - ${metadata.name}" }
-        private val textureSetup = texture.textureSetup
+        private val textureSetup = texture.textureView.asTextureSetup(
+            RenderSystem.getSamplerCache().getRepeat(FilterMode.LINEAR)
+        )
+        private var currentOffsetX = 0f
+        private var currentOffsetY = 0f
+
+        private fun smooth(current: Float, target: Float, delta: Float, speed: Float): Float {
+            val factor = 1f - exp((-speed * delta).toDouble()).toFloat()
+            return current + (target - current) * factor
+        }
 
         override fun draw(
             context: GuiGraphicsExtractor,
@@ -87,10 +97,36 @@ sealed interface ThemeBackground : Closeable {
             mouseY: Int,
             delta: Float
         ): Boolean {
+            val texW = texture.texture.getWidth(0).toFloat()
+            val texH = texture.texture.getHeight(0).toFloat()
+
+            val baseScale = (width.toFloat() / texW).coerceAtLeast(height.toFloat() / texH)
+
+            val scale = baseScale * 1.25f
+
+            val maxOffsetX = ((texW * scale - width) / 2f).coerceAtLeast(0f)
+            val maxOffsetY = ((texH * scale - height) / 2f).coerceAtLeast(0f)
+
+            val targetOffsetX = (((mouseX / width.toFloat()) - 0.5f) * maxOffsetX * 2f)
+                .coerceIn(-maxOffsetX, maxOffsetX)
+            val targetOffsetY = (((mouseY / height.toFloat()) - 0.5f) * maxOffsetY * 2f)
+                .coerceIn(-maxOffsetY, maxOffsetY)
+
+            currentOffsetX = smooth(currentOffsetX, targetOffsetX, delta, 0.25f)
+            currentOffsetY = smooth(currentOffsetY, targetOffsetY, delta, 0.25f)
+
+            val scaledWidth = texW * scale
+            val scaledHeight = texH * scale
+
+            val x0 = -currentOffsetX - (scaledWidth - width) / 2f
+            val y0 = -currentOffsetY - (scaledHeight - height) / 2f
+            val x1 = x0 + scaledWidth
+            val y1 = y0 + scaledHeight
+
             context.drawTexQuad(
                 textureSetup,
-                x0 = 0f, y0 = 0f,
-                x1 = width.toFloat(), y1 = height.toFloat(),
+                x0 = x0, y0 = y0,
+                x1 = x1, y1 = y1
             )
 
             return true

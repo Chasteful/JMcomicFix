@@ -47,6 +47,7 @@
 
   .menu-list {
     background-color: var(--menu-button-container-background-color);
+    box-shadow: 0 0 8px var(--menu-button-container-background-color);
     flex: 1;
     border-radius: 5px;
     margin-bottom: 25px;

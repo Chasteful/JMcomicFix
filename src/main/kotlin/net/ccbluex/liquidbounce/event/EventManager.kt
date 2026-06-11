@@ -57,6 +57,7 @@ import net.ccbluex.liquidbounce.event.events.ClientPlayerInventoryEvent
 import net.ccbluex.liquidbounce.event.events.ClientShutdownEvent
 import net.ccbluex.liquidbounce.event.events.ClientStartEvent
 import net.ccbluex.liquidbounce.event.events.ComponentsUpdateEvent
+import net.ccbluex.liquidbounce.event.events.ConnectionDetailsEvent
 import net.ccbluex.liquidbounce.event.events.DeathEvent
 import net.ccbluex.liquidbounce.event.events.DisconnectEvent
 import net.ccbluex.liquidbounce.event.events.DrawOutlinesEvent
@@ -72,8 +73,10 @@ import net.ccbluex.liquidbounce.event.events.GameRenderEvent
 import net.ccbluex.liquidbounce.event.events.GameRenderTaskQueueEvent
 import net.ccbluex.liquidbounce.event.events.GameTickEvent
 import net.ccbluex.liquidbounce.event.events.HealthUpdateEvent
+import net.ccbluex.liquidbounce.event.events.HudValueChangeEvent
 import net.ccbluex.liquidbounce.event.events.InputHandleEvent
 import net.ccbluex.liquidbounce.event.events.ItemLoreQueryEvent
+import net.ccbluex.liquidbounce.event.events.KeyBindingCPSEvent
 import net.ccbluex.liquidbounce.event.events.KeyEvent
 import net.ccbluex.liquidbounce.event.events.KeybindChangeEvent
 import net.ccbluex.liquidbounce.event.events.KeybindIsPressedEvent
@@ -87,9 +90,14 @@ import net.ccbluex.liquidbounce.event.events.MouseRotationEvent
 import net.ccbluex.liquidbounce.event.events.MouseScrollEvent
 import net.ccbluex.liquidbounce.event.events.MouseScrollInHotbarEvent
 import net.ccbluex.liquidbounce.event.events.MovementInputEvent
+import net.ccbluex.liquidbounce.event.events.NameProtectEvent
 import net.ccbluex.liquidbounce.event.events.NotificationEvent
+import net.ccbluex.liquidbounce.event.events.OverlayChatEvent
+import net.ccbluex.liquidbounce.event.events.OverlayDisconnectionEvent
 import net.ccbluex.liquidbounce.event.events.OverlayMessageEvent
+import net.ccbluex.liquidbounce.event.events.OverlayPlayListEvent
 import net.ccbluex.liquidbounce.event.events.OverlayRenderEvent
+import net.ccbluex.liquidbounce.event.events.OverlayTitleEvent
 import net.ccbluex.liquidbounce.event.events.PacketEvent
 import net.ccbluex.liquidbounce.event.events.PerspectiveEvent
 import net.ccbluex.liquidbounce.event.events.PipelineEvent
@@ -113,6 +121,7 @@ import net.ccbluex.liquidbounce.event.events.PlayerUseMultiplier
 import net.ccbluex.liquidbounce.event.events.PlayerVelocityStrafe
 import net.ccbluex.liquidbounce.event.events.ProxyCheckResultEvent
 import net.ccbluex.liquidbounce.event.events.RefreshArrayListEvent
+import net.ccbluex.liquidbounce.event.events.ResetHotbarSlotSilentlyEvent
 import net.ccbluex.liquidbounce.event.events.ResourceReloadEvent
 import net.ccbluex.liquidbounce.event.events.RotationUpdateEvent
 import net.ccbluex.liquidbounce.event.events.ScaleFactorChangeEvent
@@ -120,9 +129,11 @@ import net.ccbluex.liquidbounce.event.events.ScheduleInventoryActionEvent
 import net.ccbluex.liquidbounce.event.events.ScreenEvent
 import net.ccbluex.liquidbounce.event.events.ScreenRenderEvent
 import net.ccbluex.liquidbounce.event.events.SelectHotbarSlotSilentlyEvent
+import net.ccbluex.liquidbounce.event.events.SelectingHotbarSlotSilentlyEvent
 import net.ccbluex.liquidbounce.event.events.ServerConnectEvent
 import net.ccbluex.liquidbounce.event.events.ServerPingedEvent
 import net.ccbluex.liquidbounce.event.events.SessionEvent
+import net.ccbluex.liquidbounce.event.events.ShadowValueChangeEvent
 import net.ccbluex.liquidbounce.event.events.SpaceSeperatedNamesChangeEvent
 import net.ccbluex.liquidbounce.event.events.SprintEvent
 import net.ccbluex.liquidbounce.event.events.TagEntityEvent
@@ -270,6 +281,17 @@ internal val ALL_EVENT_CLASSES: Array<Class<out Event>> = arrayOf(
     TitleEvent.Clear::class.java,
     UserLoggedInEvent::class.java,
     UserLoggedOutEvent::class.java,
+    NameProtectEvent::class.java,
+    HudValueChangeEvent::class.java,
+    ShadowValueChangeEvent::class.java,
+    KeyBindingCPSEvent::class.java,
+    OverlayChatEvent::class.java,
+    OverlayPlayListEvent::class.java,
+    OverlayTitleEvent::class.java,
+    ConnectionDetailsEvent::class.java,
+    OverlayDisconnectionEvent::class.java,
+    SelectingHotbarSlotSilentlyEvent::class.java,
+    ResetHotbarSlotSilentlyEvent::class.java,
 )
 
 inline fun <reified E : Event> eventFlow(): SharedFlow<E> =

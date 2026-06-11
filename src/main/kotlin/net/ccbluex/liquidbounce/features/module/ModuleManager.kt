@@ -192,6 +192,7 @@ import net.ccbluex.liquidbounce.features.module.modules.render.ModuleBetterInven
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleBlockESP
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleBlockOutline
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleBreadcrumbs
+import net.ccbluex.liquidbounce.features.module.modules.render.ModuleCapes
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleChams
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleClickGui
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleCombineMobs
@@ -208,6 +209,7 @@ import net.ccbluex.liquidbounce.features.module.modules.render.ModuleItemChams
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleItemESP
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleItemTags
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleJumpEffect
+import net.ccbluex.liquidbounce.features.module.modules.render.ModuleKillEffects
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleLogoffSpot
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleMobOwners
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleNewChunks
@@ -676,6 +678,8 @@ object ModuleManager : EventListener, Collection<ClientModule> by modules {
             ModuleSkinChanger,
             ModuleProtectionZones,
             ModuleCrosshair,
+            ModuleKillEffects,
+            ModuleCapes,
 
             // World
             ModuleAirPlace,

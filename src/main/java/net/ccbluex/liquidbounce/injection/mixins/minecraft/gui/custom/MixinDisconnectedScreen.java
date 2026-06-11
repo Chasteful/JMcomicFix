@@ -19,12 +19,15 @@
 
 package net.ccbluex.liquidbounce.injection.mixins.minecraft.gui.custom;
 
+import net.ccbluex.liquidbounce.event.EventManager;
+import net.ccbluex.liquidbounce.event.events.OverlayDisconnectionEvent;
 import net.ccbluex.liquidbounce.features.misc.HideAppearance;
 import net.ccbluex.liquidbounce.injection.mixins.minecraft.gui.MixinScreen;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.DisconnectedScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.network.DisconnectionDetails;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -49,11 +52,19 @@ public abstract class MixinDisconnectedScreen extends MixinScreen {
     @Final
     private Screen parent;
 
+
+    @Shadow
+    @Final
+    private DisconnectionDetails details;
+
     @Unique
     private Button disconnectButton;
 
+    @Unique
+    private boolean eventFired = false;
+
     @Inject(method = "init", at = @At("HEAD"))
-    private void injectButtons(final CallbackInfo callback) {
+    private void injectButtons(final CallbackInfo ci) {
         if (HideAppearance.INSTANCE.isHidingNow()) {
             return;
         }
@@ -65,21 +76,37 @@ public abstract class MixinDisconnectedScreen extends MixinScreen {
          */
         int x = this.width - 140;
         int y = this.height - 30;
-        disconnectButton = (this.minecraft.allowsMultiplayer() ?
+        if (this.minecraft != null) {
+            disconnectButton = (this.minecraft.allowsMultiplayer() ?
                 Button.builder(this.buttonText, button -> this.minecraft.setScreen(this.parent)) :
                 Button.builder(TO_TITLE, button -> this.minecraft.setScreen(new TitleScreen()))
-        ).bounds(x, y, 120, 20).build();
+            ).bounds(x, y, 120, 20).build();
+        }
         addRenderableWidget(disconnectButton);
+
+        if (!eventFired && this.parent != null && this.details != null) {
+            eventFired = true;
+
+            new Thread(() -> {
+                try {
+                    Thread.sleep(800);
+                } catch (InterruptedException ignored) {
+                }
+
+                EventManager.INSTANCE.callEvent(new OverlayDisconnectionEvent(
+                    parent,
+                    details.reason()
+                ));
+            }).start();
+        }
     }
 
     @Inject(method = "repositionElements", at = @At("HEAD"))
     private void moveButtons(final CallbackInfo callback) {
         if (disconnectButton != null) {
-            // fixes button position
             int x = this.width - 140;
             int y = this.height - 30;
             disconnectButton.setPosition(x, y);
         }
     }
-
 }

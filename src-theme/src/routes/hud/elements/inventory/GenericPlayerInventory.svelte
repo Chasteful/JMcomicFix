@@ -6,6 +6,7 @@
     import {onMount} from "svelte";
     import {getPlayerInventory} from "../../../../integration/rest";
 
+    export let settings: { [name: string]: any };
     export let rowLength: number;
     export let backgroundColor: string = "var(--inventory-background-color)";
     export let gap: string = "0.5rem";
@@ -24,6 +25,7 @@
 </script>
 
 <div class="inventory" style="
+    transform: scale({settings.scale}
     background-color: {backgroundColor};
     gap: {gap};
     --row-length: {rowLength};

@@ -7,5 +7,16 @@
     "horizontalOffset": 15,
     "verticalAlignment": "Top",
     "verticalOffset": 90
-  }
+  },
+  "values": [
+    {
+      "type": "FLOAT",
+      "name": "Scale",
+      "value": 1.0,
+      "range": {
+        "min": 0.5,
+        "max": 2.0
+      }
+    }
+  ]
 }

@@ -2,47 +2,89 @@
     import {fly} from "svelte/transition";
     import {notification, type TNotification} from "./notification_store";
     import {onMount} from "svelte";
+    import {get} from "svelte/store";
+    import {cubicOut} from 'svelte/easing';
+    import {Tween} from "svelte/motion";
 
-    interface NotificationWithId {
-        notification: TNotification;
-        id: number;
-    }
+    let progress = new Tween(1, {duration: 0, easing: cubicOut});
 
-    let notifications: NotificationWithId[] = [];
+    let currentNotification: TNotification | null = null;
+    let showNotification = false;
+    let timeoutHandle: ReturnType<typeof setTimeout> | null = null;
+    progress.set(1, {duration: 0});
+
 
     onMount(() => {
-       notifications = [];
+        if (get(notification)) notification.set(null);
+
+        const unsubscribe = notification.subscribe((n) => {
+            if (n) {
+
+                if (timeoutHandle) {
+                    clearTimeout(timeoutHandle);
+                    timeoutHandle = null;
+                }
+
+                currentNotification = n;
+                showNotification = true;
+                progress.set(1, {duration: 0});
+                timeoutHandle = setTimeout(() => {
+                    showNotification = false;
+                    timeoutHandle = null;
+                }, (n.delay ?? 3) * 1000);
+
+                progress.set(0, {
+                    duration: (n.delay ?? 3) * 1000,
+                    easing: cubicOut
+                });
+            } else {
+                showNotification = false;
+            }
+        });
+
+        return () => {
+            unsubscribe();
+            if (timeoutHandle) clearTimeout(timeoutHandle);
+        };
     });
 
-    notification.subscribe((v) => {
-        if (!v) {
-            return;
-        }
-        const id = Date.now();
-        const n = {
-            notification: v,
-            id
-        };
-        notifications = [...notifications, n];
-        setTimeout(() => {
-            notifications = notifications.filter(n => n.id !== id);
-        }, (v?.delay ?? 3) * 1000);
-    });
 </script>
 
-<div class="notifications">
-    {#each notifications as n (n.id)}
-        <div class="notification" transition:fly|global={{duration: 500, y: -100}}>
-            <div class="icon" class:error={n.notification.error}>
-                <img src="img/hud/notification/icon-info.svg" alt="info">
-            </div>
-            <div class="title">{n.notification.title}</div>
-            <div class="message">{n.notification.message}</div>
-        </div>
-    {/each}
-</div>
 
+<div class="notifications">
+    {#if showNotification && currentNotification}
+        {#key currentNotification.id || currentNotification.message}
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <div class="notification"
+                 transition:fly|global={{duration: 500, y: -100}}
+                 style="--progress: {progress.current}"
+                 on:click={() => {
+    if (currentNotification?.url) {
+        navigator.clipboard.writeText(currentNotification.url)
+            .then(() => {
+                               if (currentNotification) {
+                    currentNotification.message = "Link copied!";
+                }
+            })
+            .catch(err => console.error("Copy failed", err));
+    }
+}}
+                 on:outroend={() => {
+        if (!showNotification) currentNotification = null;
+     }}>
+
+                <div class="icon" class:error={currentNotification.error}>
+                    <img src="img/hud/notification/icon-info.svg" alt="info">
+                </div>
+                <div class="title">{currentNotification.title}</div>
+                <div class="message">{currentNotification.message}</div>
+            </div>
+        {/key}
+    {/if}
+</div>
 <style lang="scss">
+  @use "../../../../colors.scss" as *;
 
   .notifications {
     display: grid;
@@ -50,9 +92,11 @@
   }
 
   .notification {
+    position: relative;
     grid-row-start: 1;
     grid-column-start: 1;
-    background-color: var(--menu-header-notification-background-color);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
     border-radius: 5px;
     display: grid;
     grid-template-areas:
@@ -63,8 +107,26 @@
     padding-right: 10px;
     min-width: 350px;
 
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+      width: calc(100% * var(--progress));
+      background: linear-gradient(to left, rgba(100, 150, 255, 0.2), rgba(100, 150, 255, 0));
+      pointer-events: none;
+      transition: width 0.1s linear;
+      z-index: 0;
+    }
+
+    > * {
+      position: relative;
+      z-index: 1;
+    }
+
     .title {
-      color: var(--menu-text-color);
+      color: white;
       font-weight: 600;
       font-size: 18px;
       grid-area: b;
@@ -72,7 +134,7 @@
     }
 
     .message {
-      color: var(--menu-text-dimmed-color);
+      color: var(--text-color);
       font-weight: 500;
       grid-area: c;
     }
@@ -81,15 +143,11 @@
       grid-area: a;
       height: 65px;
       width: 65px;
-      background-color: var(--menu-header-notification-icon-background-color);
+      background-color: rgba(255, 255, 255, 0.1);
       display: flex;
       align-items: center;
       justify-content: center;
       margin-right: 10px;
-
-      &.error {
-        background-color: var(--menu-header-notification-icon-error-background-color);
-      }
     }
   }
 </style>

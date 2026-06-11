@@ -1,0 +1,26 @@
+{
+  "name": "Message",
+  "enabled": true,
+  "singleton": true,
+  "alignment": {
+    "horizontalAlignment": "CenterTranslated",
+    "horizontalOffset": 0,
+    "verticalAlignment": "Bottom",
+    "verticalOffset": 200
+  },
+  "tweaks": [
+    "DISABLE_HELD_ITEM_TOOL_TIP",
+    "DISABLE_OVERLAY_MESSAGE"
+  ],
+  "values": [
+    {
+      "type": "FLOAT",
+      "name": "Scale",
+      "value": 1.0,
+      "range": {
+        "min": 0.5,
+        "max": 2.0
+      }
+    }
+  ]
+}

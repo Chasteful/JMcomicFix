@@ -228,6 +228,7 @@ export interface PlayerData {
     armor: number;
     food: number;
     air: number;
+    ping: number;
     maxAir: number;
     experienceLevel: number;
     experienceProgress: number;
@@ -236,6 +237,12 @@ export interface PlayerData {
     offHandStack: ItemStack;
     armorItems: ItemStack[];
     scoreboard: Scoreboard;
+    serverAddress: String,
+    isDead: boolean,
+    winsCount:number;
+    killsCount: number;
+    deathCount: number;
+    playTime: number;
 }
 
 export interface StatusEffect {
@@ -267,6 +274,16 @@ export interface ItemStack {
     maxDamage: number;
     displayName: TextComponent | string;
     enchantments?: Record<string, number>;
+    dyedColor?: number;
+}
+
+export function getEffectiveEnchantmentStatus(item: ItemStack): boolean {
+    const specialEnchantedItems = new Set([
+        "minecraft:enchanted_golden_apple",
+        "minecraft:enchanted_book"
+    ]);
+
+    return item.enchantments != null || specialEnchantedItems.has(item.identifier);
 }
 
 export interface PrintableKey {
@@ -381,11 +398,8 @@ export interface GameWindow {
 export interface Theme {
     name: string;
     id: string;
-    colors: {
-        accent: number;
-        tint: number;
-    };
-    settings: { [name: string]: any };
+    colors: Record<string, number>;
+    settings: Record<string, any>;
 }
 
 export interface HudComponent {
@@ -430,6 +444,15 @@ export interface ClientInfo {
     viaFabricPlus: boolean;
     hasProtocolHack: boolean;
 }
+
+export interface ClientRelease {
+    tagName: string;
+    downloadUrl: string;
+    publishedAt: string;
+    prerelease: boolean;
+    error?: string;
+}
+
 
 export interface ClientUpdate {
     development: boolean;

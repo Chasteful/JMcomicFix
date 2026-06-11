@@ -18,6 +18,7 @@
     import TabbedClickGui from "./routes/clickgui/TabbedClickGui.svelte";
     import {intToRgba, rgbaToHex} from "./integration/util";
     import type {ThemeColorChangeEvent} from "./integration/events";
+    import ConnectionScreen from "./routes/menu/connected/ConnectionScreen.svelte";
 
     const routes = {
         "/clickgui": TabbedClickGui,
@@ -29,6 +30,7 @@
         "/singleplayer": Singleplayer,
         "/proxymanager": ProxyManager,
         "/none": None,
+        "/connecting": ConnectionScreen,
         "/disconnected": Disconnected,
         "/browser": Browser
     };
@@ -53,8 +55,13 @@
         return `color-mix(in srgb, ${leftColor} ${100 - strength}%, ${rightColor})`;
     }
 
-    function applyAccentColor(color: number) {
-        setThemeColor("accent-color", themeColorToHex(color));
+    function applyColors(colors: Record<string, number>) {
+        for (const [name, value] of Object.entries(colors)) {
+            setThemeColor(
+                `${name.toLowerCase()}-color`,
+                themeColorToHex(value)
+            );
+        }
     }
 
     function applyTintColor(defaultSurfaceColor: string, color: number) {
@@ -67,24 +74,22 @@
 
         let theme = await getTheme(metadata.id);
 
-        applyAccentColor(theme.colors.accent);
+        applyColors(theme.colors);
         applyTintColor(defaultSurfaceColor, theme.colors.tint);
 
         await insertPersistentData();
 
-        listenAlways("themeColorChange", async (event: ThemeColorChangeEvent) => {
-            if (event.themeId !== metadata?.id) {
+        listenAlways("themeColorChange", (event) => {
+            if (event.themeId !== metadata.id) {
                 return;
             }
 
-            switch (event.name) {
-                case "Accent":
-                    applyAccentColor(event.value);
-                    break;
-                case "Tint":
-                    applyTintColor(defaultSurfaceColor, event.value);
-                    break;
-            }
+            const name = event.name.toLowerCase();
+
+            setThemeColor(
+                `${name}-color`,
+                themeColorToHex(event.value)
+            );
         });
 
         if (isStatic) {

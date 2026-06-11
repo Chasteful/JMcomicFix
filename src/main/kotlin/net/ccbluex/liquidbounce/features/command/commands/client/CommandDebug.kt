@@ -92,7 +92,7 @@ object CommandDebug : Command.Factory {
     private fun createDebugJson(
         autoConfigPaste: String
     ) = JsonObject().apply {
-        add("client", JsonObject().apply {
+        add("jmcomicfix/api/services/client", JsonObject().apply {
             addProperty("name", LiquidBounce.CLIENT_NAME)
             addProperty("version", LiquidBounce.clientVersion)
             addProperty("commit", LiquidBounce.clientCommit)

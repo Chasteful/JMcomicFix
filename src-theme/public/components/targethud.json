@@ -4,8 +4,35 @@
   "singleton": true,
   "alignment": {
     "horizontalAlignment": "Center",
-    "horizontalOffset": 20,
+    "horizontalOffset": 120,
     "verticalAlignment": "CenterTranslated",
-    "verticalOffset": 0
-  }
+    "verticalOffset": 100
+  },
+  "values": [
+    {
+      "type": "FLOAT",
+      "name": "Scale",
+      "value": 1.0,
+      "range": {
+        "min": 0.5,
+        "max": 2.0
+      }
+    },
+    {
+      "type": "CHOOSE",
+      "name": "Mode",
+      "value": "Modern",
+      "choices": ["Simple", "Modern", "户籍"]
+    },
+    {
+      "type": "INT",
+      "name": "Timeout",
+      "value": 2000,
+      "range": {
+        "min": 0,
+        "max": 5000
+      },
+      "suffix": "ms"
+    }
+  ]
 }

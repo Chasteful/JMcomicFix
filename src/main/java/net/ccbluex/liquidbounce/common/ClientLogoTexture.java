@@ -53,7 +53,7 @@ public final class ClientLogoTexture extends ReloadableTexture {
 
     @Override
     public TextureContents loadContents(ResourceManager resourceManager) {
-        try (var stream = LiquidBounce.class.getResourceAsStream("/resources/liquidbounce/logo_banner.png")) {
+        try (var stream = LiquidBounce.class.getResourceAsStream("/resources/liquidbounce/contributor.png")) {
             var nativeImage = NativeImage.read(Objects.requireNonNull(stream));
 
             return new TextureContents(nativeImage, new TextureMetadataSection(true, false, MipmapStrategy.AUTO, TextureMetadataSection.DEFAULT_ALPHA_CUTOFF_BIAS));

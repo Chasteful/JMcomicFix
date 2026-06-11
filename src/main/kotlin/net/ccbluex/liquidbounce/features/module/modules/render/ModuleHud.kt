@@ -24,7 +24,9 @@ import net.ccbluex.liquidbounce.config.types.group.ValueGroup
 import net.ccbluex.liquidbounce.event.EventManager
 import net.ccbluex.liquidbounce.event.events.BrowserReadyEvent
 import net.ccbluex.liquidbounce.event.events.DisconnectEvent
+import net.ccbluex.liquidbounce.event.events.HudValueChangeEvent
 import net.ccbluex.liquidbounce.event.events.ScreenEvent
+import net.ccbluex.liquidbounce.event.events.ShadowValueChangeEvent
 import net.ccbluex.liquidbounce.event.events.SpaceSeperatedNamesChangeEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.misc.HideAppearance.isDestructed
@@ -37,6 +39,7 @@ import net.ccbluex.liquidbounce.integration.screen.CustomScreenType
 import net.ccbluex.liquidbounce.integration.screen.impl.CustomOverlay
 import net.ccbluex.liquidbounce.integration.theme.ThemeManager
 import net.ccbluex.liquidbounce.integration.theme.component.components.minimap.MinimapHudComponent
+import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.ccbluex.liquidbounce.utils.client.chat
 import net.ccbluex.liquidbounce.utils.client.inGame
 import net.ccbluex.liquidbounce.utils.client.markAsError
@@ -76,10 +79,48 @@ object ModuleHud : ClientModule("HUD", ModuleCategories.RENDER, state = true, hi
     }
 
     @Suppress("unused")
+    private val shadow by boolean("SpaceSeperatedNames", true).onChange { state ->
+        EventManager.callEvent(SpaceSeperatedNamesChangeEvent(state))
+        state
+    }
+
+    @Suppress("unused")
     private val spaceSeperatedNames by boolean("SpaceSeperatedNames", true).onChange { state ->
         EventManager.callEvent(SpaceSeperatedNamesChangeEvent(state))
         state
     }
+
+    class Customization : ValueGroup( "Customization") {
+        val hudZoom by float("ScaleFactor", 0.8f, 0.5f..2f).onChanged {
+            EventManager.callEvent(HudValueChangeEvent(ModuleHud))
+        }
+        val borderRadius by int("BorderRadius", 12, 1..24).onChanged {
+            EventManager.callEvent(HudValueChangeEvent(ModuleHud))
+        }
+        val shadowStrength by int("ShadowStrength", 16, 4..32).onChanged { state ->
+            EventManager.callEvent(HudValueChangeEvent(ModuleHud))
+        }
+        val clientName by text("ClientName", "").onChanged {
+            EventManager.callEvent(HudValueChangeEvent(ModuleHud))
+        }
+        val scoreboardIP by text("ScoreboardIP", "").onChanged {
+            EventManager.callEvent(HudValueChangeEvent(ModuleHud))
+        }
+        val primaryColor by color("Primary", Color4b.fromHex("#666666")).onChanged {
+            EventManager.callEvent(HudValueChangeEvent(ModuleHud))
+        }
+        val secondaryColor by color("Secondary", Color4b.fromHex("#A270FF")).onChanged {
+            EventManager.callEvent(HudValueChangeEvent(ModuleHud))
+        }
+        val shadowColor by color("Shadow", Color4b.fromHex("#232323")).onChanged {
+            EventManager.callEvent(HudValueChangeEvent(ModuleHud))
+        }
+    }
+
+    private val customization = tree(Customization())
+
+    val clientName: String
+        get() = customization.clientName
 
     val isBlurEffectActive
         get() = Blur.enabled && !(mc.options.hideGui && mc.screen == null)
@@ -89,6 +130,14 @@ object ModuleHud : ClientModule("HUD", ModuleCategories.RENDER, state = true, hi
     val components = tree(ValueGroup("AdditionalComponents")).apply {
         tree(MinimapHudComponent)
     }
+
+    fun getThemeColor(): Pair<Color4b, Color4b> =
+        customization.primaryColor to customization.secondaryColor
+    @JvmStatic
+    fun getPrimaryColor(): Color4b = customization.primaryColor
+
+    @JvmStatic
+    fun getSecondaryColor(): Color4b = customization.secondaryColor
 
     /**
      * Updates [themes] content

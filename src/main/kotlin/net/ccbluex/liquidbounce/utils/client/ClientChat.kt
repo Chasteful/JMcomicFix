@@ -25,6 +25,7 @@ import net.ccbluex.liquidbounce.event.EventManager
 import net.ccbluex.liquidbounce.event.events.NotificationEvent
 import net.ccbluex.liquidbounce.features.command.Command
 import net.ccbluex.liquidbounce.features.module.ClientModule
+import net.ccbluex.liquidbounce.features.module.modules.render.ModuleHud
 import net.ccbluex.liquidbounce.injection.mixins.minecraft.gui.MixinChatScreenAccessor
 import net.ccbluex.liquidbounce.interfaces.TextColorAddition
 import net.ccbluex.liquidbounce.lang.translation
@@ -43,11 +44,19 @@ import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
 import java.io.File
+import kotlin.text.append
+import kotlin.text.ifEmpty
 
 // Chat formatting
-private val clientPrefix: Component = "".asText()
+private fun getClientPrefix(): Component = "".asText()
     .withStyle(ChatFormatting.RESET, ChatFormatting.GRAY)
-    .append(gradientText("LiquidBounce", Color4b.fromHex("#4677ff"), Color4b.fromHex("#24AA7F")))
+    .append(
+        gradientText(
+            ModuleHud.clientName.ifEmpty { "JMcomicFix" },
+            ModuleHud.getThemeColor().first,
+            ModuleHud.getThemeColor().second
+        )
+    )
     .append(" ▸ ".asText().withStyle(ChatFormatting.RESET, ChatFormatting.GRAY))
 
 fun regular(text: MutableComponent): MutableComponent = text.withStyle(ChatFormatting.GRAY)
@@ -199,7 +208,7 @@ data class MessageMetadata(
 }
 
 fun chat(text: Component, metadata: MessageMetadata = defaultMessageMetadata) {
-    val realText = if (metadata.prefix) clientPrefix.copy().append(text) else text
+    val realText = if (metadata.prefix) getClientPrefix().copy().append(text) else text
 
     if (mc.player == null) {
         logger.info("(Chat) ${realText.string}")

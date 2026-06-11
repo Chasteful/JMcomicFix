@@ -1,9 +1,8 @@
 <script lang="ts">
     import {
-        deleteScreen,
         getAccounts,
         loginToAccount as loginToAccountRest,
-        orderAccounts,
+        openScreen, orderAccounts,
         removeAccount as restRemoveAccount,
         restoreSession,
         setAccountFavorite
@@ -28,8 +27,10 @@
     import type {
         AccountManagerAdditionEvent,
         AccountManagerLoginEvent,
+        AccountManagerMessageEvent
     } from "../../../integration/events.js";
     import DirectLoginModal from "./directLogin/DirectLoginModal.svelte";
+
 
     let premiumOnly = false;
     let favoritesOnly = false;
@@ -121,13 +122,13 @@
 <Menu>
     <OptionBar>
         <Search on:search={handleSearch}/>
-        <SwitchSetting title="Premium Only" bind:value={premiumOnly}/>
-        <SwitchSetting title="Favorites Only" bind:value={favoritesOnly}/>
-        <MultiSelect title="Account Type" options={["Mojang", "TheAltening"]} bind:values={accountTypes}/>
+        <SwitchSetting bind:value={premiumOnly} title="Premium Only"/>
+        <SwitchSetting bind:value={favoritesOnly} title="Favorites Only"/>
+        <MultiSelect bind:values={accountTypes} options={["Mojang", "TheAltening"]} title="Account Type"/>
     </OptionBar>
 
-    <MenuList sortable={accounts.length === renderedAccounts.length} elementCount={accounts.length}
-              on:sort={handleAccountSort}>
+    <MenuList elementCount={accounts.length} on:sort={handleAccountSort}
+              sortable={accounts.length === renderedAccounts.length}>
         {#key accounts}
             {#each renderedAccounts as account}
                 <MenuListItem
@@ -159,21 +160,16 @@
 
     <BottomButtonWrapper>
         <ButtonContainer>
-            <IconTextButton icon="icon-plus-circle.svg" title="Add" on:click={() => addAccountModalVisible = true}/>
-            <IconTextButton icon="icon-plane.svg" title="Direct" on:click={() => directLoginModalVisible = true}/>
-            <IconTextButton icon="icon-random.svg" disabled={renderedAccounts.length === 0} title="Random"
-                            on:click={loginToRandomAccount}/>
-            <IconTextButton icon="icon-refresh.svg" title="Restore" on:click={restoreSession}/>
+            <IconTextButton icon="icon-plus-circle.svg" on:click={() => addAccountModalVisible = true} title="Add"/>
+            <IconTextButton icon="icon-plane.svg" on:click={() => directLoginModalVisible = true} title="Direct"/>
+            <IconTextButton disabled={renderedAccounts.length === 0} icon="icon-random.svg"
+                            on:click={loginToRandomAccount}
+                            title="Random"/>
+            <IconTextButton icon="icon-refresh.svg" on:click={restoreSession} title="Restore"/>
         </ButtonContainer>
 
         <ButtonContainer>
-            <IconTextButton icon="icon-back.svg" title="Back" on:click={() => deleteScreen()}/>
+            <IconTextButton icon="icon-back.svg" on:click={() => openScreen("title")} title="Back"/>
         </ButtonContainer>
     </BottomButtonWrapper>
 </Menu>
-
-<style lang="scss">
-  .uuid {
-    font-family: monospace;
-  }
-</style>

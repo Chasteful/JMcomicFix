@@ -6,7 +6,33 @@
     "horizontalAlignment": "Right",
     "horizontalOffset": 15,
     "verticalAlignment": "Bottom",
-    "verticalOffset": 15
+    "verticalOffset": 75
   },
+  "values": [
+    {
+      "type": "FLOAT",
+      "name": "Scale",
+      "value": 1.0,
+      "range": {
+        "min": 0.5,
+        "max": 2.0
+      }
+    },
+    {
+      "type": "CHOOSE",
+      "name": "Mode",
+      "value": "Modern",
+      "choices": [
+        "Simple",
+        "Modern",
+        "Hanabi"
+      ]
+    },
+    {
+      "type": "BOOLEAN",
+      "name": "Forcedenglish",
+      "value": true
+    }
+  ],
   "tweaks": ["DISABLE_STATUS_EFFECT_OVERLAY"]
 }

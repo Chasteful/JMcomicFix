@@ -10,21 +10,49 @@
   },
   "values": [
     {
+      "type": "FLOAT",
+      "name": "Scale",
+      "value": 1.0,
+      "range": {
+        "min": 0.5,
+        "max": 2.0
+      }
+    },
+    {
+      "type": "CHOOSE",
+      "name": "Mode",
+      "value": "Rise",
+      "choices": [
+        "Simple",
+        "Rise"
+      ]
+    },
+    {
       "type": "BOOLEAN",
-      "name": "ShowTags",
-      "value": true
+      "name": "Scoreboard",
+      "value": false
     },
     {
-      "type": "CHOOSE",
-      "name": "ItemAlignment",
-      "value": "Right",
-      "choices": ["Left", "Right"]
-    },
-    {
-      "type": "CHOOSE",
-      "name": "Order",
-      "value": "Descending",
-      "choices": ["Ascending", "Descending"]
+      "type": "MULTI_CHOOSE",
+      "name": "Prefix",
+      "value": [
+        "CHOICE",
+        "INT",
+        "FLOAT"
+      ],
+      "choices": [
+        "CHOICE",
+        "CHOOSE",
+        "MULTI_CHOOSE",
+        "INT_RANGE",
+        "FLOAT_RANGE",
+        "INT",
+        "FLOAT",
+        "TEXT"
+      ],
+      "canBeNone": true
     }
-  ]
+
+  ],
+  "tweaks": ["DISABLE_SCOREBOARD"]
 }

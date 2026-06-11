@@ -797,5 +797,7 @@
   "liquidbounce.module.newChunks.description": "高亮显示可能是新生成的区块。",
   "liquidbounce.module.strongholdFinder.description": "跟踪末影之眼投掷并预测最可能的要塞区块候选。",
   "liquidbounce.module.strongholdFinder.messages.sampleCaptured": "已采集样本（#%s）。",
-  "liquidbounce.module.strongholdFinder.messages.bestChunk": "最佳区块：%s, %s（p=%s%%）。"
+  "liquidbounce.module.strongholdFinder.messages.bestChunk": "最佳区块：%s, %s（p=%s%%）。",
+  "liquidbounce.module.capes.description": "仅你可见的自定义披风。",
+  "liquidbounce.module.killEffects.description": "在你击杀目标时显示一些效果。"
 }

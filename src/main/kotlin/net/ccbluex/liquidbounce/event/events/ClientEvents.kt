@@ -57,6 +57,15 @@ class ClickGuiScaleChangeEvent(val value: Float) : Event(), WebSocketEvent
 @Tag("clickGuiValueChange")
 class ClickGuiValueChangeEvent(val configurable: ValueGroup) : Event(), WebSocketEvent
 
+@Tag("hudValueChange")
+class HudValueChangeEvent(val configurable: ValueGroup) : Event(),WebSocketEvent
+
+@Tag("shadowValueChange")
+class ShadowValueChangeEvent(val value: Boolean) : Event(), WebSocketEvent
+
+@Tag("nameProtectValueChange")
+class NameProtectEvent(val configurable: ValueGroup) : Event(),WebSocketEvent
+
 @Tag("spaceSeperatedNamesChange")
 class SpaceSeperatedNamesChangeEvent(val value: Boolean) : Event(), WebSocketEvent
 
@@ -84,7 +93,7 @@ object RefreshArrayListEvent : Event(), WebSocketEvent
 @Tag("notification")
 class NotificationEvent(val title: String, val message: String, val severity: Severity) : Event(), WebSocketEvent {
     enum class Severity {
-        INFO, SUCCESS, ERROR, ENABLED, DISABLED
+        INFO, SUCCESS, ERROR, ENABLED, DISABLED, BLINK, BLINKED, BLINKING
     }
 }
 
@@ -92,7 +101,7 @@ class NotificationEvent(val title: String, val message: String, val severity: Se
 class GameModeChangeEvent(val gameMode: GameType) : Event(), WebSocketEvent
 
 @Tag("targetChange")
-class TargetChangeEvent(val target: PlayerData?) : Event(), WebSocketEvent
+class TargetChangeEvent(val target: PlayerData?,val distant: Float) : Event(), WebSocketEvent
 
 @Tag("blockCountChange")
 class BlockCountChangeEvent(val nextBlock: Block?, val count: Int?) : Event(), WebSocketEvent
@@ -238,4 +247,10 @@ object UserLoggedInEvent : Event(), WebSocketEvent
 
 @Tag("userLoggedOut")
 object UserLoggedOutEvent : Event(), WebSocketEvent
+
+@Tag("selectingHotbarSlotSilently")
+class SelectingHotbarSlotSilentlyEvent : Event(), WebSocketEvent
+
+@Tag("resetHotbarSlotSilently")
+class ResetHotbarSlotSilentlyEvent : Event(), WebSocketEvent
 

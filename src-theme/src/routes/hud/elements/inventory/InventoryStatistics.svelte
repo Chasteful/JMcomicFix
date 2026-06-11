@@ -65,6 +65,7 @@
 </script>
 
 <GenericPlayerInventory
+        settings={settings}
         rowLength={cSettings.rowLength}
         backgroundColor="transparent"
         gap="2px"

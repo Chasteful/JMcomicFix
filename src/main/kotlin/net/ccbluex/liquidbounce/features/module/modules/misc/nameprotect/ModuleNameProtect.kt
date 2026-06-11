@@ -23,7 +23,9 @@ import net.ccbluex.fastutil.LfuCache
 import net.ccbluex.fastutil.Pool
 import net.ccbluex.fastutil.Pool.Companion.use
 import net.ccbluex.liquidbounce.config.types.group.ToggleableValueGroup
+import net.ccbluex.liquidbounce.event.EventManager
 import net.ccbluex.liquidbounce.event.events.GameTickEvent
+import net.ccbluex.liquidbounce.event.events.NameProtectEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.misc.FriendManager
 import net.ccbluex.liquidbounce.features.module.ClientModule
@@ -52,6 +54,11 @@ private const val DEFAULT_CACHE_SIZE = 512
 object ModuleNameProtect : ClientModule("NameProtect", ModuleCategories.MISC) {
 
     private val replacement by text("Replacement", "You")
+
+    @Suppress("unused")
+    private val applyGarbled by boolean("Garbled", false).onChanged {
+        EventManager.callEvent(NameProtectEvent(ModuleNameProtect))
+    }
 
     private val colorMode = choices<GenericColorMode<Unit>>(
         "ColorMode",

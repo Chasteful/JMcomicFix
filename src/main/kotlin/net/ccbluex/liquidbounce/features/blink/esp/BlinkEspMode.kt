@@ -30,6 +30,7 @@ import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.ccbluex.liquidbounce.render.renderEnvironmentForWorld
 import net.ccbluex.liquidbounce.render.withPositionRelativeToCamera
 import net.ccbluex.liquidbounce.utils.aiming.data.Rotation
+import net.ccbluex.liquidbounce.utils.render.WireframeEntity
 import net.ccbluex.liquidbounce.utils.render.WireframePlayer
 import net.ccbluex.liquidbounce.utils.render.isCustom
 import net.ccbluex.liquidbounce.utils.render.scaleLightCoords
@@ -135,17 +136,15 @@ class BlinkEspWireframe(
     private val color by color("Color", Color4b(36, 32, 147, 87))
     private val outlineColor by color("OutlineColor", Color4b(36, 32, 147, 255))
 
-    private val wireframePlayer = WireframePlayer()
 
     @Suppress("unused")
     private val renderHandler = handler<WorldRenderEvent> {
         val (entity, pos, rotation) = this.getEspData.get() ?: return@handler
 
-        wireframePlayer.pos = pos
-        wireframePlayer.pose = entity.pose
-        wireframePlayer.swimAmount = (entity as? LivingEntity)?.getSwimAmount(it.partialTicks) ?: 0f
-        wireframePlayer.setRotation(rotation)
-        wireframePlayer.render(it, color, outlineColor)
+        val wireframeEntity = WireframeEntity(
+            pos, entity.yRot, entity.xRot, entity
+        )
+        wireframeEntity.render(it, color, outlineColor)
     }
 }
 

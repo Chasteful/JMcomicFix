@@ -1,11 +1,37 @@
 {
   "name": "Inventory",
-  "enabled": false,
+  "enabled": true,
   "singleton": true,
   "alignment": {
-    "horizontalAlignment": "Right",
-    "horizontalOffset": 35,
-    "verticalAlignment": "Bottom",
-    "verticalOffset": 35
-  }
+    "horizontalAlignment": "Left",
+    "horizontalOffset": 5,
+    "verticalAlignment": "CenterTranslated",
+    "verticalOffset": 80
+  },
+  "values": [
+    {
+      "type": "FLOAT",
+      "name": "Scale",
+      "value": 1.0,
+      "range": {
+        "min": 0.5,
+        "max": 2.0
+      }
+    },
+    {
+      "type": "BOOLEAN",
+      "name": "Title",
+      "value": true
+    },
+    {
+      "type": "BOOLEAN",
+      "name": "Divider",
+      "value": false
+    },
+    {
+      "type": "BOOLEAN",
+      "name": "Gradient",
+      "value": false
+    }
+  ]
 }

@@ -10,6 +10,15 @@
   },
   "values": [
     {
+      "type": "FLOAT",
+      "name": "Scale",
+      "value": 1.5,
+      "range": {
+        "min": 0.5,
+        "max": 2.0
+      }
+    },
+    {
       "type": "REGISTRY_LIST",
       "name": "Items",
       "innerValueType": "ITEM",

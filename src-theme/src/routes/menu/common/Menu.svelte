@@ -2,22 +2,35 @@
     import Header from "./header/Header.svelte";
     import {fly} from "svelte/transition";
     import {onMount} from "svelte";
+    import {location} from "svelte-spa-router";
+    import Background from "./Background.svelte";
 
-    const transitionDuration = 700; // TODO: suboptimal
 
+    const transitionDuration = 700;
     let ready = false;
+
+    const noAccountPaths = ["/altmanager", "/disconnected"];
+    const noHeaderPaths = ["/lockscreen", "/disconnected"];
+    const BackgroundPaths = ["lockscreen",];
+
 
     onMount(() => {
         setTimeout(() => {
             ready = true;
         }, transitionDuration);
     });
+    $: showAccount = !noAccountPaths.includes($location);
+    $: showHeader = !noHeaderPaths.includes($location);
+    $: showBackground = BackgroundPaths.includes($location);
+
 </script>
 
 <div class="menu">
     {#if ready}
         <div transition:fly|global={{duration: 700, y: -100}}>
-            <Header/>
+            <Header showAccount={showAccount}
+                    showHeader={showHeader}
+            />
         </div>
 
         <div class="menu-wrapper">
@@ -25,7 +38,7 @@
         </div>
     {/if}
 </div>
-
+<Background showBackground={showBackground}/>
 <style lang="scss">
   .menu {
     padding: 50px;

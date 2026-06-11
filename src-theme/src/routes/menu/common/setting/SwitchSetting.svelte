@@ -7,73 +7,90 @@
     const dispatch = createEventDispatcher();
 </script>
 
-<label class="switch-setting">
-    <span class="switch">
-        <input type="checkbox" bind:checked={value} on:change={() => dispatch("change")}/>
-        <span class="slider"></span>
-    </span>
-
-    <span class="title">{title}</span>
-</label>
+<div class="switch-setting">
+    <label class="switch">
+        <input bind:checked={value} on:change={() => dispatch("change")} type="checkbox"/>
+        <span class="checkbox"></span>
+    </label>
+    <div class="title">{title}</div>
+</div>
 
 <style lang="scss">
+  @use "sass:color";
+  @use "../../../../colors.scss" as *;
+
+  $text: var(--text-color);
 
   .switch-setting {
     display: flex;
     align-items: center;
-    cursor: pointer;
+    justify-content: flex-start;
+    margin: 10px 0;
+    transition: all 0.3s ease;
   }
 
   .title {
-    color: var(--menu-text-color);
-    font-size: 20px;
-    margin-left: 10px;
+    color: $text;
+    font-size: 22px;
+    margin-left: 12px;
     font-weight: 500;
-  }
-
-  .slider {
-    position: absolute;
-    top: 2px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: var(--menu-switch-track-color);
-    transition: ease 0.4s;
-    height: 14px;
-    border-radius: 10px;
-
-    &::before {
-      position: absolute;
-      content: "";
-      height: 21px;
-      width: 21px;
-      top: -4px;
-      left: -10px;
-      background-color: var(--menu-switch-thumb-color);
-      transition: ease 0.4s;
-      border-radius: 50%;
-    }
+    transition: color 0.2s ease-in-out;
   }
 
   .switch {
     position: relative;
     display: flex;
-    width: 28px;
-    height: 18px;
     align-items: center;
-    margin: 0 10px;
+    cursor: pointer;
+  }
 
-    input {
-      display: none;
+  .checkbox {
+    display: block;
+    position: relative;
+    width: 32px;
+    height: 32px;
+    background-color: rgba($base, 0.5);
+    border-radius: 10px;
+    border: 2px solid rgba(white, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
+
+  }
+
+  input {
+    display: none;
+  }
+
+  input:checked + .checkbox {
+    background-color: $text;
+    box-shadow: 0 0 12px 3px rgba($text, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.1);
+    animation: pulse 0.5s ease-out;
+  }
+
+  .switch:hover .checkbox {
+    box-shadow: 0 0 12px 3px rgba($text, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.1);
+  }
+
+  .switch:focus-within .checkbox {
+    outline: 2px solid $text;
+  }
+
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 12px 3px rgba($text, 0.4),
+      inset 0 1px 2px rgba(255, 255, 255, 0.1),
+      0 0 0 0 rgba($text, 0.7);
     }
-
-    input:checked + .slider {
-      background-color: var(--menu-switch-track-active-color);
+    70% {
+      box-shadow: 0 0 12px 3px rgba($text, 0.4),
+      inset 0 1px 2px rgba(255, 255, 255, 0.1),
+      0 0 0 8px rgba($text, 0);
     }
-
-    input:checked + .slider:before {
-      transform: translateX(27px);
-      background-color: var(--menu-switch-thumb-active-color);
+    100% {
+      box-shadow: 0 0 12px 3px rgba($text, 0.4),
+      inset 0 1px 2px rgba(255, 255, 255, 0.1);
     }
   }
 </style>

@@ -22,7 +22,9 @@ import net.ccbluex.liquidbounce.additions.realSelectedSlot
 import net.ccbluex.liquidbounce.event.EventListener
 import net.ccbluex.liquidbounce.event.EventManager
 import net.ccbluex.liquidbounce.event.events.GameTickEvent
+import net.ccbluex.liquidbounce.event.events.ResetHotbarSlotSilentlyEvent
 import net.ccbluex.liquidbounce.event.events.SelectHotbarSlotSilentlyEvent
+import net.ccbluex.liquidbounce.event.events.SelectingHotbarSlotSilentlyEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.ModuleScaffold
 import net.ccbluex.liquidbounce.utils.inventory.HotbarItemSlot
@@ -63,11 +65,13 @@ object SilentHotbar : EventListener {
 
         hotbarState = SilentHotbarState(slot, requester, ticksUntilReset, clientsideSlot)
         ticksSinceLastUpdate = 0
+        EventManager.callEvent(SelectingHotbarSlotSilentlyEvent())
     }
 
     fun resetSlot(requester: Any?) {
         if (hotbarState?.requester == requester) {
             hotbarState = null
+            EventManager.callEvent(ResetHotbarSlotSilentlyEvent())
         }
     }
 
@@ -84,6 +88,7 @@ object SilentHotbar : EventListener {
 
         if (ticksSinceLastUpdate >= hotbarState.ticksUntilReset) {
             this.hotbarState = null
+            EventManager.callEvent(ResetHotbarSlotSilentlyEvent())
             return@handler
         }
 

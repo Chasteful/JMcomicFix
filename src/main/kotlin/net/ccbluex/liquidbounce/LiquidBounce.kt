@@ -87,12 +87,15 @@ import net.ccbluex.liquidbounce.utils.inventory.EnderChestInventoryTracker
 import net.ccbluex.liquidbounce.utils.inventory.InventoryManager
 import net.ccbluex.liquidbounce.utils.kotlin.EventPriorityConvention.FIRST_PRIORITY
 import net.ccbluex.liquidbounce.utils.kotlin.Minecraft
+import net.ccbluex.liquidbounce.utils.session.PlayTimeTracker
 import net.minecraft.resources.Identifier
 import net.minecraft.server.packs.resources.PreparableReloadListener
 import net.minecraft.server.packs.resources.ReloadableResourceManager
 import java.io.InputStream
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import kotlin.time.measureTime
 
 /**
@@ -286,6 +289,11 @@ object LiquidBounce : EventListener {
         ItemImageAtlas
 
         scriptEngineJob.join()
+
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(
+            { PlayTimeTracker.update()},
+            0, 1, TimeUnit.SECONDS
+        )
     }
 
     /**

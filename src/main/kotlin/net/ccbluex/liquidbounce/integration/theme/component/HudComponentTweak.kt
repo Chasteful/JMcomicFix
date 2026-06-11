@@ -34,15 +34,18 @@ enum class HudComponentTweak(override val tag: String) : Tagged {
      *   items in the overlay or via component
      */
     TWEAK_HOTBAR("tweakHotbar"),
-
+    DISABLE_ITEM_ICONS("disableItemIcons"),
     DISABLE_CROSSHAIR("disableCrosshair"),
     DISABLE_SCOREBOARD("disableScoreboard"),
     DISABLE_STATUS_BAR("disableStatusBar"),
     DISABLE_EXP_BAR("disableExpBar"),
     DISABLE_HELD_ITEM_TOOL_TIP("disableHeldItemToolTip"),
     DISABLE_OVERLAY_MESSAGE("disableOverlayMessage"),
+    DISABLE_TITLE("disableTitle"),
     DISABLE_STATUS_EFFECT_OVERLAY("disableStatusEffectOverlay"),
-    DISABLE_LOCATOR_BAR("disableLocatorBar");
-
+    DISABLE_LOCATOR_BAR("disableLocatorBar"),
+    DISABLE_CHAT_HUD("disableChat"),
+    DISABLE_PLAYER_LIST_HUD("disablePlayerListHud"),
+    DISABLE_ALL_GAME_HUD("disableAllGameHud");
 
 }

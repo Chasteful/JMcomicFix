@@ -57,6 +57,7 @@ object ModuleBlink : ClientModule("Blink", ModuleCategories.PLAYER) {
     private val dummy by boolean("Dummy", false)
     private val ambush by boolean("Ambush", false)
     private val autoDisable by boolean("AutoDisable", true)
+    private val notification by boolean("Notification", true)
 
     private object AutoResetOption : ToggleableValueGroup(this, "AutoReset", false) {
         val resetAfter by int("ResetAfter", 100, 1..1000)
@@ -65,6 +66,10 @@ object ModuleBlink : ClientModule("Blink", ModuleCategories.PLAYER) {
 
     private var dummyPlayer: RemotePlayer? = null
     private var tickCounter = 0
+
+    private var lastNotifyTime = 0L
+    private var lastNotifyCount = -1
+    private var blinkPacketCount = 0
 
     init {
         tree(AutoResetOption)
@@ -85,12 +90,26 @@ object ModuleBlink : ClientModule("Blink", ModuleCategories.PLAYER) {
             world.addEntity(clone)
 
             dummyPlayer = clone
+            notification(
+                "Blink",
+                "Currently storing packets for later send.",
+                NotificationEvent.Severity.BLINK
+            )
         }
     }
 
     override fun onDisabled() {
+        notification(
+            "Blink",
+            "Currently storing packets for later send.",
+            NotificationEvent.Severity.BLINKED
+        )
+
         directions.forEach { BlinkManager.flush(it) }
         removeClone()
+
+        blinkPacketCount = 0
+        lastNotifyCount = -1
     }
 
     private fun removeClone() {
@@ -115,7 +134,21 @@ object ModuleBlink : ClientModule("Blink", ModuleCategories.PLAYER) {
             return@handler
         }
     }
+    @Suppress("unused")
+    private val blinkNotifyHandler = tickHandler {
+        if (!notification || blinkPacketCount <= 0) return@tickHandler
 
+        val now = System.currentTimeMillis()
+        if (blinkPacketCount != lastNotifyCount || now - lastNotifyTime > 1000L) {
+            lastNotifyTime = now
+            lastNotifyCount = blinkPacketCount
+
+            notification(
+                "Blink", "Currently storing $blinkPacketCount packets.",
+                NotificationEvent.Severity.BLINKING
+            )
+        }
+    }
     @Suppress("unused")
     private val tickTask = tickHandler {
         if (ModuleAutoDodge.enabled) {
@@ -158,7 +191,7 @@ object ModuleBlink : ClientModule("Blink", ModuleCategories.PLAYER) {
                     dummyPlayer?.copyPosition(player)
                 }
             }
-
+            blinkPacketCount = 0
             notification("Blink", "Auto reset", NotificationEvent.Severity.INFO)
             if (autoDisable) {
                 enabled = false
@@ -170,6 +203,7 @@ object ModuleBlink : ClientModule("Blink", ModuleCategories.PLAYER) {
     private val fakeLagHandler = handler<BlinkPacketEvent> { event ->
         if (directions.contains(event.origin)) {
             event.action = Action.QUEUE
+            blinkPacketCount++
         }
     }
 

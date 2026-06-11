@@ -1,0 +1,46 @@
+{
+  "name": "SessionInfo",
+  "enabled": true,
+  "singleton": true,
+  "alignment": {
+    "horizontalAlignment": "Left",
+    "horizontalOffset": 250,
+    "verticalAlignment": "Top",
+    "verticalOffset": 90
+  },
+  "values": [
+    {
+      "type": "FLOAT",
+      "name": "Scale",
+      "value": 1.0,
+      "range": {
+        "min": 0.5,
+        "max": 2.0
+      }
+    },
+    {
+      "type": "CHOOSE",
+      "name": "Mode",
+      "value": "Ambient",
+      "choices": [
+        "Simple",
+        "Ambient"
+      ]
+    },
+    {
+      "type": "BOOLEAN",
+      "name": "Title",
+      "value": true
+    },
+    {
+      "type": "BOOLEAN",
+      "name": "Divider",
+      "value": true
+    },
+    {
+      "type": "BOOLEAN",
+      "name": "Gradient",
+      "value": false
+    }
+  ]
+}

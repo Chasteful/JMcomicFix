@@ -52,35 +52,29 @@ import net.minecraft.client.CameraType
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.renderer.texture.AbstractTexture
 import net.minecraft.util.Mth
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
-import org.joml.Matrix3x2f
 import org.joml.Vector2f
 import kotlin.math.atan2
 
 /**
  * Radar module
  *
- * Shows the direction of rendered entities on GUI.
+ * Shows the direction of rendered entities on GUI with smoothed Yaw and Pitch.
  */
 object ModuleRadar : ClientModule("Radar", ModuleCategories.RENDER, aliases = listOf("PointerESP")) {
+    private val onlyPlayers by boolean("OnlyPlayers", false)
 
     private val tiltModes = choices("Tilt", 0) {
-        arrayOf(TiltMode.Static, TiltMode.ByPitch)
+        arrayOf(TiltMode.ByPitch, TiltMode.Static)
     }
 
     private sealed class TiltMode(name: String) : Mode(name) {
         final override val parent: ModeValueGroup<*>
             get() = tiltModes
 
-        abstract fun transform(pose: Matrix3x2f, partialTick: Float)
+        abstract fun getTargetScaleY(partialTick: Float): Float
 
-        object Static : TiltMode("Static") {
-            private val angle by float("Angle", 90f, -90f..90f, "deg")
-
-            override fun transform(pose: Matrix3x2f, partialTick: Float) {
-                pose.scale(1f, angle.fastSin())
-            }
-        }
 
         object ByPitch : TiltMode("ByPitch") {
             private val limitation by floatRange("Limitation", 45f..90f, 0f..90f, "deg").onChanged {
@@ -88,30 +82,30 @@ object ModuleRadar : ClientModule("Radar", ModuleCategories.RENDER, aliases = li
             }
             private var limitationNeg: ClosedFloatingPointRange<Float> = -limitation
 
-            override fun transform(pose: Matrix3x2f, partialTick: Float) {
-                val pitchRad = run {
-                    val pitch = player.getXRot(partialTick)
-                    if (pitch >= 0) {
-                        pitch.coerceIn(limitation)
-                    } else {
-                        pitch.coerceIn(limitationNeg)
-                    }
-                }.toRadians()
+            override fun getTargetScaleY(partialTick: Float): Float {
+                val pitch = player.getXRot(partialTick)
+                val coercedPitch = if (pitch >= 0f) {
+                    pitch.coerceIn(limitation)
+                } else {
+                    pitch.coerceIn(limitationNeg)
+                }
+                return coercedPitch.toRadians().fastSin()
+            }
+        }
 
-                pose.scale(1f, pitchRad.fastSin())
+        object Static : TiltMode("Static") {
+            private val angle by float("Angle", 45f, -90f..90f, "deg")
+            override fun getTargetScaleY(partialTick: Float): Float {
+                return angle.fastSin()
             }
         }
     }
 
-    private val radius by float("Radius", 40f, 2f..200f)
-
-    private val onlyPlayers by boolean("OnlyPlayers", false)
-
-    private val pointerModes = choices("PointerMode", 0) {
+    private val pointerModes = choices("Mode", 0) {
         arrayOf(
+            PointerMode.ImageMode("Triangle1", LiquidBounce.resource("misc/triangle1.png").readNativeImage()),
+            PointerMode.ImageMode("triangle2", LiquidBounce.resource("misc/triangle2.png").readNativeImage()),
             PointerMode.Triangle,
-            PointerMode.ImageMode("Image1", LiquidBounce.resource("misc/triangle1.png").readNativeImage()),
-            PointerMode.ImageMode("Image2", LiquidBounce.resource("misc/triangle2.png").readNativeImage()),
         )
     }
 
@@ -122,7 +116,7 @@ object ModuleRadar : ClientModule("Radar", ModuleCategories.RENDER, aliases = li
         context(ctx: GuiGraphicsExtractor)
         abstract fun draw(color: Color4b)
 
-        object Triangle : PointerMode("Triangle") {
+        object Triangle : PointerMode("Render") {
             private val width by float("Width", 8f, 1f..100f)
             private val height by float("Height", 10f, 1f..100f)
             private val tailConcaveSize by float("TailConcaveSize", 2f, 0f..50f).onChange {
@@ -161,13 +155,16 @@ object ModuleRadar : ClientModule("Radar", ModuleCategories.RENDER, aliases = li
         class ImageMode(name: String, val texture: AbstractTexture) : PointerMode(name) {
             constructor(name: String, nativeImage: NativeImage) : this(name, nativeImage.asTexture { "Radar $name" })
 
-            private val size by float("Size", 10f, 1f..100f)
+            private val size by float("Size", 20f, 1f..100f)
 
             context(ctx: GuiGraphicsExtractor)
             override fun draw(color: Color4b) {
+                val (width, height) = mc.window.scaledDimension
+                val minDimension = width.coerceAtMost(height)
+                val adaptiveSize = size * (minDimension / 1000f)
                 ctx.drawTexQuad(
                     texture.textureSetup,
-                    -size / 2f, 0f, size / 2f, size,
+                    -adaptiveSize / 2f, 0f, adaptiveSize / 2f, adaptiveSize,
                     u1 = 1f, v1 = 1f, u2 = 0f, v2 = 0f,
                     argb = color.argb,
                     pipeline = ClientRenderPipelines.GUI.TexQuadNoCull,
@@ -192,14 +189,25 @@ object ModuleRadar : ClientModule("Radar", ModuleCategories.RENDER, aliases = li
         yAxis = "Alpha" axis 0f..1f,
     )
 
-    override fun onEnabled() {
-        RenderedEntities.subscribe(this)
-        super.onEnabled()
-    }
+    private val smoothingFactor by float(
+        "SmoothingFactor",
+        0.1f,
+        0.05f..1f
+    )
+    private val radius by float("Radius", 100f, 50f..200f)
+
+    private val pointerStates = mutableMapOf<Entity, Pair<Float, Float>>()
 
     override fun onDisabled() {
+        pointerStates.clear()
         RenderedEntities.unsubscribe(this)
         super.onDisabled()
+    }
+
+    override fun onEnabled() {
+        pointerStates.clear()
+        RenderedEntities.subscribe(this)
+        super.onEnabled()
     }
 
     @Suppress("unused")
@@ -209,38 +217,53 @@ object ModuleRadar : ClientModule("Radar", ModuleCategories.RENDER, aliases = li
                 val (width, height) = mc.window.scaledDimension
                 translate(width * 0.5f, height * 0.5f)
 
-                val yawRad = player.getYRot(it.tickDelta).toRadians()
+                val yawDeg = player.getYRot(it.tickDelta)
                 val playerPos = player.interpolateCurrentPosition(it.tickDelta)
 
-                tiltModes.activeMode.transform(this, it.tickDelta)
+                val targetScaleY = tiltModes.activeMode.getTargetScaleY(it.tickDelta)
 
                 if (mc.options.cameraType == CameraType.THIRD_PERSON_FRONT) {
                     scale(-1f, 1f)
                 }
 
-                rotate(-yawRad)
 
                 for (entity in RenderedEntities) {
                     if (entity === player || (onlyPlayers && entity !is Player)) continue
                     val entityPos = entity.interpolateCurrentPosition(it.tickDelta)
-
                     val cameraDistance = entityPos.cameraDistance().toFloat()
                     val alpha = (alpha.transform(cameraDistance) * 255).floorToInt()
                     if (alpha == 0) continue
 
                     val color = colorModes.activeMode.getColor(entity).alpha(alpha)
+                    val minDimension = width.coerceAtMost(height)
+                    val adaptiveRadius = radius * (minDimension / 1000f)
 
                     val diffX = entityPos.x - playerPos.x
                     val diffZ = entityPos.z - playerPos.z
+                    val rawAngleDeg = Math.toDegrees(atan2(diffZ, diffX)).toFloat() + 90f
+                    val viewYaw = if (mc.options.cameraType == CameraType.THIRD_PERSON_FRONT) -yawDeg else yawDeg
+                    val targetAngleDeg = rawAngleDeg - viewYaw
+
+                    val (prevAngleDeg, prevScaleY) = pointerStates.getOrPut(entity) {
+                        Pair(targetAngleDeg, targetScaleY)
+                    }
+
+                    val smoothedAngleDeg = Mth.rotLerp(smoothingFactor, prevAngleDeg, targetAngleDeg)
+                    val smoothedScaleY = Mth.lerp(smoothingFactor, prevScaleY, targetScaleY)
+
+                    pointerStates[entity] = Pair(smoothedAngleDeg, smoothedScaleY)
 
                     withPush {
-                        rotate(atan2(diffZ, diffX).toFloat() + Mth.HALF_PI)
-                        translate(0f, radius)
+                        scale(1f, smoothedScaleY)
+                        rotate(smoothedAngleDeg.toRadians())
+                        translate(0f, adaptiveRadius)
+
                         with(this@with) {
-                            pointerModes.activeMode.draw(color = color)
+                            pointerModes.activeMode.draw(color)
                         }
                     }
                 }
+                pointerStates.keys.retainAll(RenderedEntities.toSet())
             }
         }
     }

@@ -1,0 +1,22 @@
+{
+  "name": "MotionGraph",
+  "enabled": true,
+  "singleton": true,
+  "alignment": {
+    "horizontalAlignment": "Left",
+    "horizontalOffset": 450,
+    "verticalAlignment": "Bottom",
+    "verticalOffset": 0
+  },
+  "values": [
+    {
+      "type": "FLOAT",
+      "name": "Scale",
+      "value": 1.0,
+      "range": {
+        "min": 0.5,
+        "max": 2.0
+      }
+    }
+  ]
+}

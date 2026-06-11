@@ -46,7 +46,7 @@
 
   .tab-button {
     font-family: "Inter", sans-serif;
-    background-color: var(--menu-modal-tab-background-color);
+    background-color: color-mix(in srgb,var(--menu-modal-tab-background-color) 36%, transparent);
     color: var(--menu-text-color);
     padding: 10px;
     border: solid 2px transparent;
@@ -64,7 +64,7 @@
     }
 
     &.active {
-      border-color: var(--menu-modal-tab-active-border-color);
+      border-color: color-mix(in srgb,var(--menu-modal-tab-active-border-color) 36%, transparent);
     }
   }
 </style>

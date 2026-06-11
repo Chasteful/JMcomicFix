@@ -3,7 +3,6 @@
     import {afterUpdate} from "svelte";
 
     export let text: string;
-    export let color = "var(--tooltip-background-color)";
 
     let element: HTMLElement;
     let shown = false;
@@ -21,7 +20,7 @@
 
 <div bind:this={element}>
     {#if shown}
-        <div transition:fly="{{ y: -10, duration: 200 }}" class="tooltip" style="background-color: {color};">{text}</div>
+        <div transition:fly="{{ y: -10, duration: 200 }}" class="tooltip">{text}</div>
     {/if}
 </div>
 
@@ -29,6 +28,7 @@
 
   .tooltip {
     color: var(--tooltip-text-color);
+    background-color:transparent;;
     padding: 10px 15px;
     border-radius: 20px;
     font-size: 16px;

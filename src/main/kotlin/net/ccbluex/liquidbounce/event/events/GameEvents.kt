@@ -61,6 +61,9 @@ class KeyEvent(
     val action: Int,
 ) : Event(), WebSocketEvent
 
+@Tag("keyBindingCPS")
+class KeyBindingCPSEvent(val key: InputConstants.Key, val cps: Int) : Event(), WebSocketEvent
+
 // Input events
 @Tag("inputHandle")
 object InputHandleEvent : Event()
@@ -187,3 +190,51 @@ class ItemLoreQueryEvent(
     val itemStack: ItemStack,
     val lore: ArrayList<Component>,
 ) : Event()
+
+@Tag("overlayTitle")
+class OverlayTitleEvent(
+    var title: Component,
+    var subtitle: Component
+) : Event(),WebSocketEvent {
+    var isCancelled = false
+
+    fun cancel() {
+        isCancelled = true
+        title = Component.empty()
+        subtitle = Component.empty()
+    }
+}
+
+@Tag("overlayDisconnection")
+class OverlayDisconnectionEvent(
+    var parent: Screen,
+    var info: Component
+) : Event(),WebSocketEvent
+
+@Tag("connectionDetails")
+class ConnectionDetailsEvent(
+    val result: Component,
+) : Event(),WebSocketEvent
+
+@Tag("overlayPlayList")
+class OverlayPlayListEvent(
+    var header: Component,
+    var footer: Component,
+    var players: List<PlayerEntry>
+) : Event(),WebSocketEvent
+
+data class PlayerEntry(
+    val name: Component,
+    val uuid: String,
+    val latency: Component,
+    val isFriend: Boolean,
+    val isStaff: Boolean,
+    val isSelf:Boolean,
+)
+
+@Tag("overlayChatMessage")
+class OverlayChatEvent(
+    val content: Component,
+    val timestamp: Long,
+    val isSystem: Boolean
+) : Event(),WebSocketEvent

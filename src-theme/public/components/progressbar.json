@@ -1,0 +1,31 @@
+{
+  "name": "ProgressBar",
+  "enabled": true,
+  "singleton": true,
+  "alignment": {
+    "horizontalAlignment": "CenterTranslated",
+    "horizontalOffset": 0,
+    "verticalAlignment": "CenterTranslated",
+    "verticalOffset": 60
+  },
+  "values": [
+    {
+      "type": "FLOAT",
+      "name": "Scale",
+      "value": 1.0,
+      "range": {
+        "min": 0.5,
+        "max": 2.0
+      }
+    },
+    {
+      "type": "FLOAT",
+      "name": "Width",
+      "value": 0.4,
+      "range": {
+        "min": 0.1,
+        "max": 1.0
+      }
+    }
+  ]
+}

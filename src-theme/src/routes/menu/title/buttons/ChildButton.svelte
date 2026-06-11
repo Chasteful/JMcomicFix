@@ -1,7 +1,7 @@
 <script lang="ts">
+    import {fade} from "svelte/transition";
     import {createEventDispatcher} from "svelte";
     import ToolTip from "../../common/ToolTip.svelte";
-    import TitleButtonIcon from "./TitleButtonIcon.svelte";
 
     export let title: string;
     export let icon: string;
@@ -12,52 +12,55 @@
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<div class="child-button" on:click|stopPropagation={() => dispatch("click")} class:parent-hovered={parentHovered}>
-    <ToolTip color="var(--menu-base-color)" text="Join Realms server" />
+<div class="child-button" class:parent-hovered={parentHovered} on:click|stopPropagation={() => dispatch("click")}>
+    <ToolTip color="black" text="Join Realms server"/>
 
     <div class="icon">
-        <TitleButtonIcon {icon} />
+        <img alt={title} draggable="false" src="img/menu/icon-{icon}.svg" transition:fade="{{ duration: 200 }}">
     </div>
 
     <div class="title">{title}</div>
 </div>
 
 <style lang="scss">
+  @use "../../../../colors.scss" as *;
 
-    .child-button {
-      position: relative;
-      display: flex;
-      align-items: center;
-      border-radius: 5px;
-      background-color: var(--menu-child-button-background-color);
-      transition: ease background-color .2s;
-      padding: 15px;
+  .child-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    background-color: var(--surface-color);
+    transition: ease background-color .2s;
+    padding: 15px;
 
-      &.parent-hovered {
-        background-color: var(--menu-child-button-hover-background-color);
+    &.parent-hovered {
+      box-shadow: 0 0 4px rgba(var(--surface-color), 0.5);
 
-        .icon {
-          color: var(--menu-child-button-icon-hover-color);
-        }
-
-        .title {
-          color: var(--menu-child-button-hover-text-color);
-        }
+      .title {
+        color: var(--text-color);
       }
     }
+  }
 
-    .title {
-      color: var(--menu-text-color);
-      font-weight: 600;
-      font-size: 16px;
-      transition: ease color 0.2s;
-      margin-left: 10px;
-    }
+  .title {
+    color: var(--text-color);
+    font-weight: 600;
+    font-size: 16px;
+    transition: ease color 0.2s;
+    margin-left: 10px;
+  }
 
-    .icon { /* necessary because svelte's transition system sucks */
-      color: var(--menu-child-button-icon-color);
-      width: 28px;
-      height: 28px;
-      transition: ease color 0.2s;
+  .icon {
+    width: 28px;
+    height: 28px;
+    position: relative;
+
+    img {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
     }
+  }
 </style>

@@ -200,6 +200,13 @@ public abstract class MixinGui {
         return original || ModuleSwordBlock.INSTANCE.shouldHideOffhand() && ModuleSwordBlock.INSTANCE.getHideShieldSlot();
     }
 
+    @Inject(method = "extractSlot", at = @At("HEAD"), cancellable = true)
+    private void hookRenderHotbarItem(GuiGraphicsExtractor graphics, int x, int y, DeltaTracker deltaTracker, Player player, ItemStack itemStack, int seed, CallbackInfo ci) {
+        if (HudComponentManager.isTweakEnabled(HudComponentTweak.DISABLE_ITEM_ICONS)) {
+            ci.cancel();
+        }
+    }
+
     @Unique
     private void drawHotbar(GuiGraphicsExtractor context, DeltaTracker tickCounter, HudComponent hudComponent) {
         var playerEntity = this.getCameraPlayer();

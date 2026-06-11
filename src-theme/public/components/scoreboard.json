@@ -10,6 +10,15 @@
   },
   "values": [
     {
+      "type": "FLOAT",
+      "name": "Scale",
+      "value": 1.0,
+      "range": {
+        "min": 0.5,
+        "max": 2.0
+      }
+    },
+    {
       "type": "MULTI_CHOOSE",
       "name": "Show",
       "value": ["Header", "Name", "Score"],

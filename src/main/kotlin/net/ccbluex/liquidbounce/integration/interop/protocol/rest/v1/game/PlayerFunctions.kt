@@ -33,6 +33,10 @@ import net.ccbluex.liquidbounce.utils.entity.hasHealthScoreboard
 import net.ccbluex.liquidbounce.utils.entity.netherPosition
 import net.ccbluex.liquidbounce.utils.entity.ping
 import net.ccbluex.liquidbounce.utils.inventory.EnderChestInventoryTracker
+import net.ccbluex.liquidbounce.utils.session.GameWins
+import net.ccbluex.liquidbounce.utils.session.KilledTarget
+import net.ccbluex.liquidbounce.utils.session.PlayTimeTracker
+import net.ccbluex.liquidbounce.utils.session.PlayerDeadEventListener
 import net.ccbluex.netty.http.routing.Routing
 import net.minecraft.client.gui.Gui
 import net.minecraft.core.BlockPos
@@ -49,6 +53,7 @@ import net.minecraft.world.scores.DisplaySlot
 import net.minecraft.world.scores.PlayerScoreEntry
 import net.minecraft.world.scores.PlayerTeam
 import net.minecraft.world.scores.Scoreboard
+import kotlin.collections.emptyList
 import kotlin.math.min
 
 // GET /api/v1/client/player
@@ -105,11 +110,17 @@ data class PlayerData(
     val experienceLevel: Int,
     val experienceProgress: Float,
     val ping: Int,
+
     val effects: List<MobEffectInstance>,
     val mainHandStack: ItemStack,
     val offHandStack: ItemStack,
     val armorItems: List<ItemStack> = emptyList(),
     val scoreboard: ScoreboardData? = null,
+    val serverAddress: String,
+    val killsCount: Int,
+    val deathCount: Int,
+    val winsCount: Int,
+    val playTime: Long,
 ) {
 
     companion object {
@@ -138,13 +149,19 @@ data class PlayerData(
             player.experienceLevel,
             player.experienceProgress.fixNaN(),
             player.ping,
+
             player.activeEffects.toList(),
             player.mainHandItem,
             if (player == mc.player && shouldHideOffhand() && hideShieldSlot) ItemStack.EMPTY else player.offhandItem,
             player.armorItems.toList(),
             ScoreboardData.fromScoreboard(
                 player.level().scoreboard
-            )
+            ),
+            mc.currentServer?.ip ?: "SingleWorld",
+            KilledTarget.killsCount,
+            PlayerDeadEventListener.deathCount,
+            GameWins.victoryCount,
+            PlayTimeTracker.getPlayTime(),
         )
     }
 
@@ -156,6 +173,7 @@ data class PlayerInventoryData(
     val main: List<ItemStack>,
     val crafting: List<ItemStack>,
     val enderChest: List<ItemStack>,
+    val openChest: List<ItemStack>,
 ) {
 
     companion object {
@@ -166,6 +184,14 @@ data class PlayerInventoryData(
             crafting = player.inventoryMenu.craftSlots.items.map(ItemStack::copy),
             /** player.enderChestInventory.getHeldStacks().map(ItemStack::copy) */
             enderChest = EnderChestInventoryTracker.stacks,
+            openChest = player.containerMenu.let { handler ->
+            if (handler !== player.inventoryMenu) {
+                val containerSize = (handler.slots.size - 36).coerceAtLeast(0)
+                handler.slots.subList(0, containerSize).map { it.item.copy() }
+            } else {
+                emptyList()
+            }
+        }
         )
     }
 

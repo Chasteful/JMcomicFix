@@ -20,7 +20,12 @@ package net.ccbluex.liquidbounce.injection.mixins.minecraft.gui;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.ccbluex.liquidbounce.event.EventManager;
+import net.ccbluex.liquidbounce.event.events.OverlayChatEvent;
 import net.ccbluex.liquidbounce.features.module.modules.misc.betterchat.ModuleBetterChat;
+import net.ccbluex.liquidbounce.features.module.modules.misc.nameprotect.ModuleNameProtect;
+import net.ccbluex.liquidbounce.integration.theme.component.HudComponentManager;
+import net.ccbluex.liquidbounce.integration.theme.component.HudComponentTweak;
 import net.ccbluex.liquidbounce.interfaces.ChatComponentAddition;
 import net.ccbluex.liquidbounce.interfaces.GuiMessageLineAddition;
 import net.minecraft.client.Minecraft;
@@ -28,13 +33,14 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.multiplayer.chat.GuiMessage;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.ArrayListDeque;
 import net.minecraft.util.FormattedCharSequence;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
 import java.util.List;
 
 @Mixin(ChatComponent.class)
@@ -105,6 +111,13 @@ public abstract class MixinChatComponent implements ChatComponentAddition {
         }
     }
 
+    @Inject(method = "extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;IIILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;Z)V", at = @At("HEAD"), cancellable = true)
+    private void hookRenderChat(GuiGraphicsExtractor graphics, Font font, int ticks, int mouseX, int mouseY, ChatComponent.DisplayMode displayMode, boolean changeCursorOnInsertions, CallbackInfo ci) {
+        if (HudComponentManager.isTweakEnabled(HudComponentTweak.DISABLE_CHAT_HUD)) {
+            ci.cancel();
+        }
+    }
+
     /**
      * Modifies {@link ChatComponent#addMessageToDisplayQueue(GuiMessage)} so, that the id is
      * forwarded and if {@link ModuleBetterChat} is enabled, older lines won't be removed.
@@ -129,6 +142,31 @@ public abstract class MixinChatComponent implements ChatComponentAddition {
             ((GuiMessageLineAddition) (Object) visible).liquid_bounce$setId(id);
             trimmedMessages.addFirst(visible);
         }
+
+        MutableComponent formattedText = Component.empty();
+        for (FormattedCharSequence t : lines) {
+            MutableComponent finalFormattedText = formattedText;
+            t.accept((_, style, codePoint) -> {
+                finalFormattedText.append(Component.literal(String.valueOf((char) codePoint)).setStyle(style));
+                return true;
+            });
+        }
+
+        String plainText = formattedText.getString();
+        String replacedText = ModuleNameProtect.INSTANCE.replace(plainText);
+
+        if (!replacedText.equals(plainText)) {
+            formattedText = Component.literal(replacedText).withStyle(formattedText.getStyle());
+        }
+
+        if (message != null) {
+            EventManager.INSTANCE.callEvent(new OverlayChatEvent(
+                formattedText,
+                System.currentTimeMillis(),
+                false
+            ));
+        }
+
 
         var betterChat = ModuleBetterChat.INSTANCE;
         if (!betterChat.getRunning() || !betterChat.getInfiniteLength()) {

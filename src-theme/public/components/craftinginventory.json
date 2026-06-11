@@ -4,8 +4,19 @@
   "singleton": true,
   "alignment": {
     "horizontalAlignment": "Right",
-    "horizontalOffset": 35,
+    "horizontalOffset": 15,
     "verticalAlignment": "Bottom",
-    "verticalOffset": 305
-  }
+    "verticalOffset": 150
+  },
+  "values": [
+    {
+      "type": "FLOAT",
+      "name": "Scale",
+      "value": 1.0,
+      "range": {
+        "min": 0.5,
+        "max": 2.0
+      }
+    }
+  ]
 }

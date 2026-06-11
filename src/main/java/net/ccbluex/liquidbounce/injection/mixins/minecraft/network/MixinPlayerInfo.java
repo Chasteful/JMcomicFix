@@ -24,6 +24,7 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mojang.authlib.GameProfile;
 import net.ccbluex.liquidbounce.features.cosmetic.CapeCosmeticsManager;
 import net.ccbluex.liquidbounce.features.misc.HideAppearance;
+import net.ccbluex.liquidbounce.features.module.modules.render.ModuleCapes;
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleSkinChanger;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
@@ -67,7 +68,14 @@ public abstract class MixinPlayerInfo {
                 }
             }
         }
-
+        Minecraft client = Minecraft.getInstance();
+        if (client.player != null && this.profile.id().equals(client.player.getGameProfile().id())) {
+            Identifier currentModeCape = ModuleCapes.INSTANCE.getCapeTextureId();
+            if (currentModeCape != null && ModuleCapes.INSTANCE.getCapeReady()) {
+            return new PlayerSkin(original.body(), new ClientAsset.ResourceTexture(currentModeCape, currentModeCape),
+                original.elytra(), original.model(), original.secure());
+            }
+        }
         if (capeTexture != null) {
             return new PlayerSkin(original.body(), new ClientAsset.ResourceTexture(capeTexture, capeTexture),
                     original.elytra(), original.model(), original.secure());

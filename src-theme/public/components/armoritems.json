@@ -1,11 +1,37 @@
 {
   "name": "ArmorItems",
-  "enabled": false,
+  "enabled": true,
   "singleton": true,
   "alignment": {
-    "horizontalAlignment": "CenterTranslated",
-    "horizontalOffset": 240,
-    "verticalAlignment": "Bottom",
-    "verticalOffset": 15
-  }
+    "horizontalAlignment": "Left",
+    "horizontalOffset": 10,
+    "verticalAlignment": "CenterTranslated",
+    "verticalOffset": -150
+  },
+  "values": [
+    {
+      "type": "FLOAT",
+      "name": "Scale",
+      "value": 1.0,
+      "range": {
+        "min": 0.5,
+        "max": 2.0
+      }
+    },
+    {
+      "type": "BOOLEAN",
+      "name": "Title",
+      "value": true
+    },
+    {
+      "type": "BOOLEAN",
+      "name": "Divider",
+      "value": false
+    },
+    {
+      "type": "BOOLEAN",
+      "name": "Gradient",
+      "value": false
+    }
+  ]
 }
