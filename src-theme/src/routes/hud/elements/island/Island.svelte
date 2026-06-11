@@ -30,7 +30,7 @@
     } from './Island';
     import {get} from 'svelte/store';
     import {calcArmorValue} from "../../../../util/Client/calcArmorValue";
-    import { clientName } from "../../../../theme/ThemeManager";
+    import { clientName } from "../../../../theme/theme_manager";
     import {
         checkUsernameVisibility,
         nameProtect,

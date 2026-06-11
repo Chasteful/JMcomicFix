@@ -1,21 +1,24 @@
 <script lang="ts">
     import {onDestroy, onMount} from 'svelte';
-    import type {Module} from '../../../../../integration/types';
-    import {getModules} from '../../../../../integration/rest';
-    import {listen} from '../../../../../integration/ws';
-    import {getTextWidth} from '../../../../../integration/text_measurement';
-    import {convertToSpacedString, spaceSeperatedNames} from '../../../../../theme/theme_config';
+    import type {Module} from '../../../../integration/types';
+    import {getModules} from '../../../../integration/rest';
+    import {listen} from '../../../../integration/ws';
+    import {getTextWidth} from '../../../../integration/text_measurement';
+    import {convertToSpacedString, spaceSeperatedNames} from '../../../../theme/theme_config';
     import {
         arraylistGradient,
         destroyGradient,
         getPrefixAsync,
         subscribeColors,
         subscribeRenderSettings
-    } from '../arraylist';
+    } from './arraylist';
     import {flip} from 'svelte/animate';
     import {fly} from 'svelte/transition';
     import {expoOut} from "svelte/easing";
 
+    export let settings: { [name: string]: any };
+
+    $: cSettings = settings as HudArrayListSettings;
     let enabledModules: Array<Module & { prefix: string; width: number }> = [];
     let intervalId: number;
     let unsubs: [() => void, () => void];
@@ -54,8 +57,7 @@
                 width
             };
         }));
-
-        measuredModules.sort((a, b) => b.width - a.width);
+        measuredModules.sort((a, b) => cSettings.order === "Ascending" ? a.width - b.width : b.width - a.width);
 
         enabledModules = measuredModules;
     }
@@ -98,18 +100,21 @@
     <div
             class="module"
             id="module-name"
+            style={cSettings.itemAlignment === "Left" ? "margin-right: auto;" : "margin-left: auto;"}
             animate:flip={{ duration: 200,easing: expoOut }}
             in:fly={{ x: 50, duration: 200 }}
     >
         {$spaceSeperatedNames ? convertToSpacedString(name) : name}
-        {#if prefix}<span class="prefix">&nbsp;{prefix}</span>{/if}
+        {#if prefix && cSettings.showTags}
+            <span class="prefix">&nbsp;{prefix}</span>
+        {/if}
         <span class="side-bar" id="side-bar"></span>
     </div>
 {/each}
 
 
 <style lang="scss">
-  @use "../../../../../colors" as *;
+  @use "../../../../colors" as *;
 
   .module {
     position: relative;

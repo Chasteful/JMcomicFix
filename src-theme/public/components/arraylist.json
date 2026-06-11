@@ -19,18 +19,26 @@
       }
     },
     {
-      "type": "CHOOSE",
-      "name": "Mode",
-      "value": "Rise",
-      "choices": [
-        "Simple",
-        "Rise"
-      ]
-    },
-    {
       "type": "BOOLEAN",
       "name": "Scoreboard",
       "value": false
+    },
+    {
+      "type": "BOOLEAN",
+      "name": "ShowTags",
+      "value": true
+    },
+    {
+      "type": "CHOOSE",
+      "name": "ItemAlignment",
+      "value": "Right",
+      "choices": ["Left", "Right"]
+    },
+    {
+      "type": "CHOOSE",
+      "name": "Order",
+      "value": "Descending",
+      "choices": ["Ascending", "Descending"]
     },
     {
       "type": "MULTI_CHOOSE",

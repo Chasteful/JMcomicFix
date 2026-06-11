@@ -2,7 +2,7 @@
     import {listen} from "../../../integration/ws";
     import {fade} from "svelte/transition";
     import type {ProgressEvent} from "../../../integration/events";
-    import {WindowSize} from "../../../util/WindowSize";
+    import {WindowSize} from "../../../theme/WindowSize";
     import {onMount} from "svelte";
 
     export let settings: { [name: string]: any };

@@ -1,6 +1,6 @@
 <script lang="ts">
     import {onDestroy, onMount} from "svelte";
-    import {primaryRgb, secondaryRgb} from "../../../../theme/ThemeManager";
+    import {primaryRgb, secondaryRgb} from "../../../../theme/theme_manager";
 
     export let size = 262;
 

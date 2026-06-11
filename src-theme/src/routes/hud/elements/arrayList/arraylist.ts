@@ -10,7 +10,7 @@ import type {
     MultiChooseSetting,
     TextSetting,
 } from '../../../../integration/types';
-import {primaryRgb, secondaryRgb} from "../../../../theme/ThemeManager";
+import {primaryRgb, secondaryRgb} from "../../../../theme/theme_manager";
 import {type Readable, writable} from "svelte/store";
 import Color from 'colorjs.io';
 

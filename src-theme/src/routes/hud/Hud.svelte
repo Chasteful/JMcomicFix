@@ -31,8 +31,8 @@
     import {getClientInfo, getComponents, getMetadata} from "../../integration/rest";
     import {listen} from "../../integration/ws";
     import {ScaleFactor} from "./Hud_store";
-    import {WindowSize} from "../../util/WindowSize";
-    import {hudScaleFactor} from "../../theme/ThemeManager";
+    import {WindowSize} from "../../theme/WindowSize";
+    import {hudScaleFactor} from "../../theme/theme_manager";
     import { os } from "../clickgui/clickgui_store";
     import {calcResolutionCoefficient} from "../../util/resolution_utils";
     import ProgressBar from "./elements/ProgressBar.svelte";

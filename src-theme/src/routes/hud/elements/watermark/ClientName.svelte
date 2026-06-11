@@ -1,6 +1,6 @@
 <script lang="ts">
     import {fade} from 'svelte/transition';
-    import {clientName} from '../../../../theme/ThemeManager';
+    import {clientName} from '../../../../theme/theme_manager';
     import type {ClientInfo} from "../../../../integration/types";
 
     export let clientInfo: ClientInfo;

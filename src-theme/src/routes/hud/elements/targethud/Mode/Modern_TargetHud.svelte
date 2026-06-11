@@ -11,7 +11,7 @@
     import {calcArmorColor, detectTeamColor, type TeamColor} from "../../../../../util/Client/calcArmorColor";
     import AvatarView from "../../../common/Canvas/AvatarView.svelte";
     import ItemStackDisplay from "../../../common/ItemView/ItemStackDisplay.svelte";
-    import {primaryColor, secondaryColor} from "../../../../../theme/ThemeManager";
+    import {primaryColor, secondaryColor} from "../../../../../theme/theme_manager";
     import {get} from "svelte/store";
     import {visible} from "../TargetHud";
 

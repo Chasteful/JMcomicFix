@@ -4,7 +4,7 @@
     import type {ClientInfo, ItemStack, PlayerData} from "../../../../../integration/types";
     import {getClientInfo, getPlayerData, getPlayerInventory} from "../../../../../integration/rest";
     import {onMount} from "svelte";
-    import {clientName} from "../../../../../theme/ThemeManager";
+    import {clientName} from "../../../../../theme/theme_manager";
     import ItemStackDisplay from "../../../common/ItemView/ItemStackDisplay.svelte";
 
     let currentSlot = 0;

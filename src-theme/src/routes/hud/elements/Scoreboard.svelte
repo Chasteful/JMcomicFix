@@ -5,7 +5,7 @@
     import type {ClientPlayerDataEvent} from "../../../integration/events";
     import {expoInOut} from "svelte/easing";
     import { fly } from "svelte/transition";
-    import {scoreboardIP} from "../../../theme/ThemeManager";
+    import {scoreboardIP} from "../../../theme/theme_manager";
     import GradientAnimatedText from "../common/FontRenderer/GradientAnimatedText.svelte";
 
     export let settings: { [name: string]: any };

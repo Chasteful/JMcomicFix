@@ -5,24 +5,17 @@
     import TextComponent from "../../../menu/common/TextComponent.svelte";
     import type {PlayerData, Scoreboard} from "../../../../integration/types";
     import type {ClientPlayerDataEvent} from "../../../../integration/events";
-    import {scoreboardIP} from "../../../../theme/ThemeManager";
+    import {scoreboardIP} from "../../../../theme/theme_manager";
     import GradientAnimatedText from "../../common/FontRenderer/GradientAnimatedText.svelte";
-    import Rise_Arraylist from "./mode/Rise_Arraylist.svelte";
-    import Simple_Arraylist from "./mode/Simple_Arraylist.svelte";
     import {ArraylistRenderSettings} from "./arraylist";
-
-    const modes: Record<string, any> = {
-        Simple: Simple_Arraylist,
-        Rise: Rise_Arraylist,
-    }
+    import Module from "./Module.svelte";
 
     export let settings: { [name: string]: any };
+
     let scoreboard: Scoreboard | null = null;
     $: if (settings && settings.prefix) {
         ArraylistRenderSettings.set(new Set(settings.prefix));
     }
-    $: ModeComponent = modes[settings?.mode] ?? Rise_Arraylist;
-
 
     listen("clientPlayerData", (e: ClientPlayerDataEvent) => {
         const playerData: PlayerData = e.playerData;
@@ -34,8 +27,9 @@
 
 <div class="combined-container" style="transform: scale({settings.scale});">
     <div class="arraylist-section" id="arraylist"
+
          transition:fly|global={{duration: 500, y: -50, easing: expoInOut}}>
-        <svelte:component this={ModeComponent} {settings}/>
+      <Module {settings}/>
     </div>
 
     {#if scoreboard && settings?.scoreboard}
