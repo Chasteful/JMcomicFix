@@ -8,7 +8,7 @@
   .setting-button {
     font-family: "Inter", sans-serif;
     font-weight: 500;
-    font-size: 12px;
+    font-size: calc(var(--font-size) - 2px);
     color: var(--clickgui-text-color);
     background-color: var(--clickgui-button-background-color);
     border: none;

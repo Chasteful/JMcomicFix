@@ -59,6 +59,16 @@ object ModuleClickGui :
         EventManager.callEvent(ClickGuiValueChangeEvent(this))
     }
 
+    @Suppress("UnusedPrivateProperty")
+    private val length by float("Length", 66f, 30f..100f, "%").onChanged {
+        EventManager.callEvent(ClickGuiValueChangeEvent(this))
+    }
+    
+    @Suppress("UnusedPrivateProperty")
+    private val fontSize by int("FontSize", 18, 14..20, "px").onChanged {
+        EventManager.callEvent(ClickGuiValueChangeEvent(this))
+    }
+
     @Suppress("UnusedPrivateProperty", "unused")
     private val searchBarAutoFocus by boolean("SearchBarAutoFocus", true).onChanged {
         EventManager.callEvent(ClickGuiValueChangeEvent(this))
@@ -179,7 +189,7 @@ object ModuleClickGui :
         }
         standaloneScreen.close()
         this.standaloneScreen = null
-        
+
         // Only bother updating now if it was open before.
         if (wasOpen) {
             updateStandaloneScreen()

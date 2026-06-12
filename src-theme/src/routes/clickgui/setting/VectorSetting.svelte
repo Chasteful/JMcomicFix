@@ -62,7 +62,7 @@
   .name {
     font-weight: 500;
     color: var(--clickgui-text-color);
-    font-size: 12px;
+    font-size: calc(var(--font-size) - 2px);
     margin-bottom: 5px;
   }
 
@@ -74,7 +74,7 @@
       width: 100%;
       background-color: var(--clickgui-input-background-color);
       font-family: monospace;
-      font-size: 12px;
+      font-size: calc(var(--font-size) - 2px);
       color: var(--clickgui-text-color);
       border: none;
       border-bottom: solid 2px var(--clickgui-input-border-color);
@@ -101,7 +101,7 @@
       border: none;
       cursor: pointer;
       color: var(--clickgui-text-color);
-      font-size: 12px;
+      font-size: calc(var(--font-size) - 2px);
       text-align: right;
     }
   }

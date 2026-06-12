@@ -209,7 +209,7 @@
     padding: 4px;
     font-weight: 500;
     color: var(--clickgui-text-color);
-    font-size: 12px;
+    font-size: calc(var(--font-size) - 2px);
     font-family: "Inter", sans-serif;
     width: 100%;
     position: relative;

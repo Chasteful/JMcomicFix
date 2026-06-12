@@ -98,7 +98,7 @@
         grid-area: a;
         font-weight: 500;
         color: var(--clickgui-text-color);
-        font-size: 12px;
+        font-size: calc(var(--font-size) - 2px);
     }
 
     .hidden {
@@ -110,7 +110,7 @@
         font-weight: 500;
         color: var(--clickgui-text-color);
         text-align: right;
-        font-size: 12px;
+        font-size: calc(var(--font-size) - 2px);
         cursor: text;
         text-transform: uppercase;
         background-color: transparent;

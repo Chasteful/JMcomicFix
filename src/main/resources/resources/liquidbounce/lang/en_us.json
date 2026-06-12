@@ -798,5 +798,6 @@
   "liquidbounce.module.macros.description": "Lets you execute chat messages or item actions using custom keybinds.",
   "liquidbounce.module.newChunks.description": "Highlights chunks that are likely newly generated.",
   "liquidbounce.module.capes.description": "Display a cape visible only to you.",
-  "liquidbounce.module.killEffects.description": "Show an effect when you kill a target."
+  "liquidbounce.module.killEffects.description": "Show an effect when you kill a target.",
+  "liquidbounce.module.noBooks.description": "Intercept and close book GUIs opened by the server."
 }

@@ -50,7 +50,7 @@
     column-gap: 12px;
     background-color: var(--clickgui-window-header-background-color);
     padding: 16px 22px;
-    font-size: 16px;
+    font-size: calc(var(--font-size) + 2px);
     font-weight: 600;
     color: var(--clickgui-text-color);
     border-bottom: 2px solid var(--clickgui-window-header-border-color);

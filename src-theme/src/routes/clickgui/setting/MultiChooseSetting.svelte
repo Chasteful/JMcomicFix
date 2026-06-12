@@ -85,7 +85,7 @@
 
   .title {
     color: var(--clickgui-text-color);
-    font-size: 12px;
+    font-size: calc(var(--font-size) - 2px);
     font-weight: 600;
   }
 
@@ -117,7 +117,7 @@
   .amount {
     letter-spacing: 1px;
     font-weight: 500;
-    font-size: 12px;
+    font-size: calc(var(--font-size) - 2px);
     font-family: monospace;
   }
 
@@ -139,6 +139,6 @@
     display: flex;
     flex-wrap: wrap;
     gap: 7px;
-    font-size: 12px;
+    font-size: calc(var(--font-size) - 2px);
   }
 </style>

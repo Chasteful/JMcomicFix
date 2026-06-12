@@ -1,6 +1,7 @@
-// resolution_utils.ts
-
 import {writable} from "svelte/store";
+
+const width = writable(window.innerWidth);
+const height = writable(window.innerHeight);
 
 export interface ResolutionScalerOptions {
     baseResolution: { width: number; height: number };
@@ -25,8 +26,7 @@ export function calcResolutionCoefficient() {
     return Math.min(1, Math.max(0.1337, min));
 }
 export function WindowSize() {
-    const width = writable(window.innerWidth);
-    const height = writable(window.innerHeight);
+
 
     function updateSize() {
         width.set(window.innerWidth);

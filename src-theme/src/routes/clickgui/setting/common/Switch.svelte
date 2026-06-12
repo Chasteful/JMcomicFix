@@ -27,7 +27,7 @@
   .name {
     font-weight: 500;
     color: var(--clickgui-text-color);
-    font-size: 12px;
+    font-size: calc(var(--font-size) - 2px);
     margin-left: 7px;
     white-space: nowrap;
     overflow: hidden;

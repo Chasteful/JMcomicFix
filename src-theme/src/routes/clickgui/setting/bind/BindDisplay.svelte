@@ -83,13 +83,13 @@
   .divider {
     color: var(--text-color);
     opacity: 0.8;
-    font-size: 10px;
+    font-size: calc(var(--font-size) - 4px);
     line-height: 1;
     font-family: monospace;
   }
 
   .boundKey {
-    font-size: 12px;
+    font-size: calc(var(--font-size) - 2px);
   }
 
   .dimmed {

@@ -55,7 +55,7 @@
     background: transparent;
     color: var(--clickgui-text-dimmed-color);
     padding: 6px 14px;
-    font-size: 14px;
+    font-size: var(--font-size);
     font-weight: 600;
     border-radius: 999px;
     cursor: pointer;

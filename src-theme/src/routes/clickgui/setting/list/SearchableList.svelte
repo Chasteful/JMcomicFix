@@ -40,7 +40,7 @@
     border: none;
     border-bottom: solid 1px var(--accent-color);
     font-family: "Inter", sans-serif;
-    font-size: 12px;
+    font-size: calc(var(--font-size) - 2px);
     padding: 5px;
     color: var(--clickgui-text-color);
     margin-bottom: 5px;

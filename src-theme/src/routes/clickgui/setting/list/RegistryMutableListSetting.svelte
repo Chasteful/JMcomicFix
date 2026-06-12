@@ -163,7 +163,7 @@
 
     .name {
       color: var(--clickgui-text-color);
-      font-size: 12px;
+      font-size: calc(var(--font-size) - 2px);
       font-weight: 600;
     }
   }

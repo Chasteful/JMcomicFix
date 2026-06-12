@@ -78,7 +78,7 @@
     .chosen {
       font-weight: 500;
       color: var(--clickgui-text-color);
-      font-size: 12px;
+      font-size: calc(var(--font-size) - 2px);
       text-overflow: ellipsis;
       white-space: nowrap;
       grid-column: 1/1;

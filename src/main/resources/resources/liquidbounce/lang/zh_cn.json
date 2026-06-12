@@ -799,5 +799,6 @@
   "liquidbounce.module.strongholdFinder.messages.sampleCaptured": "已采集样本（#%s）。",
   "liquidbounce.module.strongholdFinder.messages.bestChunk": "最佳区块：%s, %s（p=%s%%）。",
   "liquidbounce.module.capes.description": "仅你可见的自定义披风。",
-  "liquidbounce.module.killEffects.description": "在你击杀目标时显示一些效果。"
+  "liquidbounce.module.killEffects.description": "在你击杀目标时显示一些效果。",
+  "liquidbounce.module.noBooks.description": "拦截并关闭服务器呈现的书本界面。"
 }

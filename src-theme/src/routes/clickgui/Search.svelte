@@ -228,7 +228,7 @@
     overflow: auto;
 
     .result {
-      font-size: 16px;
+      font-size: calc(var(--font-size) + 2px);
       padding: 10px 0;
       transition: ease padding-left 0.2s;
       cursor: pointer;
@@ -261,14 +261,14 @@
         &::after {
           content: "Right-click to locate";
           color: var(--clickgui-search-hint-color);
-          font-size: 12px;
+          font-size: calc(var(--font-size) - 2px);
         }
       }
     }
 
     .placeholder {
       color: var(--clickgui-text-dimmed-color);
-      font-size: 16px;
+      font-size: calc(var(--font-size) + 2px);
       padding: 10px 0;
     }
 
@@ -282,7 +282,7 @@
     background-color: transparent;
     border: none;
     font-family: "Inter", sans-serif;
-    font-size: 16px;
+    font-size: calc(var(--font-size) + 2px);
     color: var(--clickgui-text-color);
     width: 100%;
   }

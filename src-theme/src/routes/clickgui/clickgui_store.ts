@@ -22,3 +22,7 @@ export const showGrid: Writable<boolean> = writable(false);
 export const snappingEnabled: Writable<boolean> = writable(true);
 
 export const gridSize: Writable<number> = writable(10);
+
+export const panelLength: Writable<number> = writable(64);
+
+export const fontSize: Writable<number> = writable(18);

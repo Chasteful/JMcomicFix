@@ -12,7 +12,8 @@
         maxPanelZIndex,
         scaleFactor,
         showGrid,
-        snappingEnabled
+        snappingEnabled,
+        panelLength
     } from "./clickgui_store";
     import {setItem} from "../../integration/persistent_storage";
 
@@ -220,6 +221,7 @@
             class:expanded={panelConfig.expanded}
             on:scroll={handleModulesScroll}
             bind:this={modulesElement}
+            style="--duration: 0.3s; {panelConfig.expanded ? `max-height: ${2 / $scaleFactor * $panelLength}vh` : ''}"
     >
         {#each modules as {name, enabled, description, aliases} (name)}
             <Module {name} {enabled} {description} {aliases}/>
@@ -251,7 +253,7 @@
     cursor: grab;
 
     .category {
-      font-size: 14px;
+      font-size: var(--font-size);
       color: var(--clickgui-text-color);
       font-weight: 500;
     }

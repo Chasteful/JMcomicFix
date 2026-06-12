@@ -82,7 +82,7 @@
     .text {
       font-weight: 500;
       color: var(--clickgui-text-color);
-      font-size: 12px;
+      font-size: calc(var(--font-size) - 2px);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -107,7 +107,7 @@
     .option {
       color: var(--clickgui-dropdown-option-color);
       font-weight: 500;
-      font-size: 12px;
+      font-size: calc(var(--font-size) - 2px);
       padding: 5px 0;
       cursor: pointer;
       text-align: center;

@@ -145,7 +145,7 @@
 
       color: var(--clickgui-text-dimmed-color);
       text-align: center;
-      font-size: 12px;
+      font-size: calc(var(--font-size) - 2px);
       font-weight: 500;
       position: relative;
       padding: 10px;

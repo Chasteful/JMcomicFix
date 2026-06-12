@@ -73,7 +73,7 @@
   }
 
   .text {
-    font-size: 12px;
+    font-size: calc(var(--font-size) - 2px);
     padding: 10px;
     color: var(--clickgui-text-color);
   }

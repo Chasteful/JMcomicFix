@@ -46,7 +46,7 @@
     font-family: monospace;
     color: var(--clickgui-text-color);
     font-weight: 500;
-    font-size: 12px;
+    font-size: calc(var(--font-size) - 2px);
     background-color: transparent;
     border: none;
     min-width: 5px;

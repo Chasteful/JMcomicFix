@@ -105,6 +105,7 @@ import net.ccbluex.liquidbounce.features.module.modules.misc.ModuleInventoryTrac
 import net.ccbluex.liquidbounce.features.module.modules.misc.ModuleItemScroller
 import net.ccbluex.liquidbounce.features.module.modules.misc.ModuleMacros
 import net.ccbluex.liquidbounce.features.module.modules.misc.ModuleMiddleClickAction
+import net.ccbluex.liquidbounce.features.module.modules.misc.ModuleNoBooks
 import net.ccbluex.liquidbounce.features.module.modules.misc.ModuleNotifier
 import net.ccbluex.liquidbounce.features.module.modules.misc.ModulePacketLogger
 import net.ccbluex.liquidbounce.features.module.modules.misc.ModuleSpammer
@@ -552,6 +553,7 @@ object ModuleManager : EventListener, Collection<ClientModule> by modules {
             ModuleDebugRecorder,
             ModuleAntiCheatDetect,
             ModuleEasyPearl,
+            ModuleNoBooks,
 
             // Movement
             ModuleAirJump,
