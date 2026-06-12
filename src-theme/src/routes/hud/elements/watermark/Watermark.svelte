@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {getClientInfo, getSession} from "../../../../integration/rest";
+    import {getClientInfo, getModuleSettings, getSession} from "../../../../integration/rest";
     import type {ClientInfo, PlayerData, Session,} from "../../../../integration/types";
     import {onMount} from "svelte";
     import {listen} from "../../../../integration/ws";
@@ -7,6 +7,14 @@
     import {fly} from 'svelte/transition';
     import {expoInOut} from "svelte/easing";
     import ClientName from "./ClientName.svelte";
+    import {
+        checkUsernameVisibility,
+        nameProtect,
+        NameProtectSetting,
+        randomCode,
+        showUsername,
+        useGarbled
+    } from "../../../../theme/NameProtectManager";
 
     export let settings: { [name: string]: any };
 
@@ -33,6 +41,9 @@
         setInterval(async () => {
             await updateClientInfo();
             await updateSession();
+            await checkUsernameVisibility();
+            const settings = await getModuleSettings("NameProtect");
+            NameProtectSetting(settings);
         }, 1000);
     });
     listen("clientPlayerData", ((event: ClientPlayerDataEvent) => {
@@ -42,6 +53,11 @@
 
     listen("session", async () => {
         await updateSession();
+    });
+
+    listen("nameProtectValueChange", async () => {
+        const settings = await getModuleSettings("NameProtect");
+        NameProtectSetting(settings);
     });
 </script>
 
@@ -55,7 +71,13 @@
             {#if session}
                 <div class="separator"></div>
                 <div class="info">
-                    {session.username}
+                    {#if $showUsername && session}
+                        {session.username}
+                    {:else if $useGarbled}
+                        {$randomCode}
+                    {:else}
+                        {$nameProtect}
+                    {/if}
                 </div>
             {/if}
 

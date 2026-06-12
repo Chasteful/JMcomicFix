@@ -1,8 +1,7 @@
 <script lang="ts">
-    import type {PlayerData} from "../../../integration/types";
-    import type {BlockCountChangeEvent, ClientPlayerDataEvent, ModuleToggleEvent} from "../../../integration/events";
+    import type {BlockCountChangeEvent, ModuleToggleEvent} from "../../../integration/events";
     import {listen} from "../../../integration/ws";
-    import {getPlayerData, itemTextureUrl} from "../../../integration/rest";
+    import {itemTextureUrl} from "../../../integration/rest";
     import {onMount, tick} from "svelte";
     import {FadeOut} from "../../../util/animate_utils";
     import {blockCount} from './island/Island';
@@ -10,8 +9,6 @@
     import {Tween} from "svelte/motion";
 
     export let settings: { [name: string]: any };
-
-    let playerData: PlayerData | null = null;
 
     let nextBlock: string | undefined = undefined;
     let count: number | undefined = undefined;
@@ -50,10 +47,6 @@
         blockCount.set(e.count);
     });
 
-    listen("clientPlayerData", (e: ClientPlayerDataEvent) => {
-        playerData = e.playerData;
-    });
-
     listen("moduleToggle", (e: ModuleToggleEvent) => {
         if (e.moduleName === "Scaffold") {
             scaffoldEnable = e.enabled;
@@ -61,7 +54,6 @@
     });
 
     onMount(async () => {
-        playerData = await getPlayerData();
         if (contentElement && count !== undefined) {
             await updateMaxWidth(true);
         }

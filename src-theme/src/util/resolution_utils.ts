@@ -1,5 +1,7 @@
 // resolution_utils.ts
 
+import {writable} from "svelte/store";
+
 export interface ResolutionScalerOptions {
     baseResolution: { width: number; height: number };
     minScale?: number;
@@ -21,6 +23,28 @@ export function calcResolutionCoefficient() {
     }
 
     return Math.min(1, Math.max(0.1337, min));
+}
+export function WindowSize() {
+    const width = writable(window.innerWidth);
+    const height = writable(window.innerHeight);
+
+    function updateSize() {
+        width.set(window.innerWidth);
+        height.set(window.innerHeight);
+    }
+
+    window.addEventListener("resize", updateSize);
+
+
+    updateSize();
+
+    return {
+        width,
+        height,
+        destroy() {
+            window.removeEventListener("resize", updateSize);
+        }
+    };
 }
 export class Resolution_utils {
     private readonly minScale: number;

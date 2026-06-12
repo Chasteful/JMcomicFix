@@ -26,9 +26,11 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.ccbluex.liquidbounce.event.EventManager;
 import net.ccbluex.liquidbounce.event.events.OverlayMessageEvent;
 import net.ccbluex.liquidbounce.event.events.OverlayRenderEvent;
+import net.ccbluex.liquidbounce.event.events.OverlayTitleEvent;
 import net.ccbluex.liquidbounce.event.events.PerspectiveEvent;
 import net.ccbluex.liquidbounce.features.misc.HideAppearance;
 import net.ccbluex.liquidbounce.features.module.modules.combat.ModuleSwordBlock;
+import net.ccbluex.liquidbounce.features.module.modules.misc.nameprotect.ModuleNameProtect;
 import net.ccbluex.liquidbounce.features.module.modules.player.ModuleReach;
 import net.ccbluex.liquidbounce.features.module.modules.render.DoRender;
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleAntiBlind;
@@ -70,7 +72,16 @@ public abstract class MixinGui {
     @Shadow
     @Nullable
     protected abstract Player getCameraPlayer();
-
+    @Shadow
+    @Nullable
+    public Component title;
+    @Shadow
+    @Nullable
+    public Component subtitle;
+    @Unique
+    private Component cachedTitle = null;
+    @Unique
+    private Component cachedSubtitle = null;
     @Shadow
     @Final
     private Minecraft minecraft;
@@ -256,8 +267,37 @@ public abstract class MixinGui {
 
     @Inject(method = "extractTitle", at = @At("HEAD"), cancellable = true)
     private void hookRenderTitleAndSubtitle(CallbackInfo ci) {
-        if (!ModuleAntiBlind.canRender(DoRender.TITLE)) {
+        if (!ModuleAntiBlind.canRender(DoRender.TITLE) ||HudComponentManager.isTweakEnabled(HudComponentTweak.DISABLE_TITLE)){
             ci.cancel();
+        }
+    }
+
+    @Inject(method = "setTitle", at = @At("HEAD"))
+    private void onSetTitle(Component title, CallbackInfo ci) {
+        this.cachedTitle = title;
+        tryEmitOverlay();
+    }
+
+    @Inject(method = "setSubtitle", at = @At("HEAD"))
+    private void onSetSubtitle(Component subtitle, CallbackInfo ci) {
+        this.cachedSubtitle = subtitle;
+        tryEmitOverlay();
+    }
+
+    @Unique
+    private void tryEmitOverlay() {
+        if (cachedTitle != null && cachedSubtitle != null) {
+            Component protectedTitle = ModuleNameProtect.INSTANCE.replace(cachedTitle);
+            Component protectedSubtitle = ModuleNameProtect.INSTANCE.replace(cachedSubtitle);
+
+            OverlayTitleEvent event = new OverlayTitleEvent(protectedTitle, protectedSubtitle);
+
+            EventManager.INSTANCE.callEvent(event);
+
+            if (!event.isCancelled()) {
+                cachedTitle = null;
+                cachedSubtitle = null;
+            }
         }
     }
 

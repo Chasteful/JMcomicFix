@@ -149,6 +149,9 @@ object ModuleNameProtect : ClientModule("NameProtect", ModuleCategories.MISC) {
             else -> uncachedReplace(original)
         }
 
+    fun replace(component: Component): Component =
+        component.sanitizeForeignInput()
+
     private fun uncachedReplace(original: String): String {
         val replacements = replacementMappings.findReplacements(original)
 

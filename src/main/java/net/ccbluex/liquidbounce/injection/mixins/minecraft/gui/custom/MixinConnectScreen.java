@@ -46,6 +46,7 @@ import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -64,6 +65,11 @@ public abstract class MixinConnectScreen extends MixinScreen {
 
     @Unique
     private ServerAddress serverAddress = null;
+
+    @Inject(method = "shouldCloseOnEsc", at = @At("HEAD"), cancellable = true)
+    private void onShouldCloseOnEsc(CallbackInfoReturnable<Boolean> cir) {
+        cir.setReturnValue(true);
+    }
 
     @Inject(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;centeredText(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)V"))
     private void injectRender(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta, final CallbackInfo callback) {

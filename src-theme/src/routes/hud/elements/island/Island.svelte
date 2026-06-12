@@ -3,7 +3,6 @@
     import {fade} from "svelte/transition";
     import {
         getClientInfo,
-        getModuleSettings,
         getPlayerData,
         getPlayerInventory,
         getSession
@@ -31,14 +30,6 @@
     import {get} from 'svelte/store';
     import {calcArmorValue} from "../../../../util/Client/calcArmorValue";
     import { clientName } from "../../../../theme/theme_manager";
-    import {
-        checkUsernameVisibility,
-        nameProtect,
-        NameProtectSetting,
-        randomCode,
-        showUsername,
-        useGarbled
-    } from "../../../../theme/NameProtectManager";
     import {Interval} from "../../../../util/timeout_utils";
     import ItemStackDisplay from "../../common/ItemView/ItemStackDisplay.svelte";
 
@@ -56,7 +47,7 @@
 
     const userData = JSON.parse(
         localStorage.getItem('userSettings') ||
-        JSON.stringify({username: 'Customer'})
+        JSON.stringify({username: 'KotlinModule'})
     );
 
     type AlertType =
@@ -389,9 +380,6 @@
 
         await updateClientInfo();
         await updatePlayerData();
-        await checkUsernameVisibility();
-        const settings = await getModuleSettings("NameProtect");
-        NameProtectSetting(settings);
     };
 
     const handleInitialAnimationEnd = async () => {
@@ -410,15 +398,6 @@
     };
 
     $: loaded = timeLoaded && clientInfo;
-    $: if ($showUsername || $useGarbled || $nameProtect) {
-        tick().then(() => {
-            const targetEl = contentRefs[currentContent];
-            if (targetEl) {
-                const contentWidth = targetEl.scrollWidth;
-                w.set(contentWidth);
-            }
-        });
-    }
     $: {
         if ($armorDurabilityStore) checkArmorDurability();
         if ($blockCount !== undefined) checkBlockAlert($blockCount);
@@ -546,11 +525,6 @@
 
         prevOpenChest = newOpenChest.map(stack => ({...stack}));
     });
-
-    listen("nameProtectValueChange", async () => {
-        const settings = await getModuleSettings("NameProtect");
-        NameProtectSetting(settings);
-    });
 </script>
 {#if loaded && playerData}
     <div class="dynamic-island-container" style="transform: scale({settings.scale});">
@@ -626,13 +600,7 @@
                             <span class="fps">{clientInfo.fps}fps</span>
                             <div class="separator"></div>
                             <span class="username">
-                              {#if $showUsername && session}
-                                  {session.username}
-                              {:else if $useGarbled}
-                                  {$randomCode}
-                              {:else}
-                                  {$nameProtect}
-                              {/if}
+                                {userData.username}
                             </span>
                         {/if}
                     </div>

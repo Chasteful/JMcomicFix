@@ -152,19 +152,18 @@ public abstract class MixinChatComponent implements ChatComponentAddition {
             });
         }
 
-        String plainText = formattedText.getString();
-        String replacedText = ModuleNameProtect.INSTANCE.replace(plainText);
+        Component protectedComponent =
+            ModuleNameProtect.INSTANCE.replace(message.content());
 
-        if (!replacedText.equals(plainText)) {
-            formattedText = Component.literal(replacedText).withStyle(formattedText.getStyle());
-        }
 
         if (message != null) {
-            EventManager.INSTANCE.callEvent(new OverlayChatEvent(
-                formattedText,
-                System.currentTimeMillis(),
-                false
-            ));
+            EventManager.INSTANCE.callEvent(
+                new OverlayChatEvent(
+                    protectedComponent,
+                    System.currentTimeMillis(),
+                    false
+                )
+            );
         }
 
 

@@ -204,19 +204,12 @@ public abstract class MixinPlayerTabOverlay {
                 Component originalComponent = self.getNameForDisplay(entry);
                 if (originalComponent == null) originalComponent = Component.literal(entry.getProfile().name());
 
-                Component fullName;
-                if (ModuleNameProtect.INSTANCE.getRunning()) {
-                    String originalText = originalComponent.getString();
-                    String processedName = ModuleNameProtect.INSTANCE.replace(originalText);
-
-                    if (!processedName.equals(originalText)) {
-                        fullName = Component.literal(processedName).withStyle(originalComponent.getStyle());
-                    } else {
-                        fullName = originalComponent;
-                    }
-                } else {
-                    fullName = originalComponent;
-                }
+                Component
+                    fullName = ModuleNameProtect.INSTANCE.replace(
+                    ModuleBetterTab.isVisible(Visibility.NAME_ONLY)
+                        ? Component.nullToEmpty(entry.getProfile().name())
+                        : originalComponent
+                );
                 Component latency = Component.literal(entry.getLatency() + "ms")
                     .withStyle(style -> style.withColor(net.minecraft.network.chat.TextColor.fromRgb(getLatencyColor(entry.getLatency()))));
 

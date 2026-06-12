@@ -31,7 +31,6 @@
     import {getClientInfo, getComponents, getMetadata} from "../../integration/rest";
     import {listen} from "../../integration/ws";
     import {ScaleFactor} from "./Hud_store";
-    import {WindowSize} from "../../theme/WindowSize";
     import {hudScaleFactor} from "../../theme/theme_manager";
     import { os } from "../clickgui/clickgui_store";
     import {calcResolutionCoefficient} from "../../util/resolution_utils";
@@ -44,11 +43,8 @@
     import GenericPlayerInventory from "./elements/inventory/GenericPlayerInventory.svelte";
     import InventoryStatistics from "./elements/inventory/InventoryStatistics.svelte";
 
-    const {destroy} = WindowSize();
     let metadata: Metadata;
     let components: HudComponent[] = [];
-
-    $: ScaleFactor.set($hudScaleFactor * calcResolutionCoefficient());
 
     async function updateZoom(): Promise<void> {
         $ScaleFactor = $hudScaleFactor * calcResolutionCoefficient();
@@ -68,7 +64,6 @@
         return cleanup;
     });
 
-    onDestroy(destroy);
 
     listen("componentsUpdate", (data: ComponentsUpdateEvent) => {
         if (data.id != metadata.id) {
