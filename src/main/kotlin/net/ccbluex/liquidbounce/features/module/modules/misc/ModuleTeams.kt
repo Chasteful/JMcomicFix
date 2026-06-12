@@ -31,8 +31,11 @@ import net.ccbluex.liquidbounce.utils.inventory.EquipmentSlotChoice
 import net.ccbluex.liquidbounce.utils.kotlin.Priority
 import net.ccbluex.liquidbounce.utils.kotlin.matchesAny
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.Items
 import java.util.function.Predicate
 
 /**
@@ -59,6 +62,11 @@ object ModuleTeams : ClientModule("Teams", ModuleCategories.MISC) {
         canBeNone = true,
     )
 
+    private val skulls by multiEnumChoice(
+        "Skulls",
+        enumSetOf(SkullType.ZOMBIE,SkullType.SKELETON),
+    )
+
     private enum class ColorSource(
         override val tag: String,
         val entityToColor: (Entity) -> Int?,
@@ -74,6 +82,29 @@ object ModuleTeams : ClientModule("Teams", ModuleCategories.MISC) {
                 null
             }
         }),
+    }
+
+    private enum class SkullType(
+        override val tag: String,
+        val item: Item
+    ) : Tagged {
+        PLAYER("player",Items.PLAYER_HEAD),
+        SKELETON("Skeleton", Items.SKELETON_SKULL),
+        WITHER("Wither", Items.WITHER_SKELETON_SKULL),
+        ZOMBIE("Zombie", Items.ZOMBIE_HEAD),
+        CREEPER("Creeper", Items.CREEPER_HEAD),
+        DRAGON("Dragon", Items.DRAGON_HEAD),
+        PIGLIN("Piglin", Items.PIGLIN_HEAD)
+    }
+
+    private fun checkSkull(entity: LivingEntity): Boolean {
+        if (entity !is Player) {
+            return false
+        }
+
+        val helmet = entity.getItemBySlot(EquipmentSlot.HEAD)
+
+        return skulls.any { helmet.`is`(it.item) }
     }
 
     @Suppress("unused")
@@ -94,7 +125,7 @@ object ModuleTeams : ClientModule("Teams", ModuleCategories.MISC) {
      * name color, armor color or team prefix.
      */
     private fun isInClientPlayersTeam(entity: LivingEntity) =
-        matches.matchesAny(entity) || checkArmor(entity)
+        matches.matchesAny(entity) || checkArmor(entity) || checkSkull(entity)
 
     /**
      * Checks if the color of any armor piece matches.
@@ -125,7 +156,6 @@ object ModuleTeams : ClientModule("Teams", ModuleCategories.MISC) {
                 && clientColor != null
                 && targetColor == clientColor
         }),
-
         /**
          * Prefix check - this works on Hypixel BedWars, GommeHD Skywars and many other servers.
          */
