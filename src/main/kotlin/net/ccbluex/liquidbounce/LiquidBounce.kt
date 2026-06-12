@@ -447,6 +447,11 @@ object LiquidBounce : EventListener {
         ChunkScanner.stopThread()
         EventManager.unregisterAll()
 
+        // Shutdown HTTP server
+        ioScope.launch {
+            ClientInteropServer.stop()
+        }
+
         // Save all configurations
         ConfigSystem.storeAll()
 

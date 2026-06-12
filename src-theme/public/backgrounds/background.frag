@@ -1,11 +1,13 @@
 #version 330
 
+// Uniforms
 layout(std140) uniform ThemeBackgroundData {
     float time;
     vec2 mouse;
     vec2 resolution;
 };
 
+// Output color
 out vec4 fragColor;
 
 /*
