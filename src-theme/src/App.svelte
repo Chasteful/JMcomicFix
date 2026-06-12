@@ -79,8 +79,8 @@
 
         await insertPersistentData();
 
-        listenAlways("themeColorChange", (event) => {
-            if (event.themeId !== metadata.id) {
+        listenAlways("themeColorChange", async (event: ThemeColorChangeEvent) => {
+            if (event.themeId !== metadata?.id) {
                 return;
             }
 

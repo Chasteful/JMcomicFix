@@ -88,7 +88,7 @@
             {:else if c.name === 'Effects'}
                 <Effects settings={c.settings}/>
             {:else if c.name === 'Image'}
-                <img alt="" src={c.settings.uRL} style="scale: {c.settings.scale};"/>
+                <img alt="" src={c.settings.uRL} style="transform: scale({c.settings.scale});"/>
             {:else if c.name === 'ArmorItems'}
                 <ArmorItems settings={c.settings}/>
             {:else if c.name === 'ArrayList'}

@@ -1,6 +1,6 @@
 {
   "name": "StatusBar",
-  "enabled": true,
+  "enabled": false,
   "singleton": true,
   "alignment": {
     "horizontalAlignment": "CenterTranslated",
