@@ -73,6 +73,7 @@
     "minecraft.gui.MixinChatScreen",
     "minecraft.gui.MixinChatScreenAccessor",
     "minecraft.gui.MixinCommandSuggestions",
+    "minecraft.gui.MixinContextualBarRenderer",
     "minecraft.gui.MixinGui",
     "minecraft.gui.MixinGuiAccessor",
     "minecraft.gui.MixinGuiGraphicsExtractor",

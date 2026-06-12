@@ -29,7 +29,7 @@
   ],
   "tweaks": [
     "DISABLE_STATUS_BAR",
-    "DISABLE_EXP_BAR"
+    "DISABLE_EXP_NUMBER"
   ]
 }
 
