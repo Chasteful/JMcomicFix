@@ -55,10 +55,6 @@
         await updateSession();
     });
 
-    listen("nameProtectValueChange", async () => {
-        const settings = await getModuleSettings("NameProtect");
-        NameProtectSetting(settings);
-    });
 </script>
 
 

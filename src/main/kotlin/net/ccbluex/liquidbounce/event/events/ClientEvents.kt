@@ -64,7 +64,7 @@ class HudValueChangeEvent(val configurable: ValueGroup) : Event(),WebSocketEvent
 class ShadowValueChangeEvent(val value: Boolean) : Event(), WebSocketEvent
 
 @Tag("nameProtectValueChange")
-class NameProtectEvent(val configurable: ValueGroup) : Event(),WebSocketEvent
+class NameProtectEvent(val value: Boolean) : Event(),WebSocketEvent
 
 @Tag("spaceSeperatedNamesChange")
 class SpaceSeperatedNamesChangeEvent(val value: Boolean) : Event(), WebSocketEvent

@@ -22,7 +22,7 @@ export interface EventMap {
     shadowValueChange:ShadowValueChangeEvent;
     themeColorChange: ThemeColorChangeEvent;
     hudValueChange:HudValueChangeEvent;
-    nameProtectValueChange: ClickGuiValueChangeEvent;
+    nameProtectValueChange: NameProtectEvent;
     clickGuiScaleChange: ClickGuiScaleChangeEvent;
     clickGuiValueChange: ClickGuiValueChangeEvent;
     spaceSeperatedNamesChange: SpaceSeperatedNamesChangeEvent;
@@ -102,6 +102,10 @@ export interface HudValueChangeEvent{
 }
 
 export interface ShadowValueChangeEvent{
+    value: boolean;
+}
+
+export interface NameProtectEvent {
     value: boolean;
 }
 

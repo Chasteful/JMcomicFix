@@ -56,8 +56,8 @@ object ModuleNameProtect : ClientModule("NameProtect", ModuleCategories.MISC) {
     private val replacement by text("Replacement", "You")
 
     @Suppress("unused")
-    private val applyGarbled by boolean("Garbled", false).onChanged {
-        EventManager.callEvent(NameProtectEvent(ModuleNameProtect))
+    private val applyGarbled by boolean("Garbled", false).onChanged { state ->
+        EventManager.callEvent(NameProtectEvent(state))
     }
 
     private val colorMode = choices<GenericColorMode<Unit>>(

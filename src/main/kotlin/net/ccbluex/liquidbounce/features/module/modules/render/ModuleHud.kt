@@ -79,8 +79,8 @@ object ModuleHud : ClientModule("HUD", ModuleCategories.RENDER, state = true, hi
     }
 
     @Suppress("unused")
-    private val shadow by boolean("SpaceSeperatedNames", true).onChange { state ->
-        EventManager.callEvent(SpaceSeperatedNamesChangeEvent(state))
+    private val shadow by boolean("Shadow", true).onChange { state ->
+        EventManager.callEvent(ShadowValueChangeEvent(state))
         state
     }
 
@@ -91,7 +91,7 @@ object ModuleHud : ClientModule("HUD", ModuleCategories.RENDER, state = true, hi
     }
 
     class Customization : ValueGroup( "Customization") {
-        val hudZoom by float("ScaleFactor", 0.8f, 0.5f..2f).onChanged {
+        val hudScaleFactor by float("ScaleFactor", 0.8f, 0.5f..2f).onChanged {
             EventManager.callEvent(HudValueChangeEvent(ModuleHud))
         }
         val borderRadius by int("BorderRadius", 12, 1..24).onChanged {

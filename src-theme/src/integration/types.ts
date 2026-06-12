@@ -399,7 +399,7 @@ export interface Theme {
     name: string;
     id: string;
     colors: Record<string, number>;
-    settings: Record<string, any>;
+    settings: { [name: string]: any };
 }
 
 export interface HudComponent {

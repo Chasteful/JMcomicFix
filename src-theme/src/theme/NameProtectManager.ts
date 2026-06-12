@@ -2,6 +2,8 @@ import {Interval} from "../util/timeout_utils";
 import type {ConfigurableSetting, TextSetting} from "../integration/types";
 import {getModules} from "../integration/rest";
 import { writable, get} from "svelte/store";
+import {listenAlways} from "../integration/ws";
+import type {NameProtectEvent} from "../integration/events";
 
 const timeoutManager = new Interval();
 const userData = JSON.parse(
@@ -10,6 +12,7 @@ const userData = JSON.parse(
         username: 'Customer',
     })
 );
+
 export const showUsername= writable<boolean>(false);
 export const nameProtect = writable<string>("");
 export const useGarbled = writable<boolean>(false);
@@ -44,11 +47,12 @@ export const codeGenerator = {
     },
     stop: () => timeoutManager.clear("randomUsername")
 };
+
 export function NameProtectSetting(configurable: ConfigurableSetting) {
     const Replacement = configurable.value.find(v => v.name === "Replacement") as TextSetting;
     nameProtect.set(Replacement?.value ?? "Customer");
-    useGarbled.set(configurable?.value.find(v => v.name === "Garbled")?.value as boolean ?? false);
 }
+
 export const checkUsernameVisibility = async (): Promise<void> => {
     const modules = await getModules();
     showUsername.set(modules.some(module =>
@@ -58,3 +62,7 @@ export const checkUsernameVisibility = async (): Promise<void> => {
     if (!get(showUsername)) codeGenerator.start();
     else codeGenerator.stop();
 };
+
+listenAlways("nameProtectValueChange",(e: NameProtectEvent) => {
+    useGarbled.set(e.value);
+})
