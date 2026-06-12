@@ -17,6 +17,7 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LightningBolt
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import kotlin.math.acos
 import kotlin.math.cos
@@ -97,7 +98,9 @@ object ModuleKillEffects : ClientModule("KillEffects", ModuleCategories.RENDER) 
         }
 
         if (Effect.LAVA_SPARK in effects) {
-            world.levelEvent(2001, entity.blockPosition().above(1), net.minecraft.world.level.block.Block.getId(Blocks.REDSTONE_BLOCK.defaultBlockState()))
+            world.levelEvent(2001,
+                entity.blockPosition().above(1),
+                Block.getId(Blocks.REDSTONE_BLOCK.defaultBlockState()))
 
             repeat(particleCount) {
                 world.addParticle(
@@ -111,7 +114,9 @@ object ModuleKillEffects : ClientModule("KillEffects", ModuleCategories.RENDER) 
         }
 
         if (Effect.GLASS_SHATTER in effects) {
-            world.levelEvent(2001, entity.blockPosition().above(1), net.minecraft.world.level.block.Block.getId(Blocks.GLASS.defaultBlockState()))
+            world.levelEvent(2001,
+                entity.blockPosition().above(1),
+                Block.getId(Blocks.GLASS.defaultBlockState()))
             mc.soundManager.play(
                 SimpleSoundInstance.forUI(
                     SoundEvents.GLASS_BREAK,
@@ -138,7 +143,9 @@ object ModuleKillEffects : ClientModule("KillEffects", ModuleCategories.RENDER) 
         }
 
         if (Effect.BLOOD in effects && entity is LivingEntity) {
-            world.levelEvent(2001, entity.blockPosition().above(1), net.minecraft.world.level.block.Block.getId(Blocks.REDSTONE_BLOCK.defaultBlockState()))
+            world.levelEvent(2001,
+                entity.blockPosition().above(1),
+                Block.getId(Blocks.REDSTONE_BLOCK.defaultBlockState()))
         }
 
         if (Effect.FIREWORK in effects) {

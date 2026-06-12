@@ -20,8 +20,17 @@ import net.minecraft.client.model.geom.ModelLayers
 import net.minecraft.client.model.geom.ModelPart
 import net.minecraft.client.model.`object`.equipment.ElytraModel
 import net.minecraft.client.model.player.PlayerCapeModel
-import net.minecraft.client.renderer.entity.*
-import net.minecraft.client.renderer.entity.state.*
+import net.minecraft.client.renderer.entity.EnderDragonRenderer
+import net.minecraft.client.renderer.entity.EntityRenderer
+import net.minecraft.client.renderer.entity.LivingEntityRenderer
+import net.minecraft.client.renderer.entity.RenderLayerParent
+import net.minecraft.client.renderer.entity.state.AvatarRenderState
+import net.minecraft.client.renderer.entity.state.EnderDragonRenderState
+import net.minecraft.client.renderer.entity.state.EntityRenderState
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState
+import net.minecraft.client.renderer.entity.state.SlimeRenderState
+import net.minecraft.client.renderer.entity.state.WitherRenderState
 import net.minecraft.core.component.DataComponents
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.Entity
@@ -98,38 +107,51 @@ data class WireframeEntity(
                                 Mth.rotLerp(tickDelta, living.yBodyRotO, living.yBodyRot)
                             }
 
-                            val livingState = renderState as LivingEntityRenderState
-                            poseStack.scale(livingState.scale, livingState.scale, livingState.scale)
-
+                            val livingState = renderState as? LivingEntityRenderState
+                            livingState?.let {
+                                poseStack.scale(it.scale, it.scale, it.scale)
+                            }
                             val rendererInstance = mc.entityRenderDispatcher.getRenderer(entity)
-                            val livingRendererInstance = rendererInstance as? LivingEntityRenderer<LivingEntity, LivingEntityRenderState, *>
+                            val livingRendererInstance =
+                                rendererInstance as? LivingEntityRenderer<LivingEntity, LivingEntityRenderState, *>
 
                             livingRendererInstance?.let {
-                                (it as LivingEntityRendererAccessor<LivingEntity, LivingEntityRenderState>)
-                                    .invokeSetupRotations(
-                                        livingState,
-                                        poseStack,
-                                        bodyYaw,
-                                        livingState.scale
-                                    )
+                                livingState?.let { it1 ->
+                                    (it as LivingEntityRendererAccessor<LivingEntity, LivingEntityRenderState>)
+                                        .invokeSetupRotations(
+                                            livingState,
+                                            poseStack,
+                                            bodyYaw,
+                                            it1.scale
+                                        )
+                                }
                             }
                         }
                     }
 
-                    val scale = when (entity) {
-                        is WitherBoss -> {
-                            val witherState = renderState as WitherRenderState
+                    when (renderState) {
+                        is SlimeRenderState -> {
+                            val size = renderState.size
+                            val squish = renderState.squish
+                            val inv = 1.0f / (squish + 1.0f)
+                            poseStack.scale(size * inv, size / inv, size * inv)
+                        }
+                        is WitherRenderState -> {
                             var f = 2.0F
-                            if (witherState.invulnerableTicks > 0.0F) {
-                                f -= witherState.invulnerableTicks / 220.0F * 0.5F
+                            if (renderState.invulnerableTicks > 0.0F) {
+                                f -= renderState.invulnerableTicks / 220.0F * 0.5F
                             }
-                            f
+                            poseStack.scale(f, f, f)
                         }
-                        is Player -> 0.9375f
-                        else -> 1.0f
+                        else -> {
+                            val defaultScale = when (entity) {
+                                is Player -> 0.9375f
+                                else -> 1.0f
+                            }
+                            poseStack.scale(defaultScale, defaultScale, defaultScale)
+                        }
                     }
 
-                    poseStack.scale(scale, scale, scale)
                     poseStack.scale(-1f, -1f, 1f)
                     poseStack.translate(0.0, -1.501, 0.0)
 
