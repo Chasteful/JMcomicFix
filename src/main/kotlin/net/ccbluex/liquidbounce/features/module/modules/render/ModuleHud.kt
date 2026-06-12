@@ -26,7 +26,6 @@ import net.ccbluex.liquidbounce.event.events.BrowserReadyEvent
 import net.ccbluex.liquidbounce.event.events.DisconnectEvent
 import net.ccbluex.liquidbounce.event.events.HudValueChangeEvent
 import net.ccbluex.liquidbounce.event.events.ScreenEvent
-import net.ccbluex.liquidbounce.event.events.ShadowValueChangeEvent
 import net.ccbluex.liquidbounce.event.events.SpaceSeperatedNamesChangeEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.misc.HideAppearance.isDestructed
@@ -79,12 +78,6 @@ object ModuleHud : ClientModule("HUD", ModuleCategories.RENDER, state = true, hi
     }
 
     @Suppress("unused")
-    private val shadow by boolean("Shadow", true).onChange { state ->
-        EventManager.callEvent(ShadowValueChangeEvent(state))
-        state
-    }
-
-    @Suppress("unused")
     private val spaceSeperatedNames by boolean("SpaceSeperatedNames", true).onChange { state ->
         EventManager.callEvent(SpaceSeperatedNamesChangeEvent(state))
         state
@@ -97,7 +90,7 @@ object ModuleHud : ClientModule("HUD", ModuleCategories.RENDER, state = true, hi
         val borderRadius by int("BorderRadius", 12, 1..24).onChanged {
             EventManager.callEvent(HudValueChangeEvent(ModuleHud))
         }
-        val shadowStrength by int("ShadowStrength", 16, 4..32).onChanged { state ->
+        val shadowStrength by int("ShadowStrength", 16, 0..32).onChanged { state ->
             EventManager.callEvent(HudValueChangeEvent(ModuleHud))
         }
         val clientName by text("ClientName", "").onChanged {
@@ -106,13 +99,13 @@ object ModuleHud : ClientModule("HUD", ModuleCategories.RENDER, state = true, hi
         val scoreboardIP by text("ScoreboardIP", "").onChanged {
             EventManager.callEvent(HudValueChangeEvent(ModuleHud))
         }
-        val primaryColor by color("Primary", Color4b.fromHex("#666666")).onChanged {
+        val primaryColor by color("PrimaryColor", Color4b.fromHex("#666666")).onChanged {
             EventManager.callEvent(HudValueChangeEvent(ModuleHud))
         }
-        val secondaryColor by color("Secondary", Color4b.fromHex("#A270FF")).onChanged {
+        val secondaryColor by color("SecondaryColor", Color4b.fromHex("#A270FF")).onChanged {
             EventManager.callEvent(HudValueChangeEvent(ModuleHud))
         }
-        val shadowColor by color("Shadow", Color4b.fromHex("#232323")).onChanged {
+        val shadowColor by color("ShadowColor", Color4b.fromHex("#232323")).onChanged {
             EventManager.callEvent(HudValueChangeEvent(ModuleHud))
         }
     }

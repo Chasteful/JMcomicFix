@@ -60,9 +60,6 @@ class ClickGuiValueChangeEvent(val configurable: ValueGroup) : Event(), WebSocke
 @Tag("hudValueChange")
 class HudValueChangeEvent(val configurable: ValueGroup) : Event(),WebSocketEvent
 
-@Tag("shadowValueChange")
-class ShadowValueChangeEvent(val value: Boolean) : Event(), WebSocketEvent
-
 @Tag("nameProtectValueChange")
 class NameProtectEvent(val value: Boolean) : Event(),WebSocketEvent
 

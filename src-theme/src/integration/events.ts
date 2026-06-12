@@ -19,7 +19,6 @@ import type {
 
 export interface EventMap {
     socketReady: void;
-    shadowValueChange:ShadowValueChangeEvent;
     themeColorChange: ThemeColorChangeEvent;
     hudValueChange:HudValueChangeEvent;
     nameProtectValueChange: NameProtectEvent;
@@ -101,9 +100,6 @@ export interface HudValueChangeEvent{
     configurable: ConfigurableSetting;
 }
 
-export interface ShadowValueChangeEvent{
-    value: boolean;
-}
 
 export interface NameProtectEvent {
     value: boolean;

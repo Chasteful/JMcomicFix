@@ -43,8 +43,13 @@
                 ? convertToSpacedString(m.name)
                 : m.name;
             const prefix = prefixMap.get(m.name) || '';
-            const showPrefix = prefix.trim().length > 0;
-            const fullName = showPrefix ? `${formattedName}\u00A0${prefix}` : formattedName;
+            const showPrefix =
+                cSettings.showTags &&
+                prefix.trim().length > 0;
+
+            const fullName = showPrefix
+                ? `${formattedName}\u00A0${prefix}`
+                : formattedName;
 
             const width = getTextWidth(
                 fullName,

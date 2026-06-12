@@ -70,7 +70,15 @@
                 aria-hidden={count === undefined}
                 out:FadeOut|global={{ duration: 200 }}>
             {#if nextBlock}
-            <img class="icon" src={itemTextureUrl(nextBlock)} alt={nextBlock}/>
+            <img class="icon" src={itemTextureUrl(nextBlock)} alt={nextBlock}  style="transform: scale(0.75);"/>
+            {:else}
+                <div class="icon" style="filter:brightness(0) invert(1);">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd"
+                              d="M11.7925 5.04509C11.9243 4.98497 12.0757 4.98497 12.2075 5.04509L18.2075 7.78193C18.3857 7.8632 18.5 8.04101 18.5 8.23684V15.0789C18.5 15.2585 18.4037 15.4243 18.2477 15.5133L12.2477 18.9344C12.0942 19.0219 11.9058 19.0219 11.7523 18.9344L5.75234 15.5133C5.59632 15.4243 5.5 15.2585 5.5 15.0789V8.23684C5.5 8.04101 5.61433 7.8632 5.7925 7.78193L11.7925 5.04509ZM6.5 9.04163L11.5 11.5124V17.6393L6.5 14.7885V9.04163ZM12.5 17.6393L17.5 14.7885V9.04163L12.5 11.5124V17.6393ZM12 10.644L16.8348 8.25491L12 6.04956L7.16519 8.25491L12 10.644Z"
+                              fill="#000000"/>
+                    </svg>
+                </div>
             {/if}
             <div class="count">Amount:
                 <span class="count-number">{count}</span>
@@ -112,6 +120,7 @@
   .hud {
     display: flex;
     align-items: center;
+    gap: 8px;
     height: 48px;
     padding: 0 10px;
     border-radius: 12px;
@@ -126,17 +135,21 @@
   }
 
   .icon {
-    width: 32px;
-    height: 32px;
-    object-fit: contain;
+    width: 48px;
+    height: 48px;
     flex-shrink: 0;
-    //filter: brightness(0) invert(1);
-  }
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+  }
   .count {
     color: #CCCCCC;
     text-shadow: 0 0 3px rgba(204, 204, 204, 0.9);
-    padding: 0 8px 0 0;
 
     .count-number {
       font-weight: bold;

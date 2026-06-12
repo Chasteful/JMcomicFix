@@ -133,7 +133,6 @@ import net.ccbluex.liquidbounce.event.events.SelectingHotbarSlotSilentlyEvent
 import net.ccbluex.liquidbounce.event.events.ServerConnectEvent
 import net.ccbluex.liquidbounce.event.events.ServerPingedEvent
 import net.ccbluex.liquidbounce.event.events.SessionEvent
-import net.ccbluex.liquidbounce.event.events.ShadowValueChangeEvent
 import net.ccbluex.liquidbounce.event.events.SpaceSeperatedNamesChangeEvent
 import net.ccbluex.liquidbounce.event.events.SprintEvent
 import net.ccbluex.liquidbounce.event.events.TagEntityEvent
@@ -283,7 +282,6 @@ internal val ALL_EVENT_CLASSES: Array<Class<out Event>> = arrayOf(
     UserLoggedOutEvent::class.java,
     NameProtectEvent::class.java,
     HudValueChangeEvent::class.java,
-    ShadowValueChangeEvent::class.java,
     KeyBindingCPSEvent::class.java,
     OverlayChatEvent::class.java,
     OverlayPlayListEvent::class.java,

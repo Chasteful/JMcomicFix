@@ -2,7 +2,7 @@ import { writable, derived, type Writable, type Readable } from 'svelte/store';
 import { getModuleSettings } from '../integration/rest';
 import {listenAlways} from '../integration/ws';
 import type {ConfigurableSetting, TextSetting} from '../integration/types';
-import type {HudValueChangeEvent, ShadowValueChangeEvent,} from "../integration/events";
+import type {HudValueChangeEvent} from "../integration/events";
 import { type ColorFormats, convertColor4b, type ThemeColors} from "../util/color_utils";
 
 export const themeColors: Writable<ThemeColors> = writable({
@@ -129,34 +129,26 @@ async function loadInitialColors(): Promise<void> {
 }
 
 function updateColorsFromSettings(settings: ConfigurableSetting): void {
-    let shadowStrengthSetting: number | undefined;
-    let borderRadiusSetting: number | undefined;
     const customization = settings.value.find(v => v.name === "Customization") as ConfigurableSetting;
 
+    const shadowStrengthSetting = customization.value.find(v => v.name === "ShadowStrength")?.value as number;
+    shadowStrength.set(shadowStrengthSetting ?? 16);
 
-    if (!shadow) {
-        shadowStrength.set(0);
-        shadowStrengthSetting = 0;
-    } else {
-        shadowStrengthSetting = customization.value.find(v => v.name === "ShadowStrength")?.value as number;
-        shadowStrength.set(shadowStrengthSetting ?? 16);
-    }
-
-
-    const primaryValue = customization.value.find((v) => v.name === 'Primary')?.value as number;
-    const secondaryValue = customization.value.find((v) => v.name === 'Secondary')?.value as number;
-    const shadowColorValue = customization.value.find((v) => v.name === 'Shadow')?.value as number;
     const scaleFactor = customization.value.find(v => v.name === "ScaleFactor")?.value as number ?? 1;
     hudScaleFactor.set(scaleFactor);
+
     const clientNameSetting = customization.value.find(v => v.name === "ClientName") as TextSetting;
     clientName.set(clientNameSetting?.value ?? "");
 
     const scoreboardIPSetting = customization.value.find(v => v.name === "ScoreboardIP") as TextSetting;
     scoreboardIP.set(scoreboardIPSetting?.value ?? "");
 
-    borderRadiusSetting = customization.value.find(v => v.name === "BorderRadius")?.value as number;
+    const borderRadiusSetting = customization.value.find(v => v.name === "BorderRadius")?.value as number;
     borderRadius.set(borderRadiusSetting ?? 6);
 
+    const primaryValue = customization.value.find((v) => v.name === 'PrimaryColor')?.value as number;
+    const secondaryValue = customization.value.find((v) => v.name === 'SecondaryColor')?.value as number;
+    const shadowColorValue = customization.value.find((v) => v.name === 'ShadowColor')?.value as number;
 
     if (primaryValue !== undefined && secondaryValue !== undefined && shadowColorValue !== undefined) {
         const newTheme: ThemeColors = {
@@ -176,9 +168,5 @@ function updateColorsFromSettings(settings: ConfigurableSetting): void {
 listenAlways("hudValueChange", (e: HudValueChangeEvent) => {
     updateColorsFromSettings(e.configurable);
 });
-
-listenAlways("shadowValueChange",(e: ShadowValueChangeEvent) => {
-    shadow.set(e.value);
-})
 
 loadInitialColors().catch(console.error);

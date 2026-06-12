@@ -45,6 +45,7 @@
 
     let metadata: Metadata;
     let components: HudComponent[] = [];
+    $: ScaleFactor.set($hudScaleFactor * calcResolutionCoefficient());
 
     async function updateZoom(): Promise<void> {
         $ScaleFactor = $hudScaleFactor * calcResolutionCoefficient();
