@@ -5,20 +5,15 @@
     import {gridSize, os, scaleFactor, showGrid, snappingEnabled, panelLength,fontSize} from "./clickgui_store";
     import type {ConfigurableSetting, TogglableSetting} from "../../integration/types";
     import {onDestroy, onMount} from "svelte";
-    import {getClientInfo, getGameWindow, getModuleSettings, setTyping} from "../../integration/rest";
+    import {getClientInfo,getModuleSettings, setTyping} from "../../integration/rest";
     import {listen} from "../../integration/ws";
-    import type {ClickGuiValueChangeEvent, ScaleFactorChangeEvent} from "../../integration/events";
-    import {Resolution_utils} from "../../util/resolution_utils";
+    import type {ClickGuiValueChangeEvent} from "../../integration/events";
+    import {resolutionCoefficient} from "../../util/resolution_utils";
 
     const tabs = [
         {title: "ClickGUI", content: ClickGui},
         {title: "Settings", content: GlobalSettings}
     ];
-
-
-    let resolutionScaler = new Resolution_utils({
-        baseResolution: {width: 1920, height: 1080}
-    });
 
     let activeTab = $state(0);
     let minecraftScaleFactor = $state(2);
@@ -32,12 +27,14 @@
         $fontSize = fontSizeFactor
 
     });
+
     function updateScaleFactor() {
         $scaleFactor =
             minecraftScaleFactor *
             clickGuiScaleFactor *
-            resolutionScaler.getScaleFactor();
+            $resolutionCoefficient;
     }
+
     function applyValues(configurable: ConfigurableSetting) {
         const scaleValue = configurable.value.find(v => v.name === "Scale");
         const panelLength= configurable.value.find(v => v.name === "Length")
@@ -67,19 +64,14 @@
 
     const handleResize = () => {
         requestAnimationFrame(() => {
-            resolutionScaler.updateScaleFactor();
             updateScaleFactor()
         });
     };
 
     onMount(async () => {
-
-        resolutionScaler.updateScaleFactor();
         updateScaleFactor()
 
         $os = (await getClientInfo()).os;
-        const gameWindow = await getGameWindow();
-        minecraftScaleFactor = gameWindow.scaleFactor;
 
         const clickGuiSettings = await getModuleSettings("ClickGUI");
         applyValues(clickGuiSettings);
@@ -92,10 +84,6 @@
 
     onDestroy(() => {
         window.removeEventListener("resize", handleResize);
-    });
-
-    listen("scaleFactorChange", (e: ScaleFactorChangeEvent) => {
-        minecraftScaleFactor = e.scaleFactor;
     });
 
     listen("clickGuiValueChange", (e: ClickGuiValueChangeEvent) => {

@@ -4,9 +4,9 @@
   "singleton": true,
   "alignment": {
     "horizontalAlignment": "CenterTranslated",
-    "horizontalOffset": 0,
+    "horizontalOffset": -255,
     "verticalAlignment": "Top",
-    "verticalOffset": 50
+    "verticalOffset": 20
   },
   "values": [
     {

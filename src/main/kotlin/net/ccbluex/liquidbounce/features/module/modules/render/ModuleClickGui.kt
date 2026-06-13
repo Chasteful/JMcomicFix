@@ -54,7 +54,7 @@ object ModuleClickGui :
     override val running get() = true
 
     @Suppress("UnusedPrivateProperty")
-    private val scale by float("Scale", 1f, 0.5f..2f).onChanged {
+    private val scale by float("Scale", 0.9f, 0.5f..2f).onChanged {
         EventManager.callEvent(ClickGuiScaleChangeEvent(it))
         EventManager.callEvent(ClickGuiValueChangeEvent(this))
     }
@@ -63,7 +63,7 @@ object ModuleClickGui :
     private val length by float("Length", 66f, 30f..100f, "%").onChanged {
         EventManager.callEvent(ClickGuiValueChangeEvent(this))
     }
-    
+
     @Suppress("UnusedPrivateProperty")
     private val fontSize by int("FontSize", 18, 14..20, "px").onChanged {
         EventManager.callEvent(ClickGuiValueChangeEvent(this))

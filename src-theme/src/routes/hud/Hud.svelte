@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {onDestroy, onMount} from "svelte";
+    import {onMount} from "svelte";
     import ArrayList from "./elements/arrayList/ArrayList.svelte";
     import Notifications from "./elements/notifications/Notifications.svelte";
     import TabGui from "./elements/tabgui/TabGui.svelte";
@@ -27,13 +27,13 @@
         HudComponent,
         Metadata,
     } from "../../integration/types";
-    import type {ComponentsUpdateEvent} from "../../integration/events";
-    import {getClientInfo, getComponents, getMetadata} from "../../integration/rest";
+    import type {ComponentsUpdateEvent, ScaleFactorChangeEvent} from "../../integration/events";
+    import {getClientInfo, getComponents, getGameWindow, getMetadata} from "../../integration/rest";
     import {listen} from "../../integration/ws";
     import {ScaleFactor} from "./Hud_store";
     import {hudScaleFactor} from "../../theme/theme_manager";
     import { os } from "../clickgui/clickgui_store";
-    import {calcResolutionCoefficient} from "../../util/resolution_utils";
+    import {resolutionCoefficient} from "../../util/resolution_utils";
     import ProgressBar from "./elements/ProgressBar.svelte";
     import SilentHand from "./elements/SilentHand.svelte";
     import TargetHud from "./elements/targethud/TargetHud.svelte";
@@ -43,12 +43,13 @@
     import GenericPlayerInventory from "./elements/inventory/GenericPlayerInventory.svelte";
     import InventoryStatistics from "./elements/inventory/InventoryStatistics.svelte";
 
+    let zoom = 100;
     let metadata: Metadata;
     let components: HudComponent[] = [];
-    $: ScaleFactor.set($hudScaleFactor * calcResolutionCoefficient());
+    $: ScaleFactor.set($hudScaleFactor * $resolutionCoefficient);
 
     async function updateZoom(): Promise<void> {
-        $ScaleFactor = $hudScaleFactor * calcResolutionCoefficient();
+        $ScaleFactor = $hudScaleFactor * $resolutionCoefficient;
     }
 
     onMount(() => {
@@ -56,6 +57,8 @@
 
         (async () => {
             $os = (await getClientInfo()).os;
+            const gameWindow = await getGameWindow();
+            zoom = gameWindow.scaleFactor * 50;
             await updateZoom();
             metadata = await getMetadata();
             components = await getComponents(metadata.id);
@@ -65,6 +68,9 @@
         return cleanup;
     });
 
+    listen("scaleFactorChange", (data: ScaleFactorChangeEvent) => {
+        zoom = data.scaleFactor * 50;
+    });
 
     listen("componentsUpdate", (data: ComponentsUpdateEvent) => {
         if (data.id != metadata.id) {
@@ -78,7 +84,7 @@
     });
 </script>
 
-<div class="hud" style="--hud-zoom: {$ScaleFactor}">
+<div class="hud-resize-with-resolution" style="--hud-zoom: {$ScaleFactor}">
     {#each components as c}
         {#if c.settings.enabled}
             <DraggableComponent alignment={c.settings.alignment} >
@@ -106,8 +112,6 @@
                 <GenericPlayerInventory
                         settings={c.settings}
                         rowLength={9} getRenderedStacks={it => it.enderChest} />
-            {:else if c.name === 'HealthBar'}
-                <HealthBar settings={c.settings}/>
             {:else if c.name === 'Information'}
                 <Information settings={c.settings}/>
             {:else if c.name === 'Inventory'}
@@ -156,10 +160,26 @@
     {/each}
 </div>
 
+<div class="hud-resize-with-game" style="zoom: {zoom}%">
+    {#each components as c}
+        {#if c.settings.enabled}
+            <DraggableComponent alignment={c.settings.alignment} >
+                {#if c.name === 'HealthBar'}
+            <HealthBar settings={c.settings}/>
+                {/if}
+            </DraggableComponent>
+        {/if}
+    {/each}
+</div>
+
 <style lang="scss">
-  .hud {
+  .hud-resize-with-resolution {
     height: 100vh;
     width: 100vw;
     zoom: var(--hud-zoom);
+  }
+  .hud-resize-with-game {
+    height: 100vh;
+    width: 100vw;
   }
 </style>

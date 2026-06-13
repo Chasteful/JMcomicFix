@@ -6,13 +6,13 @@
     "horizontalAlignment": "CenterTranslated",
     "horizontalOffset": 0,
     "verticalAlignment": "Bottom",
-    "verticalOffset": 70
+    "verticalOffset": 30
   },
   "values": [
     {
       "type": "FLOAT",
       "name": "Scale",
-      "value": 1.0,
+      "value": 0.85,
       "range": {
         "min": 0.5,
         "max": 2.0

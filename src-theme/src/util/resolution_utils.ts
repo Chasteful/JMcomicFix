@@ -1,31 +1,42 @@
-import {writable} from "svelte/store";
+import { writable, derived } from "svelte/store";
 
-const width = writable(window.innerWidth);
-const height = writable(window.innerHeight);
+const getWindowSize = () => {
+    if (typeof window === 'undefined') return { w: 1920, h: 1080 }; // 默认回退值
+    return { w: window.innerWidth, h: window.innerHeight };
+};
 
-export interface ResolutionScalerOptions {
-    baseResolution: { width: number; height: number };
-    minScale?: number;
+const initial = getWindowSize();
+
+export const width = writable(initial.w);
+export const height = writable(initial.h);
+
+if (typeof window !== 'undefined') {
+    window.addEventListener("resize", () => {
+        width.set(window.innerWidth);
+        height.set(window.innerHeight);
+    });
 }
-const baseResolution = {width: 1920, height: 1080};
 
-export function calcResolutionCoefficient() {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    const currentAspect = w / h;
+export const resolutionCoefficient = derived(
+    [width, height],
+    ([$width, $height]) => {
+        const baseResolution = { width: 1920, height: 1080 };
+        const currentAspect = $width / $height;
 
-    const wRatio = w / baseResolution.width;
-    const hRatio = h / baseResolution.height;
+        const wRatio = $width / baseResolution.width;
+        const hRatio = $height / baseResolution.height;
 
-    let min = Math.min(wRatio, hRatio);
+        let min = Math.min(wRatio, hRatio);
 
-    if (currentAspect < 2) {
-        min = Math.max(min, 0.45);
+        if (currentAspect < 2) {
+            min = Math.max(min, 0.45);
+        }
+
+        return Math.min(1, Math.max(0.1337, min));
     }
+);
 
-    return Math.min(1, Math.max(0.1337, min));
-}
-export function WindowSize() {
+export function windowSize() {
 
 
     function updateSize() {
@@ -45,42 +56,4 @@ export function WindowSize() {
             window.removeEventListener("resize", updateSize);
         }
     };
-}
-export class Resolution_utils {
-    private readonly minScale: number;
-    private baseResolution: { width: number; height: number };
-    private scaleFactor: number = 1;
-
-    constructor(options: ResolutionScalerOptions) {
-        this.baseResolution = options.baseResolution;
-        this.minScale = options.minScale ?? 0.1337;
-    }
-
-
-    public updateScaleFactor(): void {
-        this.scaleFactor = this.calcResolutionCoefficient();
-    }
-
-    public getScaleFactor(): number {
-        return this.scaleFactor;
-    }
-
-
-    private calcAdjustedResolution(): { width: number; height: number } {
-        const w = window.innerWidth;
-        const h = window.innerHeight;
-        const aspect = Math.sqrt(2.5);
-        if (w / h > aspect) {
-            return {width: h * aspect, height: h};
-        } else {
-            return {width: w, height: w / aspect};
-        }
-    }
-
-    private calcResolutionCoefficient(): number {
-        const {width, height} = this.calcAdjustedResolution();
-        const wRatio = width / this.baseResolution.width;
-        const hRatio = height / this.baseResolution.height;
-        return Math.min(1, Math.max(this.minScale, Math.min(wRatio, hRatio)));
-    }
 }

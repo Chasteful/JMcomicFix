@@ -4,8 +4,8 @@
     import type {PlayerData} from "../../../../../integration/types";
     import type {ClientPlayerDataEvent} from "../../../../../integration/events";
     import {onDestroy, onMount, tick} from "svelte";
-    import {cubicOut} from 'svelte/easing';
-    import {fade} from "svelte/transition";
+    import {cubicOut, expoInOut} from 'svelte/easing';
+    import {fly} from "svelte/transition";
     import {hsvToRgba} from "../../../../../util/color_utils";
     import {Tween} from "svelte/motion";
 
@@ -103,13 +103,14 @@
     $: fadeStyle = (() => {
         const curEnd = healthPct + absorbPct;
         if (prevPct <= curEnd) return "none";
-        const hpStop = Math.max(prevHealthPct, curEnd);
-        const abStop = prevPct;
+
+        const damageColor = prevAbsorptionVal > absorptionVal ? abColor : hpColor;
+
         return `linear-gradient(to right,
+        rgba(0,0,0,0) 0%,
         rgba(0,0,0,0) ${curEnd}%,
-        ${hpColor} ${hpStop}%,
-        ${abColor} ${abStop}%,
-        rgba(0,0,0,0) ${abStop}%,
+        ${damageColor} ${curEnd}%,
+        rgba(0,0,0,0) ${prevPct}%,
         rgba(0,0,0,0) 100%
     )`;
     })();
@@ -118,11 +119,14 @@
         updatePlayerData(await getPlayerData());
         await showDelayed();
     });
-    onDestroy(() => iv && clearInterval(iv));
+
+    onDestroy(() => {
+        iv && clearInterval(iv);
+    });
 </script>
 
 {#if showHealthBar && playerData && playerData.gameMode !== "spectator"}
-    <div class="health-bar" transition:fade>
+    <div class="health-bar"  transition:fly|global={{ duration: 500, y: 50, easing: expoInOut }}>
         {#if playerData.gameMode !== "creative"}
             <div class="status-container">
                 <div class="status-wrapper">

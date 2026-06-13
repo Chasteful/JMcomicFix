@@ -2,7 +2,7 @@
     import {listen} from "../../../integration/ws";
     import {fade} from "svelte/transition";
     import type {ProgressEvent} from "../../../integration/events";
-    import {WindowSize} from "../../../util/resolution_utils";
+    import {windowSize} from "../../../util/resolution_utils";
     import {onMount} from "svelte";
 
     export let settings: { [name: string]: any };
@@ -11,7 +11,7 @@
     let progressWidth = 0;
     let hideTimeout: ReturnType<typeof setTimeout> | null = null;
 
-    const {width, destroy} = WindowSize();
+    const {width, destroy} = windowSize();
 
     $: progressWidth = $width * settings.width;
     const clearHideTimeout = () => {

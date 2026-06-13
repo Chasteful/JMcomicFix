@@ -6,7 +6,7 @@
     "horizontalAlignment": "CenterTranslated",
     "horizontalOffset": 0,
     "verticalAlignment": "Top",
-    "verticalOffset": 0
+    "verticalOffset": 50
   },
   "tweaks": ["DISABLE_PLAYER_LIST_HUD"],
   "values": [
