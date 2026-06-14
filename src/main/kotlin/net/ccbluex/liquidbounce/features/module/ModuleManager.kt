@@ -224,6 +224,7 @@ import net.ccbluex.liquidbounce.features.module.modules.render.ModuleProtectionZ
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleQuickPerspectiveSwap
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleRadar
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleRotations
+import net.ccbluex.liquidbounce.features.module.modules.render.ModuleSandevistan
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleSilentHotbar
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleSkinChanger
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleSmoothCamera
@@ -682,6 +683,7 @@ object ModuleManager : EventListener, Collection<ClientModule> by modules {
             ModuleCrosshair,
             ModuleKillEffects,
             ModuleCapes,
+            ModuleSandevistan,
 
             // World
             ModuleAirPlace,
