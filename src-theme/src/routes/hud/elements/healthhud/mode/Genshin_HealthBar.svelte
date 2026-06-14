@@ -1,25 +1,21 @@
 <script lang="ts">
-    import {listen} from "../../../../../integration/ws";
-    import {getPlayerData} from "../../../../../integration/rest";
-    import type {PlayerData} from "../../../../../integration/types";
-    import type {ClientPlayerDataEvent} from "../../../../../integration/events";
-    import {onDestroy, onMount, tick} from "svelte";
-    import {cubicOut, expoInOut} from 'svelte/easing';
-    import {fly} from "svelte/transition";
-    import {hsvToRgba} from "../../../../../util/color_utils";
-    import {Tween} from "svelte/motion";
+    import { listen } from "../../../../../integration/ws";
+    import { getPlayerData } from "../../../../../integration/rest";
+    import type { PlayerData } from "../../../../../integration/types";
+    import type { ClientPlayerDataEvent } from "../../../../../integration/events";
+    import { onDestroy, onMount, tick } from "svelte";
+    import { cubicOut, expoInOut } from 'svelte/easing';
+    import { fly } from "svelte/transition";
+    import { hsvToRgba } from "../../../../../util/color_utils";
+    import { Tween } from "svelte/motion";
 
-    let showHealthBar = false;
     let blink = false;
+    let showHealthBar = false;
+    let rafId: number | null = null;
     let playerData: PlayerData | null = null;
+    let canvas: HTMLCanvasElement | null = null;
+    let ctx: CanvasRenderingContext2D | null = null;
     let iv: ReturnType<typeof setInterval> | null = null;
-
-    const healthTweened = new Tween(0, {duration: 300, easing: cubicOut});
-    const absorptionTweened = new Tween(0, {duration: 300, easing: cubicOut});
-    const maxHealthTweened = new Tween(1, {duration: 300, easing: cubicOut});
-    const prevHealthTweened = new Tween(0, {duration: 800, easing: cubicOut});
-    const prevAbsorptionTweened = new Tween(0, {duration: 1000, easing: cubicOut});
-
 
     let healthVal = 0;
     let absorptionVal = 0;
@@ -27,23 +23,34 @@
     let prevHealthVal = 0;
     let prevAbsorptionVal = 0;
 
+    const BAR_WIDTH = 420;
+    const BAR_HEIGHT = 14;
+    const SHADOW_BLUR = 8;
+    const SHADOW_OFFSET = 4;
+
+    const healthTweened = new Tween(0, { duration: 300, easing: cubicOut });
+    const absorptionTweened = new Tween(0, { duration: 300, easing: cubicOut });
+    const maxHealthTweened = new Tween(1, { duration: 300, easing: cubicOut });
+    const prevHealthTweened = new Tween(0, { duration: 800, easing: cubicOut });
+    const prevAbsorptionTweened = new Tween(0, { duration: 1000, easing: cubicOut });
+
     function fmt(n: number): string {
         const rounded = Math.round(n);
         return Math.abs(n - rounded) < 0.05 ? `${rounded}` : n.toFixed(1);
     }
 
-    function updatePlayerData(s: PlayerData) {
-        playerData = s;
-        healthTweened.set(s.health);
-        absorptionTweened.set(s.absorption);
-        maxHealthTweened.set(s.maxHealth);
-        prevHealthTweened.set(s.health);
-        prevAbsorptionTweened.set(s.absorption);
+    function lerp(a: number, b: number, t: number) {
+        return a + (b - a) * t;
     }
 
-    listen("clientPlayerData", (e: ClientPlayerDataEvent) => {
-        updatePlayerData(e.playerData);
-    });
+    function updatePlayerData(s: PlayerData) {
+        playerData = s;
+        healthTweened.target = s.health;
+        absorptionTweened.target = s.absorption;
+        maxHealthTweened.target = s.maxHealth;
+        prevHealthTweened.target = s.health;
+        prevAbsorptionTweened.target = s.absorption;
+    }
 
     async function showDelayed() {
         await tick();
@@ -51,24 +58,174 @@
         showHealthBar = true;
     }
 
+    function drawDiamondPath(context: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
+        const midY = y + h / 2;
+        const edgeWidth = w * 0.02;
+
+        context.beginPath();
+        context.moveTo(x + edgeWidth, y);
+        context.lineTo(x + w - edgeWidth, y);
+        context.lineTo(x + w, midY);
+        context.lineTo(x + w - edgeWidth, y + h);
+        context.lineTo(x + edgeWidth, y + h);
+        context.lineTo(x, midY);
+        context.closePath();
+    }
+
+    function drawHealthBar() {
+        if (!canvas || !ctx) return;
+
+        const dpr = window.devicePixelRatio || 1;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const x = SHADOW_OFFSET * dpr;
+        const y = SHADOW_OFFSET * dpr;
+        const w = BAR_WIDTH * dpr;
+        const h = BAR_HEIGHT * dpr;
+        const currentIsLowHealth = maxHealthVal > 0 && (healthVal / maxHealthVal <= 0.25);
+
+        const pulse = currentIsLowHealth ? (Math.sin(performance.now() / 600) + 1) / 2 : 0;
+
+        ctx.save();
+        const shadowR = lerp(0, 255, pulse);
+        const shadowA = lerp(0.4, 0.7, pulse);
+
+        ctx.shadowColor = `rgba(${shadowR}, 0, 0, ${shadowA})`;
+        ctx.shadowBlur = SHADOW_BLUR * dpr;
+        ctx.shadowOffsetX = SHADOW_OFFSET * 0.5 * dpr;
+        ctx.shadowOffsetY = SHADOW_OFFSET * 0.5 * dpr;
+
+        drawDiamondPath(ctx, x, y, w, h);
+        ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+        ctx.fill();
+        ctx.restore();
+
+        ctx.save();
+        drawDiamondPath(ctx, x, y, w, h);
+        ctx.clip();
+
+        const total = Math.max(healthVal + absorptionVal, maxHealthVal, 1);
+        const healthPct = Math.min(Math.max(healthVal / total, 0), 1);
+        const absorbPct = Math.min(Math.max(absorptionVal / total, 0), 1);
+        const prevHealthPct = Math.min(Math.max(prevHealthVal / total, 0), 1);
+        const prevAbsorbPct = Math.min(Math.max(prevAbsorptionVal / total, 0), 1);
+
+        const curPct = healthPct + absorbPct;
+        const prevPct = prevHealthPct + prevAbsorbPct;
+
+        const bgGradient = ctx.createLinearGradient(x, y, x, y + h);
+        if (currentIsLowHealth) {
+            bgGradient.addColorStop(0.3, `rgba(255, 50, 50, ${lerp(0.05, 0.20, pulse)})`);
+            bgGradient.addColorStop(1, `rgba(40, 0, 0, ${lerp(0.35, 0.65, pulse)})`);
+        } else {
+            bgGradient.addColorStop(0.3, "rgba(165,200,55,0.1)");
+            bgGradient.addColorStop(1, "rgba(0,0,0,0.4)");
+        }
+
+        ctx.fillStyle = bgGradient;
+        ctx.fillRect(x, y, w, h);
+
+        const hpColor = currentIsLowHealth ? hsvToRgba(4, 60, 100, 0.7) : hsvToRgba(82, 68, 84, 0.7);
+        const abColor = "rgb(212,175,55)";
+        const tsColor =  "rgb(195,180,115)";
+
+        if (prevPct > curPct && prevPct > 0) {
+            ctx.fillStyle = prevAbsorptionVal > absorptionVal ? abColor : tsColor;
+            ctx.globalAlpha = 1.0;
+            ctx.fillRect(x + w * curPct, y, w * (prevPct - curPct), h);
+            ctx.globalAlpha = 1.0;
+        }
+
+        if (curPct > 0) {
+            const barGradient = ctx.createLinearGradient(x, y, x + w * curPct, y);
+            barGradient.addColorStop(0, hpColor);
+
+            if (healthPct > 0 && healthPct < curPct) {
+                const midPoint = healthPct / curPct;
+                const transitionWidth = 0.05;
+                barGradient.addColorStop(Math.max(0, midPoint - transitionWidth / 2), hpColor);
+                barGradient.addColorStop(Math.min(1, midPoint + transitionWidth / 2), abColor);
+            }
+
+            barGradient.addColorStop(1, curPct > healthPct ? abColor : hpColor);
+            ctx.fillStyle = barGradient;
+            ctx.fillRect(x, y, w * curPct, h);
+        }
+        ctx.restore();
+
+        ctx.save();
+        drawDiamondPath(ctx, x, y, w, h);
+        ctx.strokeStyle = "rgba(0,0,0,0.35)";
+        ctx.lineWidth = 1.5 * dpr;
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.save();
+        drawDiamondPath(ctx, x, y, w, h);
+        ctx.strokeStyle = "rgba(0,0,0,0.35)";
+        ctx.lineWidth = 1.5 * dpr;
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.save();
+        ctx.font = `bold ${14 * dpr}px "Genshin", sans-serif`;
+        ctx.fillStyle = "#fff";
+        ctx.textBaseline = "middle";
+        ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
+        ctx.shadowBlur = 3 * dpr;
+
+        const centerY = y + h / 2;
+        const separatorX = x + w / 2;
+
+        let currentText = fmt(healthVal);
+        if (absorptionVal > 0) currentText += ` +${fmt(absorptionVal)}`;
+
+        const fullText = `${currentText} / ${fmt(maxHealthVal)}`;
+
+        ctx.textAlign = "center";
+        ctx.fillText(fullText, separatorX, centerY);
+
+        ctx.restore();
+    }
+
     function animate() {
+        const changed =
+            healthVal !== healthTweened.current ||
+            absorptionVal !== absorptionTweened.current ||
+            maxHealthVal !== maxHealthTweened.current ||
+            prevHealthVal !== prevHealthTweened.current ||
+            prevAbsorptionVal !== prevAbsorptionTweened.current;
+
+        const currentIsLowHealth = maxHealthVal > 0 && (healthVal / maxHealthVal <= 0.25);
+
         healthVal = healthTweened.current;
         absorptionVal = absorptionTweened.current;
         maxHealthVal = maxHealthTweened.current;
         prevHealthVal = prevHealthTweened.current;
         prevAbsorptionVal = prevAbsorptionTweened.current;
-        requestAnimationFrame(animate);
+
+        if (changed || currentIsLowHealth) {
+            drawHealthBar();
+        }
+
+        rafId = requestAnimationFrame(animate);
     }
 
-    animate();
+    $: if (canvas) {
+        ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        const cssWidth = BAR_WIDTH + SHADOW_OFFSET * 2;
+        const cssHeight = BAR_HEIGHT + SHADOW_OFFSET * 2;
 
-    $: total = Math.max(healthVal + absorptionVal, maxHealthVal, 1);
-    $: healthPct = Math.min(Math.max(healthVal / total, 0), 1) * 100;
-    $: absorbPct = Math.min(Math.max(absorptionVal / total, 0), 1) * 100;
-    $: prevHealthPct = Math.min(Math.max(prevHealthVal / total, 0), 1) * 100;
-    $: prevAbsorbPct = Math.min(Math.max(prevAbsorptionVal / total, 0), 1) * 100;
-    $: prevPct = prevHealthPct + prevAbsorbPct;
-    $: isLowHealth = healthVal / maxHealthVal <= 0.25;
+        canvas.style.width = `${cssWidth}px`;
+        canvas.style.height = `${cssHeight}px`;
+        canvas.width = cssWidth * dpr;
+        canvas.height = cssHeight * dpr;
+
+        drawHealthBar();
+    }
+
+    $: isLowHealth = playerData ? (playerData.health / playerData.maxHealth <= 0.25) : false;
 
     $: {
         if (isLowHealth && !iv) {
@@ -80,72 +237,29 @@
         }
     }
 
-    $: bgFlash = isLowHealth && blink ? "rgba(251,114,90,0.6)" : "transparent";
-    $: hpColor = isLowHealth
-        ? hsvToRgba(4, 60, 100, 0.7)
-        : hsvToRgba(82, 68, 84, 0.7);
-    $: abColor = "rgba(212,175,55,0.7)";
-    $: barBgStyle = `linear-gradient(
-    to bottom,
-    ${bgFlash},
-    rgba(154,216,31,0.1),
-    rgba($base,0.5)
-)`;
-
-    $: barStyle = `linear-gradient(to right,
-    ${hpColor}   0%,
-    ${hpColor}   ${healthPct}%,
-    ${abColor}   ${healthPct + absorbPct}%,
-    rgba(0,0,0,0.4) ${healthPct + absorbPct}%,
-    rgba(0,0,0,0.4) 100%
-)`;
-
-    $: fadeStyle = (() => {
-        const curEnd = healthPct + absorbPct;
-        if (prevPct <= curEnd) return "none";
-
-        const damageColor = prevAbsorptionVal > absorptionVal ? abColor : hpColor;
-
-        return `linear-gradient(to right,
-        rgba(0,0,0,0) 0%,
-        rgba(0,0,0,0) ${curEnd}%,
-        ${damageColor} ${curEnd}%,
-        rgba(0,0,0,0) ${prevPct}%,
-        rgba(0,0,0,0) 100%
-    )`;
-    })();
+    listen("clientPlayerData", (e: ClientPlayerDataEvent) => {
+        updatePlayerData(e.playerData);
+    });
 
     onMount(async () => {
         updatePlayerData(await getPlayerData());
         await showDelayed();
+        animate();
     });
 
     onDestroy(() => {
-        iv && clearInterval(iv);
+        if (iv) clearInterval(iv);
+        if (rafId) cancelAnimationFrame(rafId);
     });
 </script>
 
 {#if showHealthBar && playerData && playerData.gameMode !== "spectator"}
-    <div class="health-bar"  transition:fly|global={{ duration: 500, y: 50, easing: expoInOut }}>
+    <div class="health-bar" transition:fly|global={{ duration: 500, y: 50, easing: expoInOut }}>
         {#if playerData.gameMode !== "creative"}
             <div class="status-container">
                 <div class="status-wrapper">
                     <div class="level-stat">Lv. {playerData.experienceLevel}</div>
-                    <div class="bar" style="--bar-bg: {barBgStyle}; background: {barStyle};">
-                        {#if fadeStyle !== "none"}
-                            <div class="fade" style="background: {fadeStyle};"></div>
-                        {/if}
-                    </div>
-                    <div class="health-display">
-                        <div class="left-group">
-                            <span class="number current">{fmt(healthVal)}</span>
-                            {#if absorptionVal > 0}
-                                <span class="absorption">+{fmt(absorptionVal)}</span>
-                            {/if}
-                        </div>
-                        <span class="separator">/</span>
-                        <span class="number max">{fmt(maxHealthVal)}</span>
-                    </div>
+                    <canvas bind:this={canvas} class="health-canvas"></canvas>
                 </div>
             </div>
         {/if}
@@ -154,17 +268,18 @@
 
 <style lang="scss">
   .health-bar {
+    display: flex;
     justify-content: center;
-    margin-bottom: 6px;
     align-items: center;
+    margin-bottom: 6px;
     font-family: "Genshin", sans-serif;
   }
 
   .status-container {
-    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 100%;
   }
 
   .status-wrapper {
@@ -175,100 +290,27 @@
     align-items: center;
   }
 
-  .bar {
-    width: 100%;
-    height: 100%;
-    background: var(--bar-bg);
-    clip-path: polygon(
-                    calc(2% + 0.5px) 0,
-                    calc(98% - 0.5px) 0,
-                    100% 50%,
-                    calc(98% - 0.5px) 100%,
-                    calc(2% + 0.5px) 100%,
-                    0% 50%
-    );
-    border-radius: 7px;
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    overflow: hidden;
-    position: relative;
-    z-index: 1;
-  }
-
-  .fade {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-    opacity: 0.5;
-  }
-
-  .health-display {
-    position: absolute;
-    inset: 0;
-    font-size: 16px;
-    font-weight: bold;
-    color: #fff;
-    text-shadow: 0 0 2px rgba(0, 0, 0, 0.9),
-    0 0 4px rgba(0, 0, 0, 0.7),
-    1px 1px 2px rgba(0, 0, 0, 0.6),
-    -1px -1px 2px rgba(0, 0, 0, 0.6);
-
-
-    padding: 0 2em;
-  }
-
-
-  .separator {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-
-    z-index: 2;
-  }
-
-
-  .left-group {
-    position: absolute;
-    right: calc(50% + 0.3em);
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 0.2em;
-    z-index: 1;
-  }
-
-  .number.max {
-    position: absolute;
-    left: calc(50% + 0.3em);
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 1;
-  }
-
-  .number,
-  .absorption {
-    display: inline-block;
-    font-feature-settings: "tnum";
-    text-align: center;
-  }
-
   .level-stat {
     position: absolute;
     right: calc(100% + 12px);
     font-size: 14px;
-    top: 1.5px;
     color: rgba(255, 255, 255, 0.85);
     text-shadow: 0 0 2px rgba(0, 0, 0, 0.9),
     0 0 4px rgba(0, 0, 0, 0.7),
     1px 1px 2px rgba(0, 0, 0, 0.6),
     -1px -1px 2px rgba(0, 0, 0, 0.6);
-
     white-space: nowrap;
     line-height: 1;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .health-canvas {
+    position: absolute;
+    left: -4px;
+    top: -4px;
+    display: block;
+    image-rendering: crisp-edges;
+    pointer-events: none;
   }
 </style>
