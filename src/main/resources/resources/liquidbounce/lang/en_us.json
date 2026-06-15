@@ -802,5 +802,5 @@
   "liquidbounce.module.capes.description": "Display a cape visible only to you.",
   "liquidbounce.module.killEffects.description": "Show an effect when you kill a target.",
   "liquidbounce.module.noBooks.description": "Intercept and close book GUIs opened by the server.",
-  "liquidbounce.module.sandevistan.description": "Using the physical shape as a model, one after another, render the afterimages of its motion path, while inheriting the body movements of that moment."
+  "liquidbounce.module.sandevistan.description": "Using the target object's outline as a model, inherit the body movements from that moment, and follow the motion path to sequentially render its afterimages."
 }

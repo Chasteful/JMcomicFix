@@ -801,5 +801,5 @@
   "liquidbounce.module.capes.description": "仅你可见的自定义披风。",
   "liquidbounce.module.killEffects.description": "在你击杀目标时显示一些效果。",
   "liquidbounce.module.noBooks.description": "拦截并关闭服务器呈现的书本界面。",
-  "liquidbounce.module.sandevistan.description": "以实体的外形框架为原型，依次渲染其运动轨迹的残影，并继承那一刻的肢体动作。"
+  "liquidbounce.module.sandevistan.description": "以目标实体的外形框架为原型，继承每一刻的肢体动作，沿运动轨迹依次渲染其残影。"
 }

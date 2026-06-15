@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Player
 import java.util.ArrayDeque
 import java.util.IdentityHashMap
 import kotlin.collections.component1
@@ -26,21 +27,33 @@ import kotlin.collections.component2
 import kotlin.collections.set
 
 object ModuleSandevistan : ClientModule("Sandevistan", ModuleCategories.RENDER) {
-    private val fillAlpha by int("FillAlpha", 10, 0..255)
-    private val outlineAlpha by int("OutlineAlpha", 25, 0..255)
+    private val fillAlpha by int("FillAlpha", 5, 0..255)
+    private val outlineAlpha by int("OutlineAlpha", 15, 0..255)
 
     private val delayTicks by int("DelayTicks", 2, 1..20)
-    private val aliveTicks by int("AliveTicks", 20, 10..200)
+    private val aliveTicks by int("AliveTicks", 15, 10..50)
+
+    private val onlyOwn by boolean("OnlyOwn", false)
+    private val onlyPlayer by boolean("OnlyPlayer", true)
+
     private val colorModes = choices("ColorMode", 0) {
         arrayOf(
-            GenericStaticColorMode(it, Color4b.WHITE.with(a = 100)),
+            GenericStaticColorMode(it, Color4b.LIQUID_BOUNCE),
             GenericRainbowColorMode(it)
         )
     }
-    private val lastPositions = IdentityHashMap<LivingEntity, DoubleArray>()
 
+    private val lastPositions = IdentityHashMap<LivingEntity, DoubleArray>()
     private val entityTrails = IdentityHashMap<LivingEntity, ArrayDeque<WireframeSnapshot>>()
     private var pooledSnapshots = arrayOfNulls<WireframeSnapshot>(0)
+
+    private fun shouldRenderEntity(entity: LivingEntity): Boolean {
+        return when {
+            onlyOwn -> entity == mc.player
+            onlyPlayer -> entity is Player
+            else -> true
+        }
+    }
 
     @Suppress("unused")
     private val renderHandler = handler<WorldRenderEvent> { event ->
@@ -48,7 +61,9 @@ object ModuleSandevistan : ClientModule("Sandevistan", ModuleCategories.RENDER) 
         val currentTime = world.gameTime
         val partialTicks = event.partialTicks
 
-        RenderedEntities.forEach { entity ->
+        val entitiesToRender = RenderedEntities.filter { shouldRenderEntity(it) }
+
+        entitiesToRender.forEach { entity ->
             val last = lastPositions[entity]
             val cx = entity.x; val cy = entity.y; val cz = entity.z
 
@@ -59,7 +74,9 @@ object ModuleSandevistan : ClientModule("Sandevistan", ModuleCategories.RENDER) 
 
                 val bodyYaw = run {
                     if (RotationManager.currentRotation != null && entity == mc.player && ModuleRotations.running) {
-                        Mth.rotLerp(partialTicks, RotationManager.previousRotation?.yaw ?: entity.yBodyRotO, RotationManager.currentRotation!!.yaw)
+                        Mth.rotLerp(partialTicks,
+                            RotationManager.previousRotation?.yaw ?: entity.yBodyRotO,
+                            RotationManager.currentRotation!!.yaw)
                     } else {
                         Mth.rotLerp(partialTicks, entity.yBodyRotO, entity.yBodyRot)
                     }
@@ -94,8 +111,9 @@ object ModuleSandevistan : ClientModule("Sandevistan", ModuleCategories.RENDER) 
                 trail.removeLast()
             }
         }
-        entityTrails.keys.retainAll { it.isAlive }
-        lastPositions.keys.retainAll { it.isAlive }
+
+        entityTrails.keys.retainAll { it.isAlive && shouldRenderEntity(it) }
+        lastPositions.keys.retainAll { it.isAlive && shouldRenderEntity(it) }
 
         if (entityTrails.isEmpty()) return@handler
 
