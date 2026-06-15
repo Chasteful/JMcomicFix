@@ -90,6 +90,13 @@ allprojects {
 }
 
 loom {
+    runs {
+        named("client") {
+            vmArg("-Xms4G")
+            vmArg("-Xmx4G")
+            vmArg("-XX:+UseZGC")
+        }
+    }
     accessWidenerPath = file("src/main/resources/liquidbounce.accesswidener")
 }
 
