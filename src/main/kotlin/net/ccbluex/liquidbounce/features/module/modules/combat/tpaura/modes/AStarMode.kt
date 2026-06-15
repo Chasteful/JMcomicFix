@@ -48,13 +48,16 @@ import net.ccbluex.liquidbounce.utils.math.center
 import net.ccbluex.liquidbounce.utils.math.set
 import net.ccbluex.liquidbounce.utils.math.sq
 import net.ccbluex.liquidbounce.utils.math.toVec3f
+import net.ccbluex.liquidbounce.utils.math.toVec3i
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Vec3i
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.Pos
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 
 object AStarMode : TpAuraMode("AStar"), AStarPathBuilder {
 
@@ -86,7 +89,13 @@ object AStarMode : TpAuraMode("AStar"), AStarPathBuilder {
                     weighter = { it.squaredBoxedDistanceTo(playerEyePos) }
                 )
             ).firstNotNullOfOrNull { enemy ->
-                val path = findPath(playerPosition, enemy.blockPosition(), maximumCost)
+                val targetPos = if (enemy is EnderDragon) {
+                    val head =  enemy.head
+                    Vec3(head.x, head.y - 3, head.z).toVec3i()
+                } else {
+                    enemy.blockPosition()
+                }
+                val path = findPath(playerPosition, targetPos, maximumCost)
 
                 // Skip if the path is empty
                 if (path.isNotEmpty()) {

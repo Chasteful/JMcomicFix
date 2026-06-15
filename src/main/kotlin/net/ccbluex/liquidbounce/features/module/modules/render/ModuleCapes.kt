@@ -2,6 +2,7 @@ package net.ccbluex.liquidbounce.features.module.modules.render
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
@@ -22,6 +23,7 @@ import net.minecraft.resources.Identifier
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(FlowPreview::class)
 object ModuleCapes : ClientModule(
@@ -30,7 +32,6 @@ object ModuleCapes : ClientModule(
     hide = true,
     state = true
 ) {
-    private val allowWithElytra by boolean("AllowWithElytra", false)
 
     private val mode = choices("Mode", 0) {
         arrayOf(Mode.Default, Mode.File)
@@ -41,12 +42,12 @@ object ModuleCapes : ClientModule(
     init {
         ioScope.launch {
             reloadFlow.debounce(150.milliseconds).collectLatest {
-                if (!running) return@collectLatest
                 mode.activeMode.reloadCape()
             }
         }
 
         ioScope.launch {
+            waitUntilInGame()
             mode.asStateFlow().collect {
                 triggerReload()
             }
@@ -54,15 +55,15 @@ object ModuleCapes : ClientModule(
     }
 
     fun getCapeTextureId(): Identifier? {
-        if (!running) return null
+        if (!running) {
+            return null
+        }
         return mode.activeMode.capeTextureId
     }
 
     fun getCapeReady(): Boolean {
-        val chestStack = player.getItemBySlot(EquipmentSlot.CHEST)
-        val hasElytra = chestStack.`is`(Items.ELYTRA) && chestStack.has(DataComponents.EQUIPPABLE)
-
-        if (!allowWithElytra && hasElytra) {
+        val elytraStack = player.getItemBySlot(EquipmentSlot.CHEST)
+        if (elytraStack.`is`(Items.ELYTRA) && elytraStack.has(DataComponents.EQUIPPABLE)) {
             return false
         }
 
@@ -75,6 +76,12 @@ object ModuleCapes : ClientModule(
 
     private suspend fun triggerReload() {
         reloadFlow.emit(Unit)
+    }
+
+    private suspend fun waitUntilInGame() {
+        while (!inGame) {
+            delay(1.seconds)
+        }
     }
 
     private sealed class Mode(name: String) : net.ccbluex.liquidbounce.config.types.group.Mode(name) {
@@ -105,33 +112,29 @@ object ModuleCapes : ClientModule(
 
         object File : Mode("File") {
             private val image = file("Image")
-
             private val textureId = LiquidBounce.identifier("capes/custom-file")
+
             @Volatile
             override var capeTextureId: Identifier? = null
                 private set
 
             init {
-                image.asStateFlow()
-                    .filter { it.isFile }
-                    .let { flow ->
-                        ioScope.launch {
-                            flow.collectLatest { file ->
-                                if (!inGame) return@collectLatest
-
-                                val nativeImage = withContext(Dispatchers.IO) {
-                                    file.readNativeImage()
-                                }
-
-                                withContext(Dispatchers.Minecraft) {
-                                    nativeImage.registerTexture(textureId)
-                                }
-
-                                capeTextureId = textureId
+                ioScope.launch {
+                    image.asStateFlow()
+                        .filter { it.isFile }
+                        .collectLatest { file ->
+                            val nativeImage = withContext(Dispatchers.IO) {
+                                file.readNativeImage()
                             }
+
+                            withContext(Dispatchers.Minecraft) {
+                                nativeImage.registerTexture(textureId)
+                            }
+
+                            capeTextureId = textureId
                         }
                     }
-            }
+                }
 
             override suspend fun reloadCape() {
                 val file = image.get()

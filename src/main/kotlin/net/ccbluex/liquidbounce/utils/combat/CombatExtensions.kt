@@ -56,6 +56,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.ambient.Bat
 import net.minecraft.world.entity.animal.allay.Allay
 import net.minecraft.world.entity.animal.fish.WaterAnimal
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.monster.Enemy
 import net.minecraft.world.entity.monster.Monster
@@ -262,9 +263,14 @@ fun attackEntity(entity: Entity, swing: SwingMode, keepSprint: Boolean = false) 
         if (isOlderThanOrEqual1_8) {
             swing.swing(InteractionHand.MAIN_HAND)
         }
+        val packetTarget: Entity = if (entity is EnderDragon) {
+            entity.head
+        } else {
+            entity
+        }
 
         interaction.ensureHasSentCarriedItem()
-        network.send(ServerboundAttackPacket(entity.id))
+        network.send(ServerboundAttackPacket(packetTarget.id))
 
         if (keepSprint) {
             var genericAttackDamage =
