@@ -20,7 +20,10 @@
 
 package net.ccbluex.liquidbounce.features.module.modules.render
 
+import com.google.common.collect.ImmutableMultimap
 import com.mojang.authlib.GameProfile
+import com.mojang.authlib.properties.Property
+import com.mojang.authlib.properties.PropertyMap
 import com.mojang.authlib.yggdrasil.YggdrasilEnvironment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -34,7 +37,6 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import net.ccbluex.liquidbounce.LiquidBounce
 import net.ccbluex.liquidbounce.api.core.HttpException
 import net.ccbluex.liquidbounce.api.core.ioScope
 import net.ccbluex.liquidbounce.api.core.renderScope
@@ -53,14 +55,12 @@ import net.ccbluex.liquidbounce.injection.mixins.authlib.MixinYggdrasilMinecraft
 import net.ccbluex.liquidbounce.utils.client.chat
 import net.ccbluex.liquidbounce.utils.client.inGame
 import net.ccbluex.liquidbounce.utils.kotlin.Minecraft
-import net.ccbluex.liquidbounce.utils.render.readNativeImage
-import net.ccbluex.liquidbounce.utils.render.registerTexture
 import net.minecraft.client.multiplayer.PlayerInfo
 import net.minecraft.client.player.AbstractClientPlayer
-import net.minecraft.core.ClientAsset
 import net.minecraft.world.entity.player.PlayerModelType
 import net.minecraft.world.entity.player.PlayerSkin
 import java.io.IOException
+import java.util.UUID
 import java.util.function.Supplier
 import kotlin.time.Duration.Companion.seconds
 
@@ -123,7 +123,7 @@ object ModuleSkinChanger : ClientModule("SkinChanger", ModuleCategories.RENDER) 
         }
     }
 
-    private sealed class Mode(name: String) : net.ccbluex.liquidbounce.config.types.group.Mode(name) {
+    sealed class Mode(name: String) : net.ccbluex.liquidbounce.config.types.group.Mode(name) {
         final override val parent: ModeValueGroup<*>
             get() = mode
 
@@ -146,7 +146,7 @@ object ModuleSkinChanger : ClientModule("SkinChanger", ModuleCategories.RENDER) 
 
             private suspend fun textureSupplier(username: String): Supplier<PlayerSkin> {
                 val profile = withContext(Dispatchers.IO) {
-                    val uuid = GameProfileRepository.Default.fetchUuidByUsername(username)
+                    val uuid = GameProfileRepository("https://api.mojang.com").fetchUuidByUsername(username)
                         ?: generateOfflinePlayerUuid(username)
                     mc.services.sessionService.fetchProfile(uuid, false)?.profile
                         ?: GameProfile(uuid, username)
@@ -180,17 +180,18 @@ object ModuleSkinChanger : ClientModule("SkinChanger", ModuleCategories.RENDER) 
             }
         }
 
-        object File : Mode("File"), ClientAsset.Texture {
+        object File : Mode("File") {
             private val image = file("Image")
-
             private val skinType by enumChoice("Model", ModelChoice.WIDE)
 
-            private val identifier = LiquidBounce.identifier("skin-changer-from-file")
+            override var skinTextures: Supplier<PlayerSkin>? = null
 
-            override fun id() = identifier
+            @JvmStatic
+            var currentSkinBytes: ByteArray? = null
+            @JvmStatic
+            var currentLocalFile: java.io.File? = null
 
-            override fun texturePath() = identifier
-
+            @Suppress("unused")
             private enum class ModelChoice(
                 override val tag: String,
                 val type: PlayerModelType,
@@ -199,40 +200,43 @@ object ModuleSkinChanger : ClientModule("SkinChanger", ModuleCategories.RENDER) 
                 WIDE("Default", PlayerModelType.WIDE),
             }
 
-            override val skinTextures = Supplier {
-                PlayerSkin(
-                    this, // body
-                    null, // cape
-                    null, // elytra
-                    skinType.type,
-                    false,
-                )
-            }
-
             init {
                 image.asStateFlow().filter { it.isFile }.debounceUntilInGame { file ->
-                    // New texture will replace the old one
-                    val nativeImage = withContext(Dispatchers.IO) {
-                        file.readNativeImage()
-                    }
+                    currentLocalFile = file
+                    currentSkinBytes = file.readBytes()
 
+                    val model = if (skinType.type == PlayerModelType.SLIM) "slim" else "default"
+                    val texturesJson = """
+                {
+                  "textures": {
+                    "SKIN": {
+                      "url": "https://textures.minecraft.net/texture/lb_local_skin",
+                      "metadata": { "model": "$model" }
+                    }
+                  }
+                }
+            """.trimIndent()
+
+                    val encoded = java.util.Base64.getEncoder().encodeToString(texturesJson.toByteArray(Charsets.UTF_8))
+                    val property = Property("textures", encoded)
+                    val uuid = mc.player?.uuid ?: UUID.randomUUID()
+                    val name = mc.player?.name?.string ?: "SkinChanger"
+                    val builder = ImmutableMultimap.builder<String, Property>()
+                    builder.put("textures", property)
+                    val propertyMap = PropertyMap(builder.build())
+
+                    val profile = GameProfile(uuid, name, propertyMap)
                     withContext(Dispatchers.Minecraft) {
-                        nativeImage.registerTexture(identifier)
+                        skinTextures = PlayerInfo.createSkinLookup(profile)
                     }
-
                     triggerUpload()
                 }
             }
 
             override suspend fun uploadSkin() {
                 val file = image.get()
-                if (!file.isFile) {
-                    return
-                }
-
-                request {
-                    uploadSkin(file, skinType.type)
-                }
+                if (!file.isFile) return
+                request { uploadSkin(file, skinType.type) }
             }
         }
     }

@@ -134,6 +134,7 @@
     "minecraft.render.MixinRenderTypeAccessor",
     "minecraft.render.MixinScreenEffectRenderer",
     "minecraft.render.MixinSignText",
+    "minecraft.render.MixinSkinTextureDownloader",
     "minecraft.render.MixinSkyRenderer",
     "minecraft.render.MixinVisGraph",
     "minecraft.render.MixinWeatherEffectRenderer",

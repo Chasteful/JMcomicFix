@@ -71,7 +71,7 @@ public abstract class MixinAbstractClientPlayer extends Player {
                 cir.setReturnValue(new PlayerSkin(
                         customTextures.body(),
                         original.cape(),
-                        customTextures.elytra(),
+                        original.elytra(),
                         customTextures.model(),
                         customTextures.secure()
                 ));
