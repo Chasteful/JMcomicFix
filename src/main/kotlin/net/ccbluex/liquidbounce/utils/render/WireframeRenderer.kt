@@ -23,7 +23,13 @@ import net.minecraft.client.renderer.entity.EnderDragonRenderer
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.LivingEntityRenderer
 import net.minecraft.client.renderer.entity.RenderLayerParent
-import net.minecraft.client.renderer.entity.state.*
+import net.minecraft.client.renderer.entity.state.AvatarRenderState
+import net.minecraft.client.renderer.entity.state.EnderDragonRenderState
+import net.minecraft.client.renderer.entity.state.EntityRenderState
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState
+import net.minecraft.client.renderer.entity.state.SlimeRenderState
+import net.minecraft.client.renderer.entity.state.WitherRenderState
 import net.minecraft.core.component.DataComponents
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EquipmentSlot
@@ -35,7 +41,10 @@ import net.minecraft.world.phys.AABB
 
 object WireframeRenderer {
 
-    private fun drawWireframe(event:WorldRenderEvent,part: ModelPart?, localPoseStack: PoseStack, color: Color4b, outlineColor: Color4b) {
+    private fun drawWireframe(
+        event:WorldRenderEvent,part: ModelPart?,
+        localPoseStack: PoseStack,
+        color: Color4b, outlineColor: Color4b) {
         renderEnvironmentForWorld(event.matrixStack) {
             part?.visit(localPoseStack) { _, _, _, cuboid ->
                 drawBox(
@@ -49,6 +58,7 @@ object WireframeRenderer {
         }
     }
 
+    @Suppress("CognitiveComplexMethod", "LongMethod")
     fun renderSnapshot(
         event: WorldRenderEvent,
         env: WorldRenderEnvironment,
@@ -60,7 +70,8 @@ object WireframeRenderer {
         val renderer = mc.entityRenderDispatcher.getRenderer(entity) as EntityRenderer<Entity, EntityRenderState>
 
         val model: EntityModel<EntityRenderState> = when (renderer) {
-            is EnderDragonRenderer -> (renderer as EnderDragonEntityRendererAccessor).model as? EntityModel<EntityRenderState>
+            is EnderDragonRenderer -> (
+                renderer as EnderDragonEntityRendererAccessor).model as? EntityModel<EntityRenderState>
             else -> (renderer as? RenderLayerParent<*, *>)?.model as? EntityModel<EntityRenderState>
         } ?: return
 
@@ -82,7 +93,8 @@ object WireframeRenderer {
                         poseStack.scale(it.scale, it.scale, it.scale)
                     }
 
-                    val livingRendererInstance = renderer as? LivingEntityRenderer<LivingEntity, LivingEntityRenderState, *>
+                    val livingRendererInstance =
+                        renderer as? LivingEntityRenderer<LivingEntity, LivingEntityRenderState, *>
                     livingRendererInstance?.let {
                         livingState?.let { _ ->
                             (renderer as LivingEntityRendererAccessor<LivingEntity, LivingEntityRenderState>)
