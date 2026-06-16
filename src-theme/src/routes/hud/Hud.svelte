@@ -90,8 +90,6 @@
             <DraggableComponent alignment={c.settings.alignment} >
             {#if c.name === 'Text'}
                 <Text settings={c.settings}/>
-            {:else if c.name === 'Hotbar'}
-                <HotBar settings={c.settings}/>
             {:else if c.name === 'Effects'}
                 <Effects settings={c.settings}/>
             {:else if c.name === 'Image'}
@@ -128,8 +126,6 @@
                 <Keystrokes settings={c.settings}/>
             {:else if c.name === 'Logo'}
                 <Logo settings={c.settings}/>
-            {:else if c.name === 'Message'}
-                <Message settings={c.settings}/>
             {:else if c.name === 'MotionGraph'}
                 <MotionGraph settings={c.settings}/>
             {:else if c.name === 'Notifications'}
@@ -165,7 +161,11 @@
         {#if c.settings.enabled}
             <DraggableComponent alignment={c.settings.alignment} >
                 {#if c.name === 'HealthBar'}
-            <HealthBar settings={c.settings}/>
+                    <HealthBar settings={c.settings}/>
+                {:else if c.name === 'Hotbar'}
+                    <HotBar settings={c.settings}/>
+                {:else if c.name === 'Message'}
+                    <Message settings={c.settings}/>
                 {/if}
             </DraggableComponent>
         {/if}

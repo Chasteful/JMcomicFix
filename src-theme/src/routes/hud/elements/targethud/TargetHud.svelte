@@ -12,7 +12,7 @@
     const modes: Record<string, any> = {
         Modern: ModernTargetHud,
         Simple: SimpleTargetHud,
-        户籍: HuJiTargetHud,
+        HuJi: HuJiTargetHud,
     };
     let hideTimeout: ReturnType<typeof setTimeout>;
 
