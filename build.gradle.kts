@@ -396,7 +396,7 @@ tasks.register<Copy>("copyZipInclude") {
 }
 
 tasks.named("sourcesJar") {
-    dependsOn("bundleTheme")
+    dependsOn("bundleTheme", "generateGitProperties")
 }
 
 tasks.named("build") {
