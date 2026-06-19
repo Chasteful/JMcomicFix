@@ -194,7 +194,10 @@ public abstract class MixinPlayerTabOverlay {
     @Inject(
         method = "setVisible",
         at = @At("HEAD"))
-    private void onsetVisibleHead(CallbackInfo ci) {
+    private void onsetVisibleHead(boolean visible, CallbackInfo ci) {
+        if (!visible) {
+            return;
+        }
         Minecraft.getInstance().execute(() -> {
             Component hudHeader = this.header;
             Component hudFooter = this.footer;

@@ -111,9 +111,11 @@ object ModuleSandevistan : ClientModule("Sandevistan", ModuleCategories.RENDER) 
                 trail.removeLast()
             }
         }
+        entityTrails.entries.removeIf { (entity, trail) -> !entity.isAlive && trail.isEmpty() }
+        lastPositions.entries.removeIf { (entity, _) -> entity !in entityTrails }
 
-        entityTrails.keys.retainAll { it.isAlive && shouldRenderEntity(it) }
-        lastPositions.keys.retainAll { it.isAlive && shouldRenderEntity(it) }
+        entityTrails.keys.retainAll { shouldRenderEntity(it) }
+        lastPositions.keys.retainAll { shouldRenderEntity(it) }
 
         if (entityTrails.isEmpty()) return@handler
 
@@ -159,11 +161,13 @@ object ModuleSandevistan : ClientModule("Sandevistan", ModuleCategories.RENDER) 
     }
 
     override fun onEnabled() {
+        RenderedEntities.subscribe(this)
         entityTrails.clear()
         lastPositions.clear()
     }
 
     override fun onDisabled() {
+        RenderedEntities.unsubscribe(this)
         entityTrails.clear()
         lastPositions.clear()
     }
