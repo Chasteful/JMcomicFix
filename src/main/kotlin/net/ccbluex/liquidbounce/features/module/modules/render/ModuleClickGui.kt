@@ -80,7 +80,7 @@ object ModuleClickGui :
                 return false
             }
 
-            val screen = mc.screen ?: return false
+            val screen = mc.gui.screen() ?: return false
             return screen is CustomSharedMinecraftScreen && screen.screenType == CustomScreenType.CLICK_GUI ||
                 screen is CustomStandaloneMinecraftScreen && screen.screenType == CustomScreenType.CLICK_GUI
         }
@@ -123,7 +123,7 @@ object ModuleClickGui :
 
         updateStandaloneScreen()
         mc.execute {
-            mc.setScreen(standaloneScreen ?: CustomSharedMinecraftScreen(CustomScreenType.CLICK_GUI))
+            mc.gui.setScreen(standaloneScreen ?: CustomSharedMinecraftScreen(CustomScreenType.CLICK_GUI))
         }
         super.onEnabled()
     }
@@ -151,7 +151,7 @@ object ModuleClickGui :
     @Suppress("unused")
     private val tickHandler = handler<GameTickEvent> {
         // For some reason, we actually need this.
-        standaloneScreen?.browser?.visible = mc.screen == standaloneScreen
+        standaloneScreen?.browser?.visible = mc.gui.screen() == standaloneScreen
     }
 
     fun updateStandaloneScreen(): Boolean {
@@ -181,11 +181,11 @@ object ModuleClickGui :
 
     fun invalidate() {
         val standaloneScreen = standaloneScreen ?: return
-        val wasOpen = mc.screen == standaloneScreen
+        val wasOpen = mc.gui.screen() == standaloneScreen
 
         // Close and invalidate old cache
         if (wasOpen) {
-            mc.setScreen(null)
+            mc.gui.setScreen(null)
         }
         standaloneScreen.close()
         this.standaloneScreen = null
@@ -193,7 +193,7 @@ object ModuleClickGui :
         // Only bother updating now if it was open before.
         if (wasOpen) {
             updateStandaloneScreen()
-            mc.setScreen(this.standaloneScreen ?: CustomSharedMinecraftScreen(CustomScreenType.CLICK_GUI))
+            mc.gui.setScreen(this.standaloneScreen ?: CustomSharedMinecraftScreen(CustomScreenType.CLICK_GUI))
         }
     }
 

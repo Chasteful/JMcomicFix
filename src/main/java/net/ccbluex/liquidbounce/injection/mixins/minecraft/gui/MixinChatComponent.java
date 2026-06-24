@@ -44,7 +44,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.List;
 
 @Mixin(ChatComponent.class)
-public abstract class MixinChatComponent implements ChatComponentAddition {
+public abstract class MixinChatComponent {
 
     @Shadow
     @Final
@@ -72,11 +72,8 @@ public abstract class MixinChatComponent implements ChatComponentAddition {
     @Shadow
     public abstract void scrollChat(int scroll);
 
-    @Unique
-    private int chatY = -1;
-
     @Inject(method = "<init>", at = @At(value = "TAIL"))
-    public void hookNewArrayList2(Minecraft client, CallbackInfo ci) {
+    public void hookNewArrayList2(Minecraft minecraft, CallbackInfo ci) {
         allMessages = new ArrayListDeque<>(100);
         // ArrayDeque for addFirst operations
         trimmedMessages = new ArrayListDeque<>(100);
@@ -129,7 +126,7 @@ public abstract class MixinChatComponent implements ChatComponentAddition {
         //noinspection DataFlowIssue
         var id = removable.liquid_bounce$getId();
 
-        for(int j = 0; j < lines.size(); ++j) {
+        for (int j = 0; j < lines.size(); ++j) {
             FormattedCharSequence orderedText = lines.get(j);
             if (focused && chatScrollbarPos > 0) {
                 newMessageSinceScroll = true;
@@ -137,8 +134,8 @@ public abstract class MixinChatComponent implements ChatComponentAddition {
             }
 
             boolean last = j == lines.size() - 1;
-            //noinspection DataFlowIssue
             var visible = new GuiMessage.Line(message, orderedText, last);
+            //noinspection DataFlowIssue
             ((GuiMessageLineAddition) (Object) visible).liquid_bounce$setId(id);
             trimmedMessages.addFirst(visible);
         }
@@ -254,8 +251,4 @@ public abstract class MixinChatComponent implements ChatComponentAddition {
         graphics.fill(left, top, right, bottom, 0x4422AAFF);
     }
 
-    @Override
-    public int liquidbounce_getChatY() {
-        return chatY;
-    }
 }

@@ -116,7 +116,7 @@ object ModuleHud : ClientModule("HUD", ModuleCategories.RENDER, state = true, hi
         get() = customization.clientName
 
     val isBlurEffectActive
-        get() = Blur.enabled && !(mc.options.hideGui && mc.screen == null)
+        get() = Blur.enabled && !(mc.gui.hud.isHidden && mc.gui.screen() == null)
 
     val themes = tree(ValueGroup("Themes"))
 

@@ -78,8 +78,8 @@ public abstract class MixinDisconnectedScreen extends MixinScreen {
         int y = this.height - 30;
         if (this.minecraft != null) {
             disconnectButton = (this.minecraft.allowsMultiplayer() ?
-                Button.builder(this.buttonText, button -> this.minecraft.setScreen(this.parent)) :
-                Button.builder(TO_TITLE, button -> this.minecraft.setScreen(new TitleScreen()))
+                Button.builder(this.buttonText, button -> this.minecraft.gui.setScreen(this.parent)) :
+                Button.builder(TO_TITLE, button -> this.minecraft.gui.setScreen(new TitleScreen()))
             ).bounds(x, y, 120, 20).build();
         }
         addRenderableWidget(disconnectButton);
@@ -104,9 +104,11 @@ public abstract class MixinDisconnectedScreen extends MixinScreen {
     @Inject(method = "repositionElements", at = @At("HEAD"))
     private void moveButtons(final CallbackInfo callback) {
         if (disconnectButton != null) {
+            // fixes button position
             int x = this.width - 140;
             int y = this.height - 30;
             disconnectButton.setPosition(x, y);
         }
     }
+
 }
