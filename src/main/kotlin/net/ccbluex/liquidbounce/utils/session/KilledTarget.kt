@@ -11,7 +11,7 @@ import net.minecraft.network.protocol.game.ClientboundRespawnPacket
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket
 import net.minecraft.network.protocol.game.ClientboundSetScorePacket
 import net.minecraft.network.protocol.game.ClientboundSoundPacket
-import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.EntityTypes
 import net.minecraft.world.entity.LivingEntity
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.abs
@@ -88,7 +88,7 @@ object KilledTarget : EventListener {
 
         if (isInLobby) return@handler
 
-        if (entity == mc.player || !entity.isAlive || entity.type != EntityType.PLAYER || !entity.shouldBeAttacked()) {
+        if (entity == mc.player || !entity.isAlive || entity.type != EntityTypes.PLAYER || !entity.shouldBeAttacked()) {
             return@handler
         }
 

@@ -4,6 +4,7 @@ import net.ccbluex.liquidbounce.event.EventListener
 import net.ccbluex.liquidbounce.event.events.ChatReceiveEvent
 import net.ccbluex.liquidbounce.event.events.GameTickEvent
 import net.ccbluex.liquidbounce.event.handler
+import net.ccbluex.liquidbounce.injection.mixins.minecraft.gui.MixinHudAccessor
 import net.ccbluex.liquidbounce.utils.client.mc
 import net.minecraft.network.chat.Component;
 import java.util.concurrent.TimeUnit
@@ -20,8 +21,11 @@ object GameWins : EventListener {
             val currentTime = System.currentTimeMillis()
             if (currentTime - lastWinDetectionTime < cooldownMillis) return@handler
 
-            val title = mc.gui.title
-            val subtitle = mc.gui.subtitle
+
+            val hud = mc.gui as? MixinHudAccessor ?: return@handler
+
+            val title = hud.getTitle()
+            val subtitle = hud.getSubtitle()
 
             if (checkWinCondition(title) || checkSubtitleWinCondition(subtitle)) {
                 lastWinDetectionTime = currentTime

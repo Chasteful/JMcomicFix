@@ -4,13 +4,13 @@ import net.ccbluex.liquidbounce.integration.theme.component.HudComponentManager;
 import net.ccbluex.liquidbounce.integration.theme.component.HudComponentTweak;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.contextualbar.ContextualBarRenderer;
+import net.minecraft.client.gui.contextualbar.ContextualBar;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ContextualBarRenderer.class)
+@Mixin(ContextualBar.class)
 public interface MixinContextualBarRenderer {
 
     @Inject(

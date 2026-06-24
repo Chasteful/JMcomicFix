@@ -42,10 +42,7 @@ import net.ccbluex.liquidbounce.integration.theme.component.HudComponentTweak;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.contextualbar.ContextualBarRenderer;
 import net.minecraft.client.gui.Hud;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.network.chat.Component;
@@ -57,15 +54,12 @@ import net.minecraft.world.item.component.AttackRange;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
-import org.apache.logging.log4j.core.pattern.TextRenderer;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Hud.class)
@@ -78,12 +72,6 @@ public abstract class MixinHud {
     @Shadow
     @Nullable
     protected abstract Player getCameraPlayer();
-    @Shadow
-    @Nullable
-    public Component title;
-    @Shadow
-    @Nullable
-    public Component subtitle;
     @Unique
     private Component cachedTitle = null;
     @Unique
@@ -108,8 +96,8 @@ public abstract class MixinHud {
 
         // Draw after overlay event
         var component = HudComponentManager.getComponentWithTweak(HudComponentTweak.TWEAK_HOTBAR);
-        if (component != null && component.getRunning() &&
-                minecraft.gameMode.getPlayerMode() != GameType.SPECTATOR) {
+        if (minecraft.gameMode != null && component != null && component.getRunning() &&
+            minecraft.gameMode.getPlayerMode() != GameType.SPECTATOR) {
             drawHotbar(context, tickCounter, component);
         }
     }

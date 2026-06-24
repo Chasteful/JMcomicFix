@@ -26,7 +26,6 @@ import net.ccbluex.liquidbounce.features.module.modules.misc.betterchat.ModuleBe
 import net.ccbluex.liquidbounce.features.module.modules.misc.nameprotect.ModuleNameProtect;
 import net.ccbluex.liquidbounce.integration.theme.component.HudComponentManager;
 import net.ccbluex.liquidbounce.integration.theme.component.HudComponentTweak;
-import net.ccbluex.liquidbounce.interfaces.ChatComponentAddition;
 import net.ccbluex.liquidbounce.interfaces.GuiMessageLineAddition;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;

@@ -14,7 +14,7 @@ import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.core.particles.ShriekParticleOption
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.EntityTypes
 import net.minecraft.world.entity.LightningBolt
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.level.block.Block
@@ -41,7 +41,7 @@ object ModuleKillEffects : ClientModule("KillEffects", ModuleCategories.RENDER) 
         KilledTarget.getKilledEntitiesForRender().forEach { entity ->
             if (entity == mc.player) return@forEach
 
-            if (entity.type == EntityType.PLAYER) {
+            if (entity.type == EntityTypes.PLAYER) {
                 if (!renderEntities.containsKey(entity)) {
                     renderEntities[entity] = now
                     onKillEffect(entity)
@@ -65,7 +65,7 @@ object ModuleKillEffects : ClientModule("KillEffects", ModuleCategories.RENDER) 
         val z = pos.z
 
         if (Effect.LIGHTNING in effects) {
-            val bolt = LightningBolt(EntityType.LIGHTNING_BOLT, world)
+            val bolt = LightningBolt(EntityTypes.LIGHTNING_BOLT, world)
             bolt.setPos(pos.x,pos.y,pos.z)
             bolt.setVisualOnly(true)
             world.addEntity(bolt)
