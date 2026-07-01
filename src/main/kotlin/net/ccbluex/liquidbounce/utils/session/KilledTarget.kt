@@ -7,8 +7,10 @@ import net.ccbluex.liquidbounce.event.events.PacketEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.utils.client.mc
 import net.ccbluex.liquidbounce.utils.combat.shouldBeAttacked
+import net.minecraft.network.protocol.game.ClientboundEntityEventPacket
 import net.minecraft.network.protocol.game.ClientboundRespawnPacket
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket
+import net.minecraft.network.protocol.game.ClientboundSetObjectivePacket
 import net.minecraft.network.protocol.game.ClientboundSetScorePacket
 import net.minecraft.network.protocol.game.ClientboundSoundPacket
 import net.minecraft.world.entity.EntityTypes
@@ -106,13 +108,29 @@ object KilledTarget : EventListener {
         val packet = event.packet
         val now = System.currentTimeMillis()
 
+        if (packet is ClientboundSetObjectivePacket) {
+            val objectiveName = packet.objectiveName.lowercase()
+            val displayName = packet.displayName.string.lowercase()
+
+            val isLobbyObjective = lobbyKeywords.any { keyword ->
+                objectiveName.contains(keyword) || displayName.contains(keyword)
+            }
+
+            if (isLobbyObjective) {
+                isInLobby = true
+            }
+        }
+
         if (packet is ClientboundSetScorePacket) {
             val objectiveName = packet.objectiveName.lowercase()
-            val displayComponent = packet.display().orElse(null)
-            val displayName = displayComponent?.string?.lowercase() ?: ""
+            val ownerName = packet.owner.lowercase()
 
-            isInLobby = lobbyKeywords.any { keyword ->
-                objectiveName.contains(keyword) || displayName.contains(keyword)
+            val isLobbyScore = lobbyKeywords.any { keyword ->
+                objectiveName.contains(keyword) || ownerName.contains(keyword)
+            }
+
+            if (isLobbyScore) {
+                isInLobby = true
             }
         }
 
@@ -123,32 +141,21 @@ object KilledTarget : EventListener {
         }
 
         if (packet is ClientboundRespawnPacket) {
+            isInLobby = false
             attackedEntities.clear()
             synchronized(effectsRenderQueue) { effectsRenderQueue.clear() }
             return@handler
         }
 
-        if (packet is ClientboundSetEntityMotionPacket) {
-            attackedEntities.entries.forEach { (entity, data) ->
-                if (entity.id == packet.id && now - data.lastAttackTime < 1000L) {
-                    val newVelocity = sqrt(
-                        (packet.movement.x * packet.movement.x + packet.movement.z * packet.movement.z)
-                    ) / 8000.0
-                    if (abs(newVelocity - data.lastVelocity) > 0.05) {
+        if (packet is ClientboundEntityEventPacket) {
+            if (packet.eventId.toInt() == 2) {
+                val entityId = mc.level?.let {
+                    packet.getEntity(it)
+                }?.id
+                attackedEntities.entries.forEach { (entity, data) ->
+                    if (entity.id == entityId && now - data.lastAttackTime < 1000L) {
                         data.confirmedDamage = true
-                        data.lastVelocity = newVelocity
                     }
-                }
-            }
-        }
-
-        if (packet is ClientboundSoundPacket && packet.sound.value().location.path.contains("entity.generic.hurt")) {
-            attackedEntities.entries.forEach { (entity, data) ->
-                if (now - data.lastAttackTime < 1000L &&
-                    abs(packet.x - entity.x) < 1.0 &&
-                    abs(packet.z - entity.z) < 1.0
-                ) {
-                    data.confirmedDamage = true
                 }
             }
         }
