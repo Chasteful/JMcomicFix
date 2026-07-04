@@ -8,10 +8,10 @@ import net.ccbluex.liquidbounce.injection.mixins.minecraft.render.EnderDragonEnt
 import net.ccbluex.liquidbounce.injection.mixins.minecraft.render.LivingEntityRendererAccessor
 import net.ccbluex.liquidbounce.render.drawBox
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
-import net.ccbluex.liquidbounce.render.renderEnvironmentForWorld
 import net.ccbluex.liquidbounce.render.withPositionRelativeToCamera
 import net.ccbluex.liquidbounce.render.withPush
 import net.ccbluex.liquidbounce.render.WorldRenderEnvironment
+import net.ccbluex.liquidbounce.render.renderEnvironment
 import net.ccbluex.liquidbounce.utils.client.mc
 import net.ccbluex.liquidbounce.utils.client.network
 import net.minecraft.client.model.EntityModel
@@ -41,11 +41,14 @@ import net.minecraft.world.phys.AABB
 
 object WireframeRenderer {
 
+    @Suppress("unused")
     private fun drawWireframe(
-        event:WorldRenderEvent,part: ModelPart?,
+        event:WorldRenderEvent,
+        part: ModelPart?,
         localPoseStack: PoseStack,
         color: Color4b, outlineColor: Color4b) {
-        renderEnvironmentForWorld(event.matrixStack) {
+
+        event.renderEnvironment {
             part?.visit(localPoseStack) { _, _, _, cuboid ->
                 drawBox(
                     AABB(

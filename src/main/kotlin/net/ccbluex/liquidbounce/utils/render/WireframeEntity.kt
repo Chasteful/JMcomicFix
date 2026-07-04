@@ -9,7 +9,7 @@ import net.ccbluex.liquidbounce.injection.mixins.minecraft.render.EnderDragonEnt
 import net.ccbluex.liquidbounce.injection.mixins.minecraft.render.LivingEntityRendererAccessor
 import net.ccbluex.liquidbounce.render.drawBox
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
-import net.ccbluex.liquidbounce.render.renderEnvironmentForWorld
+import net.ccbluex.liquidbounce.render.renderEnvironment
 import net.ccbluex.liquidbounce.render.withPositionRelativeToCamera
 import net.ccbluex.liquidbounce.render.withPush
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
@@ -63,7 +63,7 @@ data class WireframeEntity(
 
     @Suppress("CognitiveComplexMethod", "LongMethod")
     fun render(event: WorldRenderEvent, color: Color4b, outlineColor: Color4b) {
-        renderEnvironmentForWorld(event.matrixStack) {
+        event.renderEnvironment{
 
             fun drawWireframe(part: ModelPart?, localPoseStack: PoseStack, color: Color4b, outlineColor: Color4b) {
                 part?.visit(localPoseStack) { _, _, _, cuboid ->

@@ -8,7 +8,7 @@ import net.ccbluex.liquidbounce.features.module.ModuleCategories
 import net.ccbluex.liquidbounce.render.GenericRainbowColorMode
 import net.ccbluex.liquidbounce.render.GenericStaticColorMode
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
-import net.ccbluex.liquidbounce.render.renderEnvironmentForWorld
+import net.ccbluex.liquidbounce.render.renderEnvironment
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.entity.RenderedEntities
 import net.ccbluex.liquidbounce.utils.entity.interpolateCurrentPosition
@@ -60,7 +60,6 @@ object ModuleSandevistan : ClientModule("Sandevistan", ModuleCategories.RENDER) 
         val world = mc.level ?: return@handler
         val currentTime = world.gameTime
         val partialTicks = event.partialTicks
-
         val entitiesToRender = RenderedEntities.filter { shouldRenderEntity(it) }
 
         entitiesToRender.forEach { entity ->
@@ -142,7 +141,7 @@ object ModuleSandevistan : ClientModule("Sandevistan", ModuleCategories.RENDER) 
             }
         }
 
-        renderEnvironmentForWorld(event.matrixStack) {
+        event.renderEnvironment {
             for (i in 0 until totalSnapshots) {
                 val snapshot = pooledSnapshots[i] ?: continue
                 val entity = snapshot.entity
