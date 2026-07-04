@@ -1,81 +1,35 @@
 <script lang="ts">
-    import {createEventDispatcher, onMount, onDestroy} from "svelte";
-    import {cubicOut} from "svelte/easing";
-    import {fade, scale} from "svelte/transition";
-
+    import {fade, fly} from "svelte/transition";
+    import {createEventDispatcher} from "svelte";
 
     export let title: string;
     export let visible: boolean;
 
     const dispatch = createEventDispatcher();
 
-    let isDragging = false;
-    let offsetX = 0;
-    let offsetY = 0;
-    let modal: HTMLDivElement | null = null;
-    let titleBar: HTMLDivElement | null = null;
-
     function handleClick() {
-        closeModal();
-    }
-
-    function closeModal() {
         dispatch("close");
         visible = false;
     }
 
-    function handleKeyDown(event: KeyboardEvent) {
-        if (event.key === "Tab") {
-            closeModal();
-        }
+    function portal(node: HTMLElement) {
+        document.body.appendChild(node);
+
+        return {
+            destroy: () => node.remove()
+        };
     }
-
-
-    function startDrag(event: MouseEvent) {
-        if (titleBar && modal) {
-            isDragging = true;
-
-            const modalRect = modal.getBoundingClientRect();
-            offsetX = event.clientX - (modalRect.left + modalRect.width / 2);
-            offsetY = event.clientY - (modalRect.top + modalRect.height / 2);
-
-            document.addEventListener("mousemove", onDrag);
-            document.addEventListener("mouseup", stopDrag);
-        }
-    }
-
-    function onDrag(event: MouseEvent) {
-        if (isDragging && modal) {
-            modal.style.left = `${event.clientX - offsetX}px`;
-            modal.style.top = `${event.clientY - offsetY}px`;
-        }
-    }
-
-    function stopDrag() {
-        isDragging = false;
-        document.removeEventListener("mousemove", onDrag);
-        document.removeEventListener("mouseup", stopDrag);
-    }
-
-    onMount(() => {
-        window.addEventListener("keydown", handleKeyDown);
-    });
-
-    onDestroy(() => {
-        window.removeEventListener("keydown", handleKeyDown);
-    });
 </script>
 
 {#if visible}
-    <div class="modal-wrapper" transition:fade={{ duration: 500, easing: cubicOut }}>
-        <div class="modal" bind:this={modal} transition:scale={{ duration: 500, easing: cubicOut }}>
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
-            <div class="titlebar" bind:this={titleBar} on:mousedown={startDrag}>
-                <div class="title">{title}</div>
-                <button class="button-modal-close" on:click={handleClick}>
-                    <img src="img/menu/icon-close.svg" alt="close">
-                </button>
+    <div class="modal-wrapper" transition:fade|global={{duration: 200}} use:portal>
+        <div class="modal" in:fly|global={{duration: 300, y: -100}} out:fly|global={{duration: 300, y: -100}}>
+            <div class="titlebar">
+            <button class="button-modal-close" on:click={handleClick}>
+                <img src="img/menu/icon-close.svg" alt="close">
+            </button>
             </div>
+            <div class="title">{title}</div>
 
             <div class="content">
                 <slot/>
@@ -171,5 +125,35 @@
     font-size: 15px;
     padding-right: 8px;
     row-gap: 40px;
+  }
+
+  @media screen and (max-width: 1366px) {
+    .modal {
+      zoom: 0.8;
+    }
+  }
+
+  @media screen and (max-width: 1200px) {
+    .modal {
+      zoom: 0.5;
+    }
+  }
+
+  @media screen and (max-height: 1100px) {
+    .modal {
+      zoom: 0.8;
+    }
+  }
+
+  @media screen and (max-height: 700px) {
+    .modal {
+      zoom: 0.5;
+    }
+  }
+
+  @media screen and (max-height: 540px) {
+    .modal {
+      zoom: 0.4;
+    }
   }
 </style>

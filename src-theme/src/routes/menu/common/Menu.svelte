@@ -32,11 +32,11 @@
                     showHeader={showHeader}
             />
         </div>
-
-        <div class="menu-wrapper">
-            <slot/>
-        </div>
     {/if}
+
+    <div class="menu-wrapper">
+        <slot/>
+    </div>
 </div>
 <Background showBackground={showBackground}/>
 <style lang="scss">
