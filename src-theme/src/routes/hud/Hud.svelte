@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {onMount} from "svelte";
+    import {onMount, setContext} from "svelte";
     import ArrayList from "./elements/arrayList/ArrayList.svelte";
     import Notifications from "./elements/notifications/Notifications.svelte";
     import TabGui from "./elements/tabgui/TabGui.svelte";
@@ -28,7 +28,13 @@
         Metadata,
     } from "../../integration/types";
     import type {ComponentsUpdateEvent, ScaleFactorChangeEvent} from "../../integration/events";
-    import {getClientInfo, getComponents, getGameWindow, getMetadata} from "../../integration/rest";
+    import {
+        getClientInfo,
+        getComponents,
+        getGameWindow,
+        getMetadata,
+        getNativeComponents
+    } from "../../integration/rest";
     import {listen} from "../../integration/ws";
     import {ScaleFactor} from "./Hud_store";
     import {hudScaleFactor} from "../../theme/theme_manager";
@@ -42,15 +48,27 @@
     import HealthBar from "./elements/healthhud/HealthBar.svelte";
     import GenericPlayerInventory from "./elements/inventory/GenericPlayerInventory.svelte";
     import InventoryStatistics from "./elements/inventory/InventoryStatistics.svelte";
+    import {
+        HUD_EDITOR_ELEMENTS_CONTEXT,
+        type HudEditorDragState
+    } from "../clickgui/tabs/hud_editor/constants";
+
+    export let inEditor = false;
+    export let onDragStateChange: ((state: HudEditorDragState) => void) | undefined = undefined;
+    export let magneticTargetIds: string[] = [];
 
     let zoom = 100;
     let metadata: Metadata;
-    let components: HudComponent[] = [];
+    let nativeComponents: HudComponent[] = [];
+    let themeComponents: HudComponent[] = [];
+
+    $: renderedComponents = inEditor ? [...nativeComponents, ...themeComponents] : themeComponents;
     $: ScaleFactor.set($hudScaleFactor * $resolutionCoefficient);
 
     async function updateZoom(): Promise<void> {
         $ScaleFactor = $hudScaleFactor * $resolutionCoefficient;
     }
+    setContext(HUD_EDITOR_ELEMENTS_CONTEXT, new Map<string, HTMLElement>());
 
     onMount(() => {
         const cleanup = () => window.removeEventListener("resize", updateZoom);
@@ -61,7 +79,10 @@
             zoom = gameWindow.scaleFactor * 50;
             await updateZoom();
             metadata = await getMetadata();
-            components = await getComponents(metadata.id);
+            [nativeComponents, themeComponents] = await Promise.all([
+                inEditor ? getNativeComponents() : Promise.resolve([]),
+                getComponents(metadata.id)
+            ]);
             window.addEventListener("resize", updateZoom);
         })();
 
@@ -72,22 +93,30 @@
         zoom = data.scaleFactor * 50;
     });
 
-    listen("componentsUpdate", (data: ComponentsUpdateEvent) => {
-        if (data.id != metadata.id) {
-            // reject
-            return;
+    listen("componentsUpdate", (event: ComponentsUpdateEvent) => {
+        if (inEditor && event.source === "native") {
+            nativeComponents = event.components;
         }
 
-        // force update to re-render
-        components = [];
-        components = data.components;
+        if (event.source === "theme" && event.themeId === metadata?.id) {
+            themeComponents = event.components;
+        }
     });
 </script>
 
 <div class="hud-resize-with-resolution" style="--hud-zoom: {$ScaleFactor}">
-    {#each components as c}
+    {#each renderedComponents as c (c.id)}
         {#if c.settings.enabled}
-            <DraggableComponent alignment={c.settings.alignment} >
+            <DraggableComponent
+                    {inEditor}
+                    {onDragStateChange}
+                    componentId={c.id}
+                    componentName={c.name}
+                    alignment={c.settings.alignment}
+                    magneticallyReferenced={magneticTargetIds.includes(c.id)}
+                    width={c.width}
+                    height={c.height}
+            >
             {#if c.name === 'Text'}
                 <Text settings={c.settings}/>
             {:else if c.name === 'Effects'}
@@ -150,6 +179,8 @@
                 <TitleControl settings={c.settings}/>
             {:else if c.name === 'Watermark'}
                 <Watermark settings={c.settings}/>
+            {:else if c.width !== undefined && c.height !== undefined}
+                <div></div>
             {/if}
             </DraggableComponent>
         {/if}
@@ -157,15 +188,26 @@
 </div>
 
 <div class="hud-resize-with-game" style="zoom: {zoom}%">
-    {#each components as c}
+    {#each renderedComponents as c (c.id)}
         {#if c.settings.enabled}
-            <DraggableComponent alignment={c.settings.alignment} >
+            <DraggableComponent
+                    {inEditor}
+                    {onDragStateChange}
+                    componentId={c.id}
+                    componentName={c.name}
+                    alignment={c.settings.alignment}
+                    magneticallyReferenced={magneticTargetIds.includes(c.id)}
+                    width={c.width}
+                    height={c.height}
+            >
                 {#if c.name === 'HealthBar'}
                     <HealthBar settings={c.settings}/>
                 {:else if c.name === 'Hotbar'}
                     <HotBar settings={c.settings}/>
                 {:else if c.name === 'Message'}
                     <Message settings={c.settings}/>
+                {:else if c.width !== undefined && c.height !== undefined}
+                    <div></div>
                 {/if}
             </DraggableComponent>
         {/if}

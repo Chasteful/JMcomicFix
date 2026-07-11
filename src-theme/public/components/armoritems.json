@@ -1,6 +1,7 @@
 {
   "name": "ArmorItems",
-  "enabled": true,
+  "description": "Displays your equipped armor.",
+  "enabled": false,
   "singleton": true,
   "alignment": {
     "horizontalAlignment": "Left",

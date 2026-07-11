@@ -3,7 +3,7 @@
     import type {Module as TModule} from "../../integration/types";
     import {listen} from "../../integration/ws";
     import Module from "./Module.svelte";
-    import type {ModuleToggleEvent} from "../../integration/events";
+    import type {KeyboardKeyEvent, ModuleToggleEvent} from "../../integration/events";
     import {fade} from "svelte/transition";
     import {quintOut} from "svelte/easing";
     import {
@@ -170,17 +170,11 @@
         });
     });
 
-    function handleKeydown(e: KeyboardEvent) {
-        if (e.key === "Shift") {
-            ignoreGrid = true;
+    listen("keyboardKey", (e: KeyboardKeyEvent) => {
+        if (e.key === "key.keyboard.left.shift") {
+            ignoreGrid = e.action === 1;
         }
-    }
-
-    function handleKeyup(e: KeyboardEvent) {
-        if (e.key === "Shift") {
-            ignoreGrid = false;
-        }
-    }
+    });
 
     function snapToGrid(value: number): number {
         if (ignoreGrid || !$snappingEnabled) return value;
@@ -189,7 +183,7 @@
     }
 </script>
 
-<svelte:window on:mouseup={onMouseUp} on:mousemove={onMouseMove} on:keydown={handleKeydown} on:keyup={handleKeyup}/>
+<svelte:window on:mouseup={onMouseUp} on:mousemove={onMouseMove}/>
 
 <div
         class="panel"

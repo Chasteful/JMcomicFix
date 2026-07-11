@@ -53,14 +53,14 @@
 
 <div class="title-screen">
     {#if isAnniversary()}
-        <ConfettiBackground />
+        <ConfettiBackground/>
     {/if}
 
-        <div class="content">
-            <div class="main-buttons">
-                {#if regularButtonsShown}
-                    <MainButton title="Singleplayer" icon="singleplayer" index={0}
-                                on:click={() => openScreen("singleplayer")}/>
+    <div class="content">
+        <div class="main-buttons">
+            {#if regularButtonsShown}
+                <MainButton title="Singleplayer" icon="singleplayer" index={0}
+                            on:click={() => openScreen("singleplayer")}/>
 
                     <MainButton title="Multiplayer" icon="multiplayer" let:parentHovered
                                 on:click={() => openScreen("multiplayer")} index={1}>

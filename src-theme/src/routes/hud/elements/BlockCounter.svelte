@@ -8,7 +8,9 @@
     import {cubicOut} from "svelte/easing";
     import {Tween} from "svelte/motion";
 
-    export let settings: { [name: string]: any };
+    let cSettings: HudBlockCounterSettings;
+
+    $: cSettings = settings as HudBlockCounterSettings;
 
     let nextBlock: string | undefined = undefined;
     let count: number | undefined = undefined;

@@ -19,14 +19,18 @@
 package net.ccbluex.liquidbounce.integration.interop.protocol.rest.v1.client
 
 import com.google.gson.JsonObject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import net.ccbluex.liquidbounce.LiquidBounce
 import net.ccbluex.liquidbounce.api.services.client.ClientUpdate.update
 import net.ccbluex.liquidbounce.config.ConfigSystem
 import net.ccbluex.liquidbounce.config.types.FileDialogMode
+import net.ccbluex.liquidbounce.features.module.modules.render.ModuleHud
 import net.ccbluex.liquidbounce.utils.client.inGame
 import net.ccbluex.liquidbounce.utils.client.mc
 import net.ccbluex.liquidbounce.utils.client.usesViaFabricPlus
 import net.ccbluex.netty.http.model.RequestObject
+import net.ccbluex.liquidbounce.utils.kotlin.Minecraft
 import net.ccbluex.netty.http.routing.Routing
 import net.ccbluex.netty.http.util.httpOk
 import net.kotlinmodule.jmcomicfix.api.services.client.ClientUpdate
@@ -93,6 +97,17 @@ private fun Routing.getUpdateInfo() = get("/update") {
 // POST /api/v1/client/exit
 private fun Routing.postExit() = post("/exit") {
     mc.stop()
+    call.respondNoContent()
+}
+
+// PUT /api/v1/client/hud-editor
+private fun Routing.putHudEditorState() = put("/hud-editor") {
+    data class Request(val selected: Boolean)
+    val selected = call.receive<Request>().selected
+
+    withContext(Dispatchers.Minecraft) {
+        ModuleHud.hudEditorSelected = selected
+    }
     call.respondNoContent()
 }
 
@@ -172,6 +187,7 @@ internal fun Routing.clientRoutes() {
     getClientInfo()
     getUpdateInfo()
     postExit()
+    putHudEditorState()
     getWindowInfo()
     postBrowse()
     postBrowsePath()

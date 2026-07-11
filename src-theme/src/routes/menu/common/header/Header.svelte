@@ -13,6 +13,8 @@
     export let showAccount: boolean;
     export let showHeader: boolean;
 
+    $: showAnniversaryLogo = $location === "/title" && isAnniversary();
+
     listen("accountManagerAddition", (e: AccountManagerAdditionEvent) => {
         if (!e.error) {
             notification.set({
@@ -56,7 +58,18 @@
 
 {#if showHeader}
 <div class="header">
-    <Logo showLogo={true}/>
+    <div class="logo-wrapper">
+        <div class="logo" class:visible={showAnniversaryLogo} aria-hidden={!showAnniversaryLogo}>
+            <AnimatedLogo/>
+        </div>
+        <div class="logo" class:visible={!showAnniversaryLogo} aria-hidden={showAnniversaryLogo}>
+            <LiquidBounceLogo
+                    width="261.263px"
+                    height="98px"
+                    badgeFill="var(--accent-color)"
+            />
+        </div>
+    </div>
 
     <div class="notifications">
         <Notifications/>
@@ -78,5 +91,20 @@
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
+  }
+
+  .logo-wrapper {
+    display: grid;
+  }
+
+  .logo {
+    grid-area: 1 / 1;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .5s ease;
+
+    &.visible {
+      opacity: 1;
+    }
   }
 </style>

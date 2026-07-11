@@ -26,3 +26,5 @@ export const gridSize: Writable<number> = writable(10);
 export const panelLength: Writable<number> = writable(64);
 
 export const fontSize: Writable<number> = writable(18);
+
+export const darken = writable(true);

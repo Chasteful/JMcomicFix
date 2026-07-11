@@ -17,28 +17,14 @@
  * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ccbluex.liquidbounce.integration.theme.component.components
+package net.ccbluex.liquidbounce.utils.kotlin
 
-import com.google.gson.JsonObject
-import net.ccbluex.liquidbounce.integration.theme.component.HudComponent
-import net.ccbluex.liquidbounce.integration.theme.component.HudComponentTweak
-import net.ccbluex.liquidbounce.utils.render.Alignment
+import java.util.function.Consumer
 
-class WebHudComponent(
-    name: String,
-    enabled: Boolean,
-    alignment: Alignment,
-    tweaks: Array<HudComponentTweak> = emptyArray(),
-    val values: Array<JsonObject> = emptyArray(),
-    description: String = "",
-) : HudComponent(name, enabled, alignment, tweaks, description) {
+fun interface ReceiverConsumer<T> : Consumer<T> {
+    fun T.consume()
 
-    override fun walkInit() {
-        for (value in values) {
-            json(value)
-        }
-        registerComponentListen(this)
-        super.walkInit()
+    override fun accept(t: T) {
+        t.consume()
     }
-
 }

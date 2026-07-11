@@ -1,6 +1,7 @@
 {
   "name": "Inventory",
-  "enabled": true,
+  "description": "Displays your main inventory contents.",
+  "enabled": false,
   "singleton": true,
   "alignment": {
     "horizontalAlignment": "Left",
