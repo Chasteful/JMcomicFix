@@ -8,6 +8,8 @@
     import {cubicOut} from "svelte/easing";
     import {Tween} from "svelte/motion";
 
+    export let settings: { [name: string]: any };
+
     let cSettings: HudBlockCounterSettings;
 
     $: cSettings = settings as HudBlockCounterSettings;

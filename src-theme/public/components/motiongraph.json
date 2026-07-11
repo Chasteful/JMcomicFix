@@ -1,5 +1,6 @@
 {
   "name": "MotionGraph",
+  "description":"Visualize your workout speed.",
   "enabled": true,
   "singleton": true,
   "alignment": {

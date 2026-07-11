@@ -1,5 +1,6 @@
 {
   "name": "StatusBar",
+  "description": "Display the your status display.",
   "enabled": false,
   "singleton": true,
   "alignment": {

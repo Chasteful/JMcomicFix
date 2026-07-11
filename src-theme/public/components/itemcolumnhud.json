@@ -1,5 +1,6 @@
 {
   "name": "ItemColumn",
+  "description": "a more light-polluted hotbar",
   "enabled": false,
   "singleton": true,
   "alignment": {

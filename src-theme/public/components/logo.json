@@ -1,5 +1,6 @@
 {
   "name": "Logo",
+  "description":"LiquidBounce",
   "enabled": true,
   "singleton": true,
   "alignment": {

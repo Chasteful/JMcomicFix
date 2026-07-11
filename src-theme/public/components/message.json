@@ -1,5 +1,6 @@
 {
   "name": "Message",
+  "description":"Replaces the vanilla message text.",
   "enabled": true,
   "singleton": true,
   "alignment": {

@@ -1,5 +1,6 @@
 {
   "name": "Island",
+  "description": "I don't know how to describe it",
   "enabled": false,
   "singleton": true,
   "alignment": {

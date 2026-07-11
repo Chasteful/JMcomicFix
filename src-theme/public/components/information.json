@@ -1,5 +1,6 @@
 {
   "name": "Information",
+  "description": "Displays your framerate and movement speed and coordinates.",
   "enabled": true,
   "singleton": true,
   "alignment": {

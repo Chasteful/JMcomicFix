@@ -1,5 +1,6 @@
 {
   "name": "HealthBar",
+  "description":"Only replaces the vanilla health bar.",
   "enabled": true,
   "singleton": true,
   "alignment": {

@@ -1,5 +1,6 @@
 {
   "name": "ChatHUD",
+  "description":"Replaces the vanilla chat hud.",
   "enabled": true,
   "singleton": true,
   "alignment": {

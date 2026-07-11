@@ -1,5 +1,6 @@
 {
   "name": "SilentHand",
+  "description":"Display your actual handheld item, you need to enable the SilentHand module.",
   "enabled": true,
   "singleton": true,
   "alignment": {

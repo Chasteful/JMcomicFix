@@ -1,5 +1,6 @@
 {
   "name": "PlayerList",
+  "description":"Replaces the vanilla tab hud.",
   "enabled": true,
   "singleton": false,
   "alignment": {

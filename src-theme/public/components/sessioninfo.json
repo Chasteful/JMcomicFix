@@ -1,5 +1,6 @@
 {
   "name": "SessionInfo",
+  "description":"Display your session info.",
   "enabled": true,
   "singleton": true,
   "alignment": {

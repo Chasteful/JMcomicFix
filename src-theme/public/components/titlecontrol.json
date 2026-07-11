@@ -1,5 +1,6 @@
 {
   "name": "TitleControl",
+  "description": "Overlay the vanilla title.",
   "enabled": true,
   "singleton": true,
   "alignment": {
