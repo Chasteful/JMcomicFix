@@ -9,6 +9,9 @@
     } from "../../../../integration/events";
     import {notification} from "./notification_store";
     import Logo from "./Logo.svelte";
+    import {location} from "svelte-spa-router";
+    import {isAnniversary} from "../../../../util/utils";
+    import AnimatedLogo from "./AnimatedLogo.svelte";
 
     export let showAccount: boolean;
     export let showHeader: boolean;
@@ -63,11 +66,7 @@
             <AnimatedLogo/>
         </div>
         <div class="logo" class:visible={!showAnniversaryLogo} aria-hidden={showAnniversaryLogo}>
-            <LiquidBounceLogo
-                    width="261.263px"
-                    height="98px"
-                    badgeFill="var(--accent-color)"
-            />
+            <Logo/>
         </div>
     </div>
 

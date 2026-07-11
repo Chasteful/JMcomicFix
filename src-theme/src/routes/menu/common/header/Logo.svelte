@@ -3,11 +3,6 @@
     import {onDestroy,} from "svelte";
 
     import ClientLogo from "../../../hud/common/ClientLogo.svelte";
-    import {location} from "svelte-spa-router";
-    import {isAnniversary} from "../../../../util/utils";
-    import AnimatedLogo from "./AnimatedLogo.svelte";
-
-    export let showLogo: boolean;
     let glitchActive = false;
     let intervalId: ReturnType<typeof setInterval>;
     let timeoutId: ReturnType<typeof setTimeout>;
@@ -58,36 +53,27 @@
         clearInterval(intervalId);
         clearTimeout(timeoutId);
     });
+
 </script>
 
-
-{#if showLogo}
-    {#if $location === "/title" && isAnniversary()}
-        <AnimatedLogo/>
-    {:else}
-        <button
-                class="logo-container reset-button"
-                on:contextmenu|preventDefault={handleClick}
-                on:click|preventDefault={switchLogo}
-        >
-            <div class="logo {glitchActive ? 'transparent' : ''}">
-                <ClientLogo/>
-            </div>
-            <div bind:this={redLayer}
-                 class="logo glitch-layer red {glitchActive ? 'visible' : ''}"
-            >
-                <ClientLogo/>
-            </div>
-
-            <div bind:this={blueLayer}
-                 class="logo glitch-layer blue {glitchActive ? 'visible' : ''}"
-            >
-                <ClientLogo/>
-            </div>
-        </button>
-    {/if}
-
-{/if}
+<button class="logo-container reset-button"
+        on:contextmenu|preventDefault={handleClick}
+        on:click|preventDefault={switchLogo}
+>
+    <div class="logo {glitchActive ? 'transparent' : ''}">
+        <ClientLogo/>
+    </div>
+    <div bind:this={redLayer}
+         class="logo glitch-layer red {glitchActive ? 'visible' : ''}"
+    >
+        <ClientLogo/>
+    </div>
+    <div bind:this={blueLayer}
+         class="logo glitch-layer blue {glitchActive ? 'visible' : ''}"
+    >
+        <ClientLogo/>
+    </div>
+</button>
 
 <style lang="scss">
   @use "../../../../colors" as *;

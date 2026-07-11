@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {onDestroy, onMount} from 'svelte';
+    import {onDestroy, onMount, tick} from 'svelte';
     import type {Module} from '../../../../integration/types';
     import {getModules} from '../../../../integration/rest';
     import {listen} from '../../../../integration/ws';
@@ -65,8 +65,13 @@
         measuredModules.sort((a, b) => cSettings.order === "Ascending" ? a.width - b.width : b.width - a.width);
 
         enabledModules = measuredModules;
+        await tick();
     }
 
+    $: if (cSettings !== settings) {
+        cSettings = settings as HudArrayListSettings;
+        updateEnabledModules();
+    }
     spaceSeperatedNames.subscribe(async () => {
         await updateEnabledModules();
     });
