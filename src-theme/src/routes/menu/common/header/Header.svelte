@@ -99,7 +99,6 @@
   .logo {
     grid-area: 1 / 1;
     opacity: 0;
-    pointer-events: none;
     transition: opacity .5s ease;
 
     &.visible {
