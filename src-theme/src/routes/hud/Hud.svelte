@@ -46,12 +46,14 @@
     import Effects from "./elements/effects/Effects.svelte";
     import DraggableComponent from "./elements/DraggableComponent.svelte";
     import HealthBar from "./elements/healthhud/HealthBar.svelte";
+    import ClosedCaptions from "./elements/ClosedCaptions.svelte";
     import GenericPlayerInventory from "./elements/inventory/GenericPlayerInventory.svelte";
     import InventoryStatistics from "./elements/inventory/InventoryStatistics.svelte";
     import {
         HUD_EDITOR_ELEMENTS_CONTEXT,
         type HudEditorDragState
     } from "../clickgui/tabs/hud_editor/constants";
+    import Image from "./elements/Image.svelte";
 
     export let inEditor = false;
     export let onDragStateChange: ((state: HudEditorDragState) => void) | undefined = undefined;
@@ -113,6 +115,7 @@
                     componentId={c.id}
                     componentName={c.name}
                     alignment={c.settings.alignment}
+                    zIndex={c.settings.zIndex ?? 0}
                     magneticallyReferenced={magneticTargetIds.includes(c.id)}
                     width={c.width}
                     height={c.height}
@@ -131,6 +134,8 @@
                 <BlockCounter settings={c.settings}/>
             {:else if c.name === 'ChatHUD'}
                 <ChatHUD settings={c.settings}/>
+            {:else if c.name === "ClosedCaptions"}
+                <ClosedCaptions/>
             {:else if c.name === "CraftingInventory"}
                 <GenericPlayerInventory
                         settings={c.settings}

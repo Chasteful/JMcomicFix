@@ -321,6 +321,7 @@ export interface Server {
     version: string;
     ping: number;
     resourcePackPolicy: string;
+    lan?: boolean;
 }
 
 export interface TextComponent {

@@ -19,8 +19,11 @@
 
 package net.ccbluex.liquidbounce.integration.interop.protocol.rest.v1.game
 
+import io.ktor.server.response.respond
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.get
+import io.ktor.server.routing.route
 import net.ccbluex.fastutil.mapToArray
-import net.ccbluex.liquidbounce.config.gson.interopGson
 import net.ccbluex.liquidbounce.features.module.modules.combat.ModuleSwordBlock.hideShieldSlot
 import net.ccbluex.liquidbounce.features.module.modules.combat.ModuleSwordBlock.shouldHideOffhand
 import net.ccbluex.liquidbounce.features.module.modules.misc.nameprotect.ModuleNameProtect
@@ -56,32 +59,32 @@ import kotlin.collections.emptyList
 import kotlin.math.min
 
 // GET /api/v1/client/player
-private fun Routing.getPlayerData() = get {
+private fun Route.getPlayerData() = get {
     val playerData = mc.player?.let(PlayerData::fromPlayer)
     if (playerData != null) {
-        call.respond(playerData, interopGson)
+        call.respond(playerData)
     } else {
-        call.respondNoContent()
+        call.respond(io.ktor.http.HttpStatusCode.NoContent)
     }
 }
 
 // GET /api/v1/client/player/inventory
-private fun Routing.getPlayerInventory() = get("/inventory") {
+private fun Route.getPlayerInventory() = get("/inventory") {
     val playerInventoryData = mc.player?.let(PlayerInventoryData::fromPlayer)
     if (playerInventoryData != null) {
-        call.respond(playerInventoryData, interopGson)
+        call.respond(playerInventoryData)
     } else {
-        call.respondNoContent()
+        call.respond(io.ktor.http.HttpStatusCode.NoContent)
     }
 }
 
 // GET /api/v1/client/crosshair
-private fun Routing.getCrosshairData() = get("/crosshair") {
+private fun Route.getCrosshairData() = get("/crosshair") {
     val crosshairData = mc.hitResult
     if (crosshairData != null) {
-        call.respond(crosshairData, interopGson)
+        call.respond(crosshairData)
     } else {
-        call.respondNoContent()
+        call.respond(io.ktor.http.HttpStatusCode.NoContent)
     }
 }
 
@@ -251,7 +254,7 @@ data class ScoreboardData(val header: Component, val entries: List<SidebarEntry?
  */
 private fun Float.fixNaN() = if (isNaN()) 0f else this
 
-internal fun Routing.playerRoutes() {
+internal fun Route.playerRoutes() {
     route("/player") {
         getPlayerData()
         getPlayerInventory()

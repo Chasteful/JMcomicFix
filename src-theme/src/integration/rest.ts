@@ -270,6 +270,18 @@ export async function getServers(): Promise<Server[]> {
     return data;
 }
 
+export async function getLanServers(): Promise<Server[]> {
+    const response = await fetch(`${API_BASE}/client/servers/lan`);
+
+    if (!response.ok) {
+        return [];
+    }
+
+    const data: Server[] = await response.json();
+
+    return data;
+}
+
 export async function connectToServer(address: string) {
     await fetch(`${API_BASE}/client/servers/connect`, {
         method: "POST",
@@ -290,13 +302,13 @@ export async function removeServer(id: number) {
     });
 }
 
-export async function addServer(name: string, address: string, serverResourcePacks: string) {
+export async function addServer(name: string, address: string, resourcePackPolicy: string) {
     await fetch(`${API_BASE}/client/servers/add`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({name, address, serverResourcePacks})
+        body: JSON.stringify({name, address, resourcePackPolicy})
     });
 }
 
@@ -675,9 +687,23 @@ export async function setComponentAlignment(id: string, alignment: Alignment): P
     });
 }
 
+export async function bringComponentToFront(id: string): Promise<number> {
+    const response = await fetch(`${API_BASE}/client/components/${id}/z-index`, {
+        method: "POST"
+    });
+
+    const data: { zIndex: number } = await response.json();
+    return data.zIndex;
+}
+
 export async function getComponentSettings(id: string): Promise<ConfigurableSetting> {
     const response = await fetch(`${API_BASE}/client/components/${id}/settings`);
     return await response.json();
+}
+
+export function getComponentFileUrl(id: string, cacheKey?: string): string {
+    const url = `${API_BASE}/client/components/${id}/file`;
+    return cacheKey === undefined ? url : `${url}?v=${encodeURIComponent(cacheKey)}`;
 }
 
 export async function setComponentSettings(id: string, settings: ConfigurableSetting): Promise<void> {

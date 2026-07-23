@@ -18,7 +18,7 @@
  */
 package net.ccbluex.liquidbounce.features.module.modules.render
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap
 import net.ccbluex.fastutil.forEachFloat
 import net.ccbluex.fastutil.step
 import net.ccbluex.liquidbounce.config.types.CurveValue.Axis.Companion.axis
@@ -54,9 +54,9 @@ import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 
 /**
- * Rotations module
+ * Debug module
  *
- * Allows you to see server-sided rotations.
+ * Only of interest to developers.
  */
 
 object ModuleDebug : ClientModule("Debug", ModuleCategories.RENDER) {
@@ -164,12 +164,15 @@ object ModuleDebug : ClientModule("Debug", ModuleCategories.RENDER) {
     @JvmRecord
     private data class DebuggedKey(val owner: DebuggedOwner, val name: String)
 
+    private val KEY_COMPARATOR = compareBy<DebuggedKey> { it.owner.debugOwnerId }
+        .thenComparing(DebuggedKey::name)
+
     @JvmRecord
     private data class ParameterCapture(val time: Long = System.currentTimeMillis(), val value: Any?)
 
-    private val debugParameters = Object2ObjectOpenHashMap<DebuggedKey, ParameterCapture>()
+    private val debugParameters = Object2ObjectRBTreeMap<DebuggedKey, ParameterCapture>(KEY_COMPARATOR)
 
-    private val debuggedGeometry = Object2ObjectOpenHashMap<DebuggedKey, DebuggedGeometry>()
+    private val debuggedGeometry = Object2ObjectRBTreeMap<DebuggedKey, DebuggedGeometry>(KEY_COMPARATOR)
 
     @Suppress("unused")
     private val renderHandler = handler<WorldRenderEvent> { event ->

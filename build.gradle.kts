@@ -18,9 +18,9 @@
  */
 
 import com.github.gradle.node.npm.task.NpmTask
-import com.github.gradle.node.task.NodeTask
 import dev.detekt.gradle.DetektCreateBaselineTask
 import groovy.json.JsonOutput
+import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.support.listFilesOrdered
 
 plugins {
@@ -39,7 +39,7 @@ base {
 }
 
 /** Includes dependency recursively in the JAR file */
-val jij: Configuration by configurations.creating
+val jij = configurations.create("jij")
 
 jij.excludeProvidedLibs()
 
@@ -62,10 +62,6 @@ allprojects {
         maven {
             name = "Jitpack"
             url = uri("https://jitpack.io")
-        }
-        maven {
-            name = "TerraformersMC"
-            url = uri("https://maven.terraformersmc.com/")
         }
         maven {
             name = "ViaVersion"
@@ -128,7 +124,17 @@ dependencies {
     // JCEF Support
     api(libs.mcef)
     include(libs.mcef)
-    jij(libs.httpServer)
+
+    // Ktor Server
+    jij(libs.ktor.server.core)
+    jij(libs.ktor.server.netty)
+    jij(libs.ktor.server.websockets)
+    jij(libs.ktor.server.sse)
+    jij(libs.ktor.server.cors)
+    jij(libs.ktor.server.compression)
+    jij(libs.ktor.server.content.negotiation)
+    jij(libs.ktor.server.status.pages)
+    jij(libs.ktor.serialization.gson)
 
     // Discord RPC Support
     jij(libs.discordIpc)
@@ -170,7 +176,11 @@ dependencies {
 addResolvedDependencies(jij, "compileOnly", "include", "api")
 
 tasks.processResources {
-    dependsOn("bundleTheme")
+    dependsOn("buildTheme")
+
+    from("src-theme/dist") {
+        into("resources/liquidbounce/themes/liquidbounce")
+    }
 
     val modVersion = providers.gradleProperty("mod_version")
     val minecraftVersion = providers.gradleProperty("mod_mc_version")
@@ -224,7 +234,7 @@ tasks.processResources {
 
 tasks.register<NpmTask>("npmInstallTheme") {
     workingDir = file("src-theme")
-    args.set(listOf("i"))
+    args.set(listOf("ci"))
     doLast {
         logger.info("Successfully installed dependencies for theme")
     }
@@ -243,41 +253,15 @@ tasks.register<NpmTask>("buildTheme") {
     inputs.files(
         "src-theme/package.json",
         "src-theme/package-lock.json",
-        "src-theme/bundle.cjs",
-        "src-theme/rollup.config.js"
+        "src-theme/index.html",
+        "src-theme/svelte.config.js",
+        "src-theme/tsconfig.json",
+        "src-theme/tsconfig.node.json",
+        "src-theme/vite.config.ts",
     )
     inputs.dir("src-theme/src")
     inputs.dir("src-theme/public")
     outputs.dir("src-theme/dist")
-}
-
-tasks.register<NodeTask>("bundleTheme") {
-    dependsOn("buildTheme")
-    workingDir = file("src-theme")
-    script = file("src-theme/bundle.cjs")
-    doLast {
-        logger.info("Successfully attached theme to build")
-    }
-
-    // Incremental stuff
-    inputs.files(
-        "src-theme/package.json",
-        "src-theme/package-lock.json",
-        "src-theme/bundle.cjs",
-        "src-theme/rollup.config.js"
-    )
-    inputs.dir("src-theme/src")
-    inputs.dir("src-theme/public")
-    inputs.dir("src-theme/dist")
-    outputs.files("src-theme/resources/assets/liquidbounce/themes/liquidbounce.zip")
-}
-
-sourceSets {
-    main {
-        resources {
-            srcDirs("src-theme/resources")
-        }
-    }
 }
 
 // ensure that the encoding is set to UTF-8, no matter what the system default is
@@ -388,8 +372,11 @@ tasks.register<Copy>("copyZipInclude") {
     into("build/libs/zip")
 }
 
-tasks.named("sourcesJar") {
-    dependsOn("bundleTheme", "generateGitProperties")
+tasks.named<Jar>("sourcesJar") {
+    dependsOn("buildTheme", "generateGitProperties")
+    from("src-theme/dist") {
+        into("resources/liquidbounce/themes/liquidbounce")
+    }
 }
 
 tasks.named("build") {

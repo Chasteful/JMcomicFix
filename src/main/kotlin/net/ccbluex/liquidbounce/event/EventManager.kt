@@ -56,6 +56,7 @@ import net.ccbluex.liquidbounce.event.events.ClientPlayerEffectEvent
 import net.ccbluex.liquidbounce.event.events.ClientPlayerInventoryEvent
 import net.ccbluex.liquidbounce.event.events.ClientShutdownEvent
 import net.ccbluex.liquidbounce.event.events.ClientStartEvent
+import net.ccbluex.liquidbounce.event.events.ClosedCaptionsEvent
 import net.ccbluex.liquidbounce.event.events.ComponentsUpdateEvent
 import net.ccbluex.liquidbounce.event.events.ConnectionDetailsEvent
 import net.ccbluex.liquidbounce.event.events.DeathEvent
@@ -278,6 +279,7 @@ internal val ALL_EVENT_CLASSES: Array<Class<out Event>> = arrayOf(
     TitleEvent.Subtitle::class.java,
     TitleEvent.Fade::class.java,
     TitleEvent.Clear::class.java,
+    ClosedCaptionsEvent::class.java,
     UserLoggedInEvent::class.java,
     UserLoggedOutEvent::class.java,
     NameProtectEvent::class.java,

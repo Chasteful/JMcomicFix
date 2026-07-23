@@ -19,6 +19,7 @@ import type {
 
 export interface EventMap {
     socketReady: void;
+
     themeColorChange: ThemeColorChangeEvent;
     hudValueChange:HudValueChangeEvent;
     nameProtectValueChange: NameProtectEvent;
@@ -65,6 +66,7 @@ export interface EventMap {
     subtitle: TitleEventSubtitle;
     titleFade: TitleEventFade;
     clearTitle: TitleEventClear;
+    closedCaptions: ClosedCaptionsEvent;
     connectionDetails: ConnectionDetailsEvent;
 
     //GameEvents.kt
@@ -313,6 +315,17 @@ export interface TitleEventFade {
 
 export interface TitleEventClear {
     reset: boolean;
+}
+
+export interface ClosedCaptionsEvent {
+    entries: ClosedCaptionEntry[];
+}
+
+export interface ClosedCaptionEntry {
+    text: TextComponent | string;
+    direction: "NONE" | "LEFT" | "RIGHT";
+    textColor: number;
+    backgroundColor: number;
 }
 
 export interface VirtualScreenEvent {

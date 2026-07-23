@@ -17,18 +17,12 @@
  * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ccbluex.liquidbounce.utils.kotlin
+package net.ccbluex.liquidbounce.annotations
 
-import net.ccbluex.liquidbounce.utils.math.high32
-import net.ccbluex.liquidbounce.utils.math.longFrom32
-import net.ccbluex.liquidbounce.utils.math.low32
-
-@JvmInline
-value class IntIntValuePair private constructor(private val bits: Long) {
-    constructor(left: Int, right: Int): this(longFrom32(left, right))
-    inline val left get() = component1()
-    inline val right get() = component2()
-
-    operator fun component1(): Int = bits.high32()
-    operator fun component2(): Int = bits.low32()
-}
+/**
+ * Marks a class which will (or can) be a `value class` after
+ * [JEP-401](https://openjdk.org/jeps/401) has been used in Minecraft.
+ */
+@Retention(AnnotationRetention.SOURCE)
+@Target(AnnotationTarget.CLASS)
+annotation class ValueClassCandidate
