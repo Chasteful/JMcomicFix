@@ -467,7 +467,6 @@ object ModuleManager : EventListener, Collection<ClientModule> by modules {
             ModuleAutoArmor,
             ModuleAutoBow,
             ModuleAutoClicker,
-            AutoMobHeal,
             ModuleAutoLeave,
             ModuleAutoBuff,
             ModuleAutoRod,
@@ -688,6 +687,7 @@ object ModuleManager : EventListener, Collection<ClientModule> by modules {
             ModuleSandevistan,
 
             // World
+            AutoMobHeal,
             ModuleAirPlace,
             ModuleAutoBuild,
             ModuleAutoDisable,

@@ -24,10 +24,10 @@ djl = "0.36.0"
 okhttp = "5.4.0"
 
 ktor = "3.5.1"
-discordIpc = "0.6.0-SNAPSHOT"
 semver4j = "3.1.0"
 ahocorasick = "0.6.3"
 fastutil4k = "0.2.8"
+discord-ipc = "-SNAPSHOT"
 
 # Recommended mods
 modmenu = "20.0.0-beta.4"
@@ -43,8 +43,7 @@ iris = "1.11.1+26.2-fabric"
 # Kotlin
 # https://kotlinlang.org/releases.html
 kotlin = "2.4.0"
-# JUnit
-junit = "6.1.2"
+# Kotlin test
 # https://central.sonatype.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-test/overview
 kotlinx-coroutines = "1.11.0"
 # https://maven.fabricmc.net/net/fabricmc/fabric-language-kotlin/
@@ -70,9 +69,6 @@ fabric-api = { group = "net.fabricmc.fabric-api", name = "fabric-api", version.r
 fabric-kotlin = { group = "net.fabricmc", name = "fabric-language-kotlin", version.ref = "fabric-kotlin" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 fabric-loader-junit = { group = "net.fabricmc", name = "fabric-loader-junit", version.ref = "fabric-loader" }
-junit-bom = { group = "org.junit", name = "junit-bom", version.ref = "junit" }
-junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit" }
-junit-platform-launcher = { group = "org.junit.platform", name = "junit-platform-launcher", version.ref = "junit" }
 
 netty-handler-proxy = { group = "io.netty", name = "netty-handler-proxy", version.ref = "netty" }
 lwjgl-egl = { group = "org.lwjgl", name = "lwjgl-egl", version.ref = "lwjgl" }
@@ -80,11 +76,11 @@ okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhtt
 okhttp-coroutines = { group = "com.squareup.okhttp3", name = "okhttp-coroutines", version.ref = "okhttp" }
 mcAuthlib = { group = "net.ccbluex", name = "mc-authlib", version.ref = "mc_authlib" }
 mcef = { group = "net.ccbluex", name = "mcef", version.ref = "mcef" }
-discordIpc = { group = "com.jagrosh", name = "DiscordIPC", version.ref = "discordIpc" }
 semver4j = { group = "com.vdurmont", name = "semver4j", version.ref = "semver4j" }
 ahocorasick = { group = "org.ahocorasick", name = "ahocorasick", version.ref = "ahocorasick" }
 fastutil4k-extensionsOnly = { group = "net.ccbluex", name = "fastutil4k-extensions-only", version.ref = "fastutil4k" }
 fastutil4k-moreCollections = { group = "net.ccbluex", name = "fastutil4k-more-collections", version.ref = "fastutil4k" }
+discord-ipc = { group = "com.github.CCBlueX", name = "discord-ipc", version.ref = "discord-ipc" }
 
 polyglot = { group = "org.graalvm.polyglot", name = "polyglot", version.ref = "polyglot" }
 polyglot-tools = { group = "org.graalvm.polyglot", name = "tools-community", version.ref = "polyglot" }
