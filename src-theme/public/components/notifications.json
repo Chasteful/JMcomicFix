@@ -18,6 +18,13 @@
         "min": 0.5,
         "max": 2.0
       }
+    },
+    {
+      "type": "MULTI_CHOOSE",
+      "name": "Severities",
+      "value": ["INFO", "SUCCESS", "ERROR", "ENABLED", "DISABLED"],
+      "choices": ["INFO", "SUCCESS", "ERROR", "ENABLED", "DISABLED"],
+      "canBeNone": false
     }
   ]
 }

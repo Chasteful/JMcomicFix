@@ -3,20 +3,24 @@
     import { popScale } from "../../../../util/animate_utils";
     import { fly } from "svelte/transition";
     import Notification from "./Notification.svelte";
-    import type {NotificationEvent} from "../../../../integration/events";
+    import type {NotificationEvent, NotificationSeverity} from "../../../../integration/events";
     import { Howl } from "howler";
     import { onDestroy } from "svelte";
-
-    export let settings: { [name: string]: any };
 
     interface TNotification {
         animationKey: number;
         id: number;
-        severity: string;
+        severity: NotificationSeverity;
         message: string;
         remaining: number;
         leaving?: boolean;
     }
+
+    export let settings: { [name: string]: any };
+
+    let cSettings: HudNotificationsSettings;
+
+    $: cSettings = settings as HudNotificationsSettings;
 
     let notifications: TNotification[] = [];
 
@@ -66,7 +70,9 @@
     const blinked = new Howl({src: ['audio/notifications/blinked.ogg'], preload: true})
 
     function addNotification(title: string, message: string, severity: string) {
-        const animationKey = Date.now();
+        if (!cSettings.severities.includes(severity)) return;
+
+        let animationKey = Date.now();
         const id = animationKey;
 
         if (message.startsWith("Currently storing")) {
