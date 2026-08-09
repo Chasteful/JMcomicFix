@@ -6,6 +6,7 @@
     import type {NotificationEvent, NotificationSeverity} from "../../../../integration/events";
     import { Howl } from "howler";
     import { onDestroy } from "svelte";
+    import type { HudNotificationsSettings } from "../../components";
 
     interface TNotification {
         animationKey: number;
@@ -69,7 +70,7 @@
     const blink = new Howl({src: ['audio/notifications/blink.ogg'], preload: true})
     const blinked = new Howl({src: ['audio/notifications/blinked.ogg'], preload: true})
 
-    function addNotification(title: string, message: string, severity: string) {
+    function addNotification(title: string, message: string, severity: NotificationSeverity) {
         if (!cSettings.severities.includes(severity)) return;
 
         let animationKey = Date.now();
@@ -115,7 +116,7 @@
         startGlobalTimer();
     }
 
-    function updateExistingNotification(index: number, message: string, severity: string) {
+    function updateExistingNotification(index: number, message: string, severity: NotificationSeverity) {
 
         notifications[index] = {
             ...notifications[index],
