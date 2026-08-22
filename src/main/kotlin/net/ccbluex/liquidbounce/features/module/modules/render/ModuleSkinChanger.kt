@@ -37,14 +37,13 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import net.ccbluex.liquidbounce.LiquidBounce
 import net.ccbluex.liquidbounce.api.core.HttpClient
-import net.ccbluex.liquidbounce.api.core.HttpException
 import net.ccbluex.liquidbounce.api.core.ioScope
 import net.ccbluex.liquidbounce.api.core.renderScope
 import net.ccbluex.liquidbounce.api.thirdparty.lookupUuidByName
-import net.ccbluex.liquidbounce.api.thirdparty.mojang.model.ChangeSkinRequest
-import net.ccbluex.liquidbounce.api.thirdparty.mojang.service.MinecraftServicesApi
+import net.ccbluex.liquidbounce.authlib.mojangapi.model.ChangeSkinRequest
+import net.ccbluex.liquidbounce.authlib.mojangapi.service.MinecraftServicesApi
+import net.ccbluex.liquidbounce.authlib.utils.generateOfflinePlayerUuid
 import net.ccbluex.liquidbounce.config.gson.serializer.minecraft.accountType
 import net.ccbluex.liquidbounce.config.types.group.ModeValueGroup
 import net.ccbluex.liquidbounce.config.types.list.Tagged
@@ -151,7 +150,7 @@ object ModuleSkinChanger : ClientModule("SkinChanger", ModuleCategories.RENDER) 
 
             private suspend fun textureSupplier(username: String): Supplier<PlayerSkin> {
                 val profile = withContext(Dispatchers.IO) {
-                    val uuid = lookupUuidByName(username) ?: UUIDUtil.createOfflinePlayerUUID(username)
+                    val uuid = lookupUuidByName(username) ?: generateOfflinePlayerUuid(username)
                     mc.services.sessionService.fetchProfile(uuid, false)?.profile
                         ?: GameProfile(uuid, username)
                 }
@@ -232,7 +231,6 @@ object ModuleSkinChanger : ClientModule("SkinChanger", ModuleCategories.RENDER) 
                     withContext(Dispatchers.Minecraft) {
                         skinTextures = PlayerInfo.createSkinLookup(profile)
                     }
-
                     triggerUpload()
                 }
             }
