@@ -23,7 +23,6 @@ package net.ccbluex.liquidbounce.utils.client
 
 import net.ccbluex.liquidbounce.event.EventManager
 import net.ccbluex.liquidbounce.event.events.NotificationEvent
-import net.ccbluex.liquidbounce.features.command.Command
 import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleHud
 import net.ccbluex.liquidbounce.injection.mixins.minecraft.gui.MixinChatScreenAccessor
@@ -201,9 +200,6 @@ data class MessageMetadata(
     companion object {
         @JvmStatic
         fun byModule(module: ClientModule) = MessageMetadata(id = "M${module.name}#info")
-
-        @JvmStatic
-        fun byCommand(command: Command) = MessageMetadata(id = "C${command.name}#info")
     }
 }
 
@@ -233,11 +229,7 @@ fun chat(vararg texts: Component, metadata: MessageMetadata = defaultMessageMeta
 
 fun chat(text: Component, module: ClientModule) = chat(text, metadata = MessageMetadata.byModule(module))
 
-fun chat(text: Component, command: Command) = chat(text, metadata = MessageMetadata.byCommand(command))
-
 fun chat(text: String, module: ClientModule) = chat(text.asPlainText(), module)
-
-fun chat(text: String, command: Command) = chat(text.asPlainText(), command)
 
 fun chat(text: String) = chat(text.asPlainText())
 

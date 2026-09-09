@@ -139,6 +139,7 @@ import net.ccbluex.liquidbounce.features.module.modules.movement.ModuleSprint
 import net.ccbluex.liquidbounce.features.module.modules.movement.ModuleStrafe
 import net.ccbluex.liquidbounce.features.module.modules.movement.ModuleTargetStrafe
 import net.ccbluex.liquidbounce.features.module.modules.movement.ModuleTeleport
+import net.ccbluex.liquidbounce.features.module.modules.movement.ModuleTridentBoost
 import net.ccbluex.liquidbounce.features.module.modules.movement.ModuleVehicleBoost
 import net.ccbluex.liquidbounce.features.module.modules.movement.ModuleVehicleControl
 import net.ccbluex.liquidbounce.features.module.modules.movement.ModuleSnapTap
@@ -244,6 +245,7 @@ import net.ccbluex.liquidbounce.features.module.modules.render.hats.ModuleHats
 import net.ccbluex.liquidbounce.features.module.modules.render.hitfx.ModuleHitFX
 import net.ccbluex.liquidbounce.features.module.modules.render.murdermystery.ModuleMurderMystery
 import net.ccbluex.liquidbounce.features.module.modules.render.nametags.ModuleNametags
+import net.ccbluex.liquidbounce.features.module.modules.render.potionfx.ModulePotionFX
 import net.ccbluex.liquidbounce.features.module.modules.render.totemeffect.ModuleTotemEffect
 import net.ccbluex.liquidbounce.features.module.modules.render.trajectories.ModuleTrajectories
 import net.ccbluex.liquidbounce.features.module.modules.world.ModuleAirPlace
@@ -584,6 +586,7 @@ object ModuleManager : EventListener, Collection<ClientModule> by modules {
             ModuleReverseStep,
             ModuleStrafe,
             ModuleTerrainSpeed,
+            ModuleTridentBoost,
             ModuleVehicleBoost,
             ModuleVehicleControl,
             ModuleSpider,
@@ -681,6 +684,7 @@ object ModuleManager : EventListener, Collection<ClientModule> by modules {
             ModuleCapes,
             ModuleSandevistan,
             ModuleWings,
+            ModulePotionFX,
             ModuleTotemEffect,
 
             // World
